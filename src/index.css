@@ -1,0 +1,1021 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  --color-background: hsl(0 0% 100%);
+  --color-foreground: hsl(222.2 84% 4.9%);
+
+  --color-card: hsl(0 0% 100%);
+  --color-card-foreground: hsl(222.2 84% 4.9%);
+
+  --color-popover: hsl(0 0% 100%);
+  --color-popover-foreground: hsl(222.2 84% 4.9%);
+
+  --color-primary: hsl(210 100% 26%);
+  --color-primary-foreground: hsl(210 40% 98%);
+
+  --color-secondary: hsl(210 40% 96.1%);
+  --color-secondary-foreground: hsl(222.2 47.4% 11.2%);
+
+  --color-muted: hsl(210 40% 96.1%);
+  --color-muted-foreground: hsl(215.4 16.3% 46.9%);
+
+  --color-accent: hsl(199 100% 42%);
+  --color-accent-foreground: hsl(210 40% 98%);
+
+  --color-destructive: hsl(0 84.2% 60.2%);
+  --color-destructive-foreground: hsl(210 40% 98%);
+
+  --color-border: hsl(214.3 31.8% 91.4%);
+  --color-input: hsl(214.3 31.8% 91.4%);
+  --color-ring: hsl(210 100% 26%);
+
+  --color-sidebar-background: hsl(0 0% 98%);
+  --color-sidebar-foreground: hsl(240 5.3% 26.1%);
+  --color-sidebar-primary: hsl(210 100% 26%);
+  --color-sidebar-primary-foreground: hsl(0 0% 98%);
+  --color-sidebar-accent: hsl(240 4.8% 95.9%);
+  --color-sidebar-accent-foreground: hsl(240 5.9% 10%);
+  --color-sidebar-border: hsl(220 13% 91%);
+  --color-sidebar-ring: hsl(217.2 91.2% 59.8%);
+
+  --color-chart-1: hsl(12 76% 61%);
+  --color-chart-2: hsl(173 58% 39%);
+  --color-chart-3: hsl(197 37% 24%);
+  --color-chart-4: hsl(43 74% 66%);
+  --color-chart-5: hsl(27 87% 67%);
+
+  --radius-lg: 0.5rem;
+  --radius-md: calc(var(--radius-lg) - 2px);
+  --radius-sm: calc(var(--radius-lg) - 4px);
+
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+.dark {
+  --color-background: hsl(223, 100%, 50%);
+  --color-foreground: hsl(210 40% 98%);
+
+  --color-card: hsl(222.2 84% 4.9%);
+  --color-card-foreground: hsl(210 40% 98%);
+
+  --color-popover: hsl(222.2 84% 4.9%);
+  --color-popover-foreground: hsl(210 40% 98%);
+
+  --color-primary: hsl(199 100% 42%);
+  --color-primary-foreground: hsl(222.2 47.4% 11.2%);
+
+  --color-secondary: hsl(217.2 32.6% 17.5%);
+  --color-secondary-foreground: hsl(210 40% 98%);
+
+  --color-muted: hsl(217.2 32.6% 17.5%);
+  --color-muted-foreground: hsl(215 20.2% 65.1%);
+
+  --color-accent: hsl(217.2 32.6% 17.5%);
+  --color-accent-foreground: hsl(210 40% 98%);
+
+  --color-destructive: hsl(0 62.8% 30.6%);
+  --color-destructive-foreground: hsl(210 40% 98%);
+
+  --color-border: hsl(217.2 32.6% 17.5%);
+  --color-input: hsl(217.2 32.6% 17.5%);
+  --color-ring: hsl(212.7 26.8% 83.9%);
+
+  --color-sidebar-background: hsl(240 5.9% 10%);
+  --color-sidebar-foreground: hsl(240 4.8% 95.9%);
+  --color-sidebar-primary: hsl(199 100% 42%);
+  --color-sidebar-primary-foreground: hsl(0 0% 98%);
+  --color-sidebar-accent: hsl(240 3.7% 15.9%);
+  --color-sidebar-accent-foreground: hsl(240 4.8% 95.9%);
+  --color-sidebar-border: hsl(240 3.7% 15.9%);
+  --color-sidebar-ring: hsl(217.2 91.2% 59.8%);
+
+  --color-chart-1: hsl(220 70% 50%);
+  --color-chart-2: hsl(160 60% 45%);
+  --color-chart-3: hsl(30 80% 55%);
+  --color-chart-4: hsl(280 65% 60%);
+  --color-chart-5: hsl(340 75% 55%);
+}
+
+/* ───── Theme tokens for inline‑styled components ───── */
+/* Change --t-accent to set the company's primary color everywhere */
+:root {
+  --t-page: #f9fafb;
+  --t-card: #ffffff;
+  --t-card-hover: #fafafa;
+  --t-card-alt: #f3f4f6;
+  --t-input: #ffffff;
+  --t-surface: #f3f4f6;
+  --t-surface-deep: #e5e7eb;
+  --t-accent: #111827;
+  --t-accent-soft: #f3f4f6;
+  --t-accent-hover: #1f2937;
+  --t-accent-muted: rgba(17, 24, 39, 0.08);
+  --t-text: #111827;
+  --t-text-secondary: #374151;
+  --t-text-muted: #6b7280;
+  --t-text-faint: #9ca3af;
+  --t-text-on-accent: #ffffff;
+  --t-border: #e5e7eb;
+  --t-border-light: #f3f4f6;
+  --t-shadow: rgba(0, 0, 0, 0.06);
+  --t-overlay: rgba(0, 0, 0, 0.4);
+  /* Semantic colors */
+  --t-success: #10b981;
+  --t-success-soft: rgba(16, 185, 129, 0.08);
+  --t-warning: #f59e0b;
+  --t-warning-soft: rgba(245, 158, 11, 0.08);
+  --t-danger: #ef4444;
+  --t-danger-soft: rgba(239, 68, 68, 0.06);
+  --t-info: #3b82f6;
+  --t-info-soft: rgba(59, 130, 246, 0.08);
+}
+
+.dark {
+  --t-page: #0f172a;
+  --t-card: #1e293b;
+  --t-card-hover: #263347;
+  --t-card-alt: #334155;
+  --t-input: #1e293b;
+  --t-surface: #334155;
+  --t-surface-deep: #475569;
+  --t-accent: #e2e8f0;
+  --t-accent-soft: #334155;
+  --t-accent-hover: #cbd5e1;
+  --t-accent-muted: rgba(226, 232, 240, 0.08);
+  --t-text: #f1f5f9;
+  --t-text-secondary: #e2e8f0;
+  --t-text-muted: #94a3b8;
+  --t-text-faint: #64748b;
+  --t-text-on-accent: #0f172a;
+  --t-border: #334155;
+  --t-border-light: #1e293b;
+  --t-shadow: rgba(0, 0, 0, 0.3);
+  --t-overlay: rgba(0, 0, 0, 0.6);
+  /* Semantic colors */
+  --t-success: #34d399;
+  --t-success-soft: rgba(52, 211, 153, 0.12);
+  --t-warning: #fbbf24;
+  --t-warning-soft: rgba(251, 191, 36, 0.12);
+  --t-danger: #f87171;
+  --t-danger-soft: rgba(248, 113, 113, 0.1);
+  --t-info: #60a5fa;
+  --t-info-soft: rgba(96, 165, 250, 0.12);
+}
+
+/* ── Accent-color mapping: bg-gray-900/800/700 → var(--t-accent) ────── */
+/* This makes ALL Tailwind `bg-gray-900` / `bg-gray-800` / `bg-gray-700`
+   elements respond to the theme accent color set from the ThemeTab.    */
+.bg-gray-900 {
+  background-color: var(--t-accent) !important;
+}
+
+.bg-gray-800 {
+  background-color: var(--t-accent) !important;
+}
+
+.bg-gray-700 {
+  background-color: var(--t-accent-hover) !important;
+}
+
+.bg-gray-600 {
+  background-color: var(--t-accent-hover) !important;
+}
+
+/* Text-white on accent elements → var(--t-text-on-accent) */
+.bg-gray-900.text-white,
+.bg-gray-800.text-white {
+  color: var(--t-text-on-accent) !important;
+}
+
+/* Hover states for accent buttons */
+.hover\:bg-gray-800:hover {
+  background-color: var(--t-accent-hover) !important;
+}
+
+.hover\:bg-gray-700:hover {
+  background-color: var(--t-accent-hover) !important;
+}
+
+/* ── Dark mode global overrides for Tailwind gray utility classes ── */
+.dark .bg-gray-50 {
+  background-color: #0f172a !important;
+}
+
+.dark .bg-gray-100 {
+  background-color: #1e293b !important;
+}
+
+.dark .bg-gray-200 {
+  background-color: #334155 !important;
+}
+
+.dark .bg-white {
+  background-color: #1e293b !important;
+}
+
+.dark .text-gray-900 {
+  color: #f1f5f9 !important;
+}
+
+.dark .text-gray-800 {
+  color: #e2e8f0 !important;
+}
+
+.dark .text-gray-700 {
+  color: #cbd5e1 !important;
+}
+
+.dark .text-gray-600 {
+  color: #94a3b8 !important;
+}
+
+.dark .text-gray-500 {
+  color: #94a3b8 !important;
+}
+
+.dark .text-gray-400 {
+  color: #64748b !important;
+}
+
+.dark .text-gray-300 {
+  color: #64748b !important;
+}
+
+.dark .text-gray-200 {
+  color: #475569 !important;
+}
+
+.dark .text-white {
+  color: #f1f5f9 !important;
+}
+
+.dark .border-gray-50 {
+  border-color: #1e293b !important;
+}
+
+.dark .border-gray-100 {
+  border-color: #334155 !important;
+}
+
+.dark .border-gray-200 {
+  border-color: #475569 !important;
+}
+
+.dark .border-gray-300 {
+  border-color: #64748b !important;
+}
+
+/* bg-gray-300 / bg-gray-400 (avatars, badges) */
+.dark .bg-gray-300 {
+  background-color: #475569 !important;
+}
+
+.dark .bg-gray-400 {
+  background-color: #64748b !important;
+}
+
+/* hover on gray */
+.dark .hover\:bg-gray-50:hover {
+  background-color: #263347 !important;
+}
+
+.dark .hover\:bg-gray-100:hover {
+  background-color: #334155 !important;
+}
+
+.dark .hover\:bg-gray-200:hover {
+  background-color: #475569 !important;
+}
+
+/* ── Table row hover with opacity variants ── */
+.dark .hover\:bg-gray-50\/80:hover {
+  background-color: rgba(30, 41, 59, 0.8) !important;
+}
+
+.dark .hover\:bg-gray-50\/50:hover {
+  background-color: rgba(30, 41, 59, 0.5) !important;
+}
+
+.dark .bg-gray-50\/50 {
+  background-color: rgba(30, 41, 59, 0.5) !important;
+}
+
+.dark .bg-gray-50\/80 {
+  background-color: rgba(30, 41, 59, 0.8) !important;
+}
+
+.dark .bg-blue-50\/60 {
+  background-color: rgba(59, 130, 246, 0.12) !important;
+}
+
+.dark .bg-blue-50\/40 {
+  background-color: rgba(59, 130, 246, 0.08) !important;
+}
+
+/* divide */
+.dark .divide-gray-50> :not([hidden])~ :not([hidden]) {
+  border-color: #1e293b !important;
+}
+
+.dark .divide-gray-100> :not([hidden])~ :not([hidden]) {
+  border-color: #334155 !important;
+}
+
+.dark .placeholder\:text-gray-400::placeholder {
+  color: #475569 !important;
+}
+
+.dark .placeholder\:text-gray-300::placeholder {
+  color: #475569 !important;
+}
+
+/* ring/focus — maps to accent color */
+.focus\:border-gray-900:focus {
+  border-color: var(--t-accent) !important;
+}
+
+.dark .focus\:border-gray-400:focus {
+  border-color: #64748b !important;
+}
+
+.dark .focus\:ring-gray-100:focus {
+  --tw-ring-color: #1e293b !important;
+}
+
+.dark .focus\:ring-gray-200:focus {
+  --tw-ring-color: #334155 !important;
+}
+
+/* ── Colored hover backgrounds (action buttons in tables) ── */
+.dark .hover\:bg-amber-50:hover {
+  background-color: rgba(245, 158, 11, 0.12) !important;
+}
+
+.dark .hover\:bg-orange-50:hover {
+  background-color: rgba(249, 115, 22, 0.12) !important;
+}
+
+.dark .hover\:bg-emerald-50:hover {
+  background-color: rgba(16, 185, 129, 0.12) !important;
+}
+
+.dark .hover\:bg-purple-50:hover {
+  background-color: rgba(139, 92, 246, 0.12) !important;
+}
+
+.dark .hover\:bg-blue-50:hover {
+  background-color: rgba(59, 130, 246, 0.12) !important;
+}
+
+.dark .hover\:bg-red-50:hover {
+  background-color: rgba(239, 68, 68, 0.12) !important;
+}
+
+.dark .hover\:bg-cyan-50:hover {
+  background-color: rgba(6, 182, 212, 0.12) !important;
+}
+
+/* Colored hover text (action buttons) */
+.dark .hover\:text-amber-600:hover {
+  color: #fbbf24 !important;
+}
+
+.dark .hover\:text-orange-500:hover {
+  color: #fb923c !important;
+}
+
+.dark .hover\:text-emerald-500:hover {
+  color: #34d399 !important;
+}
+
+.dark .hover\:text-purple-500:hover {
+  color: #a78bfa !important;
+}
+
+.dark .hover\:text-blue-600:hover {
+  color: #60a5fa !important;
+}
+
+.dark .hover\:text-red-500:hover {
+  color: #f87171 !important;
+}
+
+.dark .hover\:text-red-600:hover {
+  color: #ef4444 !important;
+}
+
+.dark .hover\:text-gray-600:hover {
+  color: #94a3b8 !important;
+}
+
+.dark .hover\:text-gray-800:hover {
+  color: #e2e8f0 !important;
+}
+
+/* Colored bg/text (role badges, status badges) */
+.dark .bg-purple-50 {
+  background-color: rgba(139, 92, 246, 0.12) !important;
+}
+
+.dark .bg-cyan-50 {
+  background-color: rgba(6, 182, 212, 0.12) !important;
+}
+
+.dark .bg-amber-50 {
+  background-color: rgba(245, 158, 11, 0.12) !important;
+}
+
+.dark .bg-emerald-50 {
+  background-color: rgba(16, 185, 129, 0.12) !important;
+}
+
+.dark .bg-red-100 {
+  background-color: rgba(239, 68, 68, 0.15) !important;
+}
+
+.dark .bg-orange-50 {
+  background-color: rgba(249, 115, 22, 0.12) !important;
+}
+
+.dark .text-purple-700 {
+  color: #a78bfa !important;
+}
+
+.dark .text-blue-700 {
+  color: #60a5fa !important;
+}
+
+.dark .text-cyan-700 {
+  color: #22d3ee !important;
+}
+
+.dark .text-amber-700 {
+  color: #fbbf24 !important;
+}
+
+.dark .text-emerald-600 {
+  color: #34d399 !important;
+}
+
+.dark .text-orange-500 {
+  color: #fb923c !important;
+}
+
+/* accent colors in dark mode are already handled by the global
+   .bg-gray-900 { background-color: var(--t-accent) } override above.
+   The dark-mode --t-accent is set to a light color by default,
+   so buttons automatically invert. No extra override needed. */
+
+/* shadow overrides */
+.dark .shadow-sm {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4) !important;
+}
+
+.dark .shadow-md {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.35) !important;
+}
+
+.dark .shadow-lg {
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.35) !important;
+}
+
+.dark .shadow-xl {
+  box-shadow: 0 20px 25px rgba(0, 0, 0, 0.4) !important;
+}
+
+.dark .shadow-2xl {
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* ── Smooth theme transition ── */
+body,
+aside,
+header,
+main,
+nav,
+.bg-white,
+.bg-gray-50,
+.bg-gray-100 {
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+/* ── Dark mode scrollbar ── */
+.dark ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: #1e293b;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 4px;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+/* ── Additional dark-mode Tailwind overrides ── */
+.dark .bg-red-50 {
+  background-color: rgba(239, 68, 68, 0.1) !important;
+}
+
+.dark .bg-green-50 {
+  background-color: rgba(34, 197, 94, 0.1) !important;
+}
+
+.dark .bg-blue-50 {
+  background-color: rgba(59, 130, 246, 0.1) !important;
+}
+
+.dark .bg-yellow-50 {
+  background-color: rgba(234, 179, 8, 0.1) !important;
+}
+
+.dark .text-red-500 {
+  color: #f87171 !important;
+}
+
+.dark .text-red-600 {
+  color: #ef4444 !important;
+}
+
+.dark .text-green-500 {
+  color: #4ade80 !important;
+}
+
+.dark .text-green-600 {
+  color: #22c55e !important;
+}
+
+.dark .text-blue-500 {
+  color: #60a5fa !important;
+}
+
+.dark .text-blue-600 {
+  color: #3b82f6 !important;
+}
+
+.dark .text-yellow-600 {
+  color: #facc15 !important;
+}
+
+.dark .border-red-200 {
+  border-color: rgba(239, 68, 68, 0.2) !important;
+}
+
+.dark .border-green-200 {
+  border-color: rgba(34, 197, 94, 0.2) !important;
+}
+
+.dark .border-blue-200 {
+  border-color: rgba(59, 130, 246, 0.2) !important;
+}
+
+/* dark mode inputs */
+.dark input,
+.dark textarea,
+.dark select {
+  background-color: var(--t-input) !important;
+  color: var(--t-text) !important;
+  border-color: var(--t-border) !important;
+}
+
+.dark input:focus,
+.dark textarea:focus,
+.dark select:focus {
+  border-color: var(--t-text-faint) !important;
+  outline-color: var(--t-text-faint) !important;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: var(--t-text-faint) !important;
+}
+
+/* dark mode dialogs / popovers */
+.dark [role="dialog"],
+.dark [data-radix-popper-content-wrapper]>div {
+  background-color: var(--t-card) !important;
+  border-color: var(--t-border) !important;
+  color: var(--t-text) !important;
+}
+
+/* dark mode skeleton/loading */
+.dark .skeleton-shimmer {
+  background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%) !important;
+}
+
+/* ──────── Landing Page Animations ──────── */
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in-down {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fade-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-40px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes blur-in {
+  from {
+    opacity: 0;
+    filter: blur(12px);
+  }
+
+  to {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+@keyframes pulse-glow {
+
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(0, 152, 214, 0.15);
+  }
+
+  50% {
+    box-shadow: 0 0 40px rgba(0, 152, 214, 0.35);
+  }
+}
+
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes shimmer {
+  from {
+    background-position: -200% 0;
+  }
+
+  to {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes rotate-slow {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Hero-specific advanced animations */
+@keyframes hero-glow-pulse {
+
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.7;
+    transform: scale(1.15);
+  }
+}
+
+@keyframes orbit {
+  from {
+    transform: rotate(0deg) translateX(140px) rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg) translateX(140px) rotate(-360deg);
+  }
+}
+
+@keyframes orbit-reverse {
+  from {
+    transform: rotate(0deg) translateX(100px) rotate(0deg);
+  }
+
+  to {
+    transform: rotate(-360deg) translateX(100px) rotate(360deg);
+  }
+}
+
+@keyframes text-reveal {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes blink-cursor {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes particle-drift {
+  0% {
+    transform: translateY(0) translateX(0) scale(0);
+    opacity: 0;
+  }
+
+  10% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  90% {
+    opacity: 0.6;
+  }
+
+  100% {
+    transform: translateY(-120px) translateX(30px) scale(0.3);
+    opacity: 0;
+  }
+}
+
+@keyframes ripple-out {
+  from {
+    transform: scale(0.5);
+    opacity: 0.5;
+  }
+
+  to {
+    transform: scale(2.5);
+    opacity: 0;
+  }
+}
+
+@keyframes draw-line {
+  from {
+    stroke-dashoffset: 1000;
+  }
+
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes hero-badge-glow {
+
+  0%,
+  100% {
+    box-shadow: 0 0 15px rgba(0, 152, 214, 0.0);
+  }
+
+  50% {
+    box-shadow: 0 0 30px rgba(0, 152, 214, 0.3), 0 0 60px rgba(0, 152, 214, 0.1);
+  }
+}
+
+.anim-orbit {
+  animation: orbit 25s linear infinite;
+}
+
+.anim-orbit-reverse {
+  animation: orbit-reverse 20s linear infinite;
+}
+
+.anim-hero-glow {
+  animation: hero-glow-pulse 4s ease-in-out infinite;
+}
+
+.anim-blink {
+  animation: blink-cursor 1s step-end infinite;
+}
+
+.anim-ripple {
+  animation: ripple-out 3s ease-out infinite;
+}
+
+.anim-badge-glow {
+  animation: hero-badge-glow 3s ease-in-out infinite;
+}
+
+@keyframes counter-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.8);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes line-grow {
+  from {
+    transform: scaleX(0);
+  }
+
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes slide-in-stagger {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Scroll-triggered animation base — hiding is done via JS, not CSS */
+.animate-on-scroll {
+  /* opacity is set to 0 via JavaScript in useScrollAnimation hook */
+  transition: none;
+}
+
+.animate-on-scroll.is-visible {
+  animation-fill-mode: both;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.animate-on-scroll.is-visible.anim-fade-up {
+  animation: fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.animate-on-scroll.is-visible.anim-fade-down {
+  animation: fade-in-down 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.animate-on-scroll.is-visible.anim-fade-right {
+  animation: fade-in-right 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.animate-on-scroll.is-visible.anim-fade-left {
+  animation: fade-in-left 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.animate-on-scroll.is-visible.anim-scale {
+  animation: scale-in 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.animate-on-scroll.is-visible.anim-blur {
+  animation: blur-in 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Stagger delay classes */
+.delay-0 {
+  animation-delay: 0ms !important;
+}
+
+.delay-1 {
+  animation-delay: 100ms !important;
+}
+
+.delay-2 {
+  animation-delay: 200ms !important;
+}
+
+.delay-3 {
+  animation-delay: 300ms !important;
+}
+
+.delay-4 {
+  animation-delay: 400ms !important;
+}
+
+.delay-5 {
+  animation-delay: 500ms !important;
+}
+
+.delay-6 {
+  animation-delay: 600ms !important;
+}
+
+.delay-7 {
+  animation-delay: 700ms !important;
+}
+
+/* Utility animation classes */
+.anim-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+.anim-pulse-glow {
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
+.anim-gradient-shift {
+  background-size: 200% 200%;
+  animation: gradient-shift 6s ease infinite;
+}
+
+.anim-shimmer {
+  background-size: 200% 100%;
+  animation: shimmer 3s linear infinite;
+}
+
+.anim-rotate-slow {
+  animation: rotate-slow 20s linear infinite;
+}
+
+.anim-line-grow {
+  transform-origin: right;
+  animation: line-grow 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}

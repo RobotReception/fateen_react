@@ -1,0 +1,1616 @@
+{
+  "sections": [
+    {
+      "id": "contact_fields",
+      "base_bit": 1,
+      "name_ar": "حقول الاتصال",
+      "name_en": "Contact Fields",
+      "meta": {}
+    },
+    {
+      "id": "contacts",
+      "base_bit": 2,
+      "name_ar": "جهات الاتصال",
+      "name_en": "Contacts",
+      "meta": {}
+    },
+    {
+      "id": "customers",
+      "base_bit": 4,
+      "name_ar": "العملاء",
+      "name_en": "Customers",
+      "meta": {}
+    },
+    {
+      "id": "document_management",
+      "base_bit": 16,
+      "name_ar": "إدارة الوثائق",
+      "name_en": "Document Management",
+      "meta": {}
+    },
+    {
+      "id": "lifecycles",
+      "base_bit": 32,
+      "name_ar": "دورات الحياة",
+      "name_en": "Lifecycles",
+      "meta": {}
+    },
+    {
+      "id": "menus",
+      "base_bit": 64,
+      "name_ar": "القوائم",
+      "name_en": "Menus",
+      "meta": {}
+    },
+    {
+      "id": "operation_history",
+      "base_bit": 128,
+      "name_ar": "سجل العمليات",
+      "name_en": "Operation History",
+      "meta": {}
+    },
+    {
+      "id": "pending_requests",
+      "base_bit": 256,
+      "name_ar": "الطلبات المعلقة",
+      "name_en": "Pending Requests",
+      "meta": {}
+    },
+    {
+      "id": "permission_admin",
+      "base_bit": 512,
+      "name_ar": "إدارة الصلاحيات",
+      "name_en": "Permission Admin",
+      "meta": {}
+    },
+    {
+      "id": "roles",
+      "base_bit": 1024,
+      "name_ar": "الأدوار",
+      "name_en": "Roles",
+      "meta": {}
+    },
+    {
+      "id": "snippets",
+      "base_bit": 2048,
+      "name_ar": "المقتطفات",
+      "name_en": "Snippets",
+      "meta": {}
+    },
+    {
+      "id": "tags",
+      "base_bit": 4096,
+      "name_ar": "الوسوم",
+      "name_en": "Tags",
+      "meta": {}
+    },
+    {
+      "id": "teams",
+      "base_bit": 8192,
+      "name_ar": "الفرق",
+      "name_en": "Teams",
+      "meta": {}
+    },
+    {
+      "id": "trainrequests",
+      "base_bit": 16384,
+      "name_ar": "طلبات التدريب",
+      "name_en": "TrainRequests",
+      "meta": {}
+    },
+    {
+      "id": "admin_users",
+      "base_bit": 32768,
+      "name_ar": "مستخدمي الإدارة",
+      "name_en": "Admin Users",
+      "meta": {}
+    },
+    {
+      "id": "auth_admin",
+      "base_bit": 65536,
+      "name_ar": "المصادقة - الإدارة",
+      "name_en": "Auth Admin",
+      "meta": {}
+    },
+    {
+      "id": "channels",
+      "base_bit": 131072,
+      "name_ar": "القنوات",
+      "name_en": "Channels",
+      "meta": {}
+    },
+    {
+      "id": "document_analytics",
+      "base_bit": 262144,
+      "name_ar": "تحليلات المستخدمين",
+      "name_en": "User Analytics",
+      "meta": {}
+    }
+  ],
+  "action_weights": [
+    {
+      "id": "view_page",
+      "uid": 1000,
+      "weight": 1,
+      "en": "View Page",
+      "ar": "عرض الصفحة"
+    },
+    {
+      "id": "view",
+      "uid": 1001,
+      "weight": 2,
+      "en": "View",
+      "ar": "عرض"
+    },
+    {
+      "id": "create",
+      "uid": 1002,
+      "weight": 4,
+      "en": "Create",
+      "ar": "إنشاء"
+    },
+    {
+      "id": "update",
+      "uid": 1003,
+      "weight": 8,
+      "en": "Update",
+      "ar": "تحديث"
+    },
+    {
+      "id": "delete",
+      "uid": 1004,
+      "weight": 16,
+      "en": "Delete",
+      "ar": "حذف"
+    },
+    {
+      "id": "add_document",
+      "uid": 1005,
+      "weight": 32,
+      "en": "Add Document",
+      "ar": "إضافة مستند"
+    },
+    {
+      "id": "edit_document",
+      "uid": 1006,
+      "weight": 64,
+      "en": "Edit Document",
+      "ar": "تعديل مستند"
+    },
+    {
+      "id": "train_data_request",
+      "uid": 1007,
+      "weight": 128,
+      "en": "Upload Training File (Mixed)",
+      "ar": "رفع ملف تدريب (مختلط)"
+    },
+    {
+      "id": "train_txt_request",
+      "uid": 1008,
+      "weight": 256,
+      "en": "Upload TXT File for Training",
+      "ar": "رفع ملف TXT للتدريب"
+    },
+    {
+      "id": "train_csv_request",
+      "uid": 1009,
+      "weight": 512,
+      "en": "Upload CSV File for Training",
+      "ar": "رفع ملف CSV للتدريب"
+    },
+    {
+      "id": "add_document_json",
+      "uid": 1010,
+      "weight": 1024,
+      "en": "Add Document (JSON)",
+      "ar": "إضافة مستند (JSON)"
+    },
+    {
+      "id": "get_document_management",
+      "uid": 1011,
+      "weight": 2048,
+      "en": "Get document_management",
+      "ar": "عرض المستندات"
+    },
+    {
+      "id": "search_document_management",
+      "uid": 1012,
+      "weight": 4096,
+      "en": "Search document_management",
+      "ar": "البحث في المستندات"
+    },
+    {
+      "id": "delete_collection",
+      "uid": 1013,
+      "weight": 8192,
+      "en": "Delete Collection (Admin)",
+      "ar": "حذف Collection (Admin)"
+    },
+    {
+      "id": "get_user_files",
+      "uid": 1014,
+      "weight": 16384,
+      "en": "Get User Files",
+      "ar": "عرض ملفات مستخدم"
+    },
+    {
+      "id": "get_user_files_with_query",
+      "uid": 1015,
+      "weight": 32768,
+      "en": "Get User Files with Query",
+      "ar": "عرض ملفات مستخدم مع بحث"
+    },
+    {
+      "id": "get_all_analytics",
+      "uid": 1016,
+      "weight": 65536,
+      "en": "Get Analytics Data",
+      "ar": "عرض بيانات التحليلات"
+    },
+    {
+      "id": "get_user_file_analytics",
+      "uid": 1017,
+      "weight": 131072,
+      "en": "Get User Analytics for Specific File",
+      "ar": "تحليلات ملف محدد"
+    },
+    {
+      "id": "download_user_file",
+      "uid": 1018,
+      "weight": 262144,
+      "en": "Download User File",
+      "ar": "تنزيل ملف مستخدم"
+    },
+    {
+      "id": "delete_docs_by_username",
+      "uid": 1019,
+      "weight": 524288,
+      "en": "Delete Documents by Username",
+      "ar": "حذف مستندات مستخدم"
+    },
+    {
+      "id": "delete_docs_by_filename",
+      "uid": 1020,
+      "weight": 1048576,
+      "en": "Delete Documents by Filename",
+      "ar": "حذف مستندات حسب اسم الملف"
+    },
+    {
+      "id": "get_pending_orders",
+      "uid": 1021,
+      "weight": 2097152,
+      "en": "Get Pending Orders",
+      "ar": "عرض الطلبات المعلقة"
+    },
+    {
+      "id": "search_pending_orders",
+      "uid": 1022,
+      "weight": 4194304,
+      "en": "Search Pending Orders",
+      "ar": "البحث في الطلبات المعلقة"
+    },
+    {
+      "id": "get_request_details",
+      "uid": 1023,
+      "weight": 8388608,
+      "en": "Get Request Details",
+      "ar": "عرض تفاصيل الطلب"
+    },
+    {
+      "id": "process_approve",
+      "uid": 1024,
+      "weight": 16777216,
+      "en": "Approve Request",
+      "ar": "الموافقة على الطلب"
+    },
+    {
+      "id": "process_reject",
+      "uid": 1025,
+      "weight": 33554432,
+      "en": "Reject Request",
+      "ar": "رفض الطلب"
+    },
+    {
+      "id": "download_request_train_file",
+      "uid": 1026,
+      "weight": 67108864,
+      "en": "Download Request Train File",
+      "ar": "تنزيل ملف تدريب الطلب"
+    },
+    {
+      "id": "get_operations",
+      "uid": 1027,
+      "weight": 134217728,
+      "en": "Get Operations",
+      "ar": "عرض العمليات"
+    },
+    {
+      "id": "get_operation_details",
+      "uid": 1028,
+      "weight": 268435456,
+      "en": "Get Operation Details",
+      "ar": "عرض تفاصيل العملية"
+    },
+    {
+      "id": "search_operations",
+      "uid": 1029,
+      "weight": 536870912,
+      "en": "Search Operations",
+      "ar": "البحث في العمليات"
+    },
+    {
+      "id": "download_operations_csv",
+      "uid": 1030,
+      "weight": 1073741824,
+      "en": "Download Operations CSV",
+      "ar": "تنزيل العمليات كملف CSV"
+    },
+    {
+      "id": "download_operation_train_file",
+      "uid": 1031,
+      "weight": 2147483648,
+      "en": "Download Operation Training File",
+      "ar": "تنزيل ملف تدريب العملية"
+    },
+    {
+      "id": "get_current_user",
+      "uid": 1032,
+      "weight": 1,
+      "en": "Get Current User",
+      "ar": "عرض المستخدم الحالي"
+    },
+    {
+      "id": "get_users_brief",
+      "uid": 1033,
+      "weight": 2,
+      "en": "Get Users Brief",
+      "ar": "عرض المستخدمين المختصر"
+    },
+    {
+      "id": "get_user_by_id",
+      "uid": 1034,
+      "weight": 4,
+      "en": "Get User By ID",
+      "ar": "عرض مستخدم بالمعرف"
+    },
+    {
+      "id": "get_all_users",
+      "uid": 1035,
+      "weight": 8,
+      "en": "Get All Users",
+      "ar": "عرض كل المستخدمين"
+    },
+    {
+      "id": "create_user",
+      "uid": 1036,
+      "weight": 16,
+      "en": "Create User",
+      "ar": "إنشاء مستخدم"
+    },
+    {
+      "id": "update_user",
+      "uid": 1037,
+      "weight": 32,
+      "en": "Update User",
+      "ar": "تحديث مستخدم"
+    },
+    {
+      "id": "delete_user",
+      "uid": 1038,
+      "weight": 64,
+      "en": "Delete User",
+      "ar": "حذف مستخدم"
+    },
+    {
+      "id": "update_user_status",
+      "uid": 1039,
+      "weight": 128,
+      "en": "Update User Status",
+      "ar": "تحديث حالة المستخدم"
+    },
+    {
+      "id": "export_users",
+      "uid": 1040,
+      "weight": 256,
+      "en": "Export Users",
+      "ar": "تصدير المستخدمين"
+    },
+    {
+      "id": "get_session_info",
+      "uid": 1041,
+      "weight": 512,
+      "en": "Get Session Info",
+      "ar": "عرض معلومات الجلسة"
+    },
+    {
+      "id": "get_user_sessions",
+      "uid": 1042,
+      "weight": 1024,
+      "en": "Get User Sessions",
+      "ar": "عرض جلسات المستخدم"
+    },
+    {
+      "id": "revoke_session",
+      "uid": 1043,
+      "weight": 2048,
+      "en": "Revoke Session",
+      "ar": "إلغاء جلسة"
+    },
+    {
+      "id": "revoke_multiple_sessions",
+      "uid": 1044,
+      "weight": 4096,
+      "en": "Revoke Multiple Sessions",
+      "ar": "إلغاء جلسات متعددة"
+    },
+    {
+      "id": "revoke_all_sessions",
+      "uid": 1045,
+      "weight": 8192,
+      "en": "Revoke All Sessions",
+      "ar": "إلغاء كل الجلسات"
+    }
+  ],
+  "permissions": [
+    {
+      "id": "contact_fields:view_page",
+      "section": "contact_fields",
+      "action": "view_page",
+      "code": 1,
+      "section_code": 1,
+      "action_code": 1,
+      "name_ar": "حقول الاتصال - عرض الصفحة",
+      "name_en": "Contact Fields - View Page"
+    },
+    {
+      "id": "contact_fields:view",
+      "section": "contact_fields",
+      "action": "view",
+      "code": 2,
+      "section_code": 1,
+      "action_code": 2,
+      "name_ar": "حقول الاتصال - عرض",
+      "name_en": "Contact Fields - View"
+    },
+    {
+      "id": "contact_fields:create",
+      "section": "contact_fields",
+      "action": "create",
+      "code": 4,
+      "section_code": 1,
+      "action_code": 4,
+      "name_ar": "حقول الاتصال - إنشاء",
+      "name_en": "Contact Fields - Create"
+    },
+    {
+      "id": "contact_fields:update",
+      "section": "contact_fields",
+      "action": "update",
+      "code": 8,
+      "section_code": 1,
+      "action_code": 8,
+      "name_ar": "حقول الاتصال - تحديث",
+      "name_en": "Contact Fields - Update"
+    },
+    {
+      "id": "contact_fields:delete",
+      "section": "contact_fields",
+      "action": "delete",
+      "code": 16,
+      "section_code": 1,
+      "action_code": 16,
+      "name_ar": "حقول الاتصال - حذف",
+      "name_en": "Contact Fields - Delete"
+    },
+    {
+      "id": "contacts:view_page",
+      "section": "contacts",
+      "action": "view_page",
+      "code": 1,
+      "section_code": 2,
+      "action_code": 1,
+      "name_ar": "جهات الاتصال - عرض الصفحة",
+      "name_en": "Contacts - View Page"
+    },
+    {
+      "id": "contacts:view",
+      "section": "contacts",
+      "action": "view",
+      "code": 2,
+      "section_code": 2,
+      "action_code": 2,
+      "name_ar": "جهات الاتصال - عرض",
+      "name_en": "Contacts - View"
+    },
+    {
+      "id": "contacts:create",
+      "section": "contacts",
+      "action": "create",
+      "code": 4,
+      "section_code": 2,
+      "action_code": 4,
+      "name_ar": "جهات الاتصال - إنشاء",
+      "name_en": "Contacts - Create"
+    },
+    {
+      "id": "contacts:update",
+      "section": "contacts",
+      "action": "update",
+      "code": 8,
+      "section_code": 2,
+      "action_code": 8,
+      "name_ar": "جهات الاتصال - تحديث",
+      "name_en": "Contacts - Update"
+    },
+    {
+      "id": "contacts:delete",
+      "section": "contacts",
+      "action": "delete",
+      "code": 16,
+      "section_code": 2,
+      "action_code": 16,
+      "name_ar": "جهات الاتصال - حذف",
+      "name_en": "Contacts - Delete"
+    },
+    {
+      "id": "customers:view_page",
+      "section": "customers",
+      "action": "view_page",
+      "code": 1,
+      "section_code": 4,
+      "action_code": 1,
+      "name_ar": "العملاء - عرض الصفحة",
+      "name_en": "Customers - View Page"
+    },
+    {
+      "id": "customers:view",
+      "section": "customers",
+      "action": "view",
+      "code": 2,
+      "section_code": 4,
+      "action_code": 2,
+      "name_ar": "العملاء - عرض",
+      "name_en": "Customers - View"
+    },
+    {
+      "id": "customers:update",
+      "section": "customers",
+      "action": "update",
+      "code": 8,
+      "section_code": 4,
+      "action_code": 8,
+      "name_ar": "العملاء - تحديث",
+      "name_en": "Customers - Update"
+    },
+    {
+      "id": "document_management:view_page",
+      "section": "document_management",
+      "action": "view_page",
+      "code": 1,
+      "section_code": 16,
+      "action_code": 1,
+      "name_ar": "إدارة الوثائق - عرض الصفحة",
+      "name_en": "Document Management - View Page"
+    },
+    {
+      "id": "document_management:train_data_request",
+      "section": "document_management",
+      "action": "train_data_request",
+      "code": 128,
+      "section_code": 16,
+      "action_code": 128,
+      "name_ar": "الوثائق - رفع ملف تدريب (مختلط)",
+      "name_en": "document_management - Upload Training File (Mixed)"
+    },
+    {
+      "id": "document_management:train_txt_request",
+      "section": "document_management",
+      "action": "train_txt_request",
+      "code": 256,
+      "section_code": 16,
+      "action_code": 256,
+      "name_ar": "الوثائق - رفع ملف TXT للتدريب",
+      "name_en": "document_management - Upload TXT File for Training"
+    },
+    {
+      "id": "document_management:train_csv_request",
+      "section": "document_management",
+      "action": "train_csv_request",
+      "code": 512,
+      "section_code": 16,
+      "action_code": 512,
+      "name_ar": "الوثائق - رفع ملف CSV للتدريب",
+      "name_en": "document_management - Upload CSV File for Training"
+    },
+    {
+      "id": "document_management:add_document",
+      "section": "document_management",
+      "action": "add_document",
+      "code": 32,
+      "section_code": 16,
+      "action_code": 32,
+      "name_ar": "الوثائق - إضافة مستند",
+      "name_en": "document_management - Add Document"
+    },
+    {
+      "id": "document_management:add_document_json",
+      "section": "document_management",
+      "action": "add_document_json",
+      "code": 1024,
+      "section_code": 16,
+      "action_code": 1024,
+      "name_ar": "الوثائق - إضافة مستند (JSON)",
+      "name_en": "document_management - Add Document (JSON)"
+    },
+    {
+      "id": "document_management:update_document",
+      "section": "document_management",
+      "action": "update_document",
+      "code": 8,
+      "section_code": 16,
+      "action_code": 8,
+      "name_ar": "الوثائق - تحديث مستند",
+      "name_en": "document_management - Update Document"
+    },
+    {
+      "id": "document_management:delete_document",
+      "section": "document_management",
+      "action": "delete_document",
+      "code": 16,
+      "section_code": 16,
+      "action_code": 16,
+      "name_ar": "الوثائق - حذف مستند",
+      "name_en": "document_management - Delete Document"
+    },
+    {
+      "id": "document_management:get_document_management",
+      "section": "document_management",
+      "action": "get_document_management",
+      "code": 2048,
+      "section_code": 16,
+      "action_code": 2048,
+      "name_ar": "الوثائق - عرض المستندات",
+      "name_en": "document_management - Get document_management"
+    },
+    {
+      "id": "document_management:search_document_management",
+      "section": "document_management",
+      "action": "search_document_management",
+      "code": 4096,
+      "section_code": 16,
+      "action_code": 4096,
+      "name_ar": "الوثائق - البحث في المستندات",
+      "name_en": "document_management - Search document_management"
+    },
+    {
+      "id": "document_management:delete_collection",
+      "section": "document_management",
+      "action": "delete_collection",
+      "code": 8192,
+      "section_code": 16,
+      "action_code": 8192,
+      "name_ar": "الوثائق - حذف Collection (Admin)",
+      "name_en": "document_management - Delete Collection (Admin)"
+    },
+    {
+      "id": "lifecycles:view_page",
+      "section": "lifecycles",
+      "action": "view_page",
+      "code": 1,
+      "section_code": 32,
+      "action_code": 1,
+      "name_ar": "دورات الحياة - عرض الصفحة",
+      "name_en": "Lifecycles - View Page"
+    },
+    {
+      "id": "lifecycles:view",
+      "section": "lifecycles",
+      "action": "view",
+      "code": 2,
+      "section_code": 32,
+      "action_code": 2,
+      "name_ar": "دورات الحياة - عرض",
+      "name_en": "Lifecycles - View"
+    },
+    {
+      "id": "lifecycles:create",
+      "section": "lifecycles",
+      "action": "create",
+      "code": 4,
+      "section_code": 32,
+      "action_code": 4,
+      "name_ar": "دورات الحياة - إنشاء",
+      "name_en": "Lifecycles - Create"
+    },
+    {
+      "id": "lifecycles:update",
+      "section": "lifecycles",
+      "action": "update",
+      "code": 8,
+      "section_code": 32,
+      "action_code": 8,
+      "name_ar": "دورات الحياة - تحديث",
+      "name_en": "Lifecycles - Update"
+    },
+    {
+      "id": "lifecycles:delete",
+      "section": "lifecycles",
+      "action": "delete",
+      "code": 16,
+      "section_code": 32,
+      "action_code": 16,
+      "name_ar": "دورات الحياة - حذف",
+      "name_en": "Lifecycles - Delete"
+    },
+    {
+      "id": "menus:view_page",
+      "section": "menus",
+      "action": "view_page",
+      "code": 1,
+      "section_code": 64,
+      "action_code": 1,
+      "name_ar": "القوائم - عرض الصفحة",
+      "name_en": "Menus - View Page"
+    },
+    {
+      "id": "menus:view",
+      "section": "menus",
+      "action": "view",
+      "code": 2,
+      "section_code": 64,
+      "action_code": 2,
+      "name_ar": "القوائم - عرض",
+      "name_en": "Menus - View"
+    },
+    {
+      "id": "menus:create",
+      "section": "menus",
+      "action": "create",
+      "code": 4,
+      "section_code": 64,
+      "action_code": 4,
+      "name_ar": "القوائم - إنشاء",
+      "name_en": "Menus - Create"
+    },
+    {
+      "id": "menus:update",
+      "section": "menus",
+      "action": "update",
+      "code": 8,
+      "section_code": 64,
+      "action_code": 8,
+      "name_ar": "القوائم - تحديث",
+      "name_en": "Menus - Update"
+    },
+    {
+      "id": "menus:delete",
+      "section": "menus",
+      "action": "delete",
+      "code": 16,
+      "section_code": 64,
+      "action_code": 16,
+      "name_ar": "القوائم - حذف",
+      "name_en": "Menus - Delete"
+    },
+    {
+      "id": "operation_history:get_operations",
+      "section": "operation_history",
+      "action": "get_operations",
+      "code": 134217728,
+      "section_code": 128,
+      "action_code": 134217728,
+      "name_ar": "سجل العمليات - عرض العمليات",
+      "name_en": "Operation History - Get Operations"
+    },
+    {
+      "id": "operation_history:get_operation_details",
+      "section": "operation_history",
+      "action": "get_operation_details",
+      "code": 268435456,
+      "section_code": 128,
+      "action_code": 268435456,
+      "name_ar": "سجل العمليات - عرض تفاصيل العملية",
+      "name_en": "Operation History - Get Operation Details"
+    },
+    {
+      "id": "operation_history:search_operations",
+      "section": "operation_history",
+      "action": "search_operations",
+      "code": 536870912,
+      "section_code": 128,
+      "action_code": 536870912,
+      "name_ar": "سجل العمليات - البحث في العمليات",
+      "name_en": "Operation History - Search Operations"
+    },
+    {
+      "id": "operation_history:download_operations_csv",
+      "section": "operation_history",
+      "action": "download_operations_csv",
+      "code": 1073741824,
+      "section_code": 128,
+      "action_code": 1073741824,
+      "name_ar": "سجل العمليات - تنزيل العمليات كملف CSV",
+      "name_en": "Operation History - Download Operations CSV"
+    },
+    {
+      "id": "operation_history:download_operation_train_file",
+      "section": "operation_history",
+      "action": "download_operation_train_file",
+      "code": 2147483648,
+      "section_code": 128,
+      "action_code": 2147483648,
+      "name_ar": "سجل العمليات - تنزيل ملف تدريب العملية",
+      "name_en": "Operation History - Download Operation Training File"
+    },
+    {
+      "id": "pending_requests:get_pending_orders",
+      "section": "pending_requests",
+      "action": "get_pending_orders",
+      "code": 2097152,
+      "section_code": 256,
+      "action_code": 2097152,
+      "name_ar": "الطلبات المعلقة - عرض الطلبات المعلقة",
+      "name_en": "Pending Requests - Get Pending Orders"
+    },
+    {
+      "id": "pending_requests:search_pending_orders",
+      "section": "pending_requests",
+      "action": "search_pending_orders",
+      "code": 4194304,
+      "section_code": 256,
+      "action_code": 4194304,
+      "name_ar": "الطلبات المعلقة - البحث في الطلبات المعلقة",
+      "name_en": "Pending Requests - Search Pending Orders"
+    },
+    {
+      "id": "pending_requests:get_request_details",
+      "section": "pending_requests",
+      "action": "get_request_details",
+      "code": 8388608,
+      "section_code": 256,
+      "action_code": 8388608,
+      "name_ar": "الطلبات المعلقة - عرض تفاصيل الطلب",
+      "name_en": "Pending Requests - Get Request Details"
+    },
+    {
+      "id": "pending_requests:process_approve",
+      "section": "pending_requests",
+      "action": "process_approve",
+      "code": 16777216,
+      "section_code": 256,
+      "action_code": 16777216,
+      "name_ar": "الطلبات المعلقة - الموافقة على الطلب",
+      "name_en": "Pending Requests - Approve Request"
+    },
+    {
+      "id": "pending_requests:process_reject",
+      "section": "pending_requests",
+      "action": "process_reject",
+      "code": 33554432,
+      "section_code": 256,
+      "action_code": 33554432,
+      "name_ar": "الطلبات المعلقة - رفض الطلب",
+      "name_en": "Pending Requests - Reject Request"
+    },
+    {
+      "id": "pending_requests:download_request_train_file",
+      "section": "pending_requests",
+      "action": "download_request_train_file",
+      "code": 67108864,
+      "section_code": 256,
+      "action_code": 67108864,
+      "name_ar": "الطلبات المعلقة - تنزيل ملف التدريب",
+      "name_en": "Pending Requests - Download Training File"
+    },
+    {
+      "id": "permission_admin:view_page",
+      "section": "permission_admin",
+      "action": "view_page",
+      "code": 1,
+      "section_code": 512,
+      "action_code": 1,
+      "name_ar": "إدارة الصلاحيات - عرض الصفحة",
+      "name_en": "Permission Admin - View Page"
+    },
+    {
+      "id": "permission_admin:view",
+      "section": "permission_admin",
+      "action": "view",
+      "code": 2,
+      "section_code": 512,
+      "action_code": 2,
+      "name_ar": "إدارة الصلاحيات - عرض",
+      "name_en": "Permission Admin - View"
+    },
+    {
+      "id": "permission_admin:create",
+      "section": "permission_admin",
+      "action": "create",
+      "code": 4,
+      "section_code": 512,
+      "action_code": 4,
+      "name_ar": "إدارة الصلاحيات - إنشاء",
+      "name_en": "Permission Admin - Create"
+    },
+    {
+      "id": "permission_admin:update",
+      "section": "permission_admin",
+      "action": "update",
+      "code": 8,
+      "section_code": 512,
+      "action_code": 8,
+      "name_ar": "إدارة الصلاحيات - تحديث",
+      "name_en": "Permission Admin - Update"
+    },
+    {
+      "id": "permission_admin:delete",
+      "section": "permission_admin",
+      "action": "delete",
+      "code": 16,
+      "section_code": 512,
+      "action_code": 16,
+      "name_ar": "إدارة الصلاحيات - حذف",
+      "name_en": "Permission Admin - Delete"
+    },
+    {
+      "id": "roles:view_page",
+      "section": "roles",
+      "action": "view_page",
+      "code": 1,
+      "section_code": 1024,
+      "action_code": 1,
+      "name_ar": "الأدوار - عرض الصفحة",
+      "name_en": "Roles - View Page"
+    },
+    {
+      "id": "roles:view",
+      "section": "roles",
+      "action": "view",
+      "code": 2,
+      "section_code": 1024,
+      "action_code": 2,
+      "name_ar": "الأدوار - عرض",
+      "name_en": "Roles - View"
+    },
+    {
+      "id": "roles:create",
+      "section": "roles",
+      "action": "create",
+      "code": 4,
+      "section_code": 1024,
+      "action_code": 4,
+      "name_ar": "الأدوار - إنشاء",
+      "name_en": "Roles - Create"
+    },
+    {
+      "id": "roles:delete",
+      "section": "roles",
+      "action": "delete",
+      "code": 16,
+      "section_code": 1024,
+      "action_code": 16,
+      "name_ar": "الأدوار - حذف",
+      "name_en": "Roles - Delete"
+    },
+    {
+      "id": "snippets:view_page",
+      "section": "snippets",
+      "action": "view_page",
+      "code": 1,
+      "section_code": 2048,
+      "action_code": 1,
+      "name_ar": "المقتطفات - عرض الصفحة",
+      "name_en": "Snippets - View Page"
+    },
+    {
+      "id": "snippets:view",
+      "section": "snippets",
+      "action": "view",
+      "code": 2,
+      "section_code": 2048,
+      "action_code": 2,
+      "name_ar": "المقتطفات - عرض",
+      "name_en": "Snippets - View"
+    },
+    {
+      "id": "snippets:create",
+      "section": "snippets",
+      "action": "create",
+      "code": 4,
+      "section_code": 2048,
+      "action_code": 4,
+      "name_ar": "المقتطفات - إنشاء",
+      "name_en": "Snippets - Create"
+    },
+    {
+      "id": "snippets:update",
+      "section": "snippets",
+      "action": "update",
+      "code": 8,
+      "section_code": 2048,
+      "action_code": 8,
+      "name_ar": "المقتطفات - تحديث",
+      "name_en": "Snippets - Update"
+    },
+    {
+      "id": "snippets:delete",
+      "section": "snippets",
+      "action": "delete",
+      "code": 16,
+      "section_code": 2048,
+      "action_code": 16,
+      "name_ar": "المقتطفات - حذف",
+      "name_en": "Snippets - Delete"
+    },
+    {
+      "id": "tags:view_page",
+      "section": "tags",
+      "action": "view_page",
+      "code": 1,
+      "section_code": 4096,
+      "action_code": 1,
+      "name_ar": "الوسوم - عرض الصفحة",
+      "name_en": "Tags - View Page"
+    },
+    {
+      "id": "tags:view",
+      "section": "tags",
+      "action": "view",
+      "code": 2,
+      "section_code": 4096,
+      "action_code": 2,
+      "name_ar": "الوسوم - عرض",
+      "name_en": "Tags - View"
+    },
+    {
+      "id": "tags:create",
+      "section": "tags",
+      "action": "create",
+      "code": 4,
+      "section_code": 4096,
+      "action_code": 4,
+      "name_ar": "الوسوم - إنشاء",
+      "name_en": "Tags - Create"
+    },
+    {
+      "id": "tags:update",
+      "section": "tags",
+      "action": "update",
+      "code": 8,
+      "section_code": 4096,
+      "action_code": 8,
+      "name_ar": "الوسوم - تحديث",
+      "name_en": "Tags - Update"
+    },
+    {
+      "id": "tags:delete",
+      "section": "tags",
+      "action": "delete",
+      "code": 16,
+      "section_code": 4096,
+      "action_code": 16,
+      "name_ar": "الوسوم - حذف",
+      "name_en": "Tags - Delete"
+    },
+    {
+      "id": "teams:view_page",
+      "section": "teams",
+      "action": "view_page",
+      "code": 1,
+      "section_code": 8192,
+      "action_code": 1,
+      "name_ar": "الفرق - عرض الصفحة",
+      "name_en": "Teams - View Page"
+    },
+    {
+      "id": "teams:view",
+      "section": "teams",
+      "action": "view",
+      "code": 2,
+      "section_code": 8192,
+      "action_code": 2,
+      "name_ar": "الفرق - عرض",
+      "name_en": "Teams - View"
+    },
+    {
+      "id": "teams:create",
+      "section": "teams",
+      "action": "create",
+      "code": 4,
+      "section_code": 8192,
+      "action_code": 4,
+      "name_ar": "الفرق - إنشاء",
+      "name_en": "Teams - Create"
+    },
+    {
+      "id": "teams:update",
+      "section": "teams",
+      "action": "update",
+      "code": 8,
+      "section_code": 8192,
+      "action_code": 8,
+      "name_ar": "الفرق - تحديث",
+      "name_en": "Teams - Update"
+    },
+    {
+      "id": "teams:delete",
+      "section": "teams",
+      "action": "delete",
+      "code": 16,
+      "section_code": 8192,
+      "action_code": 16,
+      "name_ar": "الفرق - حذف",
+      "name_en": "Teams - Delete"
+    },
+    {
+      "id": "trainrequests:train_data_request",
+      "section": "trainrequests",
+      "action": "train_data_request",
+      "code": 128,
+      "section_code": 16384,
+      "action_code": 128,
+      "name_ar": "طلبات التدريب - رفع ملف تدريب (مختلط)",
+      "name_en": "TrainRequests - Upload Training File (Mixed)"
+    },
+    {
+      "id": "trainrequests:train_txt_request",
+      "section": "trainrequests",
+      "action": "train_txt_request",
+      "code": 256,
+      "section_code": 16384,
+      "action_code": 256,
+      "name_ar": "طلبات التدريب - رفع ملف TXT للتدريب",
+      "name_en": "TrainRequests - Upload TXT File for Training"
+    },
+    {
+      "id": "trainrequests:train_csv_request",
+      "section": "trainrequests",
+      "action": "train_csv_request",
+      "code": 512,
+      "section_code": 16384,
+      "action_code": 512,
+      "name_ar": "طلبات التدريب - رفع ملف CSV للتدريب",
+      "name_en": "TrainRequests - Upload CSV File for Training"
+    },
+    {
+      "id": "admin_users:view_page",
+      "section": "admin_users",
+      "action": "view_page",
+      "code": 1,
+      "section_code": 32768,
+      "action_code": 1,
+      "name_ar": "مستخدمي الإدارة - عرض الصفحة",
+      "name_en": "Admin Users - View Page"
+    },
+    {
+      "id": "admin_users:view",
+      "section": "admin_users",
+      "action": "view",
+      "code": 2,
+      "section_code": 32768,
+      "action_code": 2,
+      "name_ar": "مستخدمي الإدارة - عرض",
+      "name_en": "Admin Users - View"
+    },
+    {
+      "id": "admin_users:create",
+      "section": "admin_users",
+      "action": "create",
+      "code": 4,
+      "section_code": 32768,
+      "action_code": 4,
+      "name_ar": "مستخدمي الإدارة - إنشاء",
+      "name_en": "Admin Users - Create"
+    },
+    {
+      "id": "admin_users:update",
+      "section": "admin_users",
+      "action": "update",
+      "code": 8,
+      "section_code": 32768,
+      "action_code": 8,
+      "name_ar": "مستخدمي الإدارة - تحديث",
+      "name_en": "Admin Users - Update"
+    },
+    {
+      "id": "admin_users:delete",
+      "section": "admin_users",
+      "action": "delete",
+      "code": 16,
+      "section_code": 32768,
+      "action_code": 16,
+      "name_ar": "مستخدمي الإدارة - حذف",
+      "name_en": "Admin Users - Delete"
+    },
+    {
+      "id": "admin_users:get_current_user",
+      "section": "admin_users",
+      "action": "get_current_user",
+      "code": 1,
+      "section_code": 32768,
+      "action_code": 1,
+      "name_ar": "إدارة المستخدمين - عرض المستخدم الحالي",
+      "name_en": "Admin Users - Get Current User"
+    },
+    {
+      "id": "admin_users:get_users_brief",
+      "section": "admin_users",
+      "action": "get_users_brief",
+      "code": 2,
+      "section_code": 32768,
+      "action_code": 2,
+      "name_ar": "إدارة المستخدمين - عرض المستخدمين المختصر",
+      "name_en": "Admin Users - Get Users Brief"
+    },
+    {
+      "id": "admin_users:get_user_by_id",
+      "section": "admin_users",
+      "action": "get_user_by_id",
+      "code": 4,
+      "section_code": 32768,
+      "action_code": 4,
+      "name_ar": "إدارة المستخدمين - عرض مستخدم بالمعرف",
+      "name_en": "Admin Users - Get User By ID"
+    },
+    {
+      "id": "admin_users:get_all_users",
+      "section": "admin_users",
+      "action": "get_all_users",
+      "code": 8,
+      "section_code": 32768,
+      "action_code": 8,
+      "name_ar": "إدارة المستخدمين - عرض كل المستخدمين",
+      "name_en": "Admin Users - Get All Users"
+    },
+    {
+      "id": "admin_users:create_user",
+      "section": "admin_users",
+      "action": "create_user",
+      "code": 16,
+      "section_code": 32768,
+      "action_code": 16,
+      "name_ar": "إدارة المستخدمين - إنشاء مستخدم",
+      "name_en": "Admin Users - Create User"
+    },
+    {
+      "id": "admin_users:update_user",
+      "section": "admin_users",
+      "action": "update_user",
+      "code": 32,
+      "section_code": 32768,
+      "action_code": 32,
+      "name_ar": "إدارة المستخدمين - تحديث مستخدم",
+      "name_en": "Admin Users - Update User"
+    },
+    {
+      "id": "admin_users:delete_user",
+      "section": "admin_users",
+      "action": "delete_user",
+      "code": 64,
+      "section_code": 32768,
+      "action_code": 64,
+      "name_ar": "إدارة المستخدمين - حذف مستخدم",
+      "name_en": "Admin Users - Delete User"
+    },
+    {
+      "id": "admin_users:update_user_status",
+      "section": "admin_users",
+      "action": "update_user_status",
+      "code": 128,
+      "section_code": 32768,
+      "action_code": 128,
+      "name_ar": "إدارة المستخدمين - تحديث حالة المستخدم",
+      "name_en": "Admin Users - Update User Status"
+    },
+    {
+      "id": "admin_users:export_users",
+      "section": "admin_users",
+      "action": "export_users",
+      "code": 256,
+      "section_code": 32768,
+      "action_code": 256,
+      "name_ar": "إدارة المستخدمين - تصدير المستخدمين",
+      "name_en": "Admin Users - Export Users"
+    },
+    {
+      "id": "admin_users:get_session_info",
+      "section": "admin_users",
+      "action": "get_session_info",
+      "code": 512,
+      "section_code": 32768,
+      "action_code": 512,
+      "name_ar": "إدارة المستخدمين - عرض معلومات الجلسة",
+      "name_en": "Admin Users - Get Session Info"
+    },
+    {
+      "id": "admin_users:get_user_sessions",
+      "section": "admin_users",
+      "action": "get_user_sessions",
+      "code": 1024,
+      "section_code": 32768,
+      "action_code": 1024,
+      "name_ar": "إدارة المستخدمين - عرض جلسات المستخدم",
+      "name_en": "Admin Users - Get User Sessions"
+    },
+    {
+      "id": "admin_users:revoke_session",
+      "section": "admin_users",
+      "action": "revoke_session",
+      "code": 2048,
+      "section_code": 32768,
+      "action_code": 2048,
+      "name_ar": "إدارة المستخدمين - إلغاء جلسة",
+      "name_en": "Admin Users - Revoke Session"
+    },
+    {
+      "id": "admin_users:revoke_multiple_sessions",
+      "section": "admin_users",
+      "action": "revoke_multiple_sessions",
+      "code": 4096,
+      "section_code": 32768,
+      "action_code": 4096,
+      "name_ar": "إدارة المستخدمين - إلغاء جلسات متعددة",
+      "name_en": "Admin Users - Revoke Multiple Sessions"
+    },
+    {
+      "id": "admin_users:revoke_all_sessions",
+      "section": "admin_users",
+      "action": "revoke_all_sessions",
+      "code": 8192,
+      "section_code": 32768,
+      "action_code": 8192,
+      "name_ar": "إدارة المستخدمين - إلغاء كل الجلسات",
+      "name_en": "Admin Users - Revoke All Sessions"
+    },
+    {
+      "id": "auth_admin:view_page",
+      "section": "auth_admin",
+      "action": "view_page",
+      "code": 1,
+      "section_code": 65536,
+      "action_code": 1,
+      "name_ar": "المصادقة - الإدارة - عرض الصفحة",
+      "name_en": "Auth Admin - View Page"
+    },
+    {
+      "id": "auth_admin:view",
+      "section": "auth_admin",
+      "action": "view",
+      "code": 2,
+      "section_code": 65536,
+      "action_code": 2,
+      "name_ar": "المصادقة - الإدارة - عرض",
+      "name_en": "Auth Admin - View"
+    },
+    {
+      "id": "auth_admin:delete",
+      "section": "auth_admin",
+      "action": "delete",
+      "code": 16,
+      "section_code": 65536,
+      "action_code": 16,
+      "name_ar": "المصادقة - الإدارة - حذف",
+      "name_en": "Auth Admin - Delete"
+    },
+    {
+      "id": "channels:view_page",
+      "section": "channels",
+      "action": "view_page",
+      "code": 1,
+      "section_code": 131072,
+      "action_code": 1,
+      "name_ar": "القنوات - عرض الصفحة",
+      "name_en": "Channels - View Page"
+    },
+    {
+      "id": "channels:view",
+      "section": "channels",
+      "action": "view",
+      "code": 2,
+      "section_code": 131072,
+      "action_code": 2,
+      "name_ar": "القنوات - عرض",
+      "name_en": "Channels - View"
+    },
+    {
+      "id": "channels:create",
+      "section": "channels",
+      "action": "create",
+      "code": 4,
+      "section_code": 131072,
+      "action_code": 4,
+      "name_ar": "القنوات - إنشاء",
+      "name_en": "Channels - Create"
+    },
+    {
+      "id": "channels:update",
+      "section": "channels",
+      "action": "update",
+      "code": 8,
+      "section_code": 131072,
+      "action_code": 8,
+      "name_ar": "القنوات - تحديث",
+      "name_en": "Channels - Update"
+    },
+    {
+      "id": "channels:delete",
+      "section": "channels",
+      "action": "delete",
+      "code": 16,
+      "section_code": 131072,
+      "action_code": 16,
+      "name_ar": "القنوات - حذف",
+      "name_en": "Channels - Delete"
+    },
+    {
+      "id": "document_analytics:get_user_files",
+      "section": "document_analytics",
+      "action": "get_user_files",
+      "code": 16384,
+      "section_code": 262144,
+      "action_code": 16384,
+      "name_ar": "تحليلات المستخدمين - عرض ملفات مستخدم",
+      "name_en": "User Analytics - Get User Files"
+    },
+    {
+      "id": "document_analytics:get_user_files_with_query",
+      "section": "document_analytics",
+      "action": "get_user_files_with_query",
+      "code": 32768,
+      "section_code": 262144,
+      "action_code": 32768,
+      "name_ar": "تحليلات المستخدمين - عرض ملفات مستخدم مع بحث",
+      "name_en": "User Analytics - Get User Files with Query"
+    },
+    {
+      "id": "document_analytics:get_all_analytics",
+      "section": "document_analytics",
+      "action": "get_all_analytics",
+      "code": 65536,
+      "section_code": 262144,
+      "action_code": 65536,
+      "name_ar": "تحليلات المستخدمين - عرض بيانات التحليلات",
+      "name_en": "User Analytics - Get Analytics Data"
+    },
+    {
+      "id": "document_analytics:get_user_file_analytics",
+      "section": "document_analytics",
+      "action": "get_user_file_analytics",
+      "code": 131072,
+      "section_code": 262144,
+      "action_code": 131072,
+      "name_ar": "تحليلات المستخدمين - تحليلات ملف محدد",
+      "name_en": "User Analytics - Get User Analytics for Specific File"
+    },
+    {
+      "id": "document_analytics:download_user_file",
+      "section": "document_analytics",
+      "action": "download_user_file",
+      "code": 262144,
+      "section_code": 262144,
+      "action_code": 262144,
+      "name_ar": "تحليلات المستخدمين - تنزيل ملف مستخدم",
+      "name_en": "User Analytics - Download User File"
+    },
+    {
+      "id": "document_analytics:delete_docs_by_username",
+      "section": "document_analytics",
+      "action": "delete_docs_by_username",
+      "code": 524288,
+      "section_code": 262144,
+      "action_code": 524288,
+      "name_ar": "تحليلات المستخدمين - حذف مستندات مستخدم",
+      "name_en": "User Analytics - Delete Documents by Username"
+    },
+    {
+      "id": "document_analytics:delete_docs_by_filename",
+      "section": "document_analytics",
+      "action": "delete_docs_by_filename",
+      "code": 1048576,
+      "section_code": 262144,
+      "action_code": 1048576,
+      "name_ar": "تحليلات المستخدمين - حذف مستندات حسب اسم الملف",
+      "name_en": "User Analytics - Delete Documents by Filename"
+    },
+    {
+      "id": "document_analytics:update_document",
+      "section": "document_analytics",
+      "action": "update",
+      "code": 8,
+      "section_code": 262144,
+      "action_code": 8,
+      "name_ar": "تحليلات المستخدمين - تحديث مستند",
+      "name_en": "User Analytics - Update Document"
+    },
+    {
+      "id": "document_analytics:add_document_json",
+      "section": "document_analytics",
+      "action": "add_document_json",
+      "code": 1024,
+      "section_code": 262144,
+      "action_code": 1024,
+      "name_ar": "تحليلات المستخدمين - إضافة مستند (JSON)",
+      "name_en": "User Analytics - Add Document (JSON)"
+    },
+    {
+      "id": "document_analytics:delete_document",
+      "section": "document_analytics",
+      "action": "delete",
+      "code": 16,
+      "section_code": 262144,
+      "action_code": 16,
+      "name_ar": "تحليلات المستخدمين - حذف مستند",
+      "name_en": "User Analytics - Delete Document"
+    }
+  ],
+  "roles": [
+    {
+      "id": "owner",
+      "name_ar": "مالك",
+      "name_en": "Owner",
+      "description_ar": "صلاحيات كاملة",
+      "description_en": "Full permissions",
+      "is_system": true,
+      "permission_ids": [
+        "document_management:delete_collection",
+        "pending_requests:process_reject",
+        "document_analytics:update_document",
+        "document_management:search_document_management",
+        "document_management:train_txt_request",
+        "trainrequests:train_csv_request",
+        "document_analytics:get_user_files",
+        "document_analytics:get_user_file_analytics",
+        "pending_requests:search_pending_orders",
+        "document_analytics:download_user_file",
+        "document_management:add_document_json",
+        "document_management:get_document_management",
+        "document_management:train_csv_request",
+        "pending_requests:get_request_details",
+        "document_management:train_data_request",
+        "document_management:add_document",
+        "trainrequests:train_txt_request",
+        "document_management:delete_document",
+        "document_analytics:get_user_files_with_query",
+        "trainrequests:train_data_request",
+        "document_management:update_document",
+        "pending_requests:download_request_train_file",
+        "document_analytics:add_document_json",
+        "document_analytics:delete_document",
+        "document_analytics:get_all_analytics",
+        "document_analytics:delete_docs_by_username",
+        "document_management:view_page",
+        "pending_requests:process_approve",
+        "pending_requests:get_pending_orders",
+        "document_analytics:delete_docs_by_filename",
+        "operation_history:get_operations",
+        "operation_history:get_operation_details",
+        "operation_history:search_operations",
+        "operation_history:download_operations_csv",
+        "operation_history:download_operation_train_file",
+        "admin_users:get_current_user",
+        "admin_users:get_users_brief",
+        "admin_users:get_user_by_id",
+        "admin_users:get_all_users",
+        "admin_users:create_user",
+        "admin_users:update_user",
+        "admin_users:delete_user",
+        "admin_users:update_user_status",
+        "admin_users:export_users",
+        "admin_users:get_session_info",
+        "admin_users:get_user_sessions",
+        "admin_users:revoke_session",
+        "admin_users:revoke_multiple_sessions",
+        "admin_users:revoke_all_sessions"
+      ]
+    },
+    {
+      "id": "admin",
+      "name_ar": "مدير",
+      "name_en": "Admin",
+      "description_ar": "مدير النظام",
+      "description_en": "System administrator",
+      "is_system": true,
+      "permission_ids": []
+    }
+  ]
+}
