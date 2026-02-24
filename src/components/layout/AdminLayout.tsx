@@ -36,6 +36,12 @@ const NAV_ITEMS = [
         pageBit: null,
     },
     {
+        title: "المحادثات",
+        href: "/dashboard/inbox",
+        icon: MessageSquare,
+        pageBit: PAGE_BITS.INBOX,
+    },
+    {
         title: "قاعدة المعرفة",
         href: "/dashboard/knowledge",
         icon: BookOpen,
@@ -53,6 +59,7 @@ const NAV_ITEMS = [
         icon: History,
         pageBit: PAGE_BITS.OPERATION_HISTORY,
     },
+
 ]
 
 export function AdminLayout() {
@@ -408,7 +415,7 @@ export function AdminLayout() {
                 </header>
 
                 {/* Page content */}
-                <main className="flex-1 overflow-y-auto bg-gray-50">
+                <main className="flex-1 overflow-hidden bg-gray-50">
                     <Outlet />
                 </main>
             </div>

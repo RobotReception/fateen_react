@@ -1,6 +1,6 @@
 /* ============================================================
-   AI SETTINGS FEATURE — TYPE DEFINITIONS
-   (aligned with /api/backend/v2/ai-settings API — actual response)
+   AI SETTINGS / AGENTS FEATURE — TYPE DEFINITIONS
+   (aligned with /api/v1/agents API)
    ============================================================ */
 
 // ── Generic API response wrapper ──
@@ -11,7 +11,35 @@ export interface ApiResponse<T> {
 }
 
 // ─────────────────────────────────────────────────────────────
-//  1. AI Settings (top-level)
+//  0. Agent entity
+// ─────────────────────────────────────────────────────────────
+export interface Agent {
+    id: string
+    tenant_id: string
+    name: string
+    description?: string
+    status: "active" | "inactive"
+    departments: string[]
+    categories: string[]
+    ai: Partial<AISettings>
+    prompts: Partial<PromptsSettings>
+    tts: Partial<TTSSettings>
+    created_at: string
+    updated_at: string
+}
+
+export interface CreateAgentPayload {
+    name: string
+    description?: string
+    status?: "active" | "inactive"
+    departments?: string[]
+    categories?: string[]
+}
+
+export type UpdateAgentPayload = Partial<CreateAgentPayload>
+
+// ─────────────────────────────────────────────────────────────
+//  1. AI Settings (per agent)
 // ─────────────────────────────────────────────────────────────
 export interface LLMProviderConfig {
     temperature?: number
@@ -51,7 +79,7 @@ export type CreateProviderPayload = Partial<LLMProvider>
 // ─────────────────────────────────────────────────────────────
 export interface AddModelPayload {
     model_id: string
-    type?: "available_models"
+    type?: "available_models" | "available_embedding_models"
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -59,20 +87,7 @@ export interface AddModelPayload {
 // ─────────────────────────────────────────────────────────────
 export type UpdateAIFeaturesPayload = Partial<AIFeatures>
 
-// ─────────────────────────────────────────────────────────────
-//  4. General Features (platform)
-// ─────────────────────────────────────────────────────────────
-export interface FeaturesSettings {
-    enable_notifications: boolean
-    enable_analytics: boolean
-    enable_caching: boolean
-    cache_ttl_seconds: number
-    enable_rate_limiting: boolean
-    rate_limit_requests: number
-    rate_limit_window: number
-}
 
-export type UpdateFeaturesPayload = Partial<FeaturesSettings>
 
 // ─────────────────────────────────────────────────────────────
 //  5. Prompts Settings

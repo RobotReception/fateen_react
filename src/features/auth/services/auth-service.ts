@@ -72,6 +72,22 @@ export interface LoginResponse {
     message: string
 }
 
+export interface TenantInfo {
+    tenant_id: string
+    organization_name: string
+    role: string
+}
+
+export interface TenantSelectionResponse {
+    success: boolean
+    data: {
+        requires_tenant_selection: true
+        tenants: TenantInfo[]
+        email: string
+    }
+    message: string
+}
+
 export interface OnboardingPayload {
     user_id: string
     organization_name: string
@@ -148,9 +164,12 @@ export async function resendVerificationEmail(email: string): Promise<{ success:
     return data
 }
 
-/** Login */
-export async function login(payload: LoginPayload): Promise<LoginResponse> {
-    const { data } = await apiClient.post<LoginResponse>("/auth/login", payload)
+/** Login — returns either full auth data or a tenant selection prompt */
+export async function login(payload: LoginPayload): Promise<LoginResponse | TenantSelectionResponse> {
+    const { data } = await apiClient.post<LoginResponse | TenantSelectionResponse>("/auth/login", payload)
+    if (!data.success) {
+        throw { response: { status: 200, data } }
+    }
     return data
 }
 

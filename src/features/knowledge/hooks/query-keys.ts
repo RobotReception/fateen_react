@@ -8,15 +8,15 @@ export const knowledgeKeys = {
     /* ── Departments ── */
     departments: {
         /** Invalidates everything department-related for the tenant */
-        all: (tenantId: string) => ["departments", tenantId] as const,
+        all: (tenantId: string) => ["", tenantId] as const,
         /** GET /departments/departments/lookup */
-        lookup: (tenantId: string) => ["departments", tenantId, "lookup"] as const,
+        lookup: (tenantId: string) => ["", tenantId, "lookup"] as const,
         /** GET /departments/departments (paginated) */
         list: (tenantId: string, filters: Record<string, unknown> = {}) =>
-            ["departments", tenantId, "list", filters] as const,
+            ["", tenantId, "list", filters] as const,
         /** GET /departments/{id}/categories */
         categories: (tenantId: string, deptId: string) =>
-            ["departments", tenantId, deptId, "categories"] as const,
+            ["", tenantId, deptId, "categories"] as const,
     },
 
     /* ── Categories ── */

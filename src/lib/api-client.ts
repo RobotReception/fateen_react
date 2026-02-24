@@ -28,13 +28,27 @@ function isPublicEndpoint(url: string | undefined): boolean {
     return PUBLIC_ENDPOINTS.some((ep) => url.includes(ep))
 }
 
-// ── Request interceptor — inject JWT token (skip for public endpoints) ──
+// ── Request interceptor — inject JWT token + X-Tenant-ID (skip for public endpoints) ──
 apiClient.interceptors.request.use(
     (config) => {
         if (!isPublicEndpoint(config.url)) {
             const token = localStorage.getItem("access_token")
             if (token) {
                 config.headers.Authorization = `Bearer ${token}`
+            }
+
+            // Inject X-Tenant-ID from persisted auth store
+            if (!config.headers["X-Tenant-ID"]) {
+                try {
+                    const stored = localStorage.getItem("fateen-auth-storage")
+                    if (stored) {
+                        const parsed = JSON.parse(stored)
+                        const tenantId = parsed?.state?.user?.tenant_id
+                        if (tenantId) {
+                            config.headers["X-Tenant-ID"] = tenantId
+                        }
+                    }
+                } catch { /* silent */ }
             }
         }
         return config

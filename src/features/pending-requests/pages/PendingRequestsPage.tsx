@@ -1,6 +1,8 @@
 import { useState, useCallback, useMemo, memo } from "react"
 import { toast } from "sonner"
 import { FetchingBar } from "@/components/ui/FetchingBar"
+import { ActionGuard } from "@/components/guards/ActionGuard"
+import { PAGE_BITS, ACTION_BITS } from "@/lib/permissions"
 import {
     Search,
     Loader2,
@@ -220,14 +222,24 @@ const OrderRow = memo(function OrderRow({
             <td className="px-4 py-3.5"><p className="text-xs text-gray-500 max-w-[180px] truncate" title={order.text}>{truncate(order.text, 50)}</p></td>
             <td className="px-4 py-3.5">
                 <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-                    <button onClick={() => onView(order)} className="rounded-lg p-1.5 text-gray-400 hover:bg-blue-50 hover:text-blue-500 transition-colors" title="عرض التفاصيل"><Eye size={14} /></button>
+                    <ActionGuard pageBit={PAGE_BITS.PENDING_REQUESTS} actionBit={ACTION_BITS.GET_REQUEST_DETAILS}>
+                        <button onClick={() => onView(order)} className="rounded-lg p-1.5 text-gray-400 hover:bg-blue-50 hover:text-blue-500 transition-colors" title="عرض التفاصيل"><Eye size={14} /></button>
+                    </ActionGuard>
                     {isPending && (
                         <>
-                            <button onClick={() => onApprove(order)} className="rounded-lg p-1.5 text-gray-400 hover:bg-emerald-50 hover:text-emerald-500 transition-colors" title="موافقة"><CheckCircle2 size={14} /></button>
-                            <button onClick={() => onReject(order)} className="rounded-lg p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-500 transition-colors" title="رفض"><XCircle size={14} /></button>
+                            <ActionGuard pageBit={PAGE_BITS.PENDING_REQUESTS} actionBit={ACTION_BITS.PROCESS_APPROVE}>
+                                <button onClick={() => onApprove(order)} className="rounded-lg p-1.5 text-gray-400 hover:bg-emerald-50 hover:text-emerald-500 transition-colors" title="موافقة"><CheckCircle2 size={14} /></button>
+                            </ActionGuard>
+                            <ActionGuard pageBit={PAGE_BITS.PENDING_REQUESTS} actionBit={ACTION_BITS.PROCESS_REJECT}>
+                                <button onClick={() => onReject(order)} className="rounded-lg p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-500 transition-colors" title="رفض"><XCircle size={14} /></button>
+                            </ActionGuard>
                         </>
                     )}
-                    {hasFile && <button onClick={() => onDownload(order)} className="rounded-lg p-1.5 text-gray-400 hover:bg-purple-50 hover:text-purple-500 transition-colors" title="تحميل الملف"><Download size={14} /></button>}
+                    {hasFile && (
+                        <ActionGuard pageBit={PAGE_BITS.PENDING_REQUESTS} actionBit={ACTION_BITS.DOWNLOAD_REQUEST_TRAIN_FILE}>
+                            <button onClick={() => onDownload(order)} className="rounded-lg p-1.5 text-gray-400 hover:bg-purple-50 hover:text-purple-500 transition-colors" title="تحميل الملف"><Download size={14} /></button>
+                        </ActionGuard>
+                    )}
                 </div>
             </td>
         </tr>

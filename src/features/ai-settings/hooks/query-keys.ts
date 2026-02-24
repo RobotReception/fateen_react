@@ -1,12 +1,17 @@
-/** React Query key factory for AI Settings */
-export const aiSettingsKeys = {
-    all: ["ai-settings"] as const,
+/** React Query key factory for Agents & AI Settings */
+export const agentKeys = {
+    /* agents */
+    all: (tid: string) => ["agents", tid] as const,
+    detail: (tid: string, id: string) => ["agents", tid, id] as const,
 
-    ai: (tid: string) => [...aiSettingsKeys.all, "ai", tid] as const,
-    provider: (tid: string, name: string) => [...aiSettingsKeys.all, "provider", tid, name] as const,
-    aiFeatures: (tid: string) => [...aiSettingsKeys.all, "ai-features", tid] as const,
-    features: (tid: string) => [...aiSettingsKeys.all, "features", tid] as const,
-    prompts: (tid: string) => [...aiSettingsKeys.all, "prompts", tid] as const,
-    tts: (tid: string) => [...aiSettingsKeys.all, "tts", tid] as const,
-    ttsProvider: (tid: string, name: string) => [...aiSettingsKeys.all, "tts-provider", tid, name] as const,
+    /* per-agent settings */
+    ai: (tid: string, agentId: string) => ["agents", tid, agentId, "ai"] as const,
+    provider: (tid: string, agentId: string, name: string) => ["agents", tid, agentId, "provider", name] as const,
+    aiFeatures: (tid: string, agentId: string) => ["agents", tid, agentId, "ai-features"] as const,
+    prompts: (tid: string, agentId: string) => ["agents", tid, agentId, "prompts"] as const,
+    tts: (tid: string, agentId: string) => ["agents", tid, agentId, "tts"] as const,
+    ttsProvider: (tid: string, agentId: string, name: string) => ["agents", tid, agentId, "tts-provider", name] as const,
 }
+
+/** @deprecated — use agentKeys instead */
+export const aiSettingsKeys = agentKeys

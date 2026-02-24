@@ -10,6 +10,7 @@ const SECTION_LABELS: Record<string, string> = {
     customers: "العملاء",
     document_management: "إدارة الوثائق",
     document_analytics: "تحليلات الوثائق",
+    documents: "المستندات",
     lifecycles: "دورات الحياة",
     menus: "القوائم",
     snippets: "المقتطفات",
@@ -18,7 +19,8 @@ const SECTION_LABELS: Record<string, string> = {
     admin_users: "إدارة المستخدمين",
     auth_admin: "إدارة المصادقة",
     channels: "القنوات",
-    trainrequests: "طلبات التدريب",
+    trainrequests: "طلبات التدريب (قديم)",
+    train_requests: "طلبات التدريب",
     pending_requests: "الطلبات المعلقة",
     operation_history: "سجل العمليات",
     permission_admin: "إدارة الصلاحيات",
@@ -27,6 +29,9 @@ const SECTION_LABELS: Record<string, string> = {
     organization: "المنظمة",
     user_profile: "الملف الشخصي",
     ai_settings: "إعدادات الذكاء الاصطناعي",
+    agents: "الوكلاء",
+    inbox: "صندوق الوارد",
+    media: "الوسائط",
 }
 
 /* ─── Toggle Switch — forced LTR ─── */

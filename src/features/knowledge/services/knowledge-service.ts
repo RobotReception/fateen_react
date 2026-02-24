@@ -62,26 +62,26 @@ function headers(tenantId: string, lang = "ar") {
    DEPARTMENTS API
    ============================================================ */
 
-/** POST /departments/departments — create a department */
+/** POST /departments — create a department */
 export async function createDepartment(
     payload: CreateDepartmentPayload,
     tenantId: string
 ): Promise<DepartmentDetailResponse> {
     const { data } = await apiClient.post<DepartmentDetailResponse>(
-        "/departments/departments",
+        "/departments",
         payload,
         { headers: headers(tenantId) }
     )
     return data
 }
 
-/** GET /departments/departments — paginated list */
+/** GET /departments — paginated list */
 export async function listDepartments(
     params: PaginatedParams,
     tenantId: string
 ): Promise<DepartmentListResponse> {
     const { data } = await apiClient.get<DepartmentListResponse>(
-        "/departments/departments",
+        "/departments",
         {
             params,
             headers: headers(tenantId),
@@ -90,13 +90,13 @@ export async function listDepartments(
     return data
 }
 
-/** GET /departments/departments/lookup — simplified list */
+/** GET /departments/lookup — simplified list */
 export async function getDepartmentsLookup(
     tenantId: string,
     isActive = true
 ): Promise<DepartmentLookupResponse> {
     const { data } = await apiClient.get<DepartmentLookupResponse>(
-        "/departments/departments/lookup",
+        "/departments/lookup",
         {
             params: { is_active: isActive },
             headers: headers(tenantId),
@@ -105,78 +105,78 @@ export async function getDepartmentsLookup(
     return data
 }
 
-/** GET /departments/departments/{department_id} — full detail */
+/** GET /departments/{department_id} — full detail */
 export async function getDepartment(
     departmentId: string,
     tenantId: string
 ): Promise<DepartmentDetailResponse> {
     const { data } = await apiClient.get<DepartmentDetailResponse>(
-        `/departments/departments/${departmentId}`,
+        `/departments/${departmentId}`,
         { headers: headers(tenantId) }
     )
     return data
 }
 
-/** PATCH /departments/departments/{department_id} — partial update */
+/** PATCH /departments/{department_id} — partial update */
 export async function updateDepartment(
     departmentId: string,
     payload: UpdateDepartmentPayload,
     tenantId: string
 ): Promise<DepartmentDetailResponse> {
     const { data } = await apiClient.patch<DepartmentDetailResponse>(
-        `/departments/departments/${departmentId}`,
+        `/departments/${departmentId}`,
         payload,
         { headers: headers(tenantId) }
     )
     return data
 }
 
-/** DELETE /departments/departments/{department_id} — delete */
+/** DELETE /departments/{department_id} — delete */
 export async function deleteDepartment(
     departmentId: string,
     tenantId: string
 ): Promise<DeleteDepartmentResponse> {
     const { data } = await apiClient.delete<DeleteDepartmentResponse>(
-        `/departments/departments/${departmentId}`,
+        `/departments/${departmentId}`,
         { headers: headers(tenantId) }
     )
     return data
 }
 
-/** POST /departments/departments/{department_id}/categories/link — link a category */
+/** POST /departments/{department_id}/categories/link — link a category */
 export async function linkCategoryToDepartment(
     departmentId: string,
     payload: LinkCategoryPayload,
     tenantId: string
 ): Promise<LinkCategoryResponse> {
     const { data } = await apiClient.post<LinkCategoryResponse>(
-        `/departments/departments/${departmentId}/categories/link`,
+        `/departments/${departmentId}/categories/link`,
         payload,
         { headers: headers(tenantId) }
     )
     return data
 }
 
-/** GET /departments/departments/{department_id}/categories — linked categories */
+/** GET /departments/{department_id}/categories — linked categories */
 export async function getDepartmentCategories(
     departmentId: string,
     tenantId: string
 ): Promise<DepartmentCategoriesResponse> {
     const { data } = await apiClient.get<DepartmentCategoriesResponse>(
-        `/departments/departments/${departmentId}/categories`,
+        `/departments/${departmentId}/categories`,
         { headers: headers(tenantId) }
     )
     return data
 }
 
-/** DELETE /departments/departments/{department_id}/categories/{category_id} — unlink */
+/** DELETE /departments/{department_id}/categories/{category_id} — unlink */
 export async function unlinkCategoryFromDepartment(
     departmentId: string,
     categoryId: string,
     tenantId: string
 ): Promise<UnlinkCategoryResponse> {
     const { data } = await apiClient.delete<UnlinkCategoryResponse>(
-        `/departments/departments/${departmentId}/categories/${categoryId}`,
+        `/departments/${departmentId}/categories/${categoryId}`,
         { headers: headers(tenantId) }
     )
     return data

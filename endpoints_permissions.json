@@ -1,0 +1,1137 @@
+{
+  "_meta": {
+    "total_endpoints": 209,
+    "protected_endpoints": 197,
+    "public_endpoints": 12,
+    "unique_permissions": 194,
+    "generated_at": "2026-02-23",
+    "public_note": "PUBLIC = no @permission_required (auth routes, public APIs)"
+  },
+  "endpoints_by_module": {
+    "Agents": [
+      {
+        "method": "POST",
+        "path": "/api/backend/v2/agents/",
+        "permission": "agents:create_agent"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/agents/",
+        "permission": "agents:list_agents"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/agents/{agent_id}",
+        "permission": "agents:get_agent"
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/backend/v2/agents/{agent_id}",
+        "permission": "agents:update_agent"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/backend/v2/agents/{agent_id}",
+        "permission": "agents:delete_agent"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/agents/{agent_id}/ai",
+        "permission": "agents:get_ai_settings"
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/backend/v2/agents/{agent_id}/ai",
+        "permission": "agents:update_ai_settings"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/agents/{agent_id}/ai/providers/{provider_name}",
+        "permission": "agents:get_ai_provider"
+      },
+      {
+        "method": "POST",
+        "path": "/api/backend/v2/agents/{agent_id}/ai/providers/{provider_name}",
+        "permission": "agents:create_ai_provider"
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/backend/v2/agents/{agent_id}/ai/providers/{provider_name}",
+        "permission": "agents:update_ai_provider"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/backend/v2/agents/{agent_id}/ai/providers/{provider_name}",
+        "permission": "agents:delete_ai_provider"
+      },
+      {
+        "method": "POST",
+        "path": "/api/backend/v2/agents/{agent_id}/ai/providers/{provider_name}/models",
+        "permission": "agents:add_model"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/backend/v2/agents/{agent_id}/ai/providers/{provider_name}/models/{model_id}",
+        "permission": "agents:delete_model"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/agents/{agent_id}/ai/features",
+        "permission": "agents:get_ai_features"
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/backend/v2/agents/{agent_id}/ai/features",
+        "permission": "agents:update_ai_features"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/agents/{agent_id}/prompts",
+        "permission": "agents:get_prompts"
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/backend/v2/agents/{agent_id}/prompts",
+        "permission": "agents:update_prompts"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/agents/{agent_id}/features",
+        "permission": "agents:get_features"
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/backend/v2/agents/{agent_id}/features",
+        "permission": "agents:update_features"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/agents/{agent_id}/tts",
+        "permission": "agents:get_tts"
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/backend/v2/agents/{agent_id}/tts",
+        "permission": "agents:update_tts"
+      },
+      {
+        "method": "POST",
+        "path": "/api/backend/v2/agents/{agent_id}/tts/toggle",
+        "permission": "agents:toggle_tts"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/agents/{agent_id}/tts/providers/{provider_name}",
+        "permission": "agents:get_tts_provider"
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/backend/v2/agents/{agent_id}/tts/providers/{provider_name}",
+        "permission": "agents:update_tts_provider"
+      }
+    ],
+    "Categories": [
+      {
+        "method": "POST",
+        "path": "/api/backend/v2/",
+        "permission": "departments:create_category"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/",
+        "permission": [
+          "departments:list_category",
+          "document_search:list_department",
+          "document_analytics:list_department"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/{category_id}",
+        "permission": [
+          "departments:get_department",
+          "document_management:view",
+          "document_analytics:view"
+        ]
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/backend/v2/{category_id}",
+        "permission": "departments:update_category"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/backend/v2/{category_id}",
+        "permission": "departments:delete_category"
+      }
+    ],
+    "Channels": [
+      {
+        "method": "POST",
+        "path": "/api/backend/v2/channels/{platform}/add",
+        "permission": "channels:create_channel"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/channels/{platform}",
+        "permission": "channels:list_channels"
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/backend/v2/channels/{platform}/toggle",
+        "permission": "channels:toggle_platform"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/channels/{platform}/{identifier}",
+        "permission": "channels:get_channel"
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/backend/v2/channels/{platform}/{identifier}",
+        "permission": "channels:update_channel"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/backend/v2/channels/{platform}/{identifier}",
+        "permission": "channels:delete_channel"
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/backend/v2/channels/{platform}/{identifier}/toggle",
+        "permission": "channels:toggle_channel"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/channels/{platform}/{identifier}/flags",
+        "permission": "channels:get_channel_flags"
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/backend/v2/channels/{platform}/{identifier}/flags",
+        "permission": "channels:update_channel_flags"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/data/flags",
+        "permission": "channels:get_flags"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/data/flags/platforms",
+        "permission": "channels:get_platforms_status"
+      }
+    ],
+    "Contacts": [
+      {
+        "method": "POST",
+        "path": "/api/backend/v2/contacts/contacts/dynamic-fields",
+        "permission": "contact_fields:create_dynamic_field"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/contacts/contacts/dynamic-fields",
+        "permission": "contact_fields:list_dynamic_fields"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/contacts/contacts/dynamic-fields/{field_name}",
+        "permission": "contact_fields:get_dynamic_field"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/backend/v2/contacts/contacts/dynamic-fields/{field_name}",
+        "permission": "contact_fields:update_dynamic_field"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/backend/v2/contacts/contacts/dynamic-fields/{field_name}",
+        "permission": "contact_fields:delete_dynamic_field"
+      },
+      {
+        "method": "POST",
+        "path": "/api/backend/v2/contacts/contacts",
+        "permission": "contacts:create_contact"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/contacts/contacts",
+        "permission": "contacts:list_contacts"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/contacts/contacts/{customer_id}",
+        "permission": "contacts:get_contact"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/backend/v2/contacts/contacts/{customer_id}",
+        "permission": "contacts:update_contact"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/backend/v2/contacts/contacts/{customer_id}",
+        "permission": "contacts:delete_contact"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/contacts/contacts/stats/summary",
+        "permission": "contacts:list_contact_tags"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/contacts/contacts/filters",
+        "permission": "contacts:get_contact_lifecycle"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/contacts/contacts/fields/required",
+        "permission": "contacts:get_contact_notes"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/backend/v2/contacts/contacts/{customer_id}/custom-fields",
+        "permission": "contacts:update_contact_lifecycle"
+      },
+      {
+        "method": "POST",
+        "path": "/api/backend/v2/contacts/contacts/{customer_id}/convert",
+        "permission": "contacts:add_contact_tag"
+      },
+      {
+        "method": "POST",
+        "path": "/api/backend/v2/contacts/contacts/bulk/convert",
+        "permission": "contacts:remove_contact_tag"
+      },
+      {
+        "method": "POST",
+        "path": "/api/backend/v2/contacts/contacts/bulk/fields",
+        "permission": "contacts:add_contact_note"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/contacts/contacts/search/customers",
+        "permission": "contacts:export_contacts"
+      }
+    ],
+    "Customers": [
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/customers/",
+        "permission": "customers:list_customers"
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/backend/v2/customers/{customer_id}/enable-ai",
+        "permission": "customers:update_customer"
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/backend/v2/customers/{customer_id}/assign",
+        "permission": "customers:update_customer_status"
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/backend/v2/customers/{customer_id}/session-status",
+        "permission": "customers:update_customer_lifecycle"
+      },
+      {
+        "method": "POST",
+        "path": "/api/backend/v2/customers/{customer_id}/teams",
+        "permission": "customers:add_customer_note"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/backend/v2/customers/{customer_id}/teams",
+        "permission": "customers:delete_customer_note"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/customers/{customer_id}/messages",
+        "permission": "customers:get_customer"
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/backend/v2/customers/{customer_id}/close-conversation",
+        "permission": "customers:add_customer_tag"
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/backend/v2/customers/{customer_id}/reopen-conversation",
+        "permission": "customers:remove_customer_tag"
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/backend/v2/customers/{customer_id}/lifecycle",
+        "permission": "customers:assign_customer_agent"
+      }
+    ],
+    "Departments": [
+      {
+        "method": "POST",
+        "path": "/api/backend/v2/departments/departments",
+        "permission": "departments:create_department"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/departments/departments",
+        "permission": [
+          "departments:list_department",
+          "document_search:list_department",
+          "document_analytics:list_department"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/departments/departments/lookup",
+        "permission": [
+          "departments:list_department",
+          "document_search:list_department",
+          "document_analytics:list_department"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/departments/by-name/{department_name}/categories",
+        "permission": [
+          "departments:list_category",
+          "document_search:list_department",
+          "document_analytics:list_department"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/departments/departments/{department_id}",
+        "permission": [
+          "departments:get_department",
+          "document_management:view",
+          "document_analytics:view"
+        ]
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/backend/v2/departments/departments/{department_id}",
+        "permission": "departments:update_department"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/backend/v2/departments/departments/{department_id}",
+        "permission": "departments:delete_department"
+      },
+      {
+        "method": "POST",
+        "path": "/api/backend/v2/departments/departments/{department_id}/categories/link",
+        "permission": "departments:create_category"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/departments/departments/{department_id}/categories",
+        "permission": [
+          "departments:list_category",
+          "document_search:list_department",
+          "document_analytics:list_department"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/departments/departments/{department_id}/categories/lookup",
+        "permission": [
+          "departments:list_category",
+          "document_search:list_department",
+          "document_analytics:list_department"
+        ]
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/backend/v2/departments/departments/{department_id}/categories/{category_id}",
+        "permission": "departments:delete_category"
+      }
+    ],
+    "Documents": [
+      {
+        "method": "POST",
+        "path": "/api/backend/v2/documents/requests-add-data",
+        "permission": "documents:upload_document"
+      },
+      {
+        "method": "POST",
+        "path": "/api/backend/v2/documents/requests-add-data-json",
+        "permission": "documents:upload_document_json"
+      },
+      {
+        "method": "POST",
+        "path": "/api/backend/v2/documents/requests-update-data",
+        "permission": "documents:update_document"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/backend/v2/documents/delete-doc-by-id",
+        "permission": "documents:delete_document"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/backend/v2/documents/delete-docs-by-username",
+        "permission": "documents:delete_docs_by_username"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/backend/v2/documents/delete-docs-by-filename",
+        "permission": "documents:delete_docs_by_filename"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/documents/get-documents",
+        "permission": "documents:get_document"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/backend/v2/documents/request-delete-collection-admin",
+        "permission": "documents:delete_collection"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/documents/search-documents",
+        "permission": "documents:search_documents"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/documents/files/docs/{username}",
+        "permission": "documents:list_user_files"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/documents/get-user-files/{username}",
+        "permission": "documents:search_user_files"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/documents/get-files/data",
+        "permission": "documents:get_all_analytics"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/documents/files/docs/{username}/{filename:path}",
+        "permission": "documents:get_user_file_analytics"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/documents/download-user-file",
+        "permission": "documents:download_user_file"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/documents/files/analytics/tenant",
+        "permission": "documents:get_tenant_analytics"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/backend/v2/documents/request-delete-by-department",
+        "permission": "documents:delete_by_department"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/backend/v2/documents/request-delete-by-category",
+        "permission": "documents:delete_by_category"
+      }
+    ],
+    "Inbox": [
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/inbox/",
+        "permission": "inbox:list_pending_inbox"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/inbox/sessions",
+        "permission": "inbox:get_inbox_item"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/inbox/messages",
+        "permission": "inbox:list_inbox_by_status"
+      },
+      {
+        "method": "POST",
+        "path": "/api/backend/v2/inbox/send-message",
+        "permission": "inbox:create_inbox_item"
+      },
+      {
+        "method": "POST",
+        "path": "/api/backend/v2/inbox/upload_media",
+        "permission": "inbox:update_inbox_item"
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/backend/v2/inbox/sessions/{field}",
+        "permission": "inbox:patch_inbox_item"
+      }
+    ],
+    "Lifecycles": [
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/lifecycles/lifecycles",
+        "permission": "lifecycles:list_lifecycles"
+      },
+      {
+        "method": "POST",
+        "path": "/api/backend/v2/lifecycles/lifecycles",
+        "permission": "lifecycles:create_lifecycle"
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/backend/v2/lifecycles/lifecycles/{code}",
+        "permission": "lifecycles:update_lifecycle"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/backend/v2/lifecycles/lifecycles/{code}",
+        "permission": "lifecycles:delete_lifecycle"
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/backend/v2/lifecycles/customers/{customer_id}/lifecycle",
+        "permission": "lifecycles:reorder_lifecycles"
+      }
+    ],
+    "Media": [
+      {
+        "method": "POST",
+        "path": "/api/backend/v2/media/upload",
+        "permission": "Media:Create"
+      }
+    ],
+    "Menus": [
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/menus/menus",
+        "permission": "menus:list_menus"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/menus/menus/parent/{parent_key}",
+        "permission": "menus:get_menu"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/menus/menus/{item_id}",
+        "permission": "menus:get_menu_by_role"
+      },
+      {
+        "method": "POST",
+        "path": "/api/backend/v2/menus/menus",
+        "permission": "menus:create_menu"
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/backend/v2/menus/menus/{item_id}",
+        "permission": "menus:update_menu"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/backend/v2/menus/menus/{item_id}",
+        "permission": "menus:delete_menu"
+      }
+    ],
+    "Operation_History": [
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/operation-history/get-operations",
+        "permission": "operation_history:get_operations"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/operation-history/get-operation-details",
+        "permission": "operation_history:get_operation_details"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/operation-history/search-operations",
+        "permission": "operation_history:search_operations"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/operation-history/download-operations-csv",
+        "permission": "operation_history:download_operations_csv"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/operation-history/download-operation-train-file",
+        "permission": "operation_history:download_operation_train_file"
+      }
+    ],
+    "Organization": [
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/organization/organization",
+        "permission": "organization:view_organization"
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/backend/v2/organization/organization",
+        "permission": "organization:update_organization"
+      }
+    ],
+    "Pending_Requests": [
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/pending-requests/get-pending-orders",
+        "permission": "pending_requests:get_pending_orders"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/pending-requests/search-pending-orders",
+        "permission": "pending_requests:search_pending_orders"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/pending-requests/get-request-details",
+        "permission": "pending_requests:get_request_details"
+      },
+      {
+        "method": "POST",
+        "path": "/api/backend/v2/pending-requests/process-approve",
+        "permission": "pending_requests:process_approve"
+      },
+      {
+        "method": "POST",
+        "path": "/api/backend/v2/pending-requests/process-reject",
+        "permission": "pending_requests:process_reject"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/pending-requests/download-request-train-file",
+        "permission": "pending_requests:download_request_train_file"
+      },
+      {
+        "method": "POST",
+        "path": "/api/backend/v2/pending-requests/process-approve-enhanced",
+        "permission": "pending_requests:approve_request"
+      },
+      {
+        "method": "POST",
+        "path": "/api/backend/v2/pending-requests/process-train-request-enhanced",
+        "permission": "pending_requests:process_train_request"
+      }
+    ],
+    "Permissions": [
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/permissions/get-permission-admin-snapshot",
+        "permission": "permission_admin:snapshot"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/permissions/get-permission-admin-sections",
+        "permission": "permission_admin:sections_list"
+      },
+      {
+        "method": "POST",
+        "path": "/api/backend/v2/permissions/create-permission-admin-section",
+        "permission": "permission_admin:sections_create"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/backend/v2/permissions/update-permission-admin-section/{section_id}",
+        "permission": "permission_admin:sections_update"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/backend/v2/permissions/delete-permission-admin-section/{section_id}",
+        "permission": "permission_admin:sections_delete"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/permissions/get-permission-admin-action-weights",
+        "permission": "permission_admin:action_weights_list"
+      },
+      {
+        "method": "POST",
+        "path": "/api/backend/v2/permissions/create-permission-admin-action-weight",
+        "permission": "permission_admin:action_weights_create"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/backend/v2/permissions/update-permission-admin-action-weight/{aw_id}",
+        "permission": "permission_admin:action_weights_update"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/backend/v2/permissions/delete-permission-admin-action-weight/{aw_id}",
+        "permission": "permission_admin:action_weights_delete"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/permissions/get-permission-admin-permissions",
+        "permission": "permission_admin:permissions_list"
+      },
+      {
+        "method": "POST",
+        "path": "/api/backend/v2/permissions/create-permission-admin-permission",
+        "permission": "permission_admin:permissions_create"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/backend/v2/permissions/update-permission-admin-permission/{perm_id}",
+        "permission": "permission_admin:permissions_update"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/backend/v2/permissions/delete-permission-admin-permission/{perm_id}",
+        "permission": "permission_admin:permissions_delete"
+      },
+      {
+        "method": "POST",
+        "path": "/api/backend/v2/permissions/backfill-permission-admin-action-uids",
+        "permission": "permission_admin:backfill_action_uids"
+      }
+    ],
+    "Roles": [
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/roles/get-my-permissions",
+        "permission": "roles:permissions_me"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/roles/get-roles",
+        "permission": "roles:list_roles"
+      },
+      {
+        "method": "POST",
+        "path": "/api/backend/v2/roles/create-role",
+        "permission": "roles:create_role"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/backend/v2/roles/delete-role/{role}",
+        "permission": "roles:delete_role"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/roles/get-role-permissions/{role}",
+        "permission": "roles:get_role_permissions"
+      },
+      {
+        "method": "POST",
+        "path": "/api/backend/v2/roles/add-role-permissions/{role}",
+        "permission": "roles:add_role_permissions"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/backend/v2/roles/remove-role-permissions/{role}",
+        "permission": "roles:remove_role_permissions"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/roles/get-roles-by-permission/{permission}",
+        "permission": "roles:roles_by_permission"
+      },
+      {
+        "method": "POST",
+        "path": "/api/backend/v2/roles/assign-role",
+        "permission": "roles:assign_role"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/backend/v2/roles/remove-role",
+        "permission": "roles:remove_role"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/roles/get-user-roles/{user_id}",
+        "permission": "roles:list_user_roles"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/roles/get-users-with-role/{role}",
+        "permission": "roles:list_users_with_role"
+      }
+    ],
+    "Snippets": [
+      {
+        "method": "POST",
+        "path": "/api/backend/v2/snippets/snippets",
+        "permission": "snippets:create_snippet"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/snippets/snippets",
+        "permission": "snippets:list_snippets"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/snippets/snippets/{field_id}",
+        "permission": "snippets:get_snippet"
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/backend/v2/snippets/snippets/{field_id}",
+        "permission": "snippets:update_snippet"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/backend/v2/snippets/snippets/{field_id}",
+        "permission": "snippets:delete_snippet"
+      }
+    ],
+    "Tags": [
+      {
+        "method": "POST",
+        "path": "/api/backend/v2/tags/tags",
+        "permission": "tags:create_tag"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/tags/tags",
+        "permission": "tags:list_tags"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/tags/tags/{tag_id}",
+        "permission": "tags:get_tag"
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/backend/v2/tags/tags/{tag_id}",
+        "permission": "tags:update_tag"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/backend/v2/tags/tags/{tag_id}",
+        "permission": "tags:delete_tag"
+      }
+    ],
+    "Team": [
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/team/teams/statistics",
+        "permission": "teams:get_team_statistics"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/team/get_teams",
+        "permission": "teams:list_teams_paginated"
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/backend/v2/team/teams/assign-customer",
+        "permission": "teams:assign_customer_to_teams"
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/backend/v2/team/teams/assign-customers-bulk",
+        "permission": "teams:assign_customers_bulk"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/team/customers-by-team",
+        "permission": "teams:get_customers_by_team"
+      },
+      {
+        "method": "POST",
+        "path": "/api/backend/v2/team/teams",
+        "permission": "teams:create_team"
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/backend/v2/team/teams/{team_id}",
+        "permission": "teams:update_team"
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/backend/v2/team/teams/{team_id}/members",
+        "permission": "teams:update_team_members"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/backend/v2/team/teams/{team_id}",
+        "permission": "teams:delete_team"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/team/teams",
+        "permission": "teams:list_teams"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/team/teams/{team_id}",
+        "permission": "teams:get_team"
+      }
+    ],
+    "TrainRequests": [
+      {
+        "method": "POST",
+        "path": "/api/backend/v2/train-requests/train-data-request",
+        "permission": "train_requests:train_data"
+      },
+      {
+        "method": "POST",
+        "path": "/api/backend/v2/train-requests/train-txt-request",
+        "permission": "train_requests:train_txt"
+      },
+      {
+        "method": "POST",
+        "path": "/api/backend/v2/train-requests/train-csv-request",
+        "permission": "train_requests:train_csv"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/train-requests/check-data-model-health",
+        "permission": "train_requests:check_model_health"
+      }
+    ],
+    "UserProfile": [
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/user-profile/user/profile",
+        "permission": "user_profile:view_profile"
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/backend/v2/user-profile/user/profile",
+        "permission": "user_profile:update_profile"
+      }
+    ],
+    "admin": [
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/users/me",
+        "permission": "admin_users:get_current_user"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/users/brief",
+        "permission": "admin_users:get_users_brief"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/users/brief/{user_id}",
+        "permission": "admin_users:get_user_by_id"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/users/get-all-users",
+        "permission": "admin_users:get_all_users"
+      },
+      {
+        "method": "POST",
+        "path": "/api/backend/v2/users/create-user",
+        "permission": "admin_users:create_user"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/backend/v2/users/update-user",
+        "permission": "admin_users:update_user"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/backend/v2/users/delete-user",
+        "permission": "admin_users:delete_user"
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/backend/v2/users/update-user-status",
+        "permission": "admin_users:update_user_status"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/users/export-users-csv",
+        "permission": "admin_users:export_users"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/users/get-session-info",
+        "permission": "admin_users:get_session_info"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/users/get-all-session-handles-for-user",
+        "permission": "admin_users:get_user_sessions"
+      },
+      {
+        "method": "POST",
+        "path": "/api/backend/v2/users/revoke-user-session",
+        "permission": "admin_users:revoke_session"
+      },
+      {
+        "method": "POST",
+        "path": "/api/backend/v2/users/revoke-multiple-user-sessions",
+        "permission": "admin_users:revoke_multiple_sessions"
+      },
+      {
+        "method": "POST",
+        "path": "/api/backend/v2/users/revoke-all-sessions-for-user",
+        "permission": "admin_users:revoke_all_sessions"
+      }
+    ],
+    "auth": [
+      {
+        "method": "POST",
+        "path": "/api/backend/v2/auth/password/reset/request",
+        "permission": "PUBLIC"
+      },
+      {
+        "method": "POST",
+        "path": "/api/backend/v2/auth/password/reset/confirm",
+        "permission": "PUBLIC"
+      },
+      {
+        "method": "POST",
+        "path": "/api/backend/v2/auth/password/admin/set",
+        "permission": "PUBLIC"
+      },
+      {
+        "method": "POST",
+        "path": "/api/backend/v2/auth/register-initial",
+        "permission": "PUBLIC"
+      },
+      {
+        "method": "POST",
+        "path": "/api/backend/v2/auth/verify-email",
+        "permission": "PUBLIC"
+      },
+      {
+        "method": "POST",
+        "path": "/api/backend/v2/auth/resend-verification-email",
+        "permission": "PUBLIC"
+      },
+      {
+        "method": "POST",
+        "path": "/api/backend/v2/auth/login",
+        "permission": "PUBLIC"
+      },
+      {
+        "method": "POST",
+        "path": "/api/backend/v2/auth/refresh-token",
+        "permission": "PUBLIC"
+      },
+      {
+        "method": "POST",
+        "path": "/api/backend/v2/auth/complete-onboarding",
+        "permission": "PUBLIC"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/auth/saas/tenants/current",
+        "permission": "PUBLIC"
+      },
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/auth/onboarding-settings-options",
+        "permission": "PUBLIC"
+      },
+      {
+        "method": "POST",
+        "path": "/api/backend/v2/auth/logout",
+        "permission": "PUBLIC"
+      }
+    ],
+    "routes": [
+      {
+        "method": "GET",
+        "path": "/api/backend/v2/",
+        "permission": "system:health_check"
+      }
+    ]
+  }
+}

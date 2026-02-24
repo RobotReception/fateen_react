@@ -1,9 +1,20 @@
 import { useState, type FormEvent } from "react"
 import { Link, useNavigate } from "react-router-dom"
-import { Eye, EyeOff, LogIn, Loader2 } from "lucide-react"
-import { login } from "@/features/auth/services/auth-service"
+import { Eye, EyeOff, LogIn, Loader2, Building2, ArrowRight, ShieldCheck, User, Crown } from "lucide-react"
+import { login, type TenantInfo } from "@/features/auth/services/auth-service"
 import { useAuthStore } from "@/stores/auth-store"
 import { AuthLayout } from "@/features/auth/components/AuthLayout"
+
+/* ── Role badge helper ── */
+const ROLE_CONFIG: Record<string, { label: string; icon: typeof Crown; color: string; bg: string }> = {
+    owner: { label: "مالك", icon: Crown, color: "text-amber-700", bg: "bg-amber-50 border-amber-200" },
+    admin: { label: "مدير", icon: ShieldCheck, color: "text-blue-700", bg: "bg-blue-50 border-blue-200" },
+    user: { label: "مستخدم", icon: User, color: "text-gray-600", bg: "bg-gray-50 border-gray-200" },
+}
+
+function getRoleConfig(role: string) {
+    return ROLE_CONFIG[role] || ROLE_CONFIG.user
+}
 
 export function LoginPage() {
     const navigate = useNavigate()
@@ -15,6 +26,44 @@ export function LoginPage() {
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState("")
 
+    // ── Multi-tenant state ──
+    const [tenants, setTenants] = useState<TenantInfo[]>([])
+    const [showTenantPicker, setShowTenantPicker] = useState(false)
+    const [selectingTenantId, setSelectingTenantId] = useState<string | null>(null)
+
+    /** Completes login using standard user+token response */
+    const completeLogin = (data: any) => {
+        const { user, token, refresh_token } = data
+
+        if (!user.onboarding_complete) {
+            setRegistrationData(user.id, user.email)
+            navigate("/onboarding")
+            return
+        }
+
+        authLogin(
+            {
+                id: user.id,
+                email: user.email,
+                username: user.username,
+                tenant_id: user.tenant_id,
+                role: user.role,
+                first_name: user.first_name,
+                last_name: user.last_name,
+                phone: user.phone,
+                profile_picture: user.profile_picture,
+                email_verified: user.email_verified,
+                onboarding_complete: user.onboarding_complete,
+                pageWithPermission: user.pageWithPermission,
+            },
+            token,
+            refresh_token
+        )
+
+        navigate("/dashboard")
+    }
+
+    /** First login attempt — may return tenant selection */
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault()
         setError("")
@@ -26,46 +75,19 @@ export function LoginPage() {
 
         setLoading(true)
         try {
-            const res = await login({ email, password })
-            const { user, token, refresh_token } = res.data
+            const result = await login({ email, password })
 
-            // Route based on account state
-            if (!user.email_verified) {
-                setRegistrationData(user.id, user.email)
-                navigate("/verify-email")
-                return
+            if ("requires_tenant_selection" in result.data && result.data.requires_tenant_selection) {
+                // Multi-tenant — show picker
+                setTenants(result.data.tenants)
+                setShowTenantPicker(true)
+            } else {
+                // Single tenant — direct login
+                completeLogin(result.data)
             }
-
-            if (!user.onboarding_complete) {
-                setRegistrationData(user.id, user.email)
-                navigate("/onboarding")
-                return
-            }
-
-            // Fully onboarded user — store and go to dashboard
-            authLogin(
-                {
-                    id: user.id,
-                    email: user.email,
-                    username: user.username,
-                    tenant_id: user.tenant_id,
-                    role: user.role,
-                    first_name: user.first_name,
-                    last_name: user.last_name,
-                    phone: user.phone,
-                    profile_picture: user.profile_picture,
-                    email_verified: user.email_verified,
-                    onboarding_complete: user.onboarding_complete,
-                    pageWithPermission: user.pageWithPermission,
-                },
-                token,
-                refresh_token
-            )
-
-            navigate("/dashboard")
         } catch (err: any) {
-            const status = err.response?.status
             const msg = err.response?.data?.message
+            const status = err.response?.status
             if (status === 400) {
                 setError("البريد الإلكتروني أو كلمة المرور غير صحيحة")
             } else if (err.code === "ECONNABORTED" || err.message?.includes("timeout")) {
@@ -80,6 +102,130 @@ export function LoginPage() {
         }
     }
 
+    /** Second login — with selected tenant_id */
+    const handleTenantSelect = async (tenantId: string) => {
+        setError("")
+        setSelectingTenantId(tenantId)
+        try {
+            const result = await login({ email, password, tenant_id: tenantId })
+
+            if ("token" in result.data) {
+                completeLogin(result.data)
+                // Clear password from memory after successful login
+                setPassword("")
+            }
+        } catch (err: any) {
+            const msg = err.response?.data?.message
+            setError(msg || "حدث خطأ أثناء تسجيل الدخول. حاول مرة أخرى")
+        } finally {
+            setSelectingTenantId(null)
+        }
+    }
+
+    /** Go back from tenant picker to login form */
+    const handleBackToLogin = () => {
+        setShowTenantPicker(false)
+        setTenants([])
+        setSelectingTenantId(null)
+        setError("")
+    }
+
+    // ═══════════════════════════════════════════════
+    //  RENDER — Tenant Picker
+    // ═══════════════════════════════════════════════
+    if (showTenantPicker) {
+        return (
+            <AuthLayout>
+                <div className="mb-6 text-center">
+                    <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#0098d6]/10 to-[#004786]/10">
+                        <Building2 className="h-7 w-7 text-[#0098d6]" />
+                    </div>
+                    <h1 className="mb-1.5 text-xl font-bold text-gray-900">
+                        اختر الشركة
+                    </h1>
+                    <p className="text-sm text-gray-500">
+                        حسابك مرتبط بعدة شركات، اختر الشركة التي تريد الدخول إليها
+                    </p>
+                </div>
+
+                {error && (
+                    <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+                        {error}
+                    </div>
+                )}
+
+                <div className="space-y-3">
+                    {tenants.map((tenant) => {
+                        const roleConfig = getRoleConfig(tenant.role)
+                        const RoleIcon = roleConfig.icon
+                        const isSelecting = selectingTenantId === tenant.tenant_id
+                        const isDisabled = selectingTenantId !== null
+
+                        return (
+                            <button
+                                key={tenant.tenant_id}
+                                onClick={() => handleTenantSelect(tenant.tenant_id)}
+                                disabled={isDisabled}
+                                className={`group relative w-full rounded-xl border-2 p-4 text-right transition-all duration-300 ${isSelecting
+                                    ? "border-[#0098d6] bg-[#0098d6]/5 shadow-md shadow-[#0098d6]/10"
+                                    : isDisabled
+                                        ? "cursor-not-allowed border-gray-100 bg-gray-50/50 opacity-60"
+                                        : "border-gray-100 bg-white hover:border-[#0098d6]/40 hover:bg-[#0098d6]/[0.02] hover:shadow-md hover:shadow-[#0098d6]/5"
+                                    }`}
+                            >
+                                <div className="flex items-center gap-3">
+                                    {/* Company icon */}
+                                    <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition-colors duration-300 ${isSelecting
+                                        ? "bg-[#0098d6] text-white"
+                                        : "bg-gray-100 text-gray-500 group-hover:bg-[#0098d6]/10 group-hover:text-[#0098d6]"
+                                        }`}>
+                                        {isSelecting ? (
+                                            <Loader2 className="h-5 w-5 animate-spin" />
+                                        ) : (
+                                            <Building2 className="h-5 w-5" />
+                                        )}
+                                    </div>
+
+                                    {/* Company info */}
+                                    <div className="flex-1 min-w-0">
+                                        <p className="text-sm font-semibold text-gray-900 truncate">
+                                            {tenant.organization_name}
+                                        </p>
+                                        <p className="text-xs text-gray-400 truncate mt-0.5" dir="ltr">
+                                            {tenant.tenant_id}
+                                        </p>
+                                        <div className="mt-1 flex items-center gap-1.5">
+                                            <span className={`inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-xs font-medium ${roleConfig.bg} ${roleConfig.color}`}>
+                                                <RoleIcon className="h-3 w-3" />
+                                                {roleConfig.label}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    {/* Arrow */}
+                                    <ArrowRight className={`h-4 w-4 shrink-0 rotate-180 text-gray-300 transition-all duration-300 ${!isDisabled ? "group-hover:text-[#0098d6] group-hover:-translate-x-1" : ""
+                                        }`} />
+                                </div>
+                            </button>
+                        )
+                    })}
+                </div>
+
+                {/* Back button */}
+                <button
+                    onClick={handleBackToLogin}
+                    disabled={selectingTenantId !== null}
+                    className="mt-5 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-600 transition-all duration-300 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                    رجوع لتسجيل الدخول
+                </button>
+            </AuthLayout>
+        )
+    }
+
+    // ═══════════════════════════════════════════════
+    //  RENDER — Login Form (original, unchanged)
+    // ═══════════════════════════════════════════════
     return (
         <AuthLayout>
             <div className="mb-8 text-center">

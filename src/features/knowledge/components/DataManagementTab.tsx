@@ -51,6 +51,8 @@ import type {
     CategoryItem,
     SearchDocumentResult,
 } from "../types"
+import { ActionGuard } from "@/components/guards/ActionGuard"
+import { PAGE_BITS, ACTION_BITS } from "@/lib/permissions"
 
 /* ═══════════════════════ CONSTANTS ═══════════════════════ */
 const PAGE_SIZE = 10
@@ -566,9 +568,15 @@ const DocRow = memo(function DocRow({
             <td className="px-4 py-3"><span className="rounded-full bg-purple-50 px-2.5 py-1 text-[10px] font-semibold text-purple-600 whitespace-nowrap">{catLabel}</span></td>
             <td className="px-4 py-3">
                 <div className="flex items-center justify-center gap-1">
-                    <button onClick={() => onView(doc)} className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-blue-50 hover:text-blue-500" title="عرض"><Eye size={14} /></button>
-                    <button onClick={() => onEdit(doc)} className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-amber-50 hover:text-amber-500" title="تعديل"><Pencil size={14} /></button>
-                    <button onClick={() => onDelete(doc.doc_id)} className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-500" title="حذف"><Trash2 size={14} /></button>
+                    <ActionGuard pageBit={PAGE_BITS.DOCUMENTS} actionBit={ACTION_BITS.GET_DOCUMENT}>
+                        <button onClick={() => onView(doc)} className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-blue-50 hover:text-blue-500" title="عرض"><Eye size={14} /></button>
+                    </ActionGuard>
+                    <ActionGuard pageBit={PAGE_BITS.DOCUMENTS} actionBit={ACTION_BITS.UPDATE_DOCUMENT}>
+                        <button onClick={() => onEdit(doc)} className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-amber-50 hover:text-amber-500" title="تعديل"><Pencil size={14} /></button>
+                    </ActionGuard>
+                    <ActionGuard pageBit={PAGE_BITS.DOCUMENTS} actionBit={ACTION_BITS.DELETE_DOCUMENT}>
+                        <button onClick={() => onDelete(doc.doc_id)} className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-500" title="حذف"><Trash2 size={14} /></button>
+                    </ActionGuard>
                 </div>
             </td>
         </tr>
@@ -716,8 +724,12 @@ export function DataManagementTab({ onNavigateToTab }: { onNavigateToTab?: (tab:
                 </div>
                 {activeDeptId && (
                     <div className="flex items-center gap-2">
-                        <button onClick={() => setShowUpload(true)} className="flex items-center gap-2 rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-medium text-white  transition-transform hover:scale-[1.02] active:scale-[0.98]"><Upload size={15} />رفع ملف</button>
-                        <button onClick={() => setShowAddText(true)} className="flex items-center gap-2 rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-medium text-white  transition-transform hover:scale-[1.02] active:scale-[0.98]"><Plus size={15} />إضافة نص</button>
+                        <ActionGuard pageBit={PAGE_BITS.DOCUMENTS} actionBit={ACTION_BITS.UPLOAD_DOCUMENT}>
+                            <button onClick={() => setShowUpload(true)} className="flex items-center gap-2 rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-medium text-white  transition-transform hover:scale-[1.02] active:scale-[0.98]"><Upload size={15} />رفع ملف</button>
+                        </ActionGuard>
+                        <ActionGuard pageBit={PAGE_BITS.DOCUMENTS} actionBit={ACTION_BITS.UPLOAD_DOCUMENT_JSON}>
+                            <button onClick={() => setShowAddText(true)} className="flex items-center gap-2 rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-medium text-white  transition-transform hover:scale-[1.02] active:scale-[0.98]"><Plus size={15} />إضافة نص</button>
+                        </ActionGuard>
                     </div>
                 )}
             </div>
@@ -819,7 +831,9 @@ export function DataManagementTab({ onNavigateToTab }: { onNavigateToTab?: (tab:
             {selected.size > 0 && (
                 <div className="flex items-center justify-between rounded-xl bg-gray-50 border border-gray-200 px-4 py-2.5" style={{ animation: "fadeIn .2s ease-out" }}>
                     <p className="text-sm font-medium text-blue-700">تم تحديد <span className="font-bold">{selected.size}</span> مستند</p>
-                    <button onClick={() => setDeleteTargets([...selected])} className="flex items-center gap-1.5 rounded-lg bg-red-500 px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-red-600"><Trash2 size={12} /> حذف المحدد</button>
+                    <ActionGuard pageBit={PAGE_BITS.DOCUMENTS} actionBit={ACTION_BITS.DELETE_DOCUMENT}>
+                        <button onClick={() => setDeleteTargets([...selected])} className="flex items-center gap-1.5 rounded-lg bg-red-500 px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-red-600"><Trash2 size={12} /> حذف المحدد</button>
+                    </ActionGuard>
                 </div>
             )}
 

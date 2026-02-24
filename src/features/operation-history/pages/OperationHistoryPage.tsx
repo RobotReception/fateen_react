@@ -1,5 +1,7 @@
 import { useState, useCallback, useMemo, memo } from "react"
 import { toast } from "sonner"
+import { ActionGuard } from "@/components/guards/ActionGuard"
+import { PAGE_BITS, ACTION_BITS } from "@/lib/permissions"
 import {
     Search,
     Loader2,
@@ -21,6 +23,7 @@ import {
     ShieldCheck,
     AlertTriangle,
 } from "lucide-react"
+
 import { useAuthStore } from "@/stores/auth-store"
 import {
     getOperationDetails,
@@ -166,8 +169,14 @@ const OpRow = memo(function OpRow({
             <td className="px-4 py-3.5"><span className="text-xs text-gray-400 whitespace-nowrap">{formatDate(op.completed_at)}</span></td>
             <td className="px-4 py-3.5">
                 <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-                    <button onClick={() => onView(op)} className="rounded-lg p-1.5 text-gray-400 hover:bg-blue-50 hover:text-blue-500 transition-colors" title="عرض التفاصيل"><Eye size={14} /></button>
-                    {hasFile && <button onClick={() => onDownload(op)} className="rounded-lg p-1.5 text-gray-400 hover:bg-purple-50 hover:text-purple-500 transition-colors" title="تحميل الملف"><Download size={14} /></button>}
+                    <ActionGuard pageBit={PAGE_BITS.OPERATION_HISTORY} actionBit={ACTION_BITS.GET_OPERATION_DETAILS}>
+                        <button onClick={() => onView(op)} className="rounded-lg p-1.5 text-gray-400 hover:bg-blue-50 hover:text-blue-500 transition-colors" title="عرض التفاصيل"><Eye size={14} /></button>
+                    </ActionGuard>
+                    {hasFile && (
+                        <ActionGuard pageBit={PAGE_BITS.OPERATION_HISTORY} actionBit={ACTION_BITS.DOWNLOAD_OPERATION_TRAIN_FILE}>
+                            <button onClick={() => onDownload(op)} className="rounded-lg p-1.5 text-gray-400 hover:bg-purple-50 hover:text-purple-500 transition-colors" title="تحميل الملف"><Download size={14} /></button>
+                        </ActionGuard>
+                    )}
                 </div>
             </td>
         </tr>
@@ -319,11 +328,13 @@ export function OperationHistoryPage() {
                             {pagination.totalCount} عملية
                         </span>
                     )}
-                    <button onClick={handleExportCsv} disabled={exporting || loading}
-                        className="flex items-center gap-2 rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-medium text-white  transition-transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50">
-                        {exporting ? <Loader2 size={15} className="animate-spin" /> : <FileSpreadsheet size={15} />}
-                        تصدير CSV
-                    </button>
+                    <ActionGuard pageBit={PAGE_BITS.OPERATION_HISTORY} actionBit={ACTION_BITS.DOWNLOAD_OPERATIONS_CSV}>
+                        <button onClick={handleExportCsv} disabled={exporting || loading}
+                            className="flex items-center gap-2 rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-medium text-white  transition-transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50">
+                            {exporting ? <Loader2 size={15} className="animate-spin" /> : <FileSpreadsheet size={15} />}
+                            تصدير CSV
+                        </button>
+                    </ActionGuard>
                 </div>
             </div>
 

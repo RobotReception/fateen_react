@@ -17,6 +17,8 @@ import type {
     DepartmentDetail, CategoryItem,
     CreateDepartmentPayload, UpdateDepartmentPayload,
 } from "../types"
+import { ActionGuard } from "@/components/guards/ActionGuard"
+import { PAGE_BITS, ACTION_BITS } from "@/lib/permissions"
 
 /* ══════════ CONSTANTS ══════════ */
 const PAGE_SIZE = 15
@@ -360,9 +362,15 @@ const DeptRow = memo(function DeptRow({
                 {/* Actions */}
                 <td className="px-5 py-3.5">
                     <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-                        <button onClick={() => onEdit(dept)} className="rounded-lg p-1.5 text-gray-400 hover:bg-amber-50 hover:text-amber-500" title="تعديل"><Pencil size={14} /></button>
-                        <button onClick={() => onDeleteData(dept)} className="rounded-lg p-1.5 text-gray-400 hover:bg-orange-50 hover:text-orange-500" title="حذف بيانات القسم"><Database size={14} /></button>
-                        <button onClick={() => onDelete(dept)} className="rounded-lg p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-500" title="حذف"><Trash2 size={14} /></button>
+                        <ActionGuard pageBit={PAGE_BITS.DEPARTMENTS} actionBit={ACTION_BITS.UPDATE_DEPARTMENT}>
+                            <button onClick={() => onEdit(dept)} className="rounded-lg p-1.5 text-gray-400 hover:bg-amber-50 hover:text-amber-500" title="تعديل"><Pencil size={14} /></button>
+                        </ActionGuard>
+                        <ActionGuard pageBit={PAGE_BITS.DEPARTMENTS} actionBit={ACTION_BITS.DELETE_DEPARTMENT}>
+                            <button onClick={() => onDeleteData(dept)} className="rounded-lg p-1.5 text-gray-400 hover:bg-orange-50 hover:text-orange-500" title="حذف بيانات القسم"><Database size={14} /></button>
+                        </ActionGuard>
+                        <ActionGuard pageBit={PAGE_BITS.DEPARTMENTS} actionBit={ACTION_BITS.DELETE_DEPARTMENT}>
+                            <button onClick={() => onDelete(dept)} className="rounded-lg p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-500" title="حذف"><Trash2 size={14} /></button>
+                        </ActionGuard>
                     </div>
                 </td>
             </tr>
@@ -472,9 +480,11 @@ export function DepartmentsTab() {
                     <h2 className="text-xl font-bold text-gray-800">الأقسام</h2>
                     <p className="mt-1 text-sm text-gray-400">إدارة أقسام المؤسسة وربط الفئات بها</p>
                 </div>
-                <button onClick={() => setCreateModal(true)} className="flex items-center gap-2 rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-medium text-white  transition-transform hover:scale-[1.02] active:scale-[0.98]">
-                    <Plus size={15} />إنشاء قسم
-                </button>
+                <ActionGuard pageBit={PAGE_BITS.DEPARTMENTS} actionBit={ACTION_BITS.CREATE_DEPARTMENT}>
+                    <button onClick={() => setCreateModal(true)} className="flex items-center gap-2 rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-medium text-white  transition-transform hover:scale-[1.02] active:scale-[0.98]">
+                        <Plus size={15} />إنشاء قسم
+                    </button>
+                </ActionGuard>
             </div>
 
             {/* Search + Toggle inactive */}

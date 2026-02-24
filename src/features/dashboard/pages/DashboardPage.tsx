@@ -2,7 +2,7 @@ import { Users, FileText, BarChart3, Settings } from "lucide-react"
 
 export function DashboardPage() {
     return (
-        <div className="p-4 lg:p-6 space-y-6" dir="rtl">
+        <div className="h-full overflow-y-auto p-4 lg:p-6 space-y-6" dir="rtl">
             <div>
                 <h1 className="text-2xl font-bold text-gray-800">لوحة التحكم</h1>
                 <p className="mt-1 text-sm text-gray-400">مرحباً بك في لوحة تحكم فطين</p>

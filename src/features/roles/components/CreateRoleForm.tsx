@@ -2,6 +2,8 @@ import { useState, useCallback } from "react"
 import { Plus, X, Loader2, AlertCircle } from "lucide-react"
 import { useCreateRole } from "../hooks/use-roles"
 import type { CreateRolePayload } from "../types"
+import { ActionGuard } from "@/components/guards/ActionGuard"
+import { PAGE_BITS, ACTION_BITS } from "@/lib/permissions"
 
 interface Props { onCreated?: (role: string) => void }
 
@@ -31,11 +33,13 @@ export function CreateRoleForm({ onCreated }: Props) {
 
     if (!open) {
         return (
-            <button onClick={() => setOpen(true)}
-                className="flex w-full items-center gap-1.5 rounded-lg px-3 py-2.5 text-[13px] font-medium
-                           text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-colors">
-                <Plus size={14} /> إنشاء دور جديد
-            </button>
+            <ActionGuard pageBit={PAGE_BITS.ROLES} actionBit={ACTION_BITS.CREATE_ROLE}>
+                <button onClick={() => setOpen(true)}
+                    className="flex w-full items-center gap-1.5 rounded-lg px-3 py-2.5 text-[13px] font-medium
+                               text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-colors">
+                    <Plus size={14} /> إنشاء دور جديد
+                </button>
+            </ActionGuard>
         )
     }
 

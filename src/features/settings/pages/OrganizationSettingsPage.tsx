@@ -2,6 +2,7 @@ import { useState } from "react"
 import {
     Building2, Users, MessageSquare, CreditCard,
     Settings, ChevronLeft, Shield, Brain, Palette,
+    UsersRound, Tag, FileText, RefreshCw,
 } from "lucide-react"
 import { Link } from "react-router-dom"
 import { OrganizationTab } from "../components/OrganizationTab"
@@ -10,6 +11,11 @@ import { UsersPage } from "@/features/users/pages/UsersPage"
 import { RolesPage } from "@/features/roles/pages/RolesPage"
 import { AISettingsTab } from "@/features/ai-settings/components/AISettingsTab"
 import { ThemeTab } from "../components/ThemeTab"
+import { ChannelsPage } from "@/features/channels/pages/ChannelsPage"
+import { TeamsTab } from "../components/TeamsTab"
+import { TagsTab } from "../components/TagsTab"
+import { SnippetsTab } from "../components/SnippetsTab"
+import { LifecyclesTab } from "../components/LifecyclesTab"
 
 /* ── sidebar items ── */
 const SIDEBAR_ITEMS = [
@@ -17,6 +23,10 @@ const SIDEBAR_ITEMS = [
     { key: "users", label: "إدارة المستخدمين", icon: Users, desc: "إضافة وإدارة مستخدمي المؤسسة وصلاحياتهم" },
     { key: "roles", label: "الأدوار والصلاحيات", icon: Shield, desc: "إنشاء الأدوار وإدارة الصلاحيات وتعيين المستخدمين" },
     { key: "channels", label: "القنوات", icon: MessageSquare, desc: "إعداد وإدارة قنوات التواصل المختلفة" },
+    { key: "teams", label: "الفرق", icon: UsersRound, desc: "إدارة فرق العمل وتوزيع الأعضاء" },
+    { key: "tags", label: "التاجات", icon: Tag, desc: "إنشاء وإدارة تاجات تصنيف العملاء والمحادثات" },
+    { key: "snippets", label: "Snippets", icon: FileText, desc: "جمل وردود جاهزة للاستخدام السريع في المحادثات" },
+    { key: "lifecycles", label: "دورات الحياة", icon: RefreshCw, desc: "تحديد مراحل دورة حياة العميل من من تحويل لعملية" },
     { key: "ai", label: "الذكاء الاصطناعي", icon: Brain, desc: "إعدادات الذكاء الاصطناعي والتوجيه وتحويل النص لكلام" },
     { key: "theme", label: "تخصيص المظهر", icon: Palette, desc: "تغيير ألوان الواجهة لتتناسب مع هوية مؤسستك" },
     { key: "billing", label: "الاشتراك والدفع", icon: CreditCard, desc: "إدارة خطتك الحالية وعرض الفواتير" },
@@ -24,32 +34,6 @@ const SIDEBAR_ITEMS = [
 
 type SidebarKey = (typeof SIDEBAR_ITEMS)[number]["key"]
 
-/* ── placeholder ── */
-function ComingSoon({ title, desc }: { title: string; desc: string }) {
-    return (
-        <div style={{
-            background: "var(--t-card)", borderRadius: 12, border: "1px solid var(--t-border)",
-            padding: "56px 24px", textAlign: "center",
-        }}>
-            <div style={{
-                width: 48, height: 48, borderRadius: 12, background: "var(--t-surface)",
-                display: "inline-flex", alignItems: "center", justifyContent: "center",
-                marginBottom: 14,
-            }}>
-                <Settings size={22} style={{ color: "var(--t-text-faint)" }} />
-            </div>
-            <h3 style={{ fontSize: 16, fontWeight: 700, color: "var(--t-text)", margin: "0 0 4px" }}>{title}</h3>
-            <p style={{ fontSize: 13, color: "var(--t-text-faint)", margin: 0, maxWidth: 320, marginInline: "auto" }}>{desc}</p>
-            <div style={{
-                marginTop: 16, display: "inline-block",
-                padding: "6px 20px", borderRadius: 8, border: "1px solid var(--t-border)",
-                fontSize: 12, fontWeight: 600, color: "var(--t-text-muted)",
-            }}>
-                قريباً
-            </div>
-        </div>
-    )
-}
 
 export function OrganizationSettingsPage() {
     const [active, setActive] = useState<SidebarKey>("general")
@@ -192,12 +176,11 @@ export function OrganizationSettingsPage() {
                     {active === "general" && <OrganizationTab />}
                     {active === "users" && <UsersPage embedded />}
                     {active === "roles" && <RolesPage embedded />}
-                    {active === "channels" && (
-                        <ComingSoon
-                            title="إعداد القنوات"
-                            desc="ربط وإدارة قنوات التواصل مثل واتساب، تلجرام، البريد الإلكتروني والمزيد."
-                        />
-                    )}
+                    {active === "channels" && <ChannelsPage />}
+                    {active === "teams" && <TeamsTab />}
+                    {active === "tags" && <TagsTab />}
+                    {active === "snippets" && <SnippetsTab />}
+                    {active === "lifecycles" && <LifecyclesTab />}
                     {active === "ai" && <AISettingsTab />}
                     {active === "theme" && <ThemeTab />}
                     {active === "billing" && <BillingTab />}

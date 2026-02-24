@@ -11,6 +11,8 @@ import { FetchingBar } from "@/components/ui/FetchingBar"
 import type {
     CategoryDetail, CreateCategoryPayload, UpdateCategoryPayload,
 } from "../types"
+import { ActionGuard } from "@/components/guards/ActionGuard"
+import { PAGE_BITS, ACTION_BITS } from "@/lib/permissions"
 
 /* ══════════ CONSTANTS ══════════ */
 const PAGE_SIZE = 20
@@ -203,8 +205,12 @@ const CatRow = memo(function CatRow({ cat, idx, onEdit, onDelete }: { cat: Categ
             <td className="px-5 py-3.5"><span className="text-xs text-gray-400">{cat.order}</span></td>
             <td className="px-5 py-3.5">
                 <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-                    <button onClick={() => onEdit(cat)} className="rounded-lg p-1.5 text-gray-400 hover:bg-amber-50 hover:text-amber-500" title="تعديل"><Pencil size={14} /></button>
-                    <button onClick={() => onDelete(cat)} className="rounded-lg p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-500" title="حذف"><Trash2 size={14} /></button>
+                    <ActionGuard pageBit={PAGE_BITS.DEPARTMENTS} actionBit={ACTION_BITS.UPDATE_CATEGORY}>
+                        <button onClick={() => onEdit(cat)} className="rounded-lg p-1.5 text-gray-400 hover:bg-amber-50 hover:text-amber-500" title="تعديل"><Pencil size={14} /></button>
+                    </ActionGuard>
+                    <ActionGuard pageBit={PAGE_BITS.DEPARTMENTS} actionBit={ACTION_BITS.DELETE_CATEGORY}>
+                        <button onClick={() => onDelete(cat)} className="rounded-lg p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-500" title="حذف"><Trash2 size={14} /></button>
+                    </ActionGuard>
                 </div>
             </td>
         </tr>
@@ -287,9 +293,11 @@ export function CategoriesTab() {
                     <h2 className="text-xl font-bold text-gray-800">الفئات</h2>
                     <p className="mt-1 text-sm text-gray-400">إدارة تصنيفات المستندات</p>
                 </div>
-                <button onClick={() => setCreateModal(true)} className="flex items-center gap-2 rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-medium text-white  transition-transform hover:scale-[1.02] active:scale-[0.98]">
-                    <Plus size={15} />إنشاء فئة
-                </button>
+                <ActionGuard pageBit={PAGE_BITS.DEPARTMENTS} actionBit={ACTION_BITS.CREATE_CATEGORY}>
+                    <button onClick={() => setCreateModal(true)} className="flex items-center gap-2 rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-medium text-white  transition-transform hover:scale-[1.02] active:scale-[0.98]">
+                        <Plus size={15} />إنشاء فئة
+                    </button>
+                </ActionGuard>
             </div>
 
             {/* Search + Toggle inactive */}

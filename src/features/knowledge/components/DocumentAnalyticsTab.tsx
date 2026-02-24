@@ -12,6 +12,8 @@ import { useDepartmentsLookup } from "../hooks/use-departments"
 import { useCategoriesLookup } from "../hooks/use-categories"
 import { useTenantAnalytics, useInvalidateAnalytics } from "../hooks/use-analytics"
 import type { TenantAnalyticsParams } from "../types"
+import { ActionGuard } from "@/components/guards/ActionGuard"
+import { PAGE_BITS, ACTION_BITS } from "@/lib/permissions"
 
 /* ══════════ COLORS ══════════ */
 const CHART_COLORS = [
@@ -166,14 +168,16 @@ export function DocumentAnalyticsTab() {
                     <h2 className="text-xl font-bold text-gray-800">تحليلات المستندات</h2>
                     <p className="mt-1 text-sm text-gray-400">إحصائيات شاملة عن المستندات والملفات في قاعدة المعرفة</p>
                 </div>
-                <button
-                    onClick={handleRefresh}
-                    disabled={isFetching}
-                    className="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-600 shadow-sm transition-all hover:bg-gray-50 hover:shadow-md disabled:opacity-50"
-                >
-                    <RefreshCw size={15} className={isFetching ? "animate-spin" : ""} />
-                    تحديث
-                </button>
+                <ActionGuard pageBit={PAGE_BITS.DOCUMENTS} actionBit={ACTION_BITS.GET_ALL_ANALYTICS_NEW}>
+                    <button
+                        onClick={handleRefresh}
+                        disabled={isFetching}
+                        className="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-600 shadow-sm transition-all hover:bg-gray-50 hover:shadow-md disabled:opacity-50"
+                    >
+                        <RefreshCw size={15} className={isFetching ? "animate-spin" : ""} />
+                        تحديث
+                    </button>
+                </ActionGuard>
             </div>
 
             {/* Filters */}

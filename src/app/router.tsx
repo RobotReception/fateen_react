@@ -21,6 +21,9 @@ import { OrganizationSettingsPage } from "@/features/settings/pages/Organization
 import { ProfileSettingsPage } from "@/features/settings/pages/ProfileSettingsPage"
 import { AISettingsPage } from "@/features/ai-settings/pages/AISettingsPage"
 import { RolesPage } from "@/features/roles/pages/RolesPage"
+import { ChannelsPage } from "@/features/channels/pages/ChannelsPage"
+import { InboxPage } from "@/features/inbox/pages/InboxPage"
+import { ConversationPage } from "@/features/inbox/pages/ConversationPage"
 
 /** يتحقق من تسجيل الدخول — يحوّل لصفحة Login إذا لم يكن مسجلاً */
 function AuthGuard({ children }: { children: React.ReactNode }) {
@@ -68,6 +71,21 @@ export function AppRouter() {
                 <Route path="roles" element={
                     <PermissionGuard pageBit={PAGE_BITS.ROLES}>
                         <RolesPage />
+                    </PermissionGuard>
+                } />
+                <Route path="channels" element={
+                    <PermissionGuard pageBit={PAGE_BITS.CHANNELS}>
+                        <ChannelsPage />
+                    </PermissionGuard>
+                } />
+                <Route path="inbox" element={
+                    <PermissionGuard pageBit={PAGE_BITS.INBOX}>
+                        <InboxPage />
+                    </PermissionGuard>
+                } />
+                <Route path="inbox/:id" element={
+                    <PermissionGuard pageBit={PAGE_BITS.INBOX}>
+                        <ConversationPage />
                     </PermissionGuard>
                 } />
                 <Route path="settings" element={<Navigate to="/dashboard/settings/organization" replace />} />
