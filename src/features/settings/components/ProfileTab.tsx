@@ -21,6 +21,7 @@ function fmtDateTime(d: string | null | undefined): string {
         return new Intl.DateTimeFormat("ar-SA", {
             year: "numeric", month: "short", day: "numeric",
             hour: "2-digit", minute: "2-digit",
+            timeZone: "Asia/Aden",
         }).format(new Date(d))
     } catch { return d }
 }
@@ -439,7 +440,7 @@ export function ProfileTab() {
                                 <div>
                                     <DataRow label="انتهاء الجلسة" value={
                                         profile.session.expires_at
-                                            ? new Date(profile.session.expires_at).toLocaleDateString("ar-SA")
+                                            ? new Date(profile.session.expires_at).toLocaleDateString("ar-SA", { timeZone: "Asia/Aden" })
                                             : null
                                     } />
                                 </div>

@@ -10,6 +10,7 @@ export function formatDate(date: string | Date): string {
         year: "numeric",
         month: "long",
         day: "numeric",
+        timeZone: "Asia/Aden",
     }).format(new Date(date))
 }
 
@@ -20,6 +21,7 @@ export function formatDateTime(date: string | Date): string {
         day: "numeric",
         hour: "2-digit",
         minute: "2-digit",
+        timeZone: "Asia/Aden",
     }).format(new Date(date))
 }
 

@@ -42,14 +42,10 @@ export function ConversationListPanel() {
 
     // ── Merge all filters → API params ──
     const customerParams = {
-        // Status
         session_status: statusParam,
-        // Search
         search: searchQuery || undefined,
-        // Section nav
         ...sectionFilters,
         ...(activeSection === "unassigned" ? { is_assigned: "false" } : {}),
-        // Advanced filters (only pass defined values)
         ...(advancedFilters.platform ? { platform: advancedFilters.platform } : {}),
         ...(advancedFilters.lifecycle && !activeSection.startsWith("lc_") ? { lifecycle: advancedFilters.lifecycle } : {}),
         ...(advancedFilters.assigned_to && activeSection !== "mine" ? { assigned_to: advancedFilters.assigned_to } : {}),
@@ -68,54 +64,30 @@ export function ConversationListPanel() {
     const totalCount = data?.pagination?.totalCount ?? customers.length
 
     return (
-        <div style={{
-            width: 310,
-            minWidth: 310,
-            height: "100%",
-            display: "flex",
-            flexDirection: "column",
-            borderLeft: "1px solid var(--t-border-light)",
-            background: "var(--t-bg, var(--t-surface))",
-            overflow: "hidden",
-        }}>
+        <div className="clp-root">
             {/* ── Filters ── */}
             <FilterBar availableFilters={availableFilters} />
 
-            {/* ── Loading bar (thin accent line during refetch) ── */}
-            <div style={{
-                height: 2,
-                background: isFetching ? "var(--t-accent)" : "transparent",
-                transition: "background 0.2s",
-                flexShrink: 0,
-                ...(isFetching ? { animation: "loading-bar 1.2s ease-in-out infinite" } : {}),
-            }} />
+            {/* ── Loading progress bar ── */}
+            <div className={`clp-progress ${isFetching ? "clp-progress-active" : ""}`} />
 
             {/* ── Conversation list ── */}
-            <div style={{ flex: 1, overflowY: "auto", position: "relative" }}>
+            <div className="clp-list">
                 {isLoading ? (
                     <LoadingSpinner />
                 ) : customers.length === 0 ? (
                     <EmptyState hasFilters={!!searchQuery || Object.values(advancedFilters).some(Boolean)} />
                 ) : (
-                    <div>
+                    <>
                         {/* Count header */}
-                        <div style={{
-                            padding: "6px 14px 4px",
-                            display: "flex", alignItems: "center", justifyContent: "space-between",
-                        }}>
-                            <span style={{ fontSize: 10, fontWeight: 600, color: "var(--t-text-faint)" }}>
-                                {totalCount} conversation{totalCount !== 1 ? "s" : ""}
+                        <div className="clp-count-row">
+                            <span className="clp-count">
+                                {totalCount} محادثة
                             </span>
                             {isFetching && !isLoading && (
-                                <span style={{ fontSize: 10, color: "var(--t-text-faint)", display: "flex", alignItems: "center", gap: 4 }}>
-                                    <span style={{
-                                        width: 8, height: 8, borderRadius: "50%",
-                                        border: "1.5px solid var(--t-accent)",
-                                        borderTopColor: "transparent",
-                                        animation: "spin 0.6s linear infinite",
-                                        display: "inline-block",
-                                    }} />
-                                    Updating…
+                                <span className="clp-updating">
+                                    <span className="clp-spinner-mini" />
+                                    جاري التحديث
                                 </span>
                             )}
                         </div>
@@ -126,17 +98,61 @@ export function ConversationListPanel() {
                                 isSelected={customer.customer_id === selectedId}
                             />
                         ))}
-                    </div>
+                    </>
                 )}
             </div>
 
             <style>{`
+                .clp-root {
+                    width:320px; min-width:320px; height:100%;
+                    display:flex; flex-direction:column;
+                    border-left:1px solid var(--t-border-light);
+                    background:var(--t-card);
+                    overflow:hidden;
+                }
+                .clp-progress {
+                    height:2px; flex-shrink:0;
+                    background:transparent;
+                    transition:background .2s;
+                }
+                .clp-progress-active {
+                    background:linear-gradient(90deg, transparent, var(--t-accent), transparent);
+                    animation:clpShimmer 1.5s ease-in-out infinite;
+                }
+                .clp-list {
+                    flex:1; overflow-y:auto; position:relative;
+                }
+                .clp-list::-webkit-scrollbar { width:4px; }
+                .clp-list::-webkit-scrollbar-thumb {
+                    background:rgba(0,0,0,.12); border-radius:4px;
+                }
+                .clp-list::-webkit-scrollbar-track { background:transparent; }
+
+                .clp-count-row {
+                    padding:8px 14px 4px;
+                    display:flex; align-items:center; justify-content:space-between;
+                }
+                .clp-count {
+                    font-size:11px; font-weight:600;
+                    color:var(--t-text-faint);
+                }
+                .clp-updating {
+                    font-size:10px; color:var(--t-text-faint);
+                    display:flex; align-items:center; gap:4px;
+                }
+                .clp-spinner-mini {
+                    width:8px; height:8px; border-radius:50%;
+                    border:1.5px solid var(--t-accent);
+                    border-top-color:transparent;
+                    animation:spin .6s linear infinite;
+                    display:inline-block;
+                }
+
                 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
                 @keyframes spin { to { transform: rotate(360deg) } }
-                @keyframes loading-bar {
-                    0% { opacity: 0.4 }
-                    50% { opacity: 1 }
-                    100% { opacity: 0.4 }
+                @keyframes clpShimmer {
+                    0% { background-position: -200px 0; }
+                    100% { background-position: 200px 0; }
                 }
             `}</style>
         </div>
@@ -148,16 +164,16 @@ function LoadingSpinner() {
         <div style={{
             display: "flex", flexDirection: "column",
             alignItems: "center", justifyContent: "center",
-            height: "100%", gap: 12,
+            height: "100%", gap: 10,
         }}>
             <div style={{
-                width: 32, height: 32, borderRadius: "50%",
+                width: 28, height: 28, borderRadius: "50%",
                 border: "3px solid var(--t-border-light)",
                 borderTopColor: "var(--t-accent)",
                 animation: "spin 0.7s linear infinite",
             }} />
             <span style={{ fontSize: 12, color: "var(--t-text-faint)", fontWeight: 500 }}>
-                Loading conversations…
+                جاري تحميل المحادثات…
             </span>
         </div>
     )
@@ -180,12 +196,11 @@ function EmptyState({ hasFilters }: { hasFilters: boolean }) {
                 {hasFilters ? "🔍" : "💬"}
             </div>
             <p style={{ fontSize: 13, fontWeight: 600, color: "var(--t-text-secondary)", margin: 0 }}>
-                {hasFilters ? "No results found" : "No conversations yet"}
+                {hasFilters ? "لا توجد نتائج" : "لا توجد محادثات بعد"}
             </p>
             <p style={{ fontSize: 11, color: "var(--t-text-faint)", margin: 0 }}>
-                {hasFilters ? "Try adjusting your filters or search" : "New conversations will appear here"}
+                {hasFilters ? "حاول تغيير الفلاتر أو البحث" : "المحادثات الجديدة ستظهر هنا"}
             </p>
         </div>
     )
 }
-

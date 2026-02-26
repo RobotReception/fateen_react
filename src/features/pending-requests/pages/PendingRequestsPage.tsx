@@ -52,7 +52,7 @@ function truncateId(id: string) {
 function formatDate(iso: string) {
     if (!iso) return "—"
     try {
-        return new Intl.DateTimeFormat("ar-SA", { year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }).format(new Date(iso))
+        return new Intl.DateTimeFormat("ar-SA", { year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit", timeZone: "Asia/Aden" }).format(new Date(iso))
     } catch { return iso }
 }
 

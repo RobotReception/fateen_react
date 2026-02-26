@@ -1,4 +1,6 @@
-import { useState, lazy, Suspense, useCallback, memo } from "react"
+import { useState, lazy, Suspense, useCallback, useMemo, memo } from "react"
+import { usePermissions } from "@/lib/usePermissions"
+import { PAGE_BITS } from "@/lib/permissions"
 import {
     Database,
     BarChart3,
@@ -7,6 +9,8 @@ import {
     BookOpen,
     ChevronLeft,
     PieChart,
+    ClipboardList,
+    History,
 } from "lucide-react"
 
 /* ── Lazy-loaded tab components (code-split per tab) ── */
@@ -15,15 +19,19 @@ const UserAnalyticsTab = lazy(() => import("../components/UserAnalyticsTab").the
 const DepartmentsTab = lazy(() => import("../components/DepartmentsTab").then(m => ({ default: m.DepartmentsTab })))
 const CategoriesTab = lazy(() => import("../components/CategoriesTab").then(m => ({ default: m.CategoriesTab })))
 const DocumentAnalyticsTab = lazy(() => import("../components/DocumentAnalyticsTab").then(m => ({ default: m.DocumentAnalyticsTab })))
+const PendingRequestsTab = lazy(() => import("../components/PendingRequestsTab").then(m => ({ default: m.PendingRequestsTab })))
+const OperationHistoryTab = lazy(() => import("../components/OperationHistoryTab").then(m => ({ default: m.OperationHistoryTab })))
 
-type TabKey = "data" | "analytics" | "departments" | "categories" | "doc-analytics"
+type TabKey = "data" | "analytics" | "departments" | "categories" | "doc-analytics" | "pending-requests" | "operation-history"
 
-const TABS: { key: TabKey; title: string; icon: typeof Database; description: string }[] = [
+const TABS: { key: TabKey; title: string; icon: typeof Database; description: string; pageBit?: number }[] = [
     { key: "doc-analytics", title: "تحليلات المستندات", icon: PieChart, description: "إحصائيات وتقارير" },
     { key: "data", title: "إدارة البيانات", icon: Database, description: "إدارة الملفات والمستندات" },
     { key: "analytics", title: "ملفات المستخدمين", icon: BarChart3, description: "عرض ملفات المستخدمين" },
     { key: "departments", title: "الأقسام", icon: Building2, description: "إدارة أقسام المؤسسة" },
     { key: "categories", title: "الفئات", icon: FolderTree, description: "تصنيف المستندات" },
+    { key: "pending-requests", title: "الطلبات المعلقة", icon: ClipboardList, description: "مراجعة الطلبات والموافقة", pageBit: PAGE_BITS.PENDING_REQUESTS },
+    { key: "operation-history", title: "سجل العمليات", icon: History, description: "تتبع العمليات المنفذة", pageBit: PAGE_BITS.OPERATION_HISTORY },
 ]
 
 /* ── Lightweight loading fallback ── */
@@ -49,6 +57,8 @@ const TAB_COMPONENTS: { key: TabKey; Component: React.LazyExoticComponent<React.
     { key: "analytics", Component: UserAnalyticsTab },
     { key: "departments", Component: DepartmentsTab },
     { key: "categories", Component: CategoriesTab },
+    { key: "pending-requests", Component: PendingRequestsTab },
+    { key: "operation-history", Component: OperationHistoryTab },
 ]
 
 export function KnowledgeBasePage() {
@@ -56,6 +66,20 @@ export function KnowledgeBasePage() {
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
     // Track which tabs have been visited — only mount a tab once it's been clicked
     const [visitedTabs, setVisitedTabs] = useState<Set<TabKey>>(new Set(["doc-analytics"]))
+    const { canAccessPage, hasPermissionData } = usePermissions()
+
+    // ── Filter tabs by page-level permission ──
+    const visibleTabs = useMemo(() => TABS.filter(tab => {
+        if (!tab.pageBit) return true              // no restriction
+        if (!hasPermissionData) return true         // owner / no restrictions
+        return canAccessPage(tab.pageBit)
+    }), [canAccessPage, hasPermissionData])
+
+    const visibleTabKeys = useMemo(() => new Set(visibleTabs.map(t => t.key)), [visibleTabs])
+
+    const visibleTabComponents = useMemo(() =>
+        TAB_COMPONENTS.filter(tc => visibleTabKeys.has(tc.key)),
+        [visibleTabKeys])
 
     const handleTabChange = useCallback((key: TabKey) => {
         setActiveTab(key)
@@ -97,7 +121,7 @@ export function KnowledgeBasePage() {
 
                 {/* Sidebar Navigation */}
                 <nav className="space-y-1 p-3">
-                    {TABS.map((tab) => {
+                    {visibleTabs.map((tab) => {
                         const Icon = tab.icon
                         const isActive = activeTab === tab.key
                         return (
@@ -138,7 +162,7 @@ export function KnowledgeBasePage() {
             {/* ── Main Content — hidden-mount pattern: tabs stay mounted but hidden ── */}
             <div className="flex-1 overflow-y-auto">
                 <Suspense fallback={<div className="p-6"><TabSkeleton /></div>}>
-                    {TAB_COMPONENTS.map(({ key, Component }) => {
+                    {visibleTabComponents.map(({ key, Component }) => {
                         if (!visitedTabs.has(key)) return null
                         return (
                             <div

@@ -15,8 +15,6 @@ import { ForgotPasswordPage } from "@/features/auth/pages/ForgotPasswordPage"
 import { DashboardPage } from "@/features/dashboard/pages/DashboardPage"
 import { UsersPage } from "@/features/users/pages/UsersPage"
 import { KnowledgeBasePage } from "@/features/knowledge/pages/KnowledgeBasePage"
-import { PendingRequestsPage } from "@/features/pending-requests/pages/PendingRequestsPage"
-import { OperationHistoryPage } from "@/features/operation-history/pages/OperationHistoryPage"
 import { OrganizationSettingsPage } from "@/features/settings/pages/OrganizationSettingsPage"
 import { ProfileSettingsPage } from "@/features/settings/pages/ProfileSettingsPage"
 import { AISettingsPage } from "@/features/ai-settings/pages/AISettingsPage"
@@ -24,6 +22,7 @@ import { RolesPage } from "@/features/roles/pages/RolesPage"
 import { ChannelsPage } from "@/features/channels/pages/ChannelsPage"
 import { InboxPage } from "@/features/inbox/pages/InboxPage"
 import { ConversationPage } from "@/features/inbox/pages/ConversationPage"
+import { ContactsPage } from "@/features/contacts/pages/ContactsPage"
 
 /** يتحقق من تسجيل الدخول — يحوّل لصفحة Login إذا لم يكن مسجلاً */
 function AuthGuard({ children }: { children: React.ReactNode }) {
@@ -58,16 +57,6 @@ export function AppRouter() {
                         <KnowledgeBasePage />
                     </PermissionGuard>
                 } />
-                <Route path="pending-requests" element={
-                    <PermissionGuard pageBit={PAGE_BITS.PENDING_REQUESTS}>
-                        <PendingRequestsPage />
-                    </PermissionGuard>
-                } />
-                <Route path="operation-history" element={
-                    <PermissionGuard pageBit={PAGE_BITS.OPERATION_HISTORY}>
-                        <OperationHistoryPage />
-                    </PermissionGuard>
-                } />
                 <Route path="roles" element={
                     <PermissionGuard pageBit={PAGE_BITS.ROLES}>
                         <RolesPage />
@@ -86,6 +75,11 @@ export function AppRouter() {
                 <Route path="inbox/:id" element={
                     <PermissionGuard pageBit={PAGE_BITS.INBOX}>
                         <ConversationPage />
+                    </PermissionGuard>
+                } />
+                <Route path="contacts" element={
+                    <PermissionGuard pageBit={PAGE_BITS.CONTACTS}>
+                        <ContactsPage />
                     </PermissionGuard>
                 } />
                 <Route path="settings" element={<Navigate to="/dashboard/settings/organization" replace />} />

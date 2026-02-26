@@ -1,6 +1,13 @@
 import { create } from "zustand"
 import type { Message } from "../types/inbox.types"
 
+export interface ReplyTo {
+    messageId: string
+    text: string
+    senderName: string
+    messageType: string
+}
+
 interface ConversationState {
     // ── Draft ──
     draftText: string
@@ -19,6 +26,10 @@ interface ConversationState {
     // ── Details panel ──
     detailsOpen: boolean
     toggleDetails: () => void
+
+    // ── Reply to ──
+    replyTo: ReplyTo | null
+    setReplyTo: (r: ReplyTo | null) => void
 }
 
 export const useConversationStore = create<ConversationState>((set) => ({
@@ -37,4 +48,7 @@ export const useConversationStore = create<ConversationState>((set) => ({
 
     detailsOpen: true,
     toggleDetails: () => set((s) => ({ detailsOpen: !s.detailsOpen })),
+
+    replyTo: null,
+    setReplyTo: (replyTo) => set({ replyTo }),
 }))

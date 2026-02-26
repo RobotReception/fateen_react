@@ -1,12 +1,9 @@
 import { useState, useEffect } from "react"
 import {
-    Users,
     UserPlus,
     Search,
     RefreshCw,
     Shield,
-    UserCheck,
-    UserX,
     Loader2,
     AlertTriangle,
 } from "lucide-react"
@@ -49,99 +46,56 @@ export function UsersPage({ embedded = false }: { embedded?: boolean }) {
     const users = usersRes?.success ? usersRes.data?.items ?? [] : []
     const error = queryError ? "حدث خطأ أثناء تحميل المستخدمين" : usersRes && !usersRes.success ? (usersRes.message || "فشل تحميل المستخدمين") : null
 
-    // Stats
-    const activeCount = users.filter((u) => u.is_active).length
-    const inactiveCount = users.filter((u) => !u.is_active).length
+
 
     return (
-        <div className={embedded ? "space-y-6" : "p-4 lg:p-6 space-y-6"} dir="rtl">
-            {/* Page header */}
-            {!embedded && (
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className={embedded ? "space-y-4" : "p-4 lg:p-6 space-y-4"} dir="rtl">
+            {/* Add user button */}
+            <div style={{ display: "flex", justifyContent: embedded ? "flex-end" : "space-between", alignItems: "center" }}>
+                {!embedded && (
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-800">إدارة المستخدمين</h1>
-                        <p className="mt-1 text-sm text-gray-400">إدارة وتنظيم مستخدمي المؤسسة</p>
+                        <h1 style={{ fontSize: 20, fontWeight: 800, color: "var(--t-text)" }}>إدارة المستخدمين</h1>
+                        <p style={{ fontSize: 12, color: "var(--t-text-faint)", marginTop: 2 }}>إضافة وإدارة مستخدمي المؤسسة وصلاحياتهم</p>
                     </div>
-                    <ActionGuard pageBit={PAGE_BITS.ADMIN_USERS} actionBit={ACTION_BITS.CREATE_USER}>
-                        <button
-                            onClick={() => setCreateOpen(true)}
-                            className="flex items-center gap-2 rounded-xl bg-gray-900 px-5 py-2.5 text-sm font-medium text-white transition-all hover:bg-gray-800 active:scale-[0.98]"
-                        >
-                            <UserPlus size={18} />
-                            إضافة مستخدم
-                        </button>
-                    </ActionGuard>
-                </div>
-            )}
-            {embedded && (
-                <div className="flex justify-end">
-                    <ActionGuard pageBit={PAGE_BITS.ADMIN_USERS} actionBit={ACTION_BITS.CREATE_USER}>
-                        <button
-                            onClick={() => setCreateOpen(true)}
-                            className="flex items-center gap-2 rounded-xl bg-gray-900 px-5 py-2.5 text-sm font-medium text-white transition-all hover:bg-gray-800 active:scale-[0.98]"
-                        >
-                            <UserPlus size={18} />
-                            إضافة مستخدم
-                        </button>
-                    </ActionGuard>
-                </div>
-            )}
-
-            {/* Stats cards */}
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                <div className="group rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-all hover:shadow-md">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className="text-sm text-gray-400">إجمالي المستخدمين</p>
-                            <p className="mt-1 text-3xl font-bold text-gray-800">
-                                {loading ? "..." : users.length}
-                            </p>
-                        </div>
-                        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-blue-500 transition-transform group-hover:scale-110">
-                            <Users size={24} />
-                        </div>
-                    </div>
-                </div>
-
-                <div className="group rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-all hover:shadow-md">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className="text-sm text-gray-400">المستخدمين النشطين</p>
-                            <p className="mt-1 text-3xl font-bold text-emerald-600">
-                                {loading ? "..." : activeCount}
-                            </p>
-                        </div>
-                        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-500 transition-transform group-hover:scale-110">
-                            <UserCheck size={24} />
-                        </div>
-                    </div>
-                </div>
-
-                <div className="group rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-all hover:shadow-md">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className="text-sm text-gray-400">المستخدمين المعطلين</p>
-                            <p className="mt-1 text-3xl font-bold text-red-500">
-                                {loading ? "..." : inactiveCount}
-                            </p>
-                        </div>
-                        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-red-50 text-red-400 transition-transform group-hover:scale-110">
-                            <UserX size={24} />
-                        </div>
-                    </div>
-                </div>
+                )}
+                <ActionGuard pageBit={PAGE_BITS.ADMIN_USERS} actionBit={ACTION_BITS.CREATE_USER}>
+                    <button
+                        onClick={() => setCreateOpen(true)}
+                        style={{
+                            display: "flex", alignItems: "center", gap: 6,
+                            padding: "8px 16px", borderRadius: 10,
+                            border: "none", background: "var(--t-accent)",
+                            color: "var(--t-text-on-accent)", fontSize: 13,
+                            fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
+                            transition: "opacity .12s",
+                        }}
+                        onMouseEnter={e => { e.currentTarget.style.opacity = "0.88" }}
+                        onMouseLeave={e => { e.currentTarget.style.opacity = "1" }}
+                    >
+                        <UserPlus size={16} />
+                        إضافة مستخدم
+                    </button>
+                </ActionGuard>
             </div>
+
+
 
             {/* Error banner */}
             {error && (
-                <div className="flex items-center gap-3 rounded-2xl border border-red-200 bg-red-50 px-5 py-4">
-                    <AlertTriangle size={20} className="shrink-0 text-red-500" />
-                    <div className="flex-1">
-                        <p className="text-sm font-medium text-red-700">{error}</p>
-                    </div>
+                <div style={{
+                    display: "flex", alignItems: "center", gap: 10,
+                    padding: "10px 16px", borderRadius: 10,
+                    background: "var(--t-danger-soft)", border: "1px solid var(--t-danger)",
+                }}>
+                    <AlertTriangle size={16} style={{ color: "var(--t-danger)", flexShrink: 0 }} />
+                    <span style={{ flex: 1, fontSize: 12, fontWeight: 600, color: "var(--t-danger)" }}>{error}</span>
                     <button
                         onClick={() => refetch()}
-                        className="rounded-lg px-3 py-1.5 text-xs font-medium text-red-600 transition-colors hover:bg-red-100"
+                        style={{
+                            border: "none", background: "transparent",
+                            fontSize: 11, fontWeight: 700, color: "var(--t-danger)",
+                            cursor: "pointer", fontFamily: "inherit",
+                        }}
                     >
                         إعادة المحاولة
                     </button>
@@ -149,32 +103,55 @@ export function UsersPage({ embedded = false }: { embedded?: boolean }) {
             )}
 
             {/* Table card */}
-            <div className="relative overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
+            <div style={{
+                borderRadius: 12, border: "1px solid var(--t-border)",
+                background: "var(--t-card)", overflow: "hidden", position: "relative",
+            }}>
                 <FetchingBar visible={backgroundFetching} />
                 {/* Table toolbar */}
-                <div className="flex flex-col gap-3 border-b border-gray-100 p-4 sm:flex-row sm:items-center sm:justify-between">
-                    <div className="relative flex-1 max-w-sm">
-                        <Search size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300" />
+                <div style={{
+                    display: "flex", alignItems: "center", justifyContent: "space-between",
+                    padding: "10px 14px", borderBottom: "1px solid var(--t-border-light)",
+                    gap: 10,
+                }}>
+                    <div style={{ position: "relative", flex: 1, maxWidth: 280 }}>
+                        <Search size={14} style={{
+                            position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)",
+                            color: "var(--t-text-faint)", pointerEvents: "none",
+                        }} />
                         <input
                             type="text"
                             value={searchInput}
                             onChange={(e) => setSearchInput(e.target.value)}
                             placeholder="بحث بالاسم أو البريد..."
-                            className="w-full rounded-xl border border-gray-200 bg-gray-50 py-2.5 pr-10 pl-3 text-sm outline-none transition-all focus:border-cyan-500 focus:bg-white focus:ring-2 focus:ring-cyan-500/20"
+                            style={{
+                                width: "100%", padding: "8px 34px 8px 10px",
+                                borderRadius: 8, border: "1.5px solid var(--t-border)",
+                                background: "var(--t-surface)", fontSize: 12,
+                                color: "var(--t-text)", outline: "none", fontFamily: "inherit",
+                            }}
                         />
                     </div>
-                    <div className="flex items-center gap-2">
-                        <span className="flex items-center gap-1 text-xs text-gray-400">
-                            <Shield size={12} />
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <span style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, color: "var(--t-text-faint)" }}>
+                            <Shield size={11} />
                             {users.length} مستخدم
                         </span>
                         <button
                             onClick={() => refetch()}
                             disabled={loading}
-                            className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 disabled:opacity-50"
                             title="تحديث"
+                            style={{
+                                width: 28, height: 28, borderRadius: 6,
+                                border: "none", background: "transparent",
+                                cursor: "pointer", display: "flex",
+                                alignItems: "center", justifyContent: "center",
+                                color: "var(--t-text-faint)", transition: "background .1s",
+                            }}
+                            onMouseEnter={e => { e.currentTarget.style.background = "var(--t-surface)" }}
+                            onMouseLeave={e => { e.currentTarget.style.background = "transparent" }}
                         >
-                            {(loading || backgroundFetching) ? <Loader2 size={16} className="animate-spin" /> : <RefreshCw size={16} />}
+                            {(loading || backgroundFetching) ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />}
                         </button>
                     </div>
                 </div>

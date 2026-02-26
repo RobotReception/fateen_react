@@ -88,6 +88,10 @@ export interface Customer {
     created_at: string
     updated_at?: string
     tenant_id?: string
+    tags?: string[]
+    account_id?: string           // platform_id — required for send-message v2
+    custom_fields?: Record<string, string>
+    contact_fields?: Record<string, string>
 }
 
 // ─── Sidebar Summary ──────────────────────
@@ -197,16 +201,41 @@ export interface MessagesResponse {
     customer?: MessagesCustomerInfo
 }
 
+// ─── Send Message Content (v2) ────────────
+export interface SendMessageContent {
+    // text
+    text?: string
+    // media (image / audio / video / document)
+    media_id?: string
+    caption?: string
+    filename?: string
+    // interactive
+    type?: string
+    body?: { text: string }
+    action?: Record<string, any>
+    // template
+    name?: string
+    language?: { code: string }
+    components?: any[]
+    // legacy — snippet URL fallback
+    url?: string
+}
+
 // ─── Payloads ─────────────────────────────
 export interface SendMessagePayload {
     platform: string
-    recipient_id: string
     sender_id: string
+    recipient_id: string
     responder: string
-    original_msg_id?: string | null
     message_type: MessageType
-    content: MessageContent
+    content: SendMessageContent
     sender_info: { name: string; profile_picture?: string | null }
+    account_id: string                       // ✅ required — platform_id
+    account_hint?: Record<string, string>    // optional
+    original_msg_id?: string | null
+    response_to?: string | null              // reply to specific message
+    name?: string                            // optional sender display name
+    profile_picture?: string                 // optional sender avatar
 }
 
 // POST /media/upload

@@ -1,6 +1,10 @@
-import { useRef } from "react"
+import { useRef, useMemo } from "react"
 import { SlidersHorizontal, Search, X, ChevronDown, Star, BellOff, Mail, Bot } from "lucide-react"
+import { useQuery } from "@tanstack/react-query"
 import { useInboxStore, type StatusFilter, type AdvancedFilters } from "../../store/inbox.store"
+import { useInboxSummary } from "../../hooks/use-inbox-summary"
+import { getBriefUsers } from "../../services/inbox-service"
+import { useAuthStore } from "@/stores/auth-store"
 import type { AvailableFilters } from "../../types/inbox.types"
 
 interface Props {
@@ -21,6 +25,45 @@ export function FilterBar({ availableFilters }: Props) {
         advancedFilters, setFilter, clearFilters,
         filterPanelOpen, toggleFilterPanel,
     } = useInboxStore()
+
+    const { user } = useAuthStore()
+    const { data: summary } = useInboxSummary(user?.id)
+    const { data: briefData } = useQuery({
+        queryKey: ["brief-users"],
+        queryFn: () => getBriefUsers(1, 100),
+        staleTime: 5 * 60 * 1000,
+    })
+
+    // Build lookup maps for ID → name resolution
+    const userMap = useMemo(() => {
+        const m = new Map<string, string>()
+        for (const u of briefData?.users ?? []) {
+            m.set(u.user_id, u.name)            // UUID → display name
+            m.set(u.name.toLowerCase(), u.name)  // lowercase name → display name
+            m.set(u.name, u.name)                // exact name → display name
+        }
+        return m
+    }, [briefData])
+
+    const teamMap = useMemo(() => {
+        const m = new Map<string, string>()
+        for (const t of summary?.teams ?? []) m.set(t.team_id, t.name)
+        return m
+    }, [summary])
+
+    const lifecycleMap = useMemo(() => {
+        const m = new Map<string, string>()
+        for (const lc of summary?.lifecycles ?? []) m.set(lc.code, `${lc.icon || ""} ${lc.name}`.trim())
+        return m
+    }, [summary])
+
+    // Helper: convert string[] to {value, label}[] using a lookup map
+    const resolveOpts = (ids: string[], nameMap: Map<string, string>) =>
+        ids.map(id => ({ value: id, label: nameMap.get(id) || id }))
+
+    // Resolve a single ID
+    const resolveName = (id: string | undefined, nameMap: Map<string, string>) =>
+        id ? (nameMap.get(id) || id) : id
 
     const activeCount = countActiveFilters(advancedFilters)
 
@@ -83,15 +126,15 @@ export function FilterBar({ availableFilters }: Props) {
                     {/* Row 1: Platform + Lifecycle */}
                     <div style={{ display: "flex", gap: 6 }}>
                         <FilterDropdown
-                            label="Platform"
+                            label="المنصة"
                             value={advancedFilters.platform}
-                            options={availableFilters?.platforms ?? []}
+                            options={(availableFilters?.platforms ?? []).map(p => ({ value: p, label: p }))}
                             onChange={(v) => setFilter("platform", v)}
                         />
                         <FilterDropdown
-                            label="Lifecycle"
+                            label="دورة الحياة"
                             value={advancedFilters.lifecycle}
-                            options={availableFilters?.lifecycles ?? []}
+                            options={resolveOpts(availableFilters?.lifecycles ?? [], lifecycleMap)}
                             onChange={(v) => setFilter("lifecycle", v)}
                         />
                     </div>
@@ -99,15 +142,15 @@ export function FilterBar({ availableFilters }: Props) {
                     {/* Row 2: Assigned To + Team */}
                     <div style={{ display: "flex", gap: 6 }}>
                         <FilterDropdown
-                            label="Assigned To"
+                            label="الموظف"
                             value={advancedFilters.assigned_to}
-                            options={availableFilters?.assigned_to ?? []}
+                            options={(briefData?.users ?? []).map(u => ({ value: u.user_id, label: u.name }))}
                             onChange={(v) => setFilter("assigned_to", v)}
                         />
                         <FilterDropdown
-                            label="Team"
+                            label="الفريق"
                             value={advancedFilters.team_id}
-                            options={availableFilters?.teams ?? []}
+                            options={(summary?.teams ?? []).map(t => ({ value: t.team_id, label: t.name }))}
                             onChange={(v) => setFilter("team_id", v)}
                         />
                     </div>
@@ -162,7 +205,7 @@ export function FilterBar({ availableFilters }: Props) {
                             background: "var(--t-surface)", color: "var(--t-text-muted)",
                             alignSelf: "flex-start", transition: "all 0.12s",
                         }}
-                            onMouseEnter={(e) => { e.currentTarget.style.background = "#fee2e2"; e.currentTarget.style.color = "#dc2626" }}
+                            onMouseEnter={(e) => { e.currentTarget.style.background = "var(--t-danger-soft)"; e.currentTarget.style.color = "var(--t-danger)" }}
                             onMouseLeave={(e) => { e.currentTarget.style.background = "var(--t-surface)"; e.currentTarget.style.color = "var(--t-text-muted)" }}
                         >
                             ✕ Clear All Filters
@@ -177,10 +220,10 @@ export function FilterBar({ availableFilters }: Props) {
                     padding: "4px 12px 8px",
                     display: "flex", gap: 4, flexWrap: "wrap",
                 }}>
-                    {advancedFilters.platform && <ActiveChip label={`Platform: ${advancedFilters.platform}`} onClear={() => setFilter("platform", undefined)} />}
-                    {advancedFilters.lifecycle && <ActiveChip label={`Lifecycle: ${advancedFilters.lifecycle}`} onClear={() => setFilter("lifecycle", undefined)} />}
-                    {advancedFilters.assigned_to && <ActiveChip label={`Agent: ${advancedFilters.assigned_to}`} onClear={() => setFilter("assigned_to", undefined)} />}
-                    {advancedFilters.team_id && <ActiveChip label={`Team: ${advancedFilters.team_id}`} onClear={() => setFilter("team_id", undefined)} />}
+                    {advancedFilters.platform && <ActiveChip label={`المنصة: ${advancedFilters.platform}`} onClear={() => setFilter("platform", undefined)} />}
+                    {advancedFilters.lifecycle && <ActiveChip label={`الحياة: ${resolveName(advancedFilters.lifecycle, lifecycleMap)}`} onClear={() => setFilter("lifecycle", undefined)} />}
+                    {advancedFilters.assigned_to && <ActiveChip label={`الموظف: ${resolveName(advancedFilters.assigned_to, userMap)}`} onClear={() => setFilter("assigned_to", undefined)} />}
+                    {advancedFilters.team_id && <ActiveChip label={`الفريق: ${resolveName(advancedFilters.team_id, teamMap)}`} onClear={() => setFilter("team_id", undefined)} />}
                     {advancedFilters.start_date && <ActiveChip label={`From: ${advancedFilters.start_date.split("T")[0]}`} onClear={() => setFilter("start_date", undefined)} />}
                     {advancedFilters.end_date && <ActiveChip label={`To: ${advancedFilters.end_date.split("T")[0]}`} onClear={() => setFilter("end_date", undefined)} />}
                     {advancedFilters.unread_only && <ActiveChip label="Unread" onClear={() => setFilter("unread_only", undefined)} />}
@@ -256,7 +299,7 @@ function PillButton({ label, isActive, onClick }: { label: string; isActive: boo
 }
 
 function FilterDropdown({ label, value, options, onChange }: {
-    label: string; value?: string; options: string[]; onChange: (v: string | undefined) => void
+    label: string; value?: string; options: { value: string; label: string }[]; onChange: (v: string | undefined) => void
 }) {
     return (
         <div style={{ flex: 1, minWidth: 0 }}>
@@ -273,15 +316,16 @@ function FilterDropdown({ label, value, options, onChange }: {
                         padding: "5px 22px 5px 8px",
                         border: value ? "1.5px solid var(--t-accent)" : "1px solid var(--t-border-light)",
                         borderRadius: 6,
-                        background: value ? "rgba(var(--t-accent-rgb, 59,130,246), 0.06)" : "var(--t-surface)",
+                        background: value ? "var(--t-accent-muted)" : "var(--t-surface)",
                         fontSize: 11, fontWeight: value ? 600 : 400,
                         color: "var(--t-text)",
                         cursor: "pointer", outline: "none",
+                        fontFamily: "inherit",
                     }}
                 >
-                    <option value="">All</option>
+                    <option value="">الكل</option>
                     {options.map((opt) => (
-                        <option key={opt} value={opt}>{opt}</option>
+                        <option key={opt.value} value={opt.value}>{opt.label}</option>
                     ))}
                 </select>
                 <ChevronDown size={10} style={{
@@ -312,7 +356,7 @@ function DateInput({ label, value, onChange }: {
                         padding: "5px 8px",
                         border: value ? "1.5px solid var(--t-accent)" : "1px solid var(--t-border-light)",
                         borderRadius: 6,
-                        background: value ? "rgba(var(--t-accent-rgb, 59,130,246), 0.06)" : "var(--t-surface)",
+                        background: value ? "var(--t-accent-muted)" : "var(--t-surface)",
                         fontSize: 11, fontWeight: value ? 600 : 400,
                         color: "var(--t-text)",
                         cursor: "pointer", outline: "none",
@@ -348,8 +392,8 @@ function ActiveChip({ label, onClear }: { label: string; onClear: () => void }) 
         <span style={{
             display: "inline-flex", alignItems: "center", gap: 3,
             padding: "2px 6px 2px 8px", borderRadius: 10,
-            background: "rgba(var(--t-accent-rgb, 59,130,246), 0.1)",
-            border: "1px solid rgba(var(--t-accent-rgb, 59,130,246), 0.25)",
+            background: "var(--t-accent-muted)",
+            border: "1px solid var(--t-accent-soft)",
             fontSize: 10, fontWeight: 600, color: "var(--t-accent)",
         }}>
             {label}

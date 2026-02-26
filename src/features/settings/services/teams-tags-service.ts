@@ -6,11 +6,13 @@ import type {
     AssignCustomerPayload, AssignCustomerResponse,
     AssignCustomersBulkPayload, AssignCustomersBulkResponse,
     CustomersByTeamParams, CustomersByTeamData,
+    CacheViewData, TeamMembersResponse,
     Tag, TagsListData, CreateTagPayload, UpdateTagPayload,
     Snippet, SnippetsListData, CreateSnippetPayload, UpdateSnippetPayload,
     Lifecycle, LifecyclesListData, CreateLifecyclePayload, UpdateLifecyclePayload,
     DeleteLifecycleParams, ChangeCustomerLifecyclePayload, ChangeCustomerLifecycleResponse,
     MediaUploadResponse,
+    DynamicField, DynamicFieldsListData, CreateDynamicFieldPayload, UpdateDynamicFieldPayload,
 } from "../types/teams-tags"
 
 
@@ -91,6 +93,22 @@ export const getCustomersByTeam = (params: CustomersByTeamParams, tid: string) =
 /** DELETE /teams/{team_id} — حذف فريق */
 export const deleteTeam = (teamId: string, tid: string) =>
     apiClient.delete<ApiResponse<{ success: boolean; team_id: string }>>(`/teams/${teamId}`, { headers: h(tid) }).then(r => r.data)
+
+/** GET /teams/cache-view — قائمة مصغرة للـ dropdown */
+export const getTeamsCacheView = (tid: string) =>
+    apiClient.get<ApiResponse<CacheViewData>>("/teams/cache-view", { headers: h(tid) }).then(r => r.data)
+
+/** GET /teams/{team_id}/members — أعضاء الفريق مع التفاصيل */
+export const getTeamMembers = (teamId: string, tid: string) =>
+    apiClient.get<ApiResponse<TeamMembersResponse>>(`/teams/${teamId}/members`, { headers: h(tid) }).then(r => r.data)
+
+/** POST /teams/{team_id}/members/{user_id} — إضافة عضو واحد */
+export const addTeamMember = (teamId: string, userId: string, tid: string) =>
+    apiClient.post<ApiResponse<TeamMembersResponse>>(`/teams/${teamId}/members/${userId}`, {}, { headers: h(tid) }).then(r => r.data)
+
+/** DELETE /teams/{team_id}/members/{user_id} — إزالة عضو واحد */
+export const removeTeamMember = (teamId: string, userId: string, tid: string) =>
+    apiClient.delete<ApiResponse<TeamMembersResponse>>(`/teams/${teamId}/members/${userId}`, { headers: h(tid) }).then(r => r.data)
 
 /* ═════════════════════════════════════
    TAGS
@@ -204,3 +222,27 @@ export const changeCustomerLifecycle = (
         payload,
         { headers: h(tid) }
     ).then(r => r.data)
+
+/* ═════════════════════════════════════
+   DYNAMIC FIELDS (Contact Fields)
+═════════════════════════════════════ */
+
+/** GET /contacts/dynamic-fields — جميع الحقول الديناميكية */
+export const getAllDynamicFields = (tid: string) =>
+    apiClient.get<ApiResponse<DynamicFieldsListData>>("/contacts/dynamic-fields", { headers: h(tid) }).then(r => r.data)
+
+/** GET /contacts/dynamic-fields/{field_name} — حقل واحد */
+export const getDynamicFieldByName = (fieldName: string, tid: string) =>
+    apiClient.get<ApiResponse<DynamicField>>(`/contacts/dynamic-fields/${fieldName}`, { headers: h(tid) }).then(r => r.data)
+
+/** POST /contacts/dynamic-fields — إنشاء حقل ديناميكي */
+export const createDynamicField = (payload: CreateDynamicFieldPayload, tid: string) =>
+    apiClient.post<ApiResponse<DynamicField>>("/contacts/dynamic-fields", payload, { headers: h(tid) }).then(r => r.data)
+
+/** PUT /contacts/dynamic-fields/{field_name} — تحديث حقل ديناميكي */
+export const updateDynamicField = (fieldName: string, payload: UpdateDynamicFieldPayload, tid: string) =>
+    apiClient.put<ApiResponse<DynamicField>>(`/contacts/dynamic-fields/${fieldName}`, payload, { headers: h(tid) }).then(r => r.data)
+
+/** DELETE /contacts/dynamic-fields/{field_name} — حذف حقل ديناميكي */
+export const deleteDynamicField = (fieldName: string, tid: string) =>
+    apiClient.delete<ApiResponse<{ message: string; field_name: string; deleted: boolean }>>(`/contacts/dynamic-fields/${fieldName}`, { headers: h(tid) }).then(r => r.data)

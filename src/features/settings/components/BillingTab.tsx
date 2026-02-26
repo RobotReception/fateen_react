@@ -11,7 +11,7 @@ import type { LimitItem } from "../types"
 /* ─── helpers ─── */
 function fmtDate(d: string | null | undefined): string {
     if (!d) return "—"
-    try { return new Intl.DateTimeFormat("ar-SA", { year: "numeric", month: "short", day: "numeric" }).format(new Date(d)) }
+    try { return new Intl.DateTimeFormat("ar-SA", { year: "numeric", month: "short", day: "numeric", timeZone: "Asia/Aden" }).format(new Date(d)) }
     catch { return d }
 }
 

@@ -115,7 +115,7 @@ function ChannelCard({ channel, idx, onView, onDelete }: {
 
     const copyId = () => { navigator.clipboard.writeText(channel.identifier); toast.success("تم نسخ المعرّف") }
     const created = channel.created_at
-        ? new Date(channel.created_at).toLocaleDateString("ar-SA", { year: "numeric", month: "short", day: "numeric" })
+        ? new Date(channel.created_at).toLocaleDateString("ar-SA", { year: "numeric", month: "short", day: "numeric", timeZone: "Asia/Aden" })
         : null
 
     return (

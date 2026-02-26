@@ -1,10 +1,10 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import {
     Building2, Users, MessageSquare, CreditCard,
     Settings, ChevronLeft, Shield, Brain, Palette,
-    UsersRound, Tag, FileText, RefreshCw,
+    UsersRound, Tag, FileText, RefreshCw, FileSliders,
 } from "lucide-react"
-import { Link } from "react-router-dom"
+import { Link, useSearchParams } from "react-router-dom"
 import { OrganizationTab } from "../components/OrganizationTab"
 import { BillingTab } from "../components/BillingTab"
 import { UsersPage } from "@/features/users/pages/UsersPage"
@@ -16,6 +16,7 @@ import { TeamsTab } from "../components/TeamsTab"
 import { TagsTab } from "../components/TagsTab"
 import { SnippetsTab } from "../components/SnippetsTab"
 import { LifecyclesTab } from "../components/LifecyclesTab"
+import { ContactFieldsTab } from "../components/ContactFieldsTab"
 
 /* ── sidebar items ── */
 const SIDEBAR_ITEMS = [
@@ -27,6 +28,7 @@ const SIDEBAR_ITEMS = [
     { key: "tags", label: "التاجات", icon: Tag, desc: "إنشاء وإدارة تاجات تصنيف العملاء والمحادثات" },
     { key: "snippets", label: "Snippets", icon: FileText, desc: "جمل وردود جاهزة للاستخدام السريع في المحادثات" },
     { key: "lifecycles", label: "دورات الحياة", icon: RefreshCw, desc: "تحديد مراحل دورة حياة العميل من من تحويل لعملية" },
+    { key: "contact-fields", label: "حقول جهات الاتصال", icon: FileSliders, desc: "إنشاء وإدارة الحقول الديناميكية لجهات الاتصال" },
     { key: "ai", label: "الذكاء الاصطناعي", icon: Brain, desc: "إعدادات الذكاء الاصطناعي والتوجيه وتحويل النص لكلام" },
     { key: "theme", label: "تخصيص المظهر", icon: Palette, desc: "تغيير ألوان الواجهة لتتناسب مع هوية مؤسستك" },
     { key: "billing", label: "الاشتراك والدفع", icon: CreditCard, desc: "إدارة خطتك الحالية وعرض الفواتير" },
@@ -36,8 +38,17 @@ type SidebarKey = (typeof SIDEBAR_ITEMS)[number]["key"]
 
 
 export function OrganizationSettingsPage() {
-    const [active, setActive] = useState<SidebarKey>("general")
+    const [searchParams] = useSearchParams()
+    const tabParam = searchParams.get("tab") as SidebarKey | null
+    const [active, setActive] = useState<SidebarKey>(tabParam && SIDEBAR_ITEMS.some(i => i.key === tabParam) ? tabParam : "general")
     const [collapsed, setCollapsed] = useState(false)
+
+    // Sync with URL tab param when it changes (e.g. navigating from another page)
+    useEffect(() => {
+        if (tabParam && SIDEBAR_ITEMS.some(i => i.key === tabParam)) {
+            setActive(tabParam)
+        }
+    }, [tabParam])
 
     const activeItem = SIDEBAR_ITEMS.find(i => i.key === active)
 
@@ -181,6 +192,7 @@ export function OrganizationSettingsPage() {
                     {active === "tags" && <TagsTab />}
                     {active === "snippets" && <SnippetsTab />}
                     {active === "lifecycles" && <LifecyclesTab />}
+                    {active === "contact-fields" && <ContactFieldsTab />}
                     {active === "ai" && <AISettingsTab />}
                     {active === "theme" && <ThemeTab />}
                     {active === "billing" && <BillingTab />}

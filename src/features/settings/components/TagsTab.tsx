@@ -4,7 +4,8 @@ import { useTags, useCreateTag, useUpdateTag, useDeleteTag } from "../hooks/use-
 import type { Tag } from "../types/teams-tags"
 import {
     Plus, Trash2, Pencil, Tag as TagIcon, X, Loader2, Search,
-    AlertTriangle, Check, Hash,
+    AlertTriangle, Check, Hash, MoreVertical, Sparkles, FolderOpen,
+    ArrowUpDown,
 } from "lucide-react"
 import { ActionGuard } from "@/components/guards/ActionGuard"
 import { PAGE_BITS, ACTION_BITS } from "@/lib/permissions"
@@ -13,52 +14,168 @@ import { PAGE_BITS, ACTION_BITS } from "@/lib/permissions"
    CSS
 ═══════════════════════════════════════ */
 const CSS = `
-.tg-card { border-radius:12px; border:1px solid var(--t-border); background:var(--t-card); padding:14px 16px; transition:box-shadow .15s,border-color .15s; }
-.tg-card:hover { border-color:var(--t-accent); box-shadow:0 0 0 3px color-mix(in srgb,var(--t-accent) 10%,transparent); }
-.tg-field { width:100%; padding:9px 12px; border-radius:9px; border:1.5px solid var(--t-border); background:var(--t-surface); font-size:13px; color:var(--t-text); outline:none; transition:border-color .15s; box-sizing:border-box; }
-.tg-field:focus { border-color:var(--t-accent); }
-.tg-label { font-size:10px; font-weight:800; letter-spacing:.07em; text-transform:uppercase; color:var(--t-text-faint); display:block; margin-bottom:5px; }
-.tg-btn-primary { display:inline-flex; align-items:center; gap:6px; padding:9px 18px; border-radius:9px; border:none; background:var(--t-accent); color:var(--t-text-on-accent); font-size:13px; font-weight:700; cursor:pointer; transition:opacity .15s; }
+.tg-table { width:100%; border-collapse:separate; border-spacing:0; }
+.tg-table thead th {
+    padding:8px 12px; font-size:11px; font-weight:600; color:var(--t-text-secondary);
+    text-align:right; border-bottom:1px solid var(--t-border); white-space:nowrap;
+    background:var(--t-surface);
+}
+.tg-table tbody td {
+    padding:9px 12px; font-size:12px; color:var(--t-text); border-bottom:1px solid var(--t-border-light);
+    vertical-align:middle;
+}
+.tg-table tbody tr { transition:background .1s; }
+.tg-table tbody tr:hover { background:color-mix(in srgb,var(--t-accent) 3%,transparent); }
+.tg-table tbody tr:last-child td { border-bottom:none; }
+.tg-th-sort { display:inline-flex; align-items:center; gap:3px; cursor:pointer; user-select:none; }
+.tg-th-sort:hover { color:var(--t-accent); }
+
+.tg-field {
+    width:100%; padding:8px 11px; border-radius:8px; border:1.5px solid var(--t-border);
+    background:var(--t-surface); font-size:12px; color:var(--t-text); outline:none;
+    transition:border-color .15s,box-shadow .15s; box-sizing:border-box; font-family:inherit;
+}
+.tg-field:focus { border-color:var(--t-accent); box-shadow:0 0 0 2px color-mix(in srgb,var(--t-accent) 10%,transparent); }
+.tg-field::placeholder { color:var(--t-text-faint); opacity:.6; }
+
+.tg-label { font-size:10px; font-weight:700; color:var(--t-text-secondary); display:flex; align-items:center; gap:3px; margin-bottom:4px; }
+.tg-label-hint { font-size:9px; font-weight:500; color:var(--t-text-faint); margin-right:auto; }
+
+.tg-btn-primary {
+    display:inline-flex; align-items:center; gap:5px; padding:7px 14px; border-radius:8px;
+    border:none; background:var(--t-accent); color:var(--t-text-on-accent); font-size:12px;
+    font-weight:700; cursor:pointer; transition:opacity .12s; font-family:inherit;
+}
 .tg-btn-primary:hover:not(:disabled) { opacity:.88; }
-.tg-btn-ghost { display:inline-flex; align-items:center; gap:6px; padding:7px 12px; border-radius:9px; border:1.5px solid var(--t-border); background:transparent; color:var(--t-text); font-size:12px; font-weight:600; cursor:pointer; transition:border-color .15s; }
-.tg-btn-ghost:hover { border-color:var(--t-accent); }
+.tg-btn-primary:disabled { opacity:.5; cursor:not-allowed; }
+
+.tg-btn-ghost {
+    display:inline-flex; align-items:center; gap:5px; padding:6px 12px; border-radius:8px;
+    border:1.5px solid var(--t-border); background:transparent; color:var(--t-text);
+    font-size:11px; font-weight:600; cursor:pointer; transition:all .12s; font-family:inherit;
+}
+.tg-btn-ghost:hover { border-color:var(--t-accent); color:var(--t-accent); }
+
 .tg-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-.tg-grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
-.tg-chip { display:inline-flex; align-items:center; gap:4px; padding:2px 10px; border-radius:20px; font-size:11px; font-weight:700; }
-@keyframes tgIn{from{opacity:0;transform:scale(.97) translateY(6px)}to{opacity:1;transform:scale(1) translateY(0)}}
+
+.tg-actions-btn {
+    width:26px; height:26px; border-radius:6px; border:none; background:transparent;
+    cursor:pointer; display:flex; align-items:center; justify-content:center;
+    color:var(--t-text-faint); transition:all .1s;
+}
+.tg-actions-btn:hover { background:var(--t-surface); color:var(--t-text); }
+
+.tg-actions-menu {
+    position:absolute; left:0; top:100%; margin-top:2px; z-index:20;
+    background:var(--t-card); border:1px solid var(--t-border); border-radius:8px;
+    box-shadow:0 6px 20px rgba(0,0,0,.1); min-width:120px; padding:3px;
+    animation:tgMenuIn .1s ease-out;
+}
+.tg-actions-menu button {
+    width:100%; padding:6px 10px; border:none; background:transparent; cursor:pointer;
+    display:flex; align-items:center; gap:6px; border-radius:6px;
+    font-size:11px; font-weight:600; color:var(--t-text); transition:background .08s;
+    font-family:inherit; text-align:right;
+}
+.tg-actions-menu button:hover { background:var(--t-surface); }
+.tg-actions-menu button.danger { color:var(--t-danger); }
+.tg-actions-menu button.danger:hover { background:rgba(239,68,68,.06); }
+
+.tg-name-badge {
+    display:inline-flex; align-items:center; gap:5px; padding:3px 10px 3px 5px;
+    border-radius:7px; background:var(--t-surface); border:1px solid var(--t-border-light);
+}
+
+.tg-color-swatch {
+    width:26px; height:26px; border-radius:50%; cursor:pointer;
+    border:2.5px solid transparent; transition:all .12s; position:relative;
+}
+.tg-color-swatch:hover { transform:scale(1.08); }
+.tg-color-swatch.active { border-color:var(--t-text); box-shadow:0 0 0 2px var(--t-card); }
+.tg-color-swatch.active::after {
+    content:'✓'; position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    color:#fff; font-size:11px; font-weight:800; text-shadow:0 1px 2px rgba(0,0,0,.3);
+}
+
+.tg-section { display:flex; align-items:center; gap:6px; margin:4px 0 2px; }
+.tg-section-label { font-size:9px; font-weight:800; color:var(--t-text-faint); text-transform:uppercase; letter-spacing:.08em; white-space:nowrap; }
+.tg-section-line { flex:1; height:1px; background:var(--t-border-light); }
+
+.tg-preview-badge {
+    display:inline-flex; align-items:center; gap:5px; padding:4px 12px 4px 6px;
+    border-radius:18px; font-size:12px; font-weight:700; transition:all .15s;
+}
+
+@keyframes tgIn { from{opacity:0;transform:scale(.97) translateY(6px)} to{opacity:1;transform:scale(1) translateY(0)} }
+@keyframes tgMenuIn { from{opacity:0;transform:translateY(-3px)} to{opacity:1;transform:translateY(0)} }
 `
 
-/* ─── tag color palette (cycles by index) ─── */
-const CHIP_COLORS = [
-    ["#6366f1", "#6366f120"],
-    ["#10b981", "#10b98120"],
-    ["#f59e0b", "#f59e0b20"],
-    ["#3b82f6", "#3b82f620"],
-    ["#ec4899", "#ec489920"],
-    ["#8b5cf6", "#8b5cf620"],
-    ["#14b8a6", "#14b8a620"],
-    ["#f97316", "#f9731620"],
+/* ─── Colors ─── */
+const TAG_COLORS = [
+    { name: "نيلي", hex: "#6366f1" }, { name: "وردي", hex: "#ec4899" },
+    { name: "أحمر", hex: "#ef4444" }, { name: "برتقالي", hex: "#f97316" },
+    { name: "أصفر", hex: "#eab308" }, { name: "أخضر", hex: "#10b981" },
+    { name: "سماوي", hex: "#06b6d4" }, { name: "أزرق", hex: "#3b82f6" },
+    { name: "بنفسجي", hex: "#8b5cf6" }, { name: "زهري", hex: "#f472b6" },
 ] as const
 
-const COLOR_MAP = new Map<string, (typeof CHIP_COLORS)[number]>()
-function getCatColor(cat: string): (typeof CHIP_COLORS)[number] {
-    if (!COLOR_MAP.has(cat)) COLOR_MAP.set(cat, CHIP_COLORS[COLOR_MAP.size % CHIP_COLORS.length])
-    return COLOR_MAP.get(cat)!
+function getTagColor(tag: Tag): string {
+    if (tag.category) {
+        let hash = 0
+        for (let i = 0; i < tag.category.length; i++) hash = tag.category.charCodeAt(i) + ((hash << 5) - hash)
+        return TAG_COLORS[Math.abs(hash) % TAG_COLORS.length].hex
+    }
+    return TAG_COLORS[0].hex
+}
+
+function fmtDate(d?: string) {
+    if (!d) return "—"
+    try {
+        return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit", timeZone: "Asia/Aden" }).format(new Date(d))
+    } catch { return d }
 }
 
 /* ─── Modal ─── */
-function Modal({ title, width = 500, onClose, children }: {
+function Modal({ title, width = 440, onClose, children }: {
     title: string; width?: number; onClose: () => void; children: React.ReactNode
 }) {
     return (
-        <div onClick={onClose} style={{ position: "fixed", inset: 0, zIndex: 90, background: "rgba(0,0,0,.5)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <div onClick={e => e.stopPropagation()} dir="rtl" style={{ borderRadius: 16, background: "var(--t-card)", border: "1px solid var(--t-border)", width: "100%", maxWidth: width, margin: 16, animation: "tgIn .15s ease-out" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 20px", borderBottom: "1px solid var(--t-border-light)" }}>
-                    <div style={{ fontSize: 15, fontWeight: 800, color: "var(--t-text)" }}>{title}</div>
-                    <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--t-text-faint)", display: "flex" }}><X size={16} /></button>
+        <div onClick={onClose} style={{ position: "fixed", inset: 0, zIndex: 90, background: "rgba(0,0,0,.4)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div onClick={e => e.stopPropagation()} dir="rtl" style={{
+                borderRadius: 14, background: "var(--t-card)", border: "1px solid var(--t-border)",
+                width: "100%", maxWidth: width, margin: 16, animation: "tgIn .15s ease-out",
+                maxHeight: "88vh", display: "flex", flexDirection: "column",
+                boxShadow: "0 12px 40px rgba(0,0,0,.1)",
+            }}>
+                <div style={{
+                    display: "flex", alignItems: "center", justifyContent: "space-between",
+                    padding: "12px 16px", borderBottom: "1px solid var(--t-border-light)", flexShrink: 0,
+                }}>
+                    <div style={{ fontSize: 14, fontWeight: 800, color: "var(--t-text)" }}>{title}</div>
+                    <button onClick={onClose} style={{
+                        width: 24, height: 24, borderRadius: 6, background: "transparent",
+                        border: "none", cursor: "pointer", color: "var(--t-text-faint)",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                    }}
+                        onMouseEnter={e => { e.currentTarget.style.background = "var(--t-surface)" }}
+                        onMouseLeave={e => { e.currentTarget.style.background = "transparent" }}
+                    >
+                        <X size={14} />
+                    </button>
                 </div>
-                <div style={{ padding: "18px 20px" }}>{children}</div>
+                <div style={{ padding: "14px 16px", overflowY: "auto", flex: 1 }}>{children}</div>
             </div>
+        </div>
+    )
+}
+
+/* ─── Section divider ─── */
+function FormSection({ label, icon }: { label: string; icon?: React.ReactNode }) {
+    return (
+        <div className="tg-section">
+            {icon}
+            <span className="tg-section-label">{label}</span>
+            <div className="tg-section-line" />
         </div>
     )
 }
@@ -76,6 +193,7 @@ function TagForm({ tag, tenantId, onClose }: { tag?: Tag; tenantId: string; onCl
     const [cat, setCat] = useState(tag?.category ?? "")
     const [desc, setDesc] = useState(tag?.description ?? "")
     const [source, setSource] = useState(tag?.source ?? "")
+    const [selectedColor, setSelectedColor] = useState<string>(TAG_COLORS[0].hex)
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault()
@@ -89,7 +207,6 @@ function TagForm({ tag, tenantId, onClose }: { tag?: Tag; tenantId: string; onCl
             source: source || undefined,
         }
         if (isEdit) {
-            // use id if available, fallback to tag_id
             const tagId = tag.id ?? tag.tag_id ?? ""
             updateMut.mutate({ tagId, payload: base }, { onSuccess: r => { if (r.success) onClose() } })
         } else {
@@ -100,23 +217,69 @@ function TagForm({ tag, tenantId, onClose }: { tag?: Tag; tenantId: string; onCl
     const isPending = createMut.isPending || updateMut.isPending
 
     return (
-        <form onSubmit={submit} style={{ display: "flex", flexDirection: "column", gap: 13 }}>
-            {/* Emoji + Name in same row */}
-            <div style={{ display: "grid", gridTemplateColumns: "60px 1fr", gap: 10 }}>
+        <form onSubmit={submit} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {/* Preview */}
+            <div style={{
+                padding: "10px 14px", borderRadius: 10,
+                background: "var(--t-surface)", border: "1px solid var(--t-border-light)",
+                display: "flex", alignItems: "center", justifyContent: "space-between",
+            }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                    <Sparkles size={10} style={{ color: "var(--t-text-faint)" }} />
+                    <span style={{ fontSize: 10, fontWeight: 600, color: "var(--t-text-faint)" }}>معاينة</span>
+                </div>
+                <div className="tg-preview-badge" style={{
+                    color: selectedColor, background: `${selectedColor}14`,
+                    border: `1.5px solid ${selectedColor}25`,
+                }}>
+                    {emoji && <span style={{ fontSize: 13 }}>{emoji}</span>}
+                    <span>{name || "اسم التاج"}</span>
+                </div>
+            </div>
+
+            {/* Emoji + Name */}
+            <div style={{ display: "grid", gridTemplateColumns: "56px 1fr", gap: 10 }}>
                 <div>
                     <label className="tg-label">إيموجي</label>
                     <input className="tg-field" value={emoji} onChange={e => setEmoji(e.target.value)}
                         placeholder="🏷️" maxLength={8}
-                        style={{ textAlign: "center", fontSize: 20, padding: "6px 0" }} />
+                        style={{ textAlign: "center", fontSize: 18, padding: "6px 0" }} />
                 </div>
                 <div>
-                    <label className="tg-label">الاسم الرئيسي *</label>
+                    <label className="tg-label">الاسم <span style={{ color: "var(--t-danger)" }}>*</span></label>
                     <input className="tg-field" value={name} onChange={e => setName(e.target.value)}
                         placeholder="عميل VIP" required />
                 </div>
             </div>
 
-            {/* Bilingual names */}
+            {/* Colors */}
+            <div>
+                <label className="tg-label">الألوان</label>
+                <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                    {TAG_COLORS.map(c => (
+                        <div key={c.hex}
+                            className={`tg-color-swatch${selectedColor === c.hex ? " active" : ""}`}
+                            style={{ background: c.hex }}
+                            onClick={() => setSelectedColor(c.hex)}
+                            title={c.name} />
+                    ))}
+                </div>
+            </div>
+
+            {/* Description */}
+            <div>
+                <label className="tg-label">
+                    الوصف
+                    <span className="tg-label-hint">{desc.length}/200</span>
+                </label>
+                <textarea className="tg-field" rows={2} value={desc} onChange={e => setDesc(e.target.value)}
+                    placeholder="وصف اختياري..." maxLength={200}
+                    style={{ resize: "vertical", lineHeight: 1.4 }} />
+            </div>
+
+            {/* Extra */}
+            <FormSection label="تفاصيل إضافية" icon={<FolderOpen size={10} style={{ color: "var(--t-text-faint)" }} />} />
+
             <div className="tg-grid-2">
                 <div>
                     <label className="tg-label">الاسم بالعربية</label>
@@ -127,12 +290,10 @@ function TagForm({ tag, tenantId, onClose }: { tag?: Tag; tenantId: string; onCl
                     <input className="tg-field" dir="ltr" value={nameEn} onChange={e => setNameEn(e.target.value)} placeholder="VIP" />
                 </div>
             </div>
-
-            {/* Category + Source */}
             <div className="tg-grid-2">
                 <div>
                     <label className="tg-label">التصنيف</label>
-                    <input className="tg-field" value={cat} onChange={e => setCat(e.target.value)} placeholder="customer" />
+                    <input className="tg-field" value={cat} onChange={e => setCat(e.target.value)} placeholder="مبيعات" />
                 </div>
                 <div>
                     <label className="tg-label">المصدر</label>
@@ -140,18 +301,14 @@ function TagForm({ tag, tenantId, onClose }: { tag?: Tag; tenantId: string; onCl
                 </div>
             </div>
 
-            {/* Description */}
-            <div>
-                <label className="tg-label">الوصف</label>
-                <textarea className="tg-field" rows={2} value={desc} onChange={e => setDesc(e.target.value)}
-                    placeholder="وصف اختياري (حتى 200 حرف)..." maxLength={200}
-                    style={{ resize: "vertical" }} />
-            </div>
-
-            <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 4 }}>
+            {/* Actions */}
+            <div style={{
+                display: "flex", gap: 8, justifyContent: "flex-end",
+                paddingTop: 6, borderTop: "1px solid var(--t-border-light)", marginTop: 2,
+            }}>
                 <button type="button" className="tg-btn-ghost" onClick={onClose}>إلغاء</button>
-                <button type="submit" className="tg-btn-primary" disabled={isPending}>
-                    {isPending ? <Loader2 size={13} className="animate-spin" /> : <Check size={13} />}
+                <button type="submit" className="tg-btn-primary" disabled={isPending || !name.trim()}>
+                    {isPending ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />}
                     {isEdit ? "حفظ التغييرات" : "إنشاء التاج"}
                 </button>
             </div>
@@ -159,73 +316,39 @@ function TagForm({ tag, tenantId, onClose }: { tag?: Tag; tenantId: string; onCl
     )
 }
 
-/* ─── Tag Card ─── */
-function TagCard({ tag, onEdit, onDelete }: {
-    tag: Tag
-    onEdit: () => void
-    onDelete: () => void
+/* ─── Actions Dropdown ─── */
+function ActionsDropdown({ onEdit, onDelete }: {
+    onEdit: () => void; onDelete: () => void
 }) {
-    const [c, bg] = getCatColor(tag.category || "other")
+    const [open, setOpen] = useState(false)
     return (
-        <div className="tg-card" style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
-            {/* Emoji bubble */}
-            <div style={{
-                width: 44, height: 44, borderRadius: 12, flexShrink: 0,
-                background: bg, display: "flex", alignItems: "center", justifyContent: "center",
-                fontSize: tag.emoji ? 22 : 16,
-            }}>
-                {tag.emoji ? tag.emoji : <Hash size={16} style={{ color: c }} />}
-            </div>
-
-            {/* Content */}
-            <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
-                    <span style={{ fontSize: 13, fontWeight: 700, color: "var(--t-text)" }}>{tag.name}</span>
-                    {tag.category && (
-                        <span className="tg-chip" style={{ color: c, background: bg }}>
-                            {tag.category}
-                        </span>
-                    )}
-                </div>
-                {/* Bilingual names */}
-                {(tag.name_ar || tag.name_en) && (
-                    <div style={{ fontSize: 10, color: "var(--t-text-faint)", marginTop: 2 }}>
-                        {[tag.name_ar, tag.name_en].filter(Boolean).join(" · ")}
+        <div style={{ position: "relative", zIndex: open ? 20 : 1 }}>
+            <button className="tg-actions-btn" onClick={(e) => { e.stopPropagation(); setOpen(!open) }}>
+                <MoreVertical size={14} />
+            </button>
+            {open && (
+                <>
+                    <div style={{ position: "fixed", inset: 0, zIndex: 15 }} onClick={() => setOpen(false)} />
+                    <div className="tg-actions-menu" dir="rtl">
+                        <ActionGuard pageBit={PAGE_BITS.TAGS} actionBit={ACTION_BITS.UPDATE_TAG}>
+                            <button onClick={() => { onEdit(); setOpen(false) }}>
+                                <Pencil size={12} /> تعديل
+                            </button>
+                        </ActionGuard>
+                        <ActionGuard pageBit={PAGE_BITS.TAGS} actionBit={ACTION_BITS.DELETE_TAG}>
+                            <button className="danger" onClick={() => { onDelete(); setOpen(false) }}>
+                                <Trash2 size={12} /> حذف
+                            </button>
+                        </ActionGuard>
                     </div>
-                )}
-                {tag.description && (
-                    <div style={{ fontSize: 11, color: "var(--t-text-faint)", marginTop: 3, lineHeight: 1.4, overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" } as React.CSSProperties}>
-                        {tag.description}
-                    </div>
-                )}
-                {/* Meta */}
-                {(tag.created_by || tag.last_edited_by) && (
-                    <div style={{ fontSize: 10, color: "var(--t-text-faint)", marginTop: 4, opacity: .7 }}>
-                        {tag.created_by && <span>أُنشئ بواسطة: {tag.created_by}</span>}
-                        {tag.last_edited_by && <span style={{ marginRight: 8 }}>· آخر تعديل: {tag.last_edited_by}</span>}
-                    </div>
-                )}
-            </div>
-
-            {/* Actions */}
-            <div style={{ display: "flex", gap: 5, flexShrink: 0 }}>
-                <ActionGuard pageBit={PAGE_BITS.TAGS} actionBit={ACTION_BITS.UPDATE_TAG}>
-                    <button className="tg-btn-ghost" onClick={onEdit} style={{ padding: "5px 8px" }}>
-                        <Pencil size={12} />
-                    </button>
-                </ActionGuard>
-                <ActionGuard pageBit={PAGE_BITS.TAGS} actionBit={ACTION_BITS.DELETE_TAG}>
-                    <button onClick={onDelete} style={{ display: "inline-flex", alignItems: "center", padding: "5px 8px", borderRadius: 9, border: "none", background: "rgba(239,68,68,.1)", color: "var(--t-danger)", cursor: "pointer" }}>
-                        <Trash2 size={12} />
-                    </button>
-                </ActionGuard>
-            </div>
+                </>
+            )}
         </div>
     )
 }
 
 /* ═══════════════════════════════════════
-   Main Component
+   Main
 ═══════════════════════════════════════ */
 export function TagsTab() {
     const { user } = useAuthStore()
@@ -238,16 +361,27 @@ export function TagsTab() {
     const [showForm, setShowForm] = useState(false)
     const [editTag, setEditTag] = useState<Tag | undefined>()
     const [deleteTarget, setDeleteTarget] = useState<Tag | null>(null)
+    const [sortField, setSortField] = useState<"name" | "created_at">("name")
+    const [sortDir, setSortDir] = useState<"asc" | "desc">("asc")
 
-    const filtered = tags.filter((t: Tag) =>
-        t.name.toLowerCase().includes(search.toLowerCase()) ||
-        (t.name_ar ?? "").toLowerCase().includes(search.toLowerCase()) ||
-        (t.name_en ?? "").toLowerCase().includes(search.toLowerCase()) ||
-        (t.category ?? "").toLowerCase().includes(search.toLowerCase())
-    )
+    const filtered = tags
+        .filter((t: Tag) =>
+            !search ||
+            t.name.toLowerCase().includes(search.toLowerCase()) ||
+            (t.name_ar ?? "").toLowerCase().includes(search.toLowerCase()) ||
+            (t.name_en ?? "").toLowerCase().includes(search.toLowerCase()) ||
+            (t.category ?? "").toLowerCase().includes(search.toLowerCase())
+        )
+        .sort((a: Tag, b: Tag) => {
+            const dir = sortDir === "asc" ? 1 : -1
+            if (sortField === "name") return a.name.localeCompare(b.name) * dir
+            return ((a.created_at ?? "") > (b.created_at ?? "") ? 1 : -1) * dir
+        })
 
-    // group by category
-    const categories = [...new Set(filtered.map((t: Tag) => t.category || "بدون تصنيف"))]
+    const toggleSort = (field: "name" | "created_at") => {
+        if (sortField === field) setSortDir(d => d === "asc" ? "desc" : "asc")
+        else { setSortField(field); setSortDir("asc") }
+    }
 
     const openEdit = (tag: Tag) => { setEditTag(tag); setShowForm(true) }
     const openCreate = () => { setEditTag(undefined); setShowForm(true) }
@@ -256,103 +390,108 @@ export function TagsTab() {
         <div style={{ direction: "rtl" }}>
             <style>{CSS}</style>
 
-            {/* ── Header pills: summary ── */}
-            {!isLoading && tags.length > 0 && (
-                <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 }}>
-                    <span style={{ fontSize: 11, fontWeight: 700, padding: "3px 12px", borderRadius: 20, background: "var(--t-surface)", color: "var(--t-text-faint)", border: "1px solid var(--t-border-light)" }}>
-                        {tags.length} تاج
-                    </span>
-                    {[...new Set(tags.map((t: Tag) => t.category).filter(Boolean))].map((cat) => {
-                        const [c, bg] = getCatColor(cat as string)
-                        return (
-                            <span key={cat as string} className="tg-chip" style={{ color: c, background: bg, cursor: "pointer" }}
-                                onClick={() => setSearch(cat as string)}>
-                                {cat as string} ({tags.filter((t: Tag) => t.category === cat).length})
-                            </span>
-                        )
-                    })}
-                </div>
-            )}
-
-            {/* ── Toolbar ── */}
-            <div style={{ display: "flex", gap: 10, marginBottom: 16, alignItems: "center" }}>
-                <div style={{ position: "relative", flex: 1 }}>
-                    <Search size={14} style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", color: "var(--t-text-faint)", pointerEvents: "none" }} />
+            {/* Toolbar */}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+                <div style={{ position: "relative", width: 200 }}>
+                    <Search size={13} style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", color: "var(--t-text-faint)", pointerEvents: "none" }} />
                     <input className="tg-field" value={search} onChange={e => setSearch(e.target.value)}
-                        placeholder="بحث بالاسم أو التصنيف..." style={{ paddingRight: 36 }} />
+                        placeholder="بحث في التاجات" style={{ paddingInlineEnd: 32, fontSize: 11 }} />
                 </div>
                 <ActionGuard pageBit={PAGE_BITS.TAGS} actionBit={ACTION_BITS.CREATE_TAG}>
                     <button className="tg-btn-primary" onClick={openCreate}>
-                        <Plus size={14} /> تاج جديد
+                        <Plus size={13} /> + تاج جديد
                     </button>
                 </ActionGuard>
             </div>
 
-            {/* ── Content ── */}
-            {isLoading ? (
-                <div style={{ textAlign: "center", padding: "48px 0", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, color: "var(--t-text-faint)" }}>
-                    <Loader2 size={18} className="animate-spin" /> جاري تحميل التاجات...
-                </div>
-            ) : filtered.length === 0 ? (
-                <div style={{ textAlign: "center", padding: "48px 0" }}>
-                    <TagIcon size={36} style={{ margin: "0 auto 12px", display: "block", opacity: .2 }} />
-                    <div style={{ fontSize: 14, color: "var(--t-text-faint)", fontWeight: 600 }}>
-                        {search ? "لا توجد نتائج للبحث" : "لا توجد تاجات بعد"}
+            {/* Table */}
+            <div style={{ borderRadius: 10, border: "1px solid var(--t-border)", background: "var(--t-card)", overflow: "visible" }}>
+                {isLoading ? (
+                    <div style={{ textAlign: "center", padding: "40px 0", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, color: "var(--t-text-faint)", fontSize: 12 }}>
+                        <Loader2 size={15} className="animate-spin" /> جاري التحميل...
                     </div>
-                    {!search && (
-                        <button className="tg-btn-primary" onClick={openCreate} style={{ marginTop: 16 }}>
-                            <Plus size={14} /> أضف أول تاج
-                        </button>
-                    )}
-                </div>
-            ) : (
-                <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-                    {categories.map(cat => (
-                        <div key={cat}>
-                            {/* Category heading */}
-                            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-                                <div style={{ height: 1, flex: 1, background: "var(--t-border-light)" }} />
-                                <span style={{ fontSize: 10, fontWeight: 800, color: "var(--t-text-faint)", textTransform: "uppercase", letterSpacing: ".08em", whiteSpace: "nowrap" }}>
-                                    {cat} ({filtered.filter((t: Tag) => (t.category || "بدون تصنيف") === cat).length})
-                                </span>
-                                <div style={{ height: 1, flex: 1, background: "var(--t-border-light)" }} />
-                            </div>
-                            {/* Tag cards in responsive grid */}
-                            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 10 }}>
-                                {filtered
-                                    .filter((t: Tag) => (t.category || "بدون تصنيف") === cat)
-                                    .map((tag: Tag) => (
-                                        <TagCard
-                                            key={tag.id ?? tag.tag_id}
-                                            tag={tag}
-                                            onEdit={() => openEdit(tag)}
-                                            onDelete={() => setDeleteTarget(tag)}
-                                        />
-                                    ))}
-                            </div>
+                ) : filtered.length === 0 ? (
+                    <div style={{ textAlign: "center", padding: "40px 0" }}>
+                        <TagIcon size={28} style={{ margin: "0 auto 8px", display: "block", color: "var(--t-text-faint)", opacity: .25 }} />
+                        <div style={{ fontSize: 13, color: "var(--t-text-secondary)", fontWeight: 600 }}>
+                            {search ? "لا توجد نتائج" : "لا توجد تاجات بعد"}
                         </div>
-                    ))}
-                </div>
-            )}
+                        {!search && (
+                            <button className="tg-btn-primary" onClick={openCreate} style={{ marginTop: 10 }}>
+                                <Plus size={13} /> أضف أول تاج
+                            </button>
+                        )}
+                    </div>
+                ) : (
+                    <table className="tg-table">
+                        <thead>
+                            <tr>
+                                <th><span className="tg-th-sort" onClick={() => toggleSort("name")}>الاسم <ArrowUpDown size={10} style={{ opacity: sortField === "name" ? 1 : .3 }} /></span></th>
+                                <th>الوصف</th>
+                                <th>أنشأ بواسطة</th>
+                                <th>المصدر</th>
+                                <th><span className="tg-th-sort" onClick={() => toggleSort("created_at")}>تاريخ الإنشاء <ArrowUpDown size={10} style={{ opacity: sortField === "created_at" ? 1 : .3 }} /></span></th>
+                                <th>آخر تعديل بواسطة</th>
+                                <th><span className="tg-th-sort" onClick={() => toggleSort("created_at")}>آخر تعديل <ArrowUpDown size={10} style={{ opacity: sortField === "created_at" ? 1 : .3 }} /></span></th>
+                                <th>إجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {filtered.map((tag: Tag) => {
+                                const color = getTagColor(tag)
+                                return (
+                                    <tr key={tag.id ?? tag.tag_id}>
+                                        <td>
+                                            <div className="tg-name-badge">
+                                                <div style={{
+                                                    width: 22, height: 22, borderRadius: 6, flexShrink: 0,
+                                                    background: `${color}14`, display: "flex", alignItems: "center", justifyContent: "center",
+                                                    fontSize: tag.emoji ? 12 : 10,
+                                                }}>
+                                                    {tag.emoji || <Hash size={10} style={{ color }} />}
+                                                </div>
+                                                <span style={{ fontWeight: 600, fontSize: 12 }}>{tag.name}</span>
+                                            </div>
+                                        </td>
+                                        <td><span style={{ color: "var(--t-text-secondary)", fontSize: 11 }}>{tag.description || "—"}</span></td>
+                                        <td><span style={{ fontSize: 11 }}>{tag.created_by || "—"}</span></td>
+                                        <td><span style={{ fontSize: 11, color: "var(--t-text-secondary)" }}>{tag.source || "—"}</span></td>
+                                        <td><span style={{ fontSize: 11, color: "var(--t-text-secondary)", whiteSpace: "nowrap" }}>{fmtDate(tag.created_at)}</span></td>
+                                        <td><span style={{ fontSize: 11 }}>{tag.last_edited_by || "—"}</span></td>
+                                        <td><span style={{ fontSize: 11, color: "var(--t-text-secondary)", whiteSpace: "nowrap" }}>{fmtDate(tag.last_edited_at || tag.updated_at)}</span></td>
+                                        <td>
+                                            <ActionsDropdown onEdit={() => openEdit(tag)} onDelete={() => setDeleteTarget(tag)} />
+                                        </td>
+                                    </tr>
+                                )
+                            })}
+                        </tbody>
+                    </table>
+                )}
+            </div>
 
-            {/* ── Modals ── */}
+            {/* Modals */}
             {showForm && (
-                <Modal title={editTag ? `تعديل: ${editTag.name}` : "إنشاء تاج جديد"} width={520} onClose={() => setShowForm(false)}>
+                <Modal title={editTag ? `تعديل: ${editTag.name}` : "تاج جديد"} width={440} onClose={() => setShowForm(false)}>
                     <TagForm tag={editTag} tenantId={tid} onClose={() => setShowForm(false)} />
                 </Modal>
             )}
 
             {deleteTarget && (
-                <Modal title="تأكيد الحذف" width={400} onClose={() => setDeleteTarget(null)}>
-                    <div style={{ textAlign: "center", padding: "8px 0 8px" }}>
-                        <div style={{ width: 52, height: 52, borderRadius: 14, background: "rgba(239,68,68,.1)", margin: "0 auto 14px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                            <AlertTriangle size={24} style={{ color: "var(--t-danger)" }} />
+                <Modal title="تأكيد الحذف" width={360} onClose={() => setDeleteTarget(null)}>
+                    <div style={{ textAlign: "center", padding: "4px 0" }}>
+                        <div style={{
+                            width: 44, height: 44, borderRadius: 12,
+                            background: "rgba(239,68,68,.08)", margin: "0 auto 12px",
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                        }}>
+                            <AlertTriangle size={20} style={{ color: "var(--t-danger)" }} />
                         </div>
-                        <div style={{ fontSize: 24, marginBottom: 4 }}>{deleteTarget.emoji}</div>
-                        <div style={{ fontSize: 14, fontWeight: 700, color: "var(--t-text)", marginBottom: 6 }}>
+                        {deleteTarget.emoji && <div style={{ fontSize: 18, marginBottom: 4 }}>{deleteTarget.emoji}</div>}
+                        <div style={{ fontSize: 13, fontWeight: 700, color: "var(--t-text)", marginBottom: 4 }}>
                             حذف تاج «{deleteTarget.name}»؟
                         </div>
-                        <div style={{ fontSize: 12, color: "var(--t-text-faint)", marginBottom: 20 }}>
+                        <div style={{ fontSize: 11, color: "var(--t-text-faint)", marginBottom: 16 }}>
                             لا يمكن التراجع عن هذا الإجراء
                         </div>
                         <div style={{ display: "flex", gap: 8, justifyContent: "center" }}>
@@ -363,8 +502,13 @@ export function TagsTab() {
                                     const tagId = deleteTarget.id ?? deleteTarget.tag_id ?? ""
                                     deleteMut.mutate(tagId, { onSuccess: r => { if (r.success) setDeleteTarget(null) } })
                                 }}
-                                style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "8px 20px", borderRadius: 9, border: "none", background: "var(--t-danger)", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
-                                {deleteMut.isPending ? <Loader2 size={13} className="animate-spin" /> : <Trash2 size={13} />} حذف
+                                style={{
+                                    display: "inline-flex", alignItems: "center", gap: 5,
+                                    padding: "7px 18px", borderRadius: 8, border: "none",
+                                    background: "var(--t-danger)", color: "#fff",
+                                    fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
+                                }}>
+                                {deleteMut.isPending ? <Loader2 size={12} className="animate-spin" /> : <Trash2 size={12} />} حذف
                             </button>
                         </div>
                     </div>

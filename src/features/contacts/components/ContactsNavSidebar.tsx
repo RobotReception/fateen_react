@@ -1,36 +1,37 @@
-import { UserCircle, UserX, ChevronDown, ChevronRight, Plus, PanelLeftClose, PanelLeftOpen } from "lucide-react"
+import {
+    ChevronDown,
+    ChevronRight,
+    PanelLeftClose,
+    PanelLeftOpen,
+    Users,
+    Plus,
+} from "lucide-react"
 import { useNavigate } from "react-router-dom"
-import { useInboxStore, type InboxSection } from "../../store/inbox.store"
-import { useInboxSummary } from "../../hooks/use-inbox-summary"
-import type { SidebarLifecycle, SidebarTeam } from "../../types/inbox.types"
+import { useContactsStore, type ContactsSection } from "../store/contacts.store"
+import { useContactsSidebarSummary } from "../hooks/use-contacts-summary"
+import type { ContactsSidebarLifecycle, ContactsSidebarTeam } from "../services/contacts-service"
 
-const TOP_NAV: { key: string; label: string; icon: React.ElementType }[] = [
-    { key: "all", label: "All", icon: UserCircle },
-    { key: "mine", label: "Mine", icon: UserCircle },
-    { key: "unassigned", label: "Unassigned", icon: UserX },
-]
+export function ContactsNavSidebar() {
+    const {
+        activeSection, setActiveSection,
+        sidebarCollapsed, toggleSidebar,
+        collapsedSections, toggleCollapsedSection,
+    } = useContactsStore()
 
-export function InboxNavSidebar() {
-    const { activeSection, setActiveSection, collapsedSections, toggleSection, sidebarCollapsed, toggleSidebar } = useInboxStore()
-    const { data: summary } = useInboxSummary()
+    const { data: summary } = useContactsSidebarSummary()
     const navigate = useNavigate()
 
-    const countMap: Record<string, number> = {
-        all: summary?.all ?? 0,
-        mine: summary?.mine ?? 0,
-        unassigned: summary?.unassigned ?? 0,
-    }
+    const lifecycles: ContactsSidebarLifecycle[] = summary?.lifecycles ?? []
+    const teams: ContactsSidebarTeam[] = summary?.teams ?? []
+    const totalCount = summary?.all ?? 0
 
-    const lifecycles: SidebarLifecycle[] = summary?.lifecycles ?? []
-    const teams: SidebarTeam[] = summary?.teams ?? []
-
-    const isActive = (key: string) => activeSection === key
     const collapsed = sidebarCollapsed
+    const isActive = (key: string) => activeSection === key
 
     return (
         <aside style={{
-            width: collapsed ? 54 : 190,
-            minWidth: collapsed ? 54 : 190,
+            width: collapsed ? 54 : 220,
+            minWidth: collapsed ? 54 : 220,
             height: "100%",
             display: "flex", flexDirection: "column",
             background: "var(--t-card)",
@@ -46,7 +47,9 @@ export function InboxNavSidebar() {
                 flexShrink: 0,
             }}>
                 {!collapsed && (
-                    <span style={{ fontSize: 15, fontWeight: 700, color: "var(--t-text)" }}>Inbox</span>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <span style={{ fontSize: 15, fontWeight: 700, color: "var(--t-text)" }}>Contacts</span>
+                    </div>
                 )}
                 <button
                     onClick={toggleSidebar}
@@ -68,41 +71,36 @@ export function InboxNavSidebar() {
 
             {/* Scrollable body */}
             <div style={{ flex: 1, overflowY: "auto", overflowX: "hidden", padding: "0 0 16px" }}>
-                {/* Top nav */}
+                {/* Top nav: All */}
                 <div style={{ padding: collapsed ? "0 4px" : "0 8px", marginBottom: 4 }}>
-                    {TOP_NAV.map((item) => {
-                        const Icon = item.icon
-                        const active = isActive(item.key)
-                        const count = countMap[item.key]
-                        return (
-                            <NavItem key={item.key} isActive={active} collapsed={collapsed}
-                                onClick={() => setActiveSection(item.key as InboxSection)}
-                                title={collapsed ? item.label : undefined}>
-                                <Icon size={14} style={{ flexShrink: 0, opacity: 0.8 }} />
-                                {!collapsed && <span style={{ flex: 1, fontWeight: active ? 700 : 500 }}>{item.label}</span>}
-                                {!collapsed && count > 0 && <CountBadge count={count} active={active} />}
-                                {collapsed && count > 0 && (
-                                    <span style={{
-                                        position: "absolute", top: 2, right: 2,
-                                        fontSize: 8, fontWeight: 700,
-                                        width: 14, height: 14, borderRadius: "50%",
-                                        background: active ? "rgba(255,255,255,0.3)" : "var(--t-accent)",
-                                        color: "var(--t-text-on-accent)",
-                                        display: "flex", alignItems: "center", justifyContent: "center",
-                                    }}>{count > 9 ? "9+" : count}</span>
-                                )}
-                            </NavItem>
-                        )
-                    })}
+                    <NavItem isActive={isActive("all")} collapsed={collapsed}
+                        onClick={() => setActiveSection("all")}
+                        title={collapsed ? "All" : undefined}>
+                        <Users size={14} style={{ flexShrink: 0, opacity: 0.8 }} />
+                        {!collapsed && <span style={{ flex: 1, fontWeight: isActive("all") ? 700 : 500 }}>All</span>}
+                        {!collapsed && totalCount > 0 && <CountBadge count={totalCount} active={isActive("all")} />}
+                        {collapsed && totalCount > 0 && (
+                            <span style={{
+                                position: "absolute", top: 2, right: 2,
+                                fontSize: 8, fontWeight: 700,
+                                width: 14, height: 14, borderRadius: "50%",
+                                background: isActive("all") ? "rgba(255,255,255,0.3)" : "var(--t-accent)",
+                                color: "var(--t-text-on-accent)",
+                                display: "flex", alignItems: "center", justifyContent: "center",
+                            }}>{totalCount > 9 ? "9+" : totalCount}</span>
+                        )}
+                    </NavItem>
                 </div>
 
-                {/* Lifecycle */}
+                {/* ── Lifecycle (from /contacts/sidebar-summary) ── */}
                 {!collapsed && (
                     <>
-                        <SectionHeader label="Lifecycle"
+                        <SectionHeader
+                            label="Lifecycle"
                             collapsed={!!collapsedSections["lifecycle"]}
-                            onToggle={() => toggleSection("lifecycle")}
-                            onAdd={() => navigate("/dashboard/settings/organization?tab=lifecycles")} />
+                            onToggle={() => toggleCollapsedSection("lifecycle")}
+                            onAdd={() => navigate("/dashboard/settings/organization?tab=lifecycles")}
+                        />
                         {!collapsedSections["lifecycle"] && (
                             <div style={{ padding: "2px 8px 6px" }}>
                                 {lifecycles.length === 0 ? (
@@ -111,38 +109,38 @@ export function InboxNavSidebar() {
                                     const key = `lc_${lc.code}`
                                     return (
                                         <NavItem key={key} isActive={isActive(key)} collapsed={false}
-                                            onClick={() => setActiveSection(key as InboxSection)}>
+                                            onClick={() => setActiveSection(key as ContactsSection)}>
                                             <span style={{ fontSize: 14, lineHeight: 1, flexShrink: 0 }}>{lc.icon || "📌"}</span>
                                             <span style={{ flex: 1 }}>{lc.name}</span>
-                                            {lc.count > 0 && <CountBadge count={lc.count} active={isActive(key)} />}
+                                            <CountBadge count={lc.count} active={isActive(key)} />
                                         </NavItem>
                                     )
                                 })}
                             </div>
                         )}
 
-                        {/* Team Inbox */}
-                        <SectionHeader label="Team Inbox"
+                        {/* ── Teams (from /contacts/sidebar-summary) ── */}
+                        <SectionHeader
+                            label="Team Inbox"
                             collapsed={!!collapsedSections["team"]}
-                            onToggle={() => toggleSection("team")}
-                            onAdd={() => navigate("/dashboard/settings/organization?tab=teams")} />
+                            onToggle={() => toggleCollapsedSection("team")}
+                            onAdd={() => navigate("/dashboard/settings/organization?tab=teams")}
+                        />
                         {!collapsedSections["team"] && (
                             <div style={{ padding: "2px 8px 6px" }}>
                                 {teams.length === 0 ? (
-                                    <EmptyLabel text="No inboxes created" />
+                                    <EmptyLabel text="No teams created" />
                                 ) : teams.map((team) => {
                                     const key = `team_${team.team_id}`
                                     return (
                                         <NavItem key={key} isActive={isActive(key)} collapsed={false}
-                                            onClick={() => setActiveSection(key as InboxSection)}>
+                                            onClick={() => setActiveSection(key as ContactsSection)}>
                                             <span style={{
                                                 width: 8, height: 8, borderRadius: "50%", flexShrink: 0,
                                                 background: team.color ?? "var(--t-text-faint)",
                                             }} />
                                             <span style={{ flex: 1 }}>{team.name}</span>
-                                            {(team.assigned_count ?? 0) > 0 && (
-                                                <CountBadge count={team.assigned_count!} active={isActive(key)} />
-                                            )}
+                                            <CountBadge count={team.customers_count} active={isActive(key)} />
                                         </NavItem>
                                     )
                                 })}
@@ -158,7 +156,7 @@ export function InboxNavSidebar() {
                             const key = `lc_${lc.code}`
                             return (
                                 <NavItem key={key} isActive={isActive(key)} collapsed={true}
-                                    onClick={() => setActiveSection(key as InboxSection)}
+                                    onClick={() => setActiveSection(key as ContactsSection)}
                                     title={lc.name}>
                                     <span style={{ fontSize: 16, lineHeight: 1 }}>{lc.icon || "📌"}</span>
                                 </NavItem>
@@ -168,7 +166,7 @@ export function InboxNavSidebar() {
                             const key = `team_${team.team_id}`
                             return (
                                 <NavItem key={key} isActive={isActive(key)} collapsed={true}
-                                    onClick={() => setActiveSection(key as InboxSection)}
+                                    onClick={() => setActiveSection(key as ContactsSection)}
                                     title={team.name}>
                                     <span style={{
                                         width: 10, height: 10, borderRadius: "50%",

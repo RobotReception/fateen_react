@@ -61,6 +61,21 @@ export async function sendMessage(payload: SendMessagePayload) {
     return data.data
 }
 
+// ─── Add Comment (internal) ─────────────────────────────
+// POST /inbox/comments
+export async function addComment(payload: {
+    customer_id: string
+    session_id: string
+    platform: string
+    sender_id: string
+    sender_type?: string
+    sender_info: { name: string; profile_picture?: string | null }
+    content: { text: string; mentions?: string[] }
+}) {
+    const { data } = await apiClient.post("/inbox/comments", payload)
+    return data.data
+}
+
 // ─── Media Upload ───────────────────────────────────────
 // POST /media/upload
 export async function uploadMedia(file: File, options?: {
@@ -143,6 +158,46 @@ export async function assignCustomerTeams(customerId: string, teamIds: string[])
 export async function removeCustomerTeams(customerId: string, teamIds: string[]) {
     const { data } = await apiClient.delete(`/customers/${customerId}/teams`, {
         data: { teams: teamIds },
+    })
+    return data.data
+}
+
+// POST /customers/{id}/tags
+export async function addCustomerTags(customerId: string, tags: string[]) {
+    const { data } = await apiClient.post(`/customers/${customerId}/tags`, { tags })
+    return data.data
+}
+
+// DELETE /customers/{id}/tags
+export async function removeCustomerTags(customerId: string, tags: string[]) {
+    const { data } = await apiClient.delete(`/customers/${customerId}/tags`, {
+        data: { tags },
+    })
+    return data.data
+}
+
+// PUT /contacts/{id}/custom-fields — Smart Update (updates only existing fields)
+export async function updateContactCustomFields(customerId: string, customFields: Record<string, string>) {
+    const { data } = await apiClient.put(`/contacts/${customerId}/custom-fields`, {
+        custom_fields: customFields,
+    })
+    return data
+}
+
+// ─── Brief Users (for assign dropdown) ──────────────────
+// GET /backend/v2/admin/brief
+export interface BriefUser {
+    user_id: string
+    name: string
+    profile_picture: string
+}
+
+export async function getBriefUsers(page = 1, pageSize = 50): Promise<{
+    users: BriefUser[]
+    pagination: { totalCount: number; totalPages: number; currentPage: number }
+}> {
+    const { data } = await apiClient.get("/admin/brief", {
+        params: { page, page_size: pageSize },
     })
     return data.data
 }

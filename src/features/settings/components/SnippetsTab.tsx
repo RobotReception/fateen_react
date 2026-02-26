@@ -157,7 +157,7 @@ function PreviewModal({ s, onClose }: { s: Snippet; onClose: () => void }) {
                 <div style={{ display: "flex", gap: 12, fontSize: 10, color: "var(--t-text-faint)", padding: "8px 0", borderTop: "1px solid var(--t-border-light)", alignItems: "center" }}>
                     <span style={{ fontFamily: "monospace", flex: 1 }}>{s.field_id}</span>
                     {s.created_by && <span>· {s.created_by}</span>}
-                    {s.created_at && <span>· {new Date(s.created_at).toLocaleDateString("ar-SA")}</span>}
+                    {s.created_at && <span>· {new Date(s.created_at).toLocaleDateString("ar-SA", { timeZone: "Asia/Aden" })}</span>}
                     {url && (
                         <a href={url} download={s.content?.filename as string || s.name}
                             style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "5px 12px", borderRadius: 8, border: "1.5px solid var(--t-border)", background: "var(--t-surface)", color: "var(--t-text)", textDecoration: "none", fontSize: 11, fontWeight: 700 }}

@@ -15,8 +15,6 @@ import {
     ChevronLeft,
     Shield,
     BookOpen,
-    ClipboardList,
-    History,
     Settings,
     Building2,
     User,
@@ -26,6 +24,7 @@ import {
     Brain,
     Sun,
     Moon,
+    BookUser,
 } from "lucide-react"
 
 const NAV_ITEMS = [
@@ -42,22 +41,16 @@ const NAV_ITEMS = [
         pageBit: PAGE_BITS.INBOX,
     },
     {
+        title: "جهات الاتصال",
+        href: "/dashboard/contacts",
+        icon: BookUser,
+        pageBit: PAGE_BITS.CONTACTS,
+    },
+    {
         title: "قاعدة المعرفة",
         href: "/dashboard/knowledge",
         icon: BookOpen,
         pageBit: PAGE_BITS.DOCUMENT_MANAGEMENT,
-    },
-    {
-        title: "الطلبات المعلقة",
-        href: "/dashboard/pending-requests",
-        icon: ClipboardList,
-        pageBit: PAGE_BITS.PENDING_REQUESTS,
-    },
-    {
-        title: "سجل العمليات",
-        href: "/dashboard/operation-history",
-        icon: History,
-        pageBit: PAGE_BITS.OPERATION_HISTORY,
     },
 
 ]

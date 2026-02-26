@@ -1,7 +1,10 @@
+import { useState, useRef } from "react"
 import { useNavigate } from "react-router-dom"
+import { useQueryClient } from "@tanstack/react-query"
 import { Avatar } from "../ui/Avatar"
-import { Star, BellOff, Check, CheckCheck } from "lucide-react"
+import { Star, BellOff, Check, CheckCheck, MoreHorizontal } from "lucide-react"
 import type { Customer } from "../../types/inbox.types"
+import { CustomerActionsMenu } from "../conversation/CustomerActionsMenu"
 
 function timeAgo(dateStr?: string | null): string {
     if (!dateStr) return ""
@@ -13,16 +16,16 @@ function timeAgo(dateStr?: string | null): string {
     if (hrs < 24) return `${hrs}h`
     const days = Math.floor(hrs / 24)
     if (days === 1) return "yesterday"
-    if (days < 7) return new Date(dateStr).toLocaleDateString("en", { weekday: "short" })
-    return new Date(dateStr).toLocaleDateString("en", { month: "short", day: "numeric" })
+    if (days < 7) return new Date(dateStr).toLocaleDateString("en", { weekday: "short", timeZone: "Asia/Aden" })
+    return new Date(dateStr).toLocaleDateString("en", { month: "short", day: "numeric", timeZone: "Asia/Aden" })
 }
 
-function statusColor(status?: string): string {
+function sessionDot(status?: string): string {
     switch (status) {
-        case "open": return "#22c55e"
-        case "pending": return "#f59e0b"
-        case "closed": return "#94a3b8"
-        default: return "#94a3b8"
+        case "open": return "var(--t-success)"
+        case "pending": return "var(--t-warning)"
+        case "closed": return "var(--t-text-faint)"
+        default: return "var(--t-text-faint)"
     }
 }
 
@@ -33,172 +36,271 @@ interface ConversationItemProps {
 
 export function ConversationItem({ customer: c, isSelected }: ConversationItemProps) {
     const navigate = useNavigate()
+    const queryClient = useQueryClient()
     const displayName = c.sender_name?.trim() || c.customer_id
     const hasUnread = c.unread_count > 0
+    const isClosed = c.conversation_status?.is_closed
+    const [hovered, setHovered] = useState(false)
+    const [menuOpen, setMenuOpen] = useState(false)
+    const menuBtnRef = useRef<HTMLButtonElement>(null)
 
     return (
         <div
-            onClick={() => navigate(`/dashboard/inbox/${c.customer_id}`)}
-            style={{
-                display: "flex", alignItems: "center", gap: 10,
-                padding: "10px 14px 10px 12px",
-                cursor: "pointer",
-                background: isSelected
-                    ? "rgba(var(--t-accent-rgb, 59,130,246), 0.08)"
-                    : "transparent",
-                borderRight: isSelected ? "3px solid var(--t-accent)" : "3px solid transparent",
-                transition: "all 0.12s ease",
-                position: "relative",
+            className={`ci-row ${isSelected ? "ci-selected" : ""} ${hovered ? "ci-hover" : ""}`}
+            onClick={(e) => {
+                if (menuOpen) return
+                if (menuBtnRef.current?.contains(e.target as Node)) return
+                navigate(`/dashboard/inbox/${c.customer_id}`)
+                // Optimistically clear unread badge in cache + background refresh
+                queryClient.setQueriesData<any>(
+                    { queryKey: ["inbox-customers"] },
+                    (old: any) => {
+                        if (!old?.items) return old
+                        return {
+                            ...old,
+                            items: old.items.map((item: any) =>
+                                item.customer_id === c.customer_id
+                                    ? { ...item, unread_count: 0, isRead: true }
+                                    : item
+                            ),
+                        }
+                    }
+                )
+                queryClient.invalidateQueries({ queryKey: ["customer-messages", c.customer_id] })
             }}
-            onMouseEnter={(e) => {
-                if (!isSelected) e.currentTarget.style.background = "var(--t-surface)"
-            }}
-            onMouseLeave={(e) => {
-                if (!isSelected) e.currentTarget.style.background = "transparent"
-            }}
+            onMouseEnter={() => setHovered(true)}
+            onMouseLeave={() => { if (!menuOpen) setHovered(false) }}
         >
-            {/* Avatar with online/status indicator */}
-            <div style={{ position: "relative", flexShrink: 0 }}>
+            {/* ── Avatar ── */}
+            <div className="ci-avatar-wrap">
                 {c.profile_photo ? (
-                    <img src={c.profile_photo} alt={displayName}
-                        style={{ width: 42, height: 42, borderRadius: "50%", objectFit: "cover" }}
+                    <img src={c.profile_photo} alt={displayName} className="ci-avatar"
                         onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none" }} />
                 ) : (
-                    <Avatar name={displayName} size={42} />
+                    <Avatar name={displayName} size={40} />
                 )}
-                {/* Status dot */}
-                <span style={{
-                    position: "absolute", bottom: 0, right: 0,
-                    width: 10, height: 10, borderRadius: "50%",
-                    background: statusColor(c.session_status),
-                    border: "2px solid var(--t-card)",
-                }} />
-                {/* Platform badge */}
+                <span className="ci-status-dot" style={{ background: sessionDot(c.session_status) }} />
                 {c.platform_icon && (
-                    <img src={c.platform_icon} alt={c.platform}
-                        style={{
-                            position: "absolute", top: -2, left: -2,
-                            width: 16, height: 16, objectFit: "contain",
-                            background: "var(--t-card)", borderRadius: "50%",
-                            padding: 1,
-                        }} />
+                    <img src={c.platform_icon} alt={c.platform} className="ci-platform-badge" />
                 )}
             </div>
 
-            {/* Content */}
-            <div style={{ flex: 1, minWidth: 0 }}>
+            {/* ── Content ── */}
+            <div className="ci-body">
                 {/* Row 1: Name + time */}
-                <div style={{
-                    display: "flex", alignItems: "center",
-                    justifyContent: "space-between", gap: 6, marginBottom: 3,
-                }}>
-                    <span style={{
-                        fontSize: 13,
-                        fontWeight: hasUnread ? 700 : 500,
-                        color: "var(--t-text)",
-                        overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-                        flex: 1,
-                    }}>
+                <div className="ci-top">
+                    <span className={`ci-name ${hasUnread ? "ci-name-bold" : ""}`}>
                         {displayName}
                     </span>
-                    <span style={{
-                        fontSize: 10,
-                        color: hasUnread ? "var(--t-accent)" : "var(--t-text-faint)",
-                        fontWeight: hasUnread ? 600 : 400,
-                        flexShrink: 0,
-                    }}>
-                        {timeAgo(c.last_timestamp)}
-                    </span>
+                    <div className="ci-top-right">
+                        {/* ⋯ menu button on hover */}
+                        {(hovered || menuOpen) && (
+                            <div style={{ position: "relative" }}>
+                                <button
+                                    ref={menuBtnRef}
+                                    className={`ci-menu-btn ${menuOpen ? "ci-menu-active" : ""}`}
+                                    onClick={(e) => { e.stopPropagation(); setMenuOpen(!menuOpen) }}
+                                    title="المزيد"
+                                >
+                                    <MoreHorizontal size={13} />
+                                </button>
+                                <CustomerActionsMenu
+                                    customer={c}
+                                    open={menuOpen}
+                                    onClose={() => { setMenuOpen(false); setHovered(false) }}
+                                    anchorRef={menuBtnRef}
+                                />
+                            </div>
+                        )}
+                        <span className={`ci-time ${hasUnread ? "ci-time-accent" : ""}`}>
+                            {timeAgo(c.last_timestamp)}
+                        </span>
+                    </div>
                 </div>
 
-                {/* Row 2: Last message + badges */}
-                <div style={{
-                    display: "flex", alignItems: "center",
-                    justifyContent: "space-between", gap: 6,
-                }}>
-                    <div style={{
-                        display: "flex", alignItems: "center", gap: 3,
-                        flex: 1, minWidth: 0,
-                    }}>
-                        {/* Direction indicator */}
+                {/* Row 2: Message preview + unread badge */}
+                <div className="ci-mid">
+                    <div className="ci-msg-row">
                         {c.last_direction === "outbound" && (
-                            <span style={{ flexShrink: 0, color: "var(--t-text-faint)", display: "flex" }}>
+                            <span className="ci-tick">
                                 {c.last_message_status === "read"
-                                    ? <CheckCheck size={12} style={{ color: "#3b82f6" }} />
+                                    ? <CheckCheck size={13} style={{ color: "var(--t-info)" }} />
                                     : c.last_message_status === "delivered"
-                                        ? <CheckCheck size={12} />
-                                        : <Check size={12} />
+                                        ? <CheckCheck size={13} />
+                                        : <Check size={13} />
                                 }
                             </span>
                         )}
-                        <p style={{
-                            fontSize: 12, margin: 0,
-                            color: hasUnread ? "var(--t-text)" : "var(--t-text-muted)",
-                            fontWeight: hasUnread ? 500 : 400,
-                            overflow: "hidden", textOverflow: "ellipsis",
-                            whiteSpace: "nowrap", flex: 1,
-                        }}>
+                        <p className={`ci-preview ${hasUnread ? "ci-preview-bold" : ""}`}>
                             {c.last_message_type !== "text" && c.last_message_type
                                 ? `📎 ${c.last_message_type}`
                                 : c.last_message || "—"
                             }
                         </p>
                     </div>
-
-                    {/* Right badges */}
-                    <div style={{ display: "flex", alignItems: "center", gap: 3, flexShrink: 0 }}>
-                        {c.favorite && (
-                            <Star size={12} style={{ color: "#f59e0b", fill: "#f59e0b" }} />
-                        )}
-                        {c.muted && (
-                            <BellOff size={12} style={{ color: "var(--t-text-faint)" }} />
-                        )}
+                    <div className="ci-badges">
+                        {c.favorite && <Star size={12} style={{ color: "var(--t-warning)", fill: "var(--t-warning)" }} />}
+                        {c.muted && <BellOff size={12} className="ci-muted-icon" />}
                         {hasUnread && (
-                            <span style={{
-                                fontSize: 10, fontWeight: 700,
-                                padding: "1px 6px", borderRadius: 10,
-                                background: "var(--t-accent)",
-                                color: "var(--t-text-on-accent)",
-                                minWidth: 18, textAlign: "center",
-                                lineHeight: "16px",
-                            }}>
+                            <span className="ci-unread-badge">
                                 {c.unread_count > 99 ? "99+" : c.unread_count}
                             </span>
                         )}
                     </div>
                 </div>
 
-                {/* Row 3: Tags/chips */}
-                <div style={{
-                    display: "flex", alignItems: "center", gap: 4,
-                    marginTop: 4, flexWrap: "wrap",
-                }}>
-                    {/* Lifecycle chip */}
-                    {c.lifecycle?.name && (
-                        <span style={{
-                            fontSize: 9.5, fontWeight: 500,
-                            display: "inline-flex", alignItems: "center", gap: 2,
-                            padding: "1px 6px", borderRadius: 10,
-                            background: "var(--t-surface)",
-                            color: "var(--t-text-muted)",
-                        }}>
-                            {c.lifecycle.icon && <span style={{ fontSize: 10 }}>{c.lifecycle.icon}</span>}
-                            {c.lifecycle.name}
-                        </span>
-                    )}
-                    {/* Assigned chip */}
-                    {c.assigned?.is_assigned && (
-                        <span style={{
-                            fontSize: 9.5, fontWeight: 500,
-                            padding: "1px 6px", borderRadius: 10,
-                            background: "rgba(var(--t-accent-rgb, 59,130,246), 0.08)",
-                            color: "var(--t-accent)",
-                        }}>
-                            {c.assigned_to || "Assigned"}
-                        </span>
-                    )}
-                </div>
+                {/* Row 3: Chips */}
+                {(c.lifecycle?.name || c.assigned?.is_assigned || isClosed) && (
+                    <div className="ci-chips">
+                        {c.lifecycle?.name && (
+                            <span className="ci-chip ci-chip-lc">
+                                {c.lifecycle.icon && <span className="ci-chip-icon">{c.lifecycle.icon}</span>}
+                                {c.lifecycle.name}
+                            </span>
+                        )}
+                        {c.assigned?.is_assigned && (
+                            <span className="ci-chip ci-chip-agent">
+                                {c.assigned.assigned_to_username || "Assigned"}
+                            </span>
+                        )}
+                        {isClosed && (
+                            <span className="ci-chip ci-chip-closed">Closed</span>
+                        )}
+                    </div>
+                )}
             </div>
+
+            {/* ── Styles ── */}
+            <style>{`
+                .ci-row {
+                    display:flex; align-items:flex-start; gap:10px;
+                    padding:10px 14px 10px 12px; cursor:pointer;
+                    border-bottom:1px solid var(--t-border-light);
+                    border-right:3px solid transparent;
+                    transition:all .15s ease; position:relative;
+                }
+                .ci-row:hover, .ci-hover { background:var(--t-surface); }
+                .ci-selected {
+                    background:var(--t-accent-muted) !important;
+                    border-right-color:var(--t-accent) !important;
+                }
+
+                /* Avatar */
+                .ci-avatar-wrap {
+                    position:relative; flex-shrink:0;
+                    width:40px; height:40px;
+                }
+                .ci-avatar {
+                    width:40px; height:40px; border-radius:50%;
+                    object-fit:cover;
+                }
+                .ci-status-dot {
+                    position:absolute; bottom:0; right:0;
+                    width:10px; height:10px; border-radius:50%;
+                    border:2px solid var(--t-card);
+                }
+                .ci-platform-badge {
+                    position:absolute; top:-2px; left:-2px;
+                    width:15px; height:15px; object-fit:contain;
+                    background:var(--t-card); border-radius:50%;
+                    padding:1px;
+                }
+
+                /* Body */
+                .ci-body { flex:1; min-width:0; }
+
+                /* Row 1: name + time */
+                .ci-top {
+                    display:flex; align-items:center;
+                    justify-content:space-between; gap:6px;
+                    margin-bottom:2px;
+                }
+                .ci-name {
+                    font-size:13px; font-weight:500;
+                    color:var(--t-text);
+                    overflow:hidden; text-overflow:ellipsis;
+                    white-space:nowrap; flex:1; line-height:1.3;
+                }
+                .ci-name-bold { font-weight:700; }
+                .ci-top-right {
+                    display:flex; align-items:center; gap:4px; flex-shrink:0;
+                }
+                .ci-time {
+                    font-size:10px; font-weight:400;
+                    color:var(--t-text-faint);
+                }
+                .ci-time-accent {
+                    color:var(--t-accent); font-weight:600;
+                }
+                .ci-menu-btn {
+                    width:20px; height:20px; border-radius:5px;
+                    border:none; background:transparent; cursor:pointer;
+                    display:flex; align-items:center; justify-content:center;
+                    color:var(--t-text-muted);
+                    transition:background .1s; padding:0;
+                }
+                .ci-menu-btn:hover, .ci-menu-active {
+                    background:var(--t-border-light);
+                }
+
+                /* Row 2: message preview */
+                .ci-mid {
+                    display:flex; align-items:center;
+                    justify-content:space-between; gap:6px;
+                    margin-bottom:1px;
+                }
+                .ci-msg-row {
+                    display:flex; align-items:center; gap:3px;
+                    flex:1; min-width:0;
+                }
+                .ci-tick {
+                    flex-shrink:0; display:flex;
+                    color:var(--t-text-faint);
+                }
+                .ci-preview {
+                    font-size:12px; margin:0; line-height:1.4;
+                    color:var(--t-text-muted); font-weight:400;
+                    overflow:hidden; text-overflow:ellipsis;
+                    white-space:nowrap; flex:1;
+                }
+                .ci-preview-bold { color:var(--t-text); font-weight:500; }
+                .ci-badges {
+                    display:flex; align-items:center; gap:4px; flex-shrink:0;
+                }
+                .ci-muted-icon { color:var(--t-text-faint); }
+                .ci-unread-badge {
+                    font-size:10px; font-weight:700;
+                    padding:1px 6px; border-radius:10px;
+                    background:var(--t-accent);
+                    color:var(--t-text-on-accent); min-width:18px; text-align:center;
+                    line-height:16px;
+                }
+
+                /* Row 3: chips */
+                .ci-chips {
+                    display:flex; align-items:center; gap:4px;
+                    margin-top:4px; flex-wrap:wrap;
+                }
+                .ci-chip {
+                    font-size:10px; font-weight:500;
+                    display:inline-flex; align-items:center; gap:2px;
+                    padding:1px 7px; border-radius:10px;
+                    line-height:16px;
+                }
+                .ci-chip-icon { font-size:10px; }
+                .ci-chip-lc {
+                    background:var(--t-surface);
+                    color:var(--t-text-muted);
+                }
+                .ci-chip-agent {
+                    background:var(--t-accent-muted);
+                    color:var(--t-accent);
+                }
+                .ci-chip-closed {
+                    background:var(--t-danger-soft);
+                    color:var(--t-danger);
+                }
+            `}</style>
         </div>
     )
 }

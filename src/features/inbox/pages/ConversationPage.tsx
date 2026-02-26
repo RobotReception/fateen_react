@@ -1,3 +1,4 @@
+import { useSyncExternalStore } from "react"
 import { useParams, Navigate } from "react-router-dom"
 import { useQueryClient } from "@tanstack/react-query"
 import { InboxNavSidebar } from "../components/sidebar/InboxNavSidebar"
@@ -5,23 +6,30 @@ import { ConversationListPanel } from "../components/sidebar/ConversationListPan
 import { ConversationHeader } from "../components/conversation/ConversationHeader"
 import { MessagesList } from "../components/conversation/MessagesList"
 import { MessageComposer } from "../components/conversation/MessageComposer"
-import { AssignPanel } from "../components/conversation/AssignPanel"
 import { ConversationDetails } from "../components/conversation/ConversationDetails"
-import { useCustomerMessages } from "../hooks/use-customer-messages"
+import { useCustomerMessages, flattenMessages } from "../hooks/use-customer-messages"
 import { useConversationStore } from "../store/conversation.store"
 import type { Customer, CustomersResponse } from "../types/inbox.types"
 
-// Find customer from cached customers queries
+// Reactive hook: subscribes to cache changes so optimistic patches re-render instantly
 function useCachedCustomer(customerId: string): Customer | null {
     const queryClient = useQueryClient()
-    // Search across all cached inbox-customers queries
-    const queries = queryClient.getQueriesData<CustomersResponse>({ queryKey: ["inbox-customers"] })
-    for (const [, data] of queries) {
-        if (!data?.items) continue
-        const found = data.items.find((c) => c.customer_id === customerId)
-        if (found) return found
-    }
-    return null
+    const cache = queryClient.getQueryCache()
+
+    // Subscribe to cache changes (any mutation/query update triggers this)
+    const customer = useSyncExternalStore(
+        (onStoreChange) => cache.subscribe(onStoreChange),
+        () => {
+            const queries = queryClient.getQueriesData<CustomersResponse>({ queryKey: ["inbox-customers"] })
+            for (const [, data] of queries) {
+                if (!data?.items) continue
+                const found = data.items.find((c) => c.customer_id === customerId)
+                if (found) return found
+            }
+            return null
+        },
+    )
+    return customer
 }
 
 export function ConversationPage() {
@@ -29,8 +37,9 @@ export function ConversationPage() {
     if (!id) return <Navigate to="/dashboard/inbox" replace />
 
     const customer = useCachedCustomer(id)
-    const { data: messages = [], isLoading: loadingMsgs } = useCustomerMessages(id)
-    const { detailsOpen, pendingMessages } = useConversationStore()
+    const { data, isLoading: loadingMsgs, fetchNextPage, hasNextPage, isFetchingNextPage } = useCustomerMessages(id)
+    const messages = flattenMessages(data)
+    const { pendingMessages } = useConversationStore()
 
     return (
         <div style={{ display: "flex", height: "100%", overflow: "hidden" }}>
@@ -43,22 +52,25 @@ export function ConversationPage() {
                 overflow: "hidden", background: "var(--t-bg, #f8fafc)",
             }}>
                 {customer ? (
-                    <>
-                        <ConversationHeader customer={customer} />
-                        <AssignPanel customer={customer} />
-                    </>
-                ) : (
+                    <ConversationHeader customer={customer} />) : (
                     <HeaderSkeleton />
                 )}
 
-                <div style={{ flex: 1, overflowY: "auto" }}>
-                    <MessagesList messages={messages} pendingMessages={pendingMessages} isLoading={loadingMsgs} />
+                <div style={{ flex: 1, overflow: "hidden" }}>
+                    <MessagesList
+                        messages={messages}
+                        pendingMessages={pendingMessages}
+                        isLoading={loadingMsgs}
+                        isFetchingMore={isFetchingNextPage}
+                        hasMore={!!hasNextPage}
+                        onLoadMore={() => fetchNextPage()}
+                    />
                 </div>
 
                 <MessageComposer customerId={id} customer={customer ?? null} />
             </div>
 
-            {detailsOpen && customer && <ConversationDetails customer={customer} />}
+            {customer && <ConversationDetails customer={customer} />}
         </div>
     )
 }
