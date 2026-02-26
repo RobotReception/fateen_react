@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback, useEffect, useMemo, type KeyboardEvent, type ChangeEvent } from "react"
 import {
-    Send, Paperclip, Smile, Type, Image, FileText,
-    MessageSquare, Sparkles, ChevronDown, X, Loader2, AtSign, Hash
+    Send, Paperclip, Smile, Image, FileText,
+    MessageSquare, Sparkles, ChevronDown, X, Loader2, AtSign, Hash, Mic, Square
 } from "lucide-react"
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query"
 import { useSendMessage } from "../../hooks/use-send-message"
@@ -40,7 +40,15 @@ const CONTACT_VARIABLES: VariableItem[] = [
     { label: "اسم المستخدم", variable: "contact.username", resolve: (c: Customer | null) => c?.username },
 ]
 
-const QUICK_EMOJIS = ["😊", "👍", "❤️", "😂", "🙏", "👋", "✅", "🎉", "🔥", "💯", "😢", "🤔", "🎁", "💪", "⭐", "🌟"]
+const EMOJI_CATEGORIES: { label: string; icon: string; emojis: string[] }[] = [
+    { label: "وجوه", icon: "😊", emojis: ["😀", "😃", "😄", "😁", "😆", "😅", "🤣", "😂", "🙂", "😊", "😇", "🥰", "😍", "🤩", "😘", "😗", "😚", "😙", "🥲", "😋", "😛", "😜", "🤪", "😝", "🤑", "🤗", "🤭", "🫢", "🤫", "🤔", "🫡", "🤐", "🤨", "😐", "😑", "😶", "🫥", "😏", "😒", "🙄", "😬", "🤥", "😌", "😔", "😪", "🤤", "😴", "😷", "🤒", "🤕", "🤢", "🤮", "🥵", "🥶", "🥴", "😵", "🤯", "🤠", "🥳", "🥸", "😎", "🤓", "🧐", "😕", "🫤", "😟", "🙁", "😮", "😯", "😲", "😳", "🥺", "🥹", "😦", "😧", "😨", "😰", "😥", "😢", "😭", "😱", "😖", "😣", "😞", "😓", "😩", "😫", "🥱", "😤", "😡", "😠", "🤬", "😈", "👿", "💀", "☠️", "💩", "🤡", "👹", "👺", "👻", "👽", "👾", "🤖"] },
+    { label: "إيماءات", icon: "👋", emojis: ["👋", "🤚", "🖐️", "✋", "🖖", "🫱", "🫲", "🫳", "🫴", "👌", "🤌", "🤏", "✌️", "🤞", "🫰", "🤟", "🤘", "🤙", "👈", "👉", "👆", "🖕", "👇", "☝️", "🫵", "👍", "👎", "✊", "👊", "🤛", "🤜", "👏", "🙌", "🫶", "👐", "🤝", "🙏", "✍️", "💅", "🤳", "💪", "🦾", "🦿", "🦵", "🦶", "👂", "🦻", "👃", "👀", "👁️", "👅", "👄", "🫦"] },
+    { label: "قلوب", icon: "❤️", emojis: ["❤️", "🧡", "💛", "💚", "💙", "💜", "🖤", "🤍", "🤎", "💔", "❤️‍🔥", "❤️‍🩹", "❣️", "💕", "💞", "💓", "💗", "💖", "💘", "💝", "💟", "♥️", "🩷", "🩵", "🩶"] },
+    { label: "أشخاص", icon: "👤", emojis: ["👶", "👧", "🧒", "👦", "👩", "🧑", "👨", "👩‍🦱", "🧑‍🦱", "👨‍🦱", "👩‍🦰", "🧑‍🦰", "👨‍🦰", "👱‍♀️", "👱", "👱‍♂️", "👩‍🦳", "🧑‍🦳", "👨‍🦳", "👩‍🦲", "🧑‍🦲", "👨‍🦲", "🧔‍♀️", "🧔", "🧔‍♂️", "👵", "🧓", "👴", "👲", "👳‍♀️", "👳", "👳‍♂️", "🧕", "👮‍♀️", "👮", "👮‍♂️", "👷‍♀️", "👷", "👷‍♂️", "💂‍♀️", "💂", "💂‍♂️", "🕵️‍♀️", "🕵️", "🕵️‍♂️", "👩‍⚕️", "🧑‍⚕️", "👨‍⚕️"] },
+    { label: "طبيعة", icon: "🌿", emojis: ["🐶", "🐱", "🐭", "🐹", "🐰", "🦊", "🐻", "🐼", "🐻‍❄️", "🐨", "🐯", "🦁", "🐮", "🐷", "🐸", "🐵", "🙈", "🙉", "🙊", "🐒", "🐔", "🐧", "🐦", "🐤", "🦆", "🦅", "🦉", "🐺", "🐗", "🐴", "🦄", "🐝", "🪱", "🐛", "🦋", "🐌", "🐞", "🌸", "💮", "🏵️", "🌹", "🥀", "🌺", "🌻", "🌼", "🌷", "🌱", "🪴", "🌲", "🌳", "🌴", "🌵", "🍀", "☀️", "🌙", "⭐", "🌟", "✨", "⚡", "🔥", "🌈", "☁️", "❄️", "💧", "🌊"] },
+    { label: "طعام", icon: "🍕", emojis: ["🍎", "🍐", "🍊", "🍋", "🍌", "🍉", "🍇", "🍓", "🫐", "🍈", "🍒", "🍑", "🥭", "🍍", "🥥", "🥝", "🍅", "🍆", "🥑", "🥦", "🥬", "🥒", "🌶️", "🫑", "🌽", "🥕", "🧄", "🧅", "🥔", "🍠", "🥐", "🍞", "🥖", "🥨", "🧀", "🥚", "🍳", "🧈", "🥞", "🧇", "🥓", "🥩", "🍗", "🍖", "🦴", "🌭", "🍔", "🍟", "🍕", "🫓", "🥪", "🌮", "🌯", "🫔", "🥙", "🧆", "🥗", "☕", "🍵", "🧃", "🥤", "🧋", "🍺", "🍷", "🥂", "🍰", "🎂", "🧁", "🍩", "🍪", "🍫", "🍬", "🍭", "🍮"] },
+    { label: "أشياء", icon: "💡", emojis: ["⌚", "📱", "💻", "⌨️", "🖥️", "🖨️", "🖱️", "💽", "💾", "💿", "📀", "📷", "📹", "🎥", "📞", "☎️", "📟", "📠", "📺", "📻", "🎙️", "🎚️", "🎛️", "🧭", "⏱️", "⏰", "📡", "🔋", "🔌", "💡", "🔦", "🕯️", "🧯", "🛢️", "💰", "💵", "💴", "💶", "💷", "🪙", "💳", "💎", "⚖️", "🧲", "🔧", "🔨", "🪛", "🔩", "⚙️", "🧰", "🗜️", "🔑", "🗝️", "🔒", "🔓", "📦", "📫", "📬", "✏️", "✒️", "🖊️", "🖋️", "📝", "📁", "📂", "📅", "📆", "📌", "📍", "✂️", "🖇️", "📎", "📏", "📐", "🗑️", "✅", "❌", "❓", "❗", "💯", "🔥", "⭐", "🎯", "🏆", "🎪", "🎭", "🎨", "🎬", "🎤", "🎧", "🎸", "🎹", "🎺", "🥁"] },
+]
 
 type ComposerMode = "reply" | "comment"
 
@@ -59,6 +67,11 @@ export function MessageComposer({ customerId, customer }: Props) {
     const [showMentions, setShowMentions] = useState(false)
     const [mentionSearch, setMentionSearch] = useState("")
     const [isSendingComment, setIsSendingComment] = useState(false)
+    const [emojiCategory, setEmojiCategory] = useState(0)
+    const [isRecording, setIsRecording] = useState(false)
+    const [recordingTime, setRecordingTime] = useState(0)
+    const mediaRecorderRef = useRef<MediaRecorder | null>(null)
+    const recordingTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
     const textareaRef = useRef<HTMLTextAreaElement>(null)
     const commentRef = useRef<HTMLInputElement>(null)
@@ -251,7 +264,8 @@ export function MessageComposer({ customerId, customer }: Props) {
         const agentName = user
             ? `${user.first_name ?? ""} ${user.last_name ?? ""}`.trim() || "Support"
             : "Support"
-        const accountId = customer.account_id ?? ""
+        const accountId = customer.account_id || customer.id || customer.tenant_id || ""
+        console.log("[SendMsg] account_id:", accountId, "| customer.account_id:", customer.account_id, "| customer.id:", customer.id)
 
         const basePayload = {
             platform: customer.platform,
@@ -543,20 +557,82 @@ export function MessageComposer({ customerId, customer }: Props) {
                     {/* Toolbar */}
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "4px 10px 6px" }}>
                         <div style={{ display: "flex", alignItems: "center", gap: 1 }}>
-                            <ToolBtn icon={<Type size={15} />} title="Formatting" />
-                            <ToolBtn icon={<Image size={15} />} title="Image" onClick={() => {
+                            <ToolBtn icon={<Image size={15} />} title="صورة" onClick={() => {
                                 if (fileInputRef.current) { fileInputRef.current.accept = "image/*"; fileInputRef.current.click() }
                             }} />
-                            <ToolBtn icon={<Smile size={15} />} title="Emoji" isActive={showEmoji}
-                                onClick={() => { setShowEmoji(!showEmoji); setShowSnippets(false); setShowVariables(false) }} />
-                            <ToolBtn icon={<Paperclip size={15} />} title="Attachment" onClick={() => {
+                            <ToolBtn icon={<Paperclip size={15} />} title="مرفق" onClick={() => {
                                 if (fileInputRef.current) { fileInputRef.current.accept = "*/*"; fileInputRef.current.click() }
                             }} />
-                            <ToolBtn icon={<AtSign size={15} />} title="Mention" />
-                            <ToolBtn icon={<MessageSquare size={15} />} title="Snippets" isActive={showSnippets}
+                            <ToolBtn icon={<Smile size={15} />} title="إيموجي" isActive={showEmoji}
+                                onClick={() => { setShowEmoji(!showEmoji); setShowSnippets(false); setShowVariables(false) }} />
+                            <ToolBtn icon={isRecording ? <Square size={15} /> : <Mic size={15} />}
+                                title={isRecording ? "إيقاف التسجيل" : "تسجيل صوتي"}
+                                isActive={isRecording}
+                                onClick={() => {
+                                    if (isRecording) {
+                                        // Stop recording
+                                        mediaRecorderRef.current?.stop()
+                                        setIsRecording(false)
+                                        if (recordingTimerRef.current) clearInterval(recordingTimerRef.current)
+                                        setRecordingTime(0)
+                                    } else {
+                                        // Start recording
+                                        navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
+                                            const mr = new MediaRecorder(stream)
+                                            mediaRecorderRef.current = mr
+                                            const chunks: BlobPart[] = []
+                                            mr.ondataavailable = (e) => chunks.push(e.data)
+                                            mr.onstop = () => {
+                                                stream.getTracks().forEach((t) => t.stop())
+                                                const blob = new Blob(chunks, { type: "audio/webm" })
+                                                const file = new File([blob], `voice_${Date.now()}.webm`, { type: "audio/webm" })
+                                                // Directly set attachment and upload (can't fake a ChangeEvent)
+                                                setAttachment({ file, type: "audio" })
+                                                setIsUploading(true)
+                                                uploadMedia(file, { platform: customer?.platform ?? "whatsapp" })
+                                                    .then((res) => {
+                                                        const mId = res.media_id || (res as any).id || ""
+                                                        const mUrl = res.public_url || res.proxy_url || ""
+                                                        setAttachment((prev) => prev ? { ...prev, mediaId: mId, mediaUrl: mUrl } : null)
+                                                        setIsUploading(false)
+                                                    })
+                                                    .catch(() => {
+                                                        toast.error("فشل رفع التسجيل الصوتي")
+                                                        setAttachment(null)
+                                                        setIsUploading(false)
+                                                    })
+                                            }
+                                            mr.start()
+                                            setIsRecording(true)
+                                            setRecordingTime(0)
+                                            recordingTimerRef.current = setInterval(() => setRecordingTime((t) => t + 1), 1000)
+                                        }).catch(() => {
+                                            toast.error("لا يمكن الوصول إلى الميكروفون")
+                                        })
+                                    }
+                                }}
+                            />
+                            <ToolBtn icon={<MessageSquare size={15} />} title="قوالب" isActive={showSnippets}
                                 onClick={() => { setShowSnippets(!showSnippets); setShowVariables(false); setShowEmoji(false); setSnippetSearch("") }} />
+                            <ToolBtn icon={<Hash size={15} />} title="متغيرات" isActive={showVariables}
+                                onClick={() => { setShowVariables(!showVariables); setShowSnippets(false); setShowEmoji(false); setVariableSearch("") }} />
                             <input ref={fileInputRef} type="file" onChange={handleFileSelect} style={{ display: "none" }} />
                         </div>
+
+                        {/* Recording indicator */}
+                        {isRecording && (
+                            <div style={{ display: "flex", alignItems: "center", gap: 6, marginRight: 8 }}>
+                                <span style={{
+                                    width: 8, height: 8, borderRadius: "50%",
+                                    background: "#ef4444",
+                                    animation: "pulse 1s ease-in-out infinite",
+                                }} />
+                                <span style={{ fontSize: 12, fontWeight: 600, color: "#ef4444", fontFamily: "monospace" }}>
+                                    {Math.floor(recordingTime / 60).toString().padStart(2, "0")}:{(recordingTime % 60).toString().padStart(2, "0")}
+                                </span>
+                            </div>
+                        )}
+
                         <button onClick={handleSend} disabled={!canSend} style={{
                             width: 32, height: 32, borderRadius: "50%", border: "none",
                             background: canSend ? "var(--t-accent)" : "var(--t-surface)",
@@ -571,18 +647,54 @@ export function MessageComposer({ customerId, customer }: Props) {
                         </button>
                     </div>
 
-                    {/* Quick emoji */}
+                    {/* Full emoji picker */}
                     {showEmoji && (
-                        <div style={{ padding: "6px 14px 8px", borderTop: "1px solid var(--t-border-light)", display: "flex", gap: 4, flexWrap: "wrap" }}>
-                            {QUICK_EMOJIS.map((em) => (
-                                <button key={em} onClick={() => { setText((p) => p + em); setShowEmoji(false); textareaRef.current?.focus() }}
-                                    style={emojiBtn}
-                                    onMouseEnter={(e) => { e.currentTarget.style.background = "var(--t-border-light)" }}
-                                    onMouseLeave={(e) => { e.currentTarget.style.background = "var(--t-surface)" }}
-                                >{em}</button>
-                            ))}
+                        <div style={{
+                            borderTop: "1px solid var(--t-border-light)",
+                            background: "var(--t-card)",
+                        }}>
+                            {/* Category tabs */}
+                            <div style={{
+                                display: "flex", gap: 0, borderBottom: "1px solid var(--t-border-light)",
+                                padding: "0 8px",
+                            }}>
+                                {EMOJI_CATEGORIES.map((cat, i) => (
+                                    <button key={cat.label}
+                                        onClick={() => setEmojiCategory(i)}
+                                        style={{
+                                            flex: 1, padding: "8px 0", border: "none",
+                                            background: "transparent", cursor: "pointer",
+                                            fontSize: 18, borderBottom: i === emojiCategory ? "2px solid var(--t-accent)" : "2px solid transparent",
+                                            opacity: i === emojiCategory ? 1 : 0.5,
+                                            transition: "all .15s",
+                                        }}
+                                        title={cat.label}
+                                    >{cat.icon}</button>
+                                ))}
+                            </div>
+                            {/* Emoji grid */}
+                            <div style={{
+                                display: "flex", flexWrap: "wrap", gap: 2,
+                                padding: "8px 10px", maxHeight: 200, overflowY: "auto",
+                            }}>
+                                {EMOJI_CATEGORIES[emojiCategory].emojis.map((em) => (
+                                    <button key={em}
+                                        onClick={() => { setText((p) => p + em); textareaRef.current?.focus() }}
+                                        style={{
+                                            width: 34, height: 34, border: "none",
+                                            background: "transparent", borderRadius: 6,
+                                            fontSize: 20, cursor: "pointer",
+                                            display: "flex", alignItems: "center", justifyContent: "center",
+                                            transition: "background 0.1s",
+                                        }}
+                                        onMouseEnter={(e) => { e.currentTarget.style.background = "var(--t-surface)" }}
+                                        onMouseLeave={(e) => { e.currentTarget.style.background = "transparent" }}
+                                    >{em}</button>
+                                ))}
+                            </div>
                         </div>
                     )}
+                    <style>{`@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }`}</style>
                 </>
             )}
 
@@ -841,13 +953,6 @@ const linkBtnDark: React.CSSProperties = {
     color: "var(--t-text-secondary)", cursor: "pointer",
 }
 
-const emojiBtn: React.CSSProperties = {
-    width: 32, height: 32, border: "none",
-    background: "var(--t-surface)", borderRadius: 6,
-    fontSize: 16, cursor: "pointer",
-    display: "flex", alignItems: "center", justifyContent: "center",
-    transition: "background 0.12s",
-}
 
 const popupStyle: React.CSSProperties = {
     position: "absolute", bottom: "100%", left: 0, right: 0,

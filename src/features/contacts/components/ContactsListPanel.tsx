@@ -1,4 +1,4 @@
-import { Search, SlidersHorizontal, Plus, ChevronLeft, ChevronRight, RefreshCw, MoreHorizontal } from "lucide-react"
+import { Search, SlidersHorizontal, ChevronLeft, ChevronRight, RefreshCw } from "lucide-react"
 import { useContactsStore } from "../store/contacts.store"
 import { useContacts } from "../hooks/use-contacts"
 import { useContactLookups } from "../hooks/use-contact-lookups"
@@ -127,18 +127,7 @@ export function ContactsListPanel() {
                         <RefreshCw size={14} className={isFetching ? "clp2-spin" : ""} />
                     </button>
 
-                    <button className="clp2-add-btn">
-                        <Plus size={14} />
-                        <span>Add contact</span>
-                    </button>
 
-                    <button className="clp2-add-dropdown">
-                        <ChevronRight size={12} style={{ transform: "rotate(90deg)" }} />
-                    </button>
-
-                    <button className="clp2-filter-btn" title="المزيد">
-                        <MoreHorizontal size={14} />
-                    </button>
                 </div>
             </div>
 
