@@ -1,4 +1,4 @@
-import { useSyncExternalStore } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useParams, Navigate } from "react-router-dom"
 import { useQueryClient } from "@tanstack/react-query"
 import { InboxNavSidebar } from "../components/sidebar/InboxNavSidebar"
@@ -11,24 +11,42 @@ import { useCustomerMessages, flattenMessages } from "../hooks/use-customer-mess
 import { useConversationStore } from "../store/conversation.store"
 import type { Customer, CustomersResponse } from "../types/inbox.types"
 
-// Reactive hook: subscribes to cache changes so optimistic patches re-render instantly
+// Find customer from all cached inbox-customers queries
+function findCustomerInCache(
+    queryClient: ReturnType<typeof useQueryClient>,
+    customerId: string,
+): Customer | null {
+    const queries = queryClient.getQueriesData<CustomersResponse>({ queryKey: ["inbox-customers"] })
+    for (const [, data] of queries) {
+        if (!data?.items) continue
+        const found = data.items.find((c) => c.customer_id === customerId)
+        if (found) return found
+    }
+    return null
+}
+
+// Reactive hook: subscribes to cache changes so optimistic patches re-render
+// Uses useState + useEffect to avoid synchronous updates during other renders
 function useCachedCustomer(customerId: string): Customer | null {
     const queryClient = useQueryClient()
     const cache = queryClient.getQueryCache()
 
-    // Subscribe to cache changes (any mutation/query update triggers this)
-    const customer = useSyncExternalStore(
-        (onStoreChange) => cache.subscribe(onStoreChange),
-        () => {
-            const queries = queryClient.getQueriesData<CustomersResponse>({ queryKey: ["inbox-customers"] })
-            for (const [, data] of queries) {
-                if (!data?.items) continue
-                const found = data.items.find((c) => c.customer_id === customerId)
-                if (found) return found
-            }
-            return null
-        },
+    const [customer, setCustomer] = useState<Customer | null>(() =>
+        findCustomerInCache(queryClient, customerId)
     )
+
+    const sync = useCallback(() => {
+        setCustomer(findCustomerInCache(queryClient, customerId))
+    }, [queryClient, customerId])
+
+    useEffect(() => {
+        // Initial sync
+        sync()
+        // Subscribe to cache changes — updates are deferred by React's setState batching
+        const unsub = cache.subscribe(sync)
+        return unsub
+    }, [cache, sync])
+
     return customer
 }
 

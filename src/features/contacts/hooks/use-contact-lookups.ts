@@ -1,5 +1,6 @@
 import { useMemo } from "react"
-import { useTags, useLifecycles } from "@/features/settings/hooks/use-teams-tags"
+import { useTags } from "@/features/settings/hooks/use-tags"
+import { useLifecycles } from "@/features/settings/hooks/use-lifecycles"
 import { useAuthStore } from "@/stores/auth-store"
 
 /**

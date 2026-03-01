@@ -5,8 +5,20 @@ import { useAssignUserRole, useRemoveUserRole } from "../hooks/use-roles"
 import { getAllUsers, type AdminUser } from "../services/admin-service"
 import { useAuthStore } from "@/stores/auth-store"
 
-interface Props {
-    role: string
+interface Props { role: string }
+
+const AVATAR_GRADIENTS = [
+    "linear-gradient(135deg, #004786, #0072b5)",
+    "linear-gradient(135deg, #0891b2, #06b6d4)",
+    "linear-gradient(135deg, #7c3aed, #a855f7)",
+    "linear-gradient(135deg, #0072b5, #0098d6)",
+    "linear-gradient(135deg, #004786, #0098d6)",
+]
+
+function hashCode(s: string): number {
+    let h = 0
+    for (let i = 0; i < s.length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0
+    return Math.abs(h)
 }
 
 export function RoleUsersSection({ role }: Props) {
@@ -19,11 +31,11 @@ export function RoleUsersSection({ role }: Props) {
     const [pickerOpen, setPickerOpen] = useState(false)
     const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null)
     const [searchQuery, setSearchQuery] = useState("")
+    const [searchFocused, setSearchFocused] = useState(false)
     const assignMut = useAssignUserRole()
     const removeMut = useRemoveUserRole()
     const dropdownRef = useRef<HTMLDivElement>(null)
 
-    // Fetch users assigned to this role
     const { data, isLoading } = useQuery({
         queryKey: ["adminUsers", "byRole", role],
         queryFn: () => getAllUsers({ role, page_size: 200 }, tenantId),
@@ -35,13 +47,9 @@ export function RoleUsersSection({ role }: Props) {
         staleTime: 60 * 1000,
     })
 
-    // Fetch ALL users for the picker dropdown
     const { data: allUsersData, isLoading: allUsersLoading } = useQuery({
         queryKey: ["adminUsers", "all", pickerSearch],
-        queryFn: () => getAllUsers({
-            page_size: 50,
-            search: pickerSearch || undefined,
-        }, tenantId),
+        queryFn: () => getAllUsers({ page_size: 50, search: pickerSearch || undefined }, tenantId),
         enabled: showAdd && !!tenantId && isAuth,
         select: (res) => {
             const items = res?.data?.items ?? []
@@ -52,12 +60,9 @@ export function RoleUsersSection({ role }: Props) {
 
     const users: AdminUser[] = data || []
     const allUsers: AdminUser[] = allUsersData || []
-
-    // Filter out users already assigned to this role
     const assignedIds = new Set(users.map(u => u.user_id))
     const availableUsers = allUsers.filter(u => !assignedIds.has(u.user_id))
 
-    // Close dropdown on outside click
     useEffect(() => {
         function handleClick(e: MouseEvent) {
             if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
@@ -81,23 +86,17 @@ export function RoleUsersSection({ role }: Props) {
         setPickerOpen(false)
         assignMut.mutate({ user_id: user.user_id, role }, {
             onSuccess: () => {
-                setSelectedUser(null)
-                setShowAdd(false)
-                setPickerSearch("")
+                setSelectedUser(null); setShowAdd(false); setPickerSearch("")
                 qc.invalidateQueries({ queryKey: ["adminUsers", "byRole", role] })
             },
-            onSettled: () => {
-                setSelectedUser(null)
-            },
+            onSettled: () => { setSelectedUser(null) },
         })
     }, [role, assignMut, qc])
 
     const handleRemove = useCallback((uid: string, name: string) => {
         if (!confirm(`هل تريد إزالة "${name}" من دور "${role}"؟`)) return
         removeMut.mutate({ user_id: uid, role }, {
-            onSuccess: () => {
-                qc.invalidateQueries({ queryKey: ["adminUsers", "byRole", role] })
-            },
+            onSuccess: () => { qc.invalidateQueries({ queryKey: ["adminUsers", "byRole", role] }) },
         })
     }, [role, removeMut, qc])
 
@@ -115,16 +114,14 @@ export function RoleUsersSection({ role }: Props) {
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                     <div style={{
                         width: 34, height: 34, borderRadius: 9,
-                        background: "var(--t-accent)",
+                        background: "linear-gradient(135deg, #004786, #0072b5)",
                         display: "flex", alignItems: "center", justifyContent: "center",
                     }}>
-                        <Users size={16} style={{ color: "var(--t-text-on-accent)" }} />
+                        <Users size={15} style={{ color: "#fff" }} />
                     </div>
                     <div>
-                        <h3 style={{ fontSize: 14, fontWeight: 700, color: "var(--t-text)", margin: 0 }}>
-                            المستخدمون
-                        </h3>
-                        <p style={{ fontSize: 12, color: "var(--t-text-faint)", margin: 0 }}>
+                        <h3 style={{ fontSize: 13, fontWeight: 700, color: "var(--t-text, #111827)", margin: 0 }}>المستخدمون</h3>
+                        <p style={{ fontSize: 11, color: "var(--t-text-faint, #9ca3af)", margin: "1px 0 0" }}>
                             {users.length} مستخدم بهذا الدور
                         </p>
                     </div>
@@ -133,13 +130,14 @@ export function RoleUsersSection({ role }: Props) {
                 <button
                     onClick={() => { setShowAdd(!showAdd); setPickerSearch(""); setSelectedUser(null); setPickerOpen(false) }}
                     style={{
-                        display: "flex", alignItems: "center", gap: 6,
-                        padding: "7px 14px", borderRadius: 8,
-                        border: "none",
-                        background: showAdd ? "var(--t-surface)" : "var(--t-accent)",
-                        color: showAdd ? "var(--t-text-muted)" : "var(--t-text-on-accent)",
-                        fontSize: 13, fontWeight: 600,
-                        cursor: "pointer", transition: "all 0.15s",
+                        display: "flex", alignItems: "center", gap: 5,
+                        padding: "7px 14px", borderRadius: 8, border: "none",
+                        background: showAdd ? "var(--t-surface, #f3f4f6)" : "#004786",
+                        color: showAdd ? "var(--t-text-faint, #6b7280)" : "#fff",
+                        fontSize: 12, fontWeight: 600,
+                        cursor: "pointer", fontFamily: "inherit",
+                        transition: "all 0.15s",
+                        boxShadow: showAdd ? "none" : "0 1px 3px rgba(0,71,134,0.15)",
                     }}
                 >
                     {showAdd ? <X size={13} /> : <UserPlus size={13} />}
@@ -151,46 +149,41 @@ export function RoleUsersSection({ role }: Props) {
             {showAdd && (
                 <div style={{
                     padding: 14, marginBottom: 14,
-                    borderRadius: 10, border: "1px solid var(--t-border)",
-                    background: "var(--t-card-hover)",
+                    borderRadius: 10, border: "1px solid var(--t-border-light, #eaedf0)",
+                    background: "var(--t-surface, #fafbfc)",
                     animation: "rusSlide .2s ease-out",
                 }}>
-                    <p style={{ fontSize: 13, fontWeight: 600, color: "var(--t-text-secondary)", margin: "0 0 8px" }}>
+                    <p style={{ fontSize: 12, fontWeight: 600, color: "var(--t-text-secondary, #6b7280)", margin: "0 0 8px" }}>
                         اختر مستخدم لتعيينه لهذا الدور
                     </p>
 
-                    {/* Search + Dropdown */}
                     <div ref={dropdownRef} style={{ position: "relative" }}>
                         <div
                             onClick={() => setPickerOpen(true)}
                             style={{
                                 display: "flex", alignItems: "center", gap: 8,
                                 padding: "9px 12px", borderRadius: 8,
-                                border: pickerOpen ? "1px solid #374151" : "1px solid #e5e7eb",
-                                background: "var(--t-card)", cursor: "pointer",
+                                border: `1.5px solid ${pickerOpen ? "#004786" : "var(--t-border, #e0e3e7)"}`,
+                                background: "var(--t-card, #fff)", cursor: "pointer",
                                 transition: "border-color 0.15s",
+                                boxShadow: pickerOpen ? "0 0 0 3px rgba(0,71,134,0.06)" : "none",
                             }}
                         >
                             {selectedUser ? (
                                 <>
                                     <div style={{
                                         width: 26, height: 26, borderRadius: 7,
-                                        background: "var(--t-surface)",
-                                        display: "flex", alignItems: "center", justifyContent: "center",
-                                        flexShrink: 0,
+                                        background: AVATAR_GRADIENTS[hashCode(selectedUser.user_id) % AVATAR_GRADIENTS.length],
+                                        display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
                                     }}>
-                                        <span style={{ fontSize: 10, fontWeight: 700, color: "var(--t-text-secondary)" }}>
-                                            {getInitials(selectedUser.full_name)}
-                                        </span>
+                                        <span style={{ fontSize: 10, fontWeight: 700, color: "#fff" }}>{getInitials(selectedUser.full_name)}</span>
                                     </div>
-                                    <span style={{ fontSize: 13, fontWeight: 600, color: "var(--t-text)", flex: 1 }}>
-                                        {selectedUser.full_name}
-                                    </span>
-                                    <span style={{ fontSize: 11, color: "var(--t-text-faint)" }}>{selectedUser.email}</span>
+                                    <span style={{ fontSize: 12, fontWeight: 600, color: "var(--t-text, #111827)", flex: 1 }}>{selectedUser.full_name}</span>
+                                    <span style={{ fontSize: 11, color: "var(--t-text-faint, #9ca3af)" }}>{selectedUser.email}</span>
                                 </>
                             ) : (
                                 <>
-                                    <Search size={13} style={{ color: "var(--t-text-faint)" }} />
+                                    <Search size={13} style={{ color: "var(--t-text-faint, #9ca3af)" }} />
                                     <input
                                         value={pickerSearch}
                                         onChange={e => { setPickerSearch(e.target.value); setPickerOpen(true) }}
@@ -198,10 +191,10 @@ export function RoleUsersSection({ role }: Props) {
                                         placeholder="ابحث بالاسم أو البريد الإلكتروني..."
                                         style={{
                                             flex: 1, border: "none", background: "transparent",
-                                            fontSize: 13, color: "var(--t-text)", outline: "none",
+                                            fontSize: 12, color: "var(--t-text, #111827)", outline: "none",
                                         }}
                                     />
-                                    <ChevronDown size={13} style={{ color: "var(--t-text-faint)", flexShrink: 0 }} />
+                                    <ChevronDown size={13} style={{ color: "var(--t-text-faint, #9ca3af)", flexShrink: 0 }} />
                                 </>
                             )}
                         </div>
@@ -211,18 +204,19 @@ export function RoleUsersSection({ role }: Props) {
                             <div style={{
                                 position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0,
                                 maxHeight: 260, overflowY: "auto",
-                                borderRadius: 10, border: "1px solid var(--t-border)",
-                                background: "var(--t-card)", boxShadow: "0 6px 20px var(--t-shadow)",
+                                borderRadius: 10, border: "1px solid var(--t-border-light, #eaedf0)",
+                                background: "var(--t-card, #fff)",
+                                boxShadow: "0 6px 20px rgba(0,0,0,0.06)",
                                 zIndex: 50, animation: "rusSlide .15s ease-out",
                             }}>
                                 {allUsersLoading ? (
                                     <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "20px 0" }}>
-                                        <Loader2 size={16} className="animate-spin" style={{ color: "var(--t-text-faint)" }} />
-                                        <span style={{ fontSize: 12, color: "var(--t-text-muted)", marginRight: 8 }}>جارٍ البحث...</span>
+                                        <Loader2 size={15} className="animate-spin" style={{ color: "#004786" }} />
+                                        <span style={{ fontSize: 11, color: "var(--t-text-faint, #9ca3af)", marginRight: 6 }}>جارٍ البحث...</span>
                                     </div>
                                 ) : availableUsers.length === 0 ? (
                                     <div style={{ padding: "18px 0", textAlign: "center" }}>
-                                        <p style={{ fontSize: 13, color: "var(--t-text-faint)", margin: 0 }}>
+                                        <p style={{ fontSize: 12, color: "var(--t-text-faint, #9ca3af)", margin: 0 }}>
                                             {pickerSearch ? `لا توجد نتائج لـ "${pickerSearch}"` : "لا يوجد مستخدمون متاحون"}
                                         </p>
                                     </div>
@@ -234,56 +228,44 @@ export function RoleUsersSection({ role }: Props) {
                                             style={{
                                                 display: "flex", alignItems: "center", gap: 10,
                                                 padding: "9px 12px", cursor: "pointer",
-                                                borderBottom: "1px solid var(--t-border-light)",
+                                                borderBottom: "1px solid var(--t-border-light, #f0f1f3)",
                                                 transition: "background 0.1s",
                                             }}
-                                            onMouseEnter={e => (e.currentTarget.style.background = "var(--t-card-hover)")}
+                                            onMouseEnter={e => (e.currentTarget.style.background = "var(--t-surface, #fafbfc)")}
                                             onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
                                         >
-                                            {/* Avatar */}
                                             {user.profile_picture ? (
                                                 <img src={user.profile_picture} alt="" style={{
-                                                    width: 32, height: 32, borderRadius: 8, objectFit: "cover", flexShrink: 0,
+                                                    width: 30, height: 30, borderRadius: 8, objectFit: "cover", flexShrink: 0,
                                                 }} />
                                             ) : (
                                                 <div style={{
-                                                    width: 32, height: 32, borderRadius: 8,
-                                                    background: "var(--t-surface)",
-                                                    display: "flex", alignItems: "center", justifyContent: "center",
-                                                    flexShrink: 0,
+                                                    width: 30, height: 30, borderRadius: 8,
+                                                    background: AVATAR_GRADIENTS[hashCode(user.user_id) % AVATAR_GRADIENTS.length],
+                                                    display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
                                                 }}>
-                                                    <span style={{ fontSize: 11, fontWeight: 700, color: "var(--t-text-secondary)", textTransform: "uppercase" }}>
+                                                    <span style={{ fontSize: 10, fontWeight: 700, color: "#fff", textTransform: "uppercase" }}>
                                                         {getInitials(user.full_name)}
                                                     </span>
                                                 </div>
                                             )}
-
-                                            {/* Info */}
                                             <div style={{ flex: 1, minWidth: 0 }}>
                                                 <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                                                    <span style={{ fontSize: 13, fontWeight: 600, color: "var(--t-text)" }}>
-                                                        {user.full_name || "—"}
-                                                    </span>
+                                                    <span style={{ fontSize: 12, fontWeight: 600, color: "var(--t-text, #111827)" }}>{user.full_name || "—"}</span>
                                                     {!user.is_active && (
                                                         <span style={{
-                                                            fontSize: 9, fontWeight: 600, color: "var(--t-text-muted)",
-                                                            background: "var(--t-surface)", padding: "1px 6px", borderRadius: 10,
-                                                        }}>
-                                                            معطّل
-                                                        </span>
+                                                            fontSize: 9, fontWeight: 600, color: "#dc2626",
+                                                            background: "rgba(239,68,68,0.06)", padding: "1px 5px", borderRadius: 4,
+                                                        }}>معطّل</span>
                                                     )}
                                                 </div>
-                                                <span style={{ fontSize: 11, color: "var(--t-text-faint)" }} dir="ltr">{user.email}</span>
+                                                <span style={{ fontSize: 10.5, color: "var(--t-text-faint, #9ca3af)" }} dir="ltr">{user.email}</span>
                                             </div>
-
-                                            {/* Role badge */}
                                             {user.role && (
                                                 <span style={{
-                                                    fontSize: 10, color: "var(--t-text-faint)", background: "var(--t-surface)",
-                                                    padding: "2px 7px", borderRadius: 5, flexShrink: 0,
-                                                }}>
-                                                    {user.role}
-                                                </span>
+                                                    fontSize: 10, color: "#004786", background: "rgba(0,71,134,0.06)",
+                                                    padding: "2px 7px", borderRadius: 4, flexShrink: 0, fontWeight: 500,
+                                                }}>{user.role}</span>
                                             )}
                                         </div>
                                     ))
@@ -294,10 +276,8 @@ export function RoleUsersSection({ role }: Props) {
 
                     {assignMut.isPending && (
                         <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 8 }}>
-                            <Loader2 size={13} className="animate-spin" style={{ color: "var(--t-text-faint)" }} />
-                            <span style={{ fontSize: 12, color: "var(--t-text-muted)", fontWeight: 500 }}>
-                                جارٍ تعيين المستخدم...
-                            </span>
+                            <Loader2 size={13} className="animate-spin" style={{ color: "#004786" }} />
+                            <span style={{ fontSize: 11, color: "var(--t-text-faint, #9ca3af)", fontWeight: 500 }}>جارٍ تعيين المستخدم...</span>
                         </div>
                     )}
                 </div>
@@ -306,20 +286,26 @@ export function RoleUsersSection({ role }: Props) {
             {/* ── Search (only when there are users) ── */}
             {users.length > 3 && (
                 <div style={{ position: "relative", marginBottom: 12 }}>
-                    <Search size={13} style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", color: "var(--t-text-faint)", pointerEvents: "none" }} />
+                    <Search size={13} style={{
+                        position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)",
+                        color: searchFocused ? "#004786" : "var(--t-text-faint, #9ca3af)",
+                        pointerEvents: "none", transition: "color .15s",
+                    }} />
                     <input
                         value={searchQuery}
                         onChange={e => setSearchQuery(e.target.value)}
+                        onFocus={() => setSearchFocused(true)}
+                        onBlur={() => setSearchFocused(false)}
                         placeholder="بحث بالاسم أو البريد..."
                         style={{
                             width: "100%", borderRadius: 8,
-                            border: "1px solid var(--t-border)", background: "var(--t-card-hover)",
-                            paddingRight: 32, paddingLeft: 12, paddingTop: 9, paddingBottom: 9,
-                            fontSize: 13, color: "var(--t-text)", outline: "none",
-                            transition: "border-color 0.15s, background 0.15s",
+                            border: `1.5px solid ${searchFocused ? "#004786" : "var(--t-border, #e0e3e7)"}`,
+                            background: "var(--t-surface, #fafafa)",
+                            paddingRight: 32, paddingLeft: 12, paddingTop: 8, paddingBottom: 8,
+                            fontSize: 12, color: "var(--t-text, #111827)", outline: "none",
+                            transition: "border-color .15s, box-shadow .15s",
+                            boxShadow: searchFocused ? "0 0 0 3px rgba(0,71,134,0.06)" : "none",
                         }}
-                        onFocus={e => { e.target.style.borderColor = "var(--t-text-faint)"; e.target.style.background = "var(--t-card)" }}
-                        onBlur={e => { e.target.style.borderColor = "var(--t-border)"; e.target.style.background = "var(--t-card-hover)" }}
                     />
                 </div>
             )}
@@ -328,8 +314,8 @@ export function RoleUsersSection({ role }: Props) {
             {isLoading && (
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "44px 0" }}>
                     <div style={{ textAlign: "center" }}>
-                        <Loader2 size={20} className="animate-spin" style={{ color: "var(--t-text-faint)", margin: "0 auto 8px" }} />
-                        <p style={{ fontSize: 13, color: "var(--t-text-muted)" }}>جارٍ تحميل المستخدمين...</p>
+                        <Loader2 size={20} className="animate-spin" style={{ color: "#004786", margin: "0 auto 8px" }} />
+                        <p style={{ fontSize: 12, color: "var(--t-text-faint, #9ca3af)", margin: 0 }}>جارٍ تحميل المستخدمين...</p>
                     </div>
                 </div>
             )}
@@ -338,21 +324,21 @@ export function RoleUsersSection({ role }: Props) {
             {!isLoading && users.length === 0 && (
                 <div style={{
                     padding: "44px 0", textAlign: "center",
-                    border: "1.5px dashed var(--t-border)", borderRadius: 10,
-                    background: "var(--t-card-hover)",
+                    border: "1.5px dashed var(--t-border, #d1d5db)", borderRadius: 10,
+                    background: "var(--t-surface, #fafbfc)",
                 }}>
                     <div style={{
                         width: 48, height: 48, borderRadius: 12,
-                        background: "var(--t-surface)",
+                        background: "rgba(0,71,134,0.06)",
                         display: "flex", alignItems: "center", justifyContent: "center",
                         margin: "0 auto 10px",
                     }}>
-                        <Users size={22} style={{ color: "var(--t-text-faint)" }} />
+                        <Users size={22} style={{ color: "#004786" }} />
                     </div>
-                    <p style={{ fontSize: 14, fontWeight: 600, color: "var(--t-text-secondary)", margin: "0 0 4px" }}>
+                    <p style={{ fontSize: 13, fontWeight: 600, color: "var(--t-text, #111827)", margin: "0 0 4px" }}>
                         لا يوجد مستخدمون بهذا الدور
                     </p>
-                    <p style={{ fontSize: 12, color: "var(--t-text-faint)", margin: 0 }}>
+                    <p style={{ fontSize: 11, color: "var(--t-text-faint, #9ca3af)", margin: 0 }}>
                         اضغط "تعيين مستخدم" لإضافة مستخدمين
                     </p>
                 </div>
@@ -360,48 +346,48 @@ export function RoleUsersSection({ role }: Props) {
 
             {/* ── Users List ── */}
             {!isLoading && filteredUsers.length > 0 && (
-                <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                    {filteredUsers.map(user => {
+                <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+                    {filteredUsers.map((user, idx) => {
                         const initials = getInitials(user.full_name)
                         const isRemoving = removeMut.isPending
+                        const gradient = AVATAR_GRADIENTS[hashCode(user.user_id) % AVATAR_GRADIENTS.length]
 
                         return (
                             <div
                                 key={user.user_id}
                                 style={{
                                     display: "flex", alignItems: "center", gap: 12,
-                                    padding: "12px 14px", borderRadius: 10,
-                                    border: "1px solid var(--t-border-light)", background: "var(--t-card)",
+                                    padding: "11px 14px", borderRadius: 10,
+                                    border: "1px solid var(--t-border-light, #eaedf0)",
+                                    background: "var(--t-card, #fff)",
                                     transition: "all 0.12s",
-                                    animation: "rusCard .2s ease-out",
+                                    animation: `rusCard .2s ease-out ${idx * 0.03}s both`,
                                 }}
                                 onMouseEnter={e => {
-                                    e.currentTarget.style.borderColor = "var(--t-border)"
+                                    e.currentTarget.style.borderColor = "var(--t-border, #d1d5db)"
                                     e.currentTarget.style.boxShadow = "0 2px 6px rgba(0,0,0,0.03)"
                                 }}
                                 onMouseLeave={e => {
-                                    e.currentTarget.style.borderColor = "var(--t-border-light)"
+                                    e.currentTarget.style.borderColor = "var(--t-border-light, #eaedf0)"
                                     e.currentTarget.style.boxShadow = "none"
                                 }}
                             >
                                 {/* Avatar */}
                                 {user.profile_picture ? (
-                                    <img
-                                        src={user.profile_picture}
-                                        alt={user.full_name}
-                                        style={{
-                                            width: 40, height: 40, borderRadius: 10,
-                                            objectFit: "cover", flexShrink: 0,
-                                        }}
-                                    />
+                                    <img src={user.profile_picture} alt={user.full_name} style={{
+                                        width: 38, height: 38, borderRadius: 10, objectFit: "cover", flexShrink: 0,
+                                    }} />
                                 ) : (
                                     <div style={{
-                                        width: 40, height: 40, borderRadius: 10,
-                                        background: "var(--t-surface)",
-                                        display: "flex", alignItems: "center", justifyContent: "center",
-                                        flexShrink: 0,
+                                        width: 38, height: 38, borderRadius: 10,
+                                        background: user.is_active ? gradient : "var(--t-surface, #e5e7eb)",
+                                        display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
                                     }}>
-                                        <span style={{ fontSize: 14, fontWeight: 700, color: "var(--t-text-secondary)", textTransform: "uppercase" }}>
+                                        <span style={{
+                                            fontSize: 13, fontWeight: 700,
+                                            color: user.is_active ? "#fff" : "var(--t-text-faint, #9ca3af)",
+                                            textTransform: "uppercase",
+                                        }}>
                                             {initials}
                                         </span>
                                     </div>
@@ -409,49 +395,37 @@ export function RoleUsersSection({ role }: Props) {
 
                                 {/* Info */}
                                 <div style={{ flex: 1, minWidth: 0 }}>
-                                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 2 }}>
-                                        <span style={{ fontSize: 14, fontWeight: 600, color: "var(--t-text)" }}>
+                                    <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 2 }}>
+                                        <span style={{ fontSize: 13, fontWeight: 600, color: "var(--t-text, #111827)" }}>
                                             {user.full_name || "—"}
                                         </span>
                                         <span style={{
-                                            display: "inline-flex", alignItems: "center", gap: 4,
-                                            fontSize: 10, fontWeight: 600,
-                                            padding: "2px 7px", borderRadius: 20,
-                                            background: user.is_active ? "var(--t-surface)" : "var(--t-surface)",
-                                            color: user.is_active ? "var(--t-text-secondary)" : "var(--t-text-faint)",
-                                            border: "1px solid var(--t-border)",
+                                            display: "inline-flex", alignItems: "center", gap: 3,
+                                            fontSize: 9.5, fontWeight: 600,
+                                            padding: "2px 6px", borderRadius: 4,
+                                            background: user.is_active ? "rgba(22,163,74,0.06)" : "rgba(239,68,68,0.06)",
+                                            color: user.is_active ? "#16a34a" : "#dc2626",
                                         }}>
                                             <span style={{
-                                                width: 5, height: 5, borderRadius: "50%",
-                                                background: user.is_active ? "var(--t-accent)" : "var(--t-surface-deep)",
+                                                width: 4, height: 4, borderRadius: "50%",
+                                                background: user.is_active ? "#16a34a" : "#dc2626",
                                             }} />
                                             {user.is_active ? "نشط" : "معطّل"}
                                         </span>
                                     </div>
-                                    <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+                                    <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
                                         {user.email && (
-                                            <span style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 12, color: "var(--t-text-muted)" }}>
-                                                <Mail size={11} style={{ color: "var(--t-text-faint)" }} />
-                                                <span dir="ltr">{user.email}</span>
+                                            <span style={{ display: "flex", alignItems: "center", gap: 3, fontSize: 11, color: "var(--t-text-faint, #9ca3af)" }}>
+                                                <Mail size={10} /> <span dir="ltr">{user.email}</span>
                                             </span>
                                         )}
                                         {user.phone && (
-                                            <span style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 12, color: "var(--t-text-muted)" }}>
-                                                <Phone size={11} style={{ color: "var(--t-text-faint)" }} />
-                                                <span dir="ltr">{user.phone}</span>
+                                            <span style={{ display: "flex", alignItems: "center", gap: 3, fontSize: 11, color: "var(--t-text-faint, #9ca3af)" }}>
+                                                <Phone size={10} /> <span dir="ltr">{user.phone}</span>
                                             </span>
                                         )}
                                     </div>
                                 </div>
-
-                                {/* User ID */}
-                                <span dir="ltr" style={{
-                                    fontSize: 10, fontFamily: "monospace", color: "var(--t-text-faint)",
-                                    background: "var(--t-surface)", padding: "3px 7px", borderRadius: 5,
-                                    flexShrink: 0, maxWidth: 130, overflow: "hidden", textOverflow: "ellipsis",
-                                }}>
-                                    {user.user_id}
-                                </span>
 
                                 {/* Remove */}
                                 <button
@@ -460,25 +434,28 @@ export function RoleUsersSection({ role }: Props) {
                                     style={{
                                         display: "flex", alignItems: "center", gap: 4,
                                         padding: "5px 10px", borderRadius: 7,
-                                        border: "1px solid var(--t-border)", background: "var(--t-card)",
-                                        color: "var(--t-text-muted)", fontSize: 11, fontWeight: 600,
+                                        border: "1px solid var(--t-border-light, #eaedf0)",
+                                        background: "var(--t-card, #fff)",
+                                        color: "var(--t-text-faint, #9ca3af)", fontSize: 11, fontWeight: 600,
                                         cursor: isRemoving ? "not-allowed" : "pointer",
                                         opacity: isRemoving ? 0.4 : 1,
                                         transition: "all 0.12s", flexShrink: 0,
+                                        fontFamily: "inherit",
                                     }}
                                     onMouseEnter={e => {
                                         if (!isRemoving) {
-                                            e.currentTarget.style.background = "var(--t-surface)"
-                                            e.currentTarget.style.color = "var(--t-accent)"
+                                            e.currentTarget.style.background = "rgba(239,68,68,0.04)"
+                                            e.currentTarget.style.color = "#dc2626"
+                                            e.currentTarget.style.borderColor = "rgba(239,68,68,0.2)"
                                         }
                                     }}
                                     onMouseLeave={e => {
-                                        e.currentTarget.style.background = "var(--t-card)"
-                                        e.currentTarget.style.color = "var(--t-text-muted)"
+                                        e.currentTarget.style.background = "var(--t-card, #fff)"
+                                        e.currentTarget.style.color = "var(--t-text-faint, #9ca3af)"
+                                        e.currentTarget.style.borderColor = "var(--t-border-light, #eaedf0)"
                                     }}
                                 >
-                                    <UserX size={11} />
-                                    إزالة
+                                    <UserX size={11} /> إزالة
                                 </button>
                             </div>
                         )
@@ -489,13 +466,13 @@ export function RoleUsersSection({ role }: Props) {
             {/* No search results */}
             {!isLoading && searchQuery.trim() && filteredUsers.length === 0 && users.length > 0 && (
                 <div style={{ padding: "28px 0", textAlign: "center" }}>
-                    <p style={{ fontSize: 13, color: "var(--t-text-muted)" }}>لا توجد نتائج لـ "{searchQuery}"</p>
+                    <p style={{ fontSize: 12, color: "var(--t-text-faint, #9ca3af)", margin: 0 }}>لا توجد نتائج لـ "{searchQuery}"</p>
                 </div>
             )}
 
             <style>{`
-                @keyframes rusSlide{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
-                @keyframes rusCard{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+                @keyframes rusSlide{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+                @keyframes rusCard{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
             `}</style>
         </div>
     )

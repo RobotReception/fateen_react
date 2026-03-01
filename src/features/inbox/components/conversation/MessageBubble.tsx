@@ -204,71 +204,101 @@ function StatusIcon({ status }: { status: string }) {
 // ── Interactive message renderer (WhatsApp-style) ────
 function InteractiveContent({ content: c, isOwn }: { content: any; isOwn: boolean }) {
     const [listOpen, setListOpen] = useState(false)
+    const [hoveredRow, setHoveredRow] = useState<number | null>(null)
     const textColor = isOwn ? "rgba(255,255,255,0.95)" : "var(--t-text)"
-    const mutedColor = isOwn ? "rgba(255,255,255,0.6)" : "var(--t-text-faint)"
-    const btnBg = isOwn ? "rgba(255,255,255,0.15)" : "var(--t-surface)"
+    const mutedColor = isOwn ? "rgba(255,255,255,0.5)" : "var(--t-text-faint)"
     const btnColor = isOwn ? "#fff" : "var(--t-accent)"
-    const borderColor = isOwn ? "rgba(255,255,255,0.2)" : "var(--t-border-light)"
+    const borderColor = isOwn ? "rgba(255,255,255,0.15)" : "var(--t-border-light)"
 
-    // Extract common interactive fields
-    const header = c.header || c.interactive?.header
+    // ── Inbound interactive (customer selected from list/button) ──
+    if (c.type === "interactive" && c.title) {
+        return (
+            <div style={{
+                display: "inline-flex", alignItems: "center", gap: 6,
+                padding: "5px 10px", borderRadius: 8,
+                background: isOwn ? "rgba(255,255,255,0.08)" : "rgba(99,102,241,0.06)",
+                border: `1px solid ${isOwn ? "rgba(255,255,255,0.12)" : "rgba(99,102,241,0.15)"}`,
+            }}>
+                <span style={{
+                    width: 16, height: 16, borderRadius: "50%",
+                    background: isOwn ? "rgba(255,255,255,0.2)" : "var(--t-accent)",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    fontSize: 8, color: "#fff", flexShrink: 0, fontWeight: 700,
+                }}>✓</span>
+                <span style={{
+                    fontSize: 12, fontWeight: 600, color: textColor,
+                }}>{c.title}</span>
+            </div>
+        )
+    }
+
+    // ── Extract interactive fields ──
+    const interactiveType = c.interactive?.type
+    const header = c.header || c.interactive?.header || c.list?.header
     const body = c.body || c.text || c.interactive?.body?.text || ""
-    const footer = c.footer || c.interactive?.footer?.text || ""
+    const footer = c.footer || c.interactive?.footer?.text || c.interactive?.footer || c.list?.footer
     const buttons: any[] = c.buttons || c.interactive?.action?.buttons || c.interactive?.buttons || []
+
+    // List-specific
+    const listRows: any[] = c.list?.rows || c.interactive?.options || c.interactive?.action?.sections?.[0]?.rows || []
+    const listBtnLabel = c.interactive?.button || c.list?.button || c.interactive?.action?.button || c.button_text || "عرض القائمة"
+    const isList = interactiveType === "list" || listRows.length > 0
+
+    // Sections fallback
     const sections: any[] = c.sections || c.interactive?.action?.sections || []
-    const listBtnLabel = c.interactive?.action?.button || c.button_text || "عرض القائمة"
 
     return (
-        <div style={{ minWidth: 180 }}>
-            {/* Header (image or text) */}
+        <div style={{ minWidth: isList ? 200 : 160, maxWidth: 280 }}>
+            {/* Header */}
             {header && (
-                header.type === "image" && header.image?.link ? (
+                typeof header === "object" && header.type === "image" && header.image?.link ? (
                     <img src={header.image.link} alt=""
-                        style={{ width: "100%", maxHeight: 180, objectFit: "cover", borderRadius: 8, marginBottom: 6 }} />
-                ) : header.type === "text" || header.text ? (
-                    <p style={{ fontSize: 14, fontWeight: 700, color: textColor, margin: "0 0 4px", lineHeight: 1.4 }}>
-                        {header.text || header}
+                        style={{ width: "100%", maxHeight: 140, objectFit: "cover", borderRadius: 6, marginBottom: 4 }} />
+                ) : (
+                    <p style={{
+                        fontSize: 12, fontWeight: 700, color: textColor,
+                        margin: "0 0 3px", lineHeight: 1.3,
+                        paddingBottom: 4,
+                        borderBottom: `1.5px solid ${isOwn ? "rgba(255,255,255,0.15)" : "rgba(99,102,241,0.2)"}`,
+                    }}>
+                        {typeof header === "string" ? header : header.text || header}
                     </p>
-                ) : typeof header === "string" ? (
-                    <p style={{ fontSize: 14, fontWeight: 700, color: textColor, margin: "0 0 4px", lineHeight: 1.4 }}>
-                        {header}
-                    </p>
-                ) : null
+                )
             )}
 
             {/* Body text */}
             {body && (
-                <p style={{ fontSize: 13, color: textColor, lineHeight: 1.6, margin: 0, whiteSpace: "pre-wrap" }}>
+                <p style={{ fontSize: 12, color: textColor, lineHeight: 1.5, margin: "2px 0 0", whiteSpace: "pre-wrap" }}>
                     {typeof body === "string" ? body : body.text || ""}
                 </p>
             )}
 
             {/* Footer */}
             {footer && (
-                <p style={{ fontSize: 11, color: mutedColor, marginTop: 4, margin: "4px 0 0" }}>
+                <p style={{ fontSize: 10, color: mutedColor, margin: "3px 0 0" }}>
                     {typeof footer === "string" ? footer : footer.text || ""}
                 </p>
             )}
 
-            {/* Buttons */}
+            {/* Reply Buttons */}
             {buttons.length > 0 && (
-                <div style={{ marginTop: 8, display: "flex", flexDirection: "column", gap: 4 }}>
+                <div style={{ marginTop: 6, display: "flex", flexDirection: "column", gap: 3 }}>
                     {buttons.map((btn: any, i: number) => {
                         const label = btn.reply?.title || btn.title || btn.text || btn.label || `Button ${i + 1}`
                         const url = btn.url || btn.reply?.url
                         const id = btn.reply?.id || btn.id || i
                         return (
                             <div key={id} style={{
-                                padding: "8px 12px", borderRadius: 8,
-                                background: btnBg,
+                                padding: "5px 10px", borderRadius: 6,
+                                background: isOwn ? "rgba(255,255,255,0.1)" : "var(--t-surface)",
                                 border: `1px solid ${borderColor}`,
-                                textAlign: "center", fontSize: 13, fontWeight: 600,
+                                textAlign: "center", fontSize: 11, fontWeight: 600,
                                 color: btnColor, cursor: url ? "pointer" : "default",
-                                display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+                                display: "flex", alignItems: "center", justifyContent: "center", gap: 4,
                             }}
                                 onClick={() => { if (url) window.open(url, "_blank") }}
                             >
-                                {url && <span style={{ fontSize: 11 }}>🔗</span>}
+                                {url && <span style={{ fontSize: 9 }}>🔗</span>}
                                 {label}
                             </div>
                         )
@@ -276,14 +306,102 @@ function InteractiveContent({ content: c, isOwn }: { content: any; isOwn: boolea
                 </div>
             )}
 
-            {/* List sections — toggle button + expandable list */}
-            {sections.length > 0 && (
+            {/* ── WhatsApp-style List ── */}
+            {isList && listRows.length > 0 && (
+                <div style={{ marginTop: 8 }}>
+                    {/* List toggle button — pill style */}
+                    <button
+                        onClick={() => setListOpen(!listOpen)}
+                        style={{
+                            width: "100%", padding: "7px 12px", borderRadius: 20,
+                            background: isOwn ? "rgba(255,255,255,0.1)" : "transparent",
+                            border: `1.5px solid ${isOwn ? "rgba(255,255,255,0.25)" : "var(--t-accent)"}`,
+                            cursor: "pointer", fontSize: 11, fontWeight: 700,
+                            color: isOwn ? "#fff" : "var(--t-accent)",
+                            display: "flex", alignItems: "center",
+                            justifyContent: "center", gap: 6, fontFamily: "inherit",
+                            transition: "all .2s ease",
+                            letterSpacing: 0.3,
+                        }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.background = isOwn ? "rgba(255,255,255,0.18)" : "var(--t-accent)"
+                            e.currentTarget.style.color = "#fff"
+                            e.currentTarget.style.transform = "scale(1.02)"
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.background = isOwn ? "rgba(255,255,255,0.1)" : "transparent"
+                            e.currentTarget.style.color = isOwn ? "#fff" : "var(--t-accent)"
+                            e.currentTarget.style.transform = "scale(1)"
+                        }}
+                    >
+                        <span style={{ fontSize: 12 }}>☰</span>
+                        {listBtnLabel}
+                        <span style={{
+                            fontSize: 8, transition: "transform .25s ease",
+                            transform: listOpen ? "rotate(180deg)" : "rotate(0)",
+                            opacity: 0.6,
+                        }}>▼</span>
+                    </button>
+
+                    {/* Expandable list rows */}
+                    {listOpen && (
+                        <div style={{
+                            marginTop: 5, borderRadius: 8, overflow: "hidden",
+                            border: `1px solid ${borderColor}`,
+                            background: isOwn ? "rgba(255,255,255,0.04)" : "var(--t-card)",
+                        }}>
+                            {listRows.map((row: any, ri: number) => (
+                                <div
+                                    key={row.id || ri}
+                                    onMouseEnter={() => setHoveredRow(ri)}
+                                    onMouseLeave={() => setHoveredRow(null)}
+                                    style={{
+                                        padding: "7px 10px",
+                                        borderBottom: ri < listRows.length - 1
+                                            ? `1px solid ${isOwn ? "rgba(255,255,255,0.06)" : "var(--t-border-light)"}`
+                                            : "none",
+                                        cursor: "default",
+                                        display: "flex", alignItems: "center", gap: 8,
+                                        transition: "all .15s ease",
+                                        background: hoveredRow === ri
+                                            ? (isOwn ? "rgba(255,255,255,0.08)" : "var(--t-surface)")
+                                            : "transparent",
+                                        borderRight: hoveredRow === ri
+                                            ? `2px solid ${isOwn ? "rgba(255,255,255,0.5)" : "var(--t-accent)"}`
+                                            : "2px solid transparent",
+                                    }}
+                                >
+                                    {/* Dot indicator */}
+                                    <span style={{
+                                        width: 5, height: 5, borderRadius: "50%",
+                                        background: hoveredRow === ri
+                                            ? (isOwn ? "#fff" : "var(--t-accent)")
+                                            : (isOwn ? "rgba(255,255,255,0.3)" : "var(--t-text-faint)"),
+                                        flexShrink: 0,
+                                        transition: "all .15s ease",
+                                    }} />
+                                    <p style={{
+                                        fontSize: 12, fontWeight: 500,
+                                        color: hoveredRow === ri ? (isOwn ? "#fff" : "var(--t-accent)") : textColor,
+                                        margin: 0, flex: 1,
+                                        overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                                        transition: "color .15s ease",
+                                    }}>{row.title}</p>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {/* Sections-based list fallback */}
+            {!isList && sections.length > 0 && (
                 <div style={{ marginTop: 8 }}>
                     <button
                         onClick={() => setListOpen(!listOpen)}
                         style={{
                             width: "100%", padding: "9px 12px", borderRadius: 8,
-                            background: btnBg, border: `1px solid ${borderColor}`,
+                            background: isOwn ? "rgba(255,255,255,0.1)" : "var(--t-surface)", border: `1px solid ${borderColor}`,
                             cursor: "pointer", fontSize: 13, fontWeight: 600,
                             color: btnColor, display: "flex", alignItems: "center",
                             justifyContent: "center", gap: 6, fontFamily: "inherit",
@@ -298,7 +416,7 @@ function InteractiveContent({ content: c, isOwn }: { content: any; isOwn: boolea
                     {listOpen && (
                         <div style={{
                             marginTop: 6, borderRadius: 8, overflow: "hidden",
-                            border: `1px solid ${borderColor}`, background: btnBg,
+                            border: `1px solid ${borderColor}`, background: isOwn ? "rgba(255,255,255,0.1)" : "var(--t-surface)",
                         }}>
                             {sections.map((section: any, si: number) => (
                                 <div key={si}>
@@ -331,7 +449,7 @@ function InteractiveContent({ content: c, isOwn }: { content: any; isOwn: boolea
             )}
 
             {/* Fallback: if no interactive content parsed, show raw text */}
-            {!body && !buttons.length && !sections.length && c.text && (
+            {!body && !buttons.length && !isList && !sections.length && c.text && (
                 <p style={{ fontSize: 13, color: textColor, lineHeight: 1.6, margin: 0, whiteSpace: "pre-wrap" }}>{c.text}</p>
             )}
         </div>

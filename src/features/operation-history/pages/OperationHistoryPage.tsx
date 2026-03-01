@@ -89,10 +89,15 @@ const SkeletonRow = memo(function SkeletonRow({ delay = 0 }: { delay?: number })
 const DetailsModal = memo(function DetailsModal({ details, loading, onClose }: { details: OperationDetails | null; loading: boolean; onClose: () => void }) {
     return (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={onClose}>
-            <div className="mx-4 w-full max-w-lg overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl" onClick={(e) => e.stopPropagation()} style={{ animation: "ohModalIn .18s ease-out" }}>
-                <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
-                    <h3 className="text-base font-bold text-gray-800">تفاصيل العملية</h3>
-                    <button onClick={onClose} className="rounded-lg p-1 text-gray-400 hover:text-gray-600"><X size={18} /></button>
+            <div className="mx-4 w-full max-w-lg overflow-hidden bg-white" onClick={(e) => e.stopPropagation()} style={{ animation: "ohModalIn .18s ease-out", borderRadius: 12, border: "1px solid var(--t-border-light, #e5e7eb)" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 20px", borderBottom: "1px solid var(--t-border-light, #f0f0f0)" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <div style={{ width: 30, height: 30, borderRadius: 8, background: "linear-gradient(135deg, #004786, #0098d6)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                            <History size={14} style={{ color: "#fff" }} />
+                        </div>
+                        <h3 style={{ fontSize: 14, fontWeight: 600, color: "var(--t-text, #1f2937)" }}>تفاصيل العملية</h3>
+                    </div>
+                    <button onClick={onClose} style={{ borderRadius: 6, padding: 5, border: "none", background: "transparent", cursor: "pointer", color: "var(--t-text-faint, #9ca3af)" }}><X size={16} /></button>
                 </div>
                 {loading || !details ? (
                     <div className="flex items-center justify-center py-16"><Loader2 size={28} className="animate-spin text-blue-500" /></div>
@@ -316,21 +321,26 @@ export function OperationHistoryPage() {
     return (
         <div className="p-6 space-y-5" dir="rtl">
             {/* Header */}
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                    <h2 className="text-xl font-bold text-gray-800">سجل العمليات</h2>
-                    <p className="mt-1 text-sm text-gray-400">استعراض وتتبع جميع العمليات المنفذة</p>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                    <div style={{ width: 40, height: 40, borderRadius: 10, background: "linear-gradient(135deg, #004786, #0098d6)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <History size={20} style={{ color: "#fff" }} />
+                    </div>
+                    <div>
+                        <h2 style={{ fontSize: 18, fontWeight: 700, color: "var(--t-text, #1f2937)", margin: 0 }}>سجل العمليات</h2>
+                        <p style={{ fontSize: 12, color: "var(--t-text-faint, #9ca3af)", marginTop: 2 }}>استعراض وتتبع جميع العمليات المنفذة</p>
+                    </div>
                 </div>
-                <div className="flex items-center gap-2">
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                     {pagination && (
-                        <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 border border-blue-200 px-3 py-1.5 text-xs font-semibold text-blue-700">
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: 5, borderRadius: 12, background: "rgba(0,71,134,0.05)", border: "1px solid rgba(0,71,134,0.12)", padding: "5px 12px", fontSize: 11, fontWeight: 600, color: "#004786" }}>
                             <History size={12} />
                             {pagination.totalCount} عملية
                         </span>
                     )}
                     <ActionGuard pageBit={PAGE_BITS.OPERATION_HISTORY} actionBit={ACTION_BITS.DOWNLOAD_OPERATIONS_CSV}>
                         <button onClick={handleExportCsv} disabled={exporting || loading}
-                            className="flex items-center gap-2 rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-medium text-white  transition-transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50">
+                            style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 18px", borderRadius: 8, border: "none", background: "#004786", color: "#fff", fontSize: 13, fontWeight: 500, cursor: "pointer", opacity: (exporting || loading) ? 0.5 : 1, transition: "all 0.15s" }}>
                             {exporting ? <Loader2 size={15} className="animate-spin" /> : <FileSpreadsheet size={15} />}
                             تصدير CSV
                         </button>
@@ -387,28 +397,22 @@ export function OperationHistoryPage() {
 
             {/* Info bar */}
             {!loading && filtered.length > 0 && pagination && (
-                <div className="flex items-center justify-between rounded-xl bg-white border border-gray-100 px-4 py-2.5 shadow-sm">
-                    <p className="text-xs text-gray-500"><span className="font-bold text-gray-700">{pagination.totalCount}</span> عملية</p>
-                    <p className="text-xs text-gray-400">صفحة {page} من {totalPages}</p>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderRadius: 8, background: "var(--t-card, #fff)", border: "1px solid var(--t-border-light, #e5e7eb)", padding: "8px 14px" }}>
+                    <p style={{ fontSize: 12, color: "var(--t-text-secondary, #6b7280)" }}><span style={{ fontWeight: 700, color: "#004786" }}>{pagination.totalCount}</span> عملية</p>
+                    <p style={{ fontSize: 11, color: "var(--t-text-faint, #9ca3af)" }}>صفحة {page} من {totalPages}</p>
                 </div>
             )}
 
             {/* Table */}
-            <div className="relative overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
+            <div style={{ position: "relative", overflow: "hidden", borderRadius: 10, border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-card, #fff)" }}>
                 <FetchingBar visible={backgroundFetching} />
                 <div className="overflow-x-auto" style={{ opacity: backgroundFetching ? 0.6 : 1, transition: 'opacity 0.2s ease' }}>
-                    <table className="w-full">
+                    <table style={{ width: "100%", borderCollapse: "collapse" }}>
                         <thead>
-                            <tr className="border-b border-gray-100 text-right">
-                                <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-gray-400">#</th>
-                                <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-gray-400">المعرّف</th>
-                                <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-gray-400">العملية</th>
-                                <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-gray-400">المستخدم</th>
-                                <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-gray-400">الحالة</th>
-                                <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-gray-400">التاريخ</th>
-                                <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-gray-400">الموافق</th>
-                                <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-gray-400">تاريخ الإنجاز</th>
-                                <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-gray-400">الإجراءات</th>
+                            <tr style={{ borderBottom: "1px solid var(--t-border-light, #f0f0f0)", background: "var(--t-surface, #fafafa)", textAlign: "right" }}>
+                                {["#", "المعرّف", "العملية", "المستخدم", "الحالة", "التاريخ", "الموافق", "تاريخ الإنجاز", "الإجراءات"].map(h => (
+                                    <th key={h} style={{ padding: "10px 16px", fontSize: 11, fontWeight: 600, color: "var(--t-text-faint, #9ca3af)", letterSpacing: "0.3px" }}>{h}</th>
+                                ))}
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-50">
@@ -441,15 +445,15 @@ export function OperationHistoryPage() {
 
             {/* Pagination */}
             {totalPages > 1 && (
-                <div className="flex items-center justify-center gap-2 pt-2">
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, paddingTop: 8 }}>
                     <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1}
-                        className="flex items-center gap-1 rounded-lg border border-gray-200 px-3 py-2 text-xs font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed">
-                        <ChevronRight size={14} /> السابق
+                        style={{ display: "flex", alignItems: "center", gap: 4, padding: "6px 12px", borderRadius: 7, border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-card, #fff)", fontSize: 12, fontWeight: 500, color: "var(--t-text-secondary, #6b7280)", cursor: "pointer", opacity: page <= 1 ? 0.4 : 1 }}>
+                        <ChevronRight size={13} /> السابق
                     </button>
-                    <span className="flex h-8 items-center rounded-lg bg-gray-900 px-3 text-xs font-bold text-white ">{page}</span>
+                    <span style={{ display: "flex", height: 30, alignItems: "center", borderRadius: 7, background: "#004786", padding: "0 12px", fontSize: 12, fontWeight: 700, color: "#fff" }}>{page}</span>
                     <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} onMouseEnter={() => page < totalPages && prefetchNextPage()} disabled={page >= totalPages}
-                        className="flex items-center gap-1 rounded-lg border border-gray-200 px-3 py-2 text-xs font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed">
-                        التالي <ChevronLeft size={14} />
+                        style={{ display: "flex", alignItems: "center", gap: 4, padding: "6px 12px", borderRadius: 7, border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-card, #fff)", fontSize: 12, fontWeight: 500, color: "var(--t-text-secondary, #6b7280)", cursor: "pointer", opacity: page >= totalPages ? 0.4 : 1 }}>
+                        التالي <ChevronLeft size={13} />
                     </button>
                 </div>
             )}

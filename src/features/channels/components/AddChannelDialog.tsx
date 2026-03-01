@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { X, Plus, Loader2, Eye, EyeOff, Bot } from "lucide-react"
-import { useCreateChannel } from "../hooks/use-channels"
+import { useCreateChannel, usePlatformsStatus } from "../hooks/use-channels"
 import { useAuthStore } from "@/stores/auth-store"
 import { PLATFORM_META, PLATFORMS } from "../types"
 import type { Platform, CreateChannelPayload } from "../types"
@@ -9,10 +9,10 @@ import { AgentMultiSelect } from "./AgentMultiSelect"
 /* ──────────── CSS ──────────── */
 const CSS = `
 @keyframes dlgIn{from{opacity:0;transform:scale(.96) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
-.dlg-field { width:100%; padding:9px 12px; border-radius:9px; border:1.5px solid var(--t-border); background:var(--t-surface); font-size:13px; color:var(--t-text); outline:none; transition:border-color .15s; box-sizing:border-box; }
-.dlg-field:focus { border-color:var(--t-accent); }
+.dlg-field { width:100%; padding:9px 12px; border-radius:9px; border:1.5px solid #e0e3e7; background:#fafafa; font-size:13px; color:var(--t-text,#111827); outline:none; transition:border-color .15s,box-shadow .15s; box-sizing:border-box; font-family:inherit; }
+.dlg-field:focus { border-color:#004786; box-shadow:0 0 0 3px rgba(0,71,134,.06); }
 .dlg-field[dir=ltr],.dlg-field.mono { font-family:monospace; }
-.dlg-label { font-size:10px; font-weight:800; letter-spacing:.07em; text-transform:uppercase; color:var(--t-text-faint); display:block; margin-bottom:5px; }
+.dlg-label { font-size:10px; font-weight:800; letter-spacing:.07em; text-transform:uppercase; color:#6b7280; display:block; margin-bottom:5px; }
 `
 
 interface FormState {
@@ -33,20 +33,28 @@ const EMPTY: FormState = {
 }
 
 /* ── Platform picker ── */
-function PlatformPicker({ value, onChange }: { value: Platform; onChange: (p: Platform) => void }) {
+function PlatformPicker({ value, onChange, platforms }: { value: Platform; onChange: (p: Platform) => void; platforms: Platform[] }) {
+    const cols = Math.min(platforms.length, 5)
     return (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 8, marginBottom: 20 }}>
-            {PLATFORMS.map(p => {
+        <div style={{ display: "grid", gridTemplateColumns: `repeat(${cols},1fr)`, gap: 8, marginBottom: 20 }}>
+            {platforms.map(p => {
                 const m = PLATFORM_META[p]
                 const active = value === p
                 return (
                     <button key={p} type="button" onClick={() => onChange(p)} style={{
-                        padding: "12px 6px", borderRadius: 11, border: `2px solid ${active ? m.color : "var(--t-border)"}`,
-                        background: active ? `${m.color}14` : "var(--t-surface)",
+                        padding: "12px 6px", borderRadius: 11, border: `2px solid ${active ? m.color : "#eaedf0"}`,
+                        background: active ? `${m.color}0d` : "#fafafa",
                         cursor: "pointer", textAlign: "center", transition: "all .15s",
+                        fontFamily: "inherit",
                     }}>
-                        <div style={{ fontSize: 22, marginBottom: 4 }}>{m.icon}</div>
-                        <div style={{ fontSize: 10, fontWeight: 700, color: active ? m.color : "var(--t-text-faint)" }}>{m.labelAr}</div>
+                        <div style={{
+                            width: 32, height: 32, borderRadius: 9, margin: "0 auto 4px",
+                            background: active ? `linear-gradient(135deg, ${m.color}, ${m.color}cc)` : "#e8ebef",
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                            fontSize: 15, filter: active ? "none" : "grayscale(.3)",
+                            boxShadow: active ? `0 2px 6px ${m.color}30` : "none", transition: "all .15s",
+                        }}>{m.icon}</div>
+                        <div style={{ fontSize: 10, fontWeight: 700, color: active ? m.color : "#9ca3af" }}>{m.labelAr}</div>
                     </button>
                 )
             })}
@@ -62,9 +70,13 @@ function SecretInput({ value, onChange, placeholder }: { value: string; onChange
             <input type={show ? "text" : "password"} value={value} onChange={e => onChange(e.target.value)}
                 placeholder={placeholder} dir="ltr" className="dlg-field mono" style={{ flex: 1 }} />
             <button type="button" onClick={() => setShow(!show)} style={{
-                width: 38, height: 38, borderRadius: 9, border: "1.5px solid var(--t-border)", flexShrink: 0,
-                background: "var(--t-surface)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--t-text-faint)",
-            }}>
+                width: 38, height: 38, borderRadius: 9, border: "1.5px solid #e0e3e7", flexShrink: 0,
+                background: "#fafafa", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+                color: "#9ca3af", transition: "all .12s",
+            }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = "#004786"; e.currentTarget.style.color = "#004786" }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = "#e0e3e7"; e.currentTarget.style.color = "#9ca3af" }}
+            >
                 {show ? <EyeOff size={14} /> : <Eye size={14} />}
             </button>
         </div>
@@ -87,15 +99,24 @@ function OriginsEditor({ value, onChange }: { value: string; onChange: (v: strin
                 <input value={input} onChange={e => setInput(e.target.value)} placeholder="https://example.com"
                     dir="ltr" className="dlg-field mono" style={{ flex: 1 }}
                     onKeyDown={e => e.key === "Enter" && (e.preventDefault(), add())} />
-                <button type="button" onClick={add} style={{ padding: "0 14px", borderRadius: 9, border: "none", background: "var(--t-accent)", color: "var(--t-text-on-accent)", fontSize: 12, fontWeight: 700, cursor: "pointer", flexShrink: 0 }}>
+                <button type="button" onClick={add} style={{
+                    padding: "0 14px", borderRadius: 9, border: "none",
+                    background: "#004786", color: "#fff",
+                    fontSize: 12, fontWeight: 700, cursor: "pointer", flexShrink: 0,
+                }}>
                     <Plus size={14} />
                 </button>
             </div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
                 {origins.map((o, i) => (
-                    <span key={i} style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "3px 10px", borderRadius: 20, background: "var(--t-surface)", border: "1px solid var(--t-border-light)", fontSize: 11, fontFamily: "monospace", color: "var(--t-text-muted)" }}>
+                    <span key={i} style={{
+                        display: "inline-flex", alignItems: "center", gap: 5,
+                        padding: "3px 10px", borderRadius: 20,
+                        background: "rgba(0,71,134,.04)", border: "1px solid rgba(0,71,134,.1)",
+                        fontSize: 11, fontFamily: "monospace", color: "#004786",
+                    }}>
                         {o}
-                        <button type="button" onClick={() => remove(i)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--t-danger)", display: "flex", padding: 0, lineHeight: 1 }}>
+                        <button type="button" onClick={() => remove(i)} style={{ background: "none", border: "none", cursor: "pointer", color: "#dc2626", display: "flex", padding: 0, lineHeight: 1 }}>
                             <X size={10} />
                         </button>
                     </span>
@@ -115,11 +136,15 @@ export function AddChannelDialog({ defaultPlatform, onClose }: { defaultPlatform
     const { user } = useAuthStore()
     const tenantId = user?.tenant_id || ""
     const createMut = useCreateChannel(tenantId)
+    const { data: platStatusRes } = usePlatformsStatus(tenantId)
 
-    const [platform, setPlatform] = useState<Platform>(defaultPlatform || "whatsapp")
+    // Only show enabled platforms
+    const enabledPlatforms = PLATFORMS.filter(p => platStatusRes?.data?.platforms?.[p] ?? false)
+    const availablePlatforms = enabledPlatforms.length > 0 ? enabledPlatforms : PLATFORMS
+
+    const [platform, setPlatform] = useState<Platform>(defaultPlatform || availablePlatforms[0] || "whatsapp")
     const [form, setForm] = useState<FormState>(EMPTY)
 
-    /* Generic string field setter */
     const set = (k: keyof FormState, v: string) => setForm(f => ({ ...f, [k]: v }))
 
     const onSubmit = (e: React.FormEvent) => {
@@ -128,7 +153,6 @@ export function AddChannelDialog({ defaultPlatform, onClose }: { defaultPlatform
         createMut.mutate({ platform, payload }, { onSuccess: r => { if (r.success) onClose() } })
     }
 
-    /* ── Shared inline field renderers (no sub-component → no focus loss) ── */
     const textField = (label: string, key: keyof FormState, placeholder?: string, dir: "ltr" | "rtl" = "ltr") => (
         <div>
             <FieldLabel>{label}</FieldLabel>
@@ -144,7 +168,6 @@ export function AddChannelDialog({ defaultPlatform, onClose }: { defaultPlatform
         </div>
     )
 
-    /* ── Platform-specific fields ── */
     const renderFields = () => {
         if (platform === "whatsapp") return (
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
@@ -197,7 +220,7 @@ export function AddChannelDialog({ defaultPlatform, onClose }: { defaultPlatform
                     <div>
                         <FieldLabel>لون الويدجت</FieldLabel>
                         <input type="color" value={form.color} onChange={e => set("color", e.target.value)}
-                            style={{ width: 38, height: 38, borderRadius: 9, border: "1.5px solid var(--t-border)", padding: 2, cursor: "pointer", background: "var(--t-surface)" }} />
+                            style={{ width: 38, height: 38, borderRadius: 9, border: "1.5px solid #e0e3e7", padding: 2, cursor: "pointer", background: "#fafafa" }} />
                     </div>
                 </div>
                 {textField("الاسم (اختياري)", "name", "Site Chat", "rtl")}
@@ -207,27 +230,60 @@ export function AddChannelDialog({ defaultPlatform, onClose }: { defaultPlatform
     }
 
     return (
-        <div onClick={onClose} style={{ position: "fixed", inset: 0, zIndex: 80, background: "rgba(0,0,0,.5)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div onClick={onClose} style={{ position: "fixed", inset: 0, zIndex: 80, background: "rgba(0,0,0,.45)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <style>{CSS}</style>
-            <div onClick={e => e.stopPropagation()} style={{ borderRadius: 18, background: "var(--t-card)", border: "1px solid var(--t-border)", width: "100%", maxWidth: 540, margin: 16, maxHeight: "90vh", display: "flex", flexDirection: "column", animation: "dlgIn .18s ease-out" }} dir="rtl">
-                {/* Header */}
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px 24px 16px", borderBottom: "1px solid var(--t-border-light)" }}>
+            <div onClick={e => e.stopPropagation()} style={{
+                borderRadius: 18, background: "#fff", overflow: "hidden",
+                width: "100%", maxWidth: 540, margin: 16, maxHeight: "90vh",
+                display: "flex", flexDirection: "column", animation: "dlgIn .18s ease-out",
+                boxShadow: "0 12px 40px rgba(0,0,0,.12)",
+            }} dir="rtl">
+                {/* Gradient Header */}
+                <div style={{
+                    background: "linear-gradient(135deg, #004786, #0072b5)",
+                    padding: "18px 24px",
+                    display: "flex", alignItems: "center", justifyContent: "space-between",
+                }}>
                     <div>
-                        <div style={{ fontSize: 16, fontWeight: 800, color: "var(--t-text)" }}>إضافة قناة جديدة</div>
-                        <div style={{ fontSize: 11, color: "var(--t-text-faint)", marginTop: 2 }}>اختر المنصة وأدخل بيانات الاتصال</div>
+                        <div style={{ fontSize: 16, fontWeight: 800, color: "#fff" }}>إضافة قناة جديدة</div>
+                        <div style={{ fontSize: 11, color: "rgba(255,255,255,.6)", marginTop: 2 }}>اختر المنصة وأدخل بيانات الاتصال</div>
                     </div>
-                    <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--t-text-faint)", display: "flex", padding: 4 }}>
-                        <X size={18} />
+                    <button onClick={onClose} style={{
+                        width: 28, height: 28, borderRadius: 8,
+                        background: "rgba(255,255,255,.12)", border: "none", cursor: "pointer",
+                        color: "#fff", display: "flex", alignItems: "center", justifyContent: "center",
+                        transition: "background .12s",
+                    }}
+                        onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,.25)" }}
+                        onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,.12)" }}
+                    >
+                        <X size={16} />
                     </button>
                 </div>
 
                 {/* Body */}
                 <form onSubmit={onSubmit} style={{ flex: 1, overflowY: "auto", padding: "20px 24px" }}>
-                    {/* Platform picker */}
-                    <FieldLabel>المنصة</FieldLabel>
-                    <PlatformPicker value={platform} onChange={p => { setPlatform(p); setForm(EMPTY) }} />
+                    {defaultPlatform ? (
+                        /* Show selected platform badge only */
+                        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16, padding: "8px 12px", borderRadius: 9, background: `${PLATFORM_META[platform].color}08`, border: `1px solid ${PLATFORM_META[platform].color}18` }}>
+                            <div style={{
+                                width: 28, height: 28, borderRadius: 8,
+                                background: `linear-gradient(135deg, ${PLATFORM_META[platform].color}, ${PLATFORM_META[platform].color}cc)`,
+                                display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14,
+                                boxShadow: `0 1px 4px ${PLATFORM_META[platform].color}25`,
+                            }}>{PLATFORM_META[platform].icon}</div>
+                            <div>
+                                <div style={{ fontSize: 12, fontWeight: 800, color: "#111827" }}>{PLATFORM_META[platform].labelAr}</div>
+                                <div style={{ fontSize: 9.5, color: "#9ca3af" }}>{PLATFORM_META[platform].label}</div>
+                            </div>
+                        </div>
+                    ) : (
+                        <>
+                            <FieldLabel>المنصة</FieldLabel>
+                            <PlatformPicker value={platform} onChange={p => { setPlatform(p); setForm(EMPTY) }} platforms={availablePlatforms} />
+                        </>
+                    )}
 
-                    {/* Platform fields */}
                     {renderFields()}
 
                     {/* Agents */}
@@ -243,13 +299,18 @@ export function AddChannelDialog({ defaultPlatform, onClose }: { defaultPlatform
 
                     {/* Submit */}
                     <div style={{ display: "flex", gap: 8, marginTop: 20, justifyContent: "flex-end" }}>
-                        <button type="button" onClick={onClose} style={{ padding: "9px 18px", borderRadius: 9, border: "1.5px solid var(--t-border)", background: "transparent", color: "var(--t-text)", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
+                        <button type="button" onClick={onClose} style={{
+                            padding: "9px 18px", borderRadius: 9, border: "1.5px solid #e0e3e7",
+                            background: "transparent", color: "var(--t-text, #374151)", fontSize: 13, fontWeight: 600,
+                            cursor: "pointer", fontFamily: "inherit",
+                        }}>
                             إلغاء
                         </button>
                         <button type="submit" disabled={createMut.isPending} style={{
                             display: "inline-flex", alignItems: "center", gap: 7, padding: "9px 22px", borderRadius: 9,
-                            border: "none", background: "var(--t-accent)", color: "var(--t-text-on-accent)",
+                            border: "none", background: "#004786", color: "#fff",
                             fontSize: 13, fontWeight: 700, cursor: "pointer", opacity: createMut.isPending ? 0.7 : 1,
+                            fontFamily: "inherit", boxShadow: "0 1px 3px rgba(0,71,134,.15)",
                         }}>
                             {createMut.isPending ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
                             إنشاء القناة
@@ -271,5 +332,5 @@ function buildPayload(platform: Platform, form: FormState): CreateChannelPayload
     if (platform === "facebook") return { ...base, page_id: form.page_id, access_token: form.access_token, META_APP_SECRET: form.META_APP_SECRET }
     if (platform === "instagram") return { ...base, page_id: form.page_id, ig_account_id: form.ig_account_id, access_token: form.access_token, META_APP_SECRET: form.META_APP_SECRET }
     if (platform === "appchat") return { ...base, app_id: form.app_id, allowed_origins: origins }
-    /* webchat — no site_id */     return { ...base, allowed_origins: origins, icon: form.icon || undefined, color: form.color || undefined }
+    /* webchat */     return { ...base, allowed_origins: origins, icon: form.icon || undefined, color: form.color || undefined }
 }

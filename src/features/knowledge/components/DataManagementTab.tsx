@@ -1,5 +1,6 @@
 ﻿import { useState, useEffect, useCallback, useRef, memo, useMemo } from "react"
 import { useQueryClient } from "@tanstack/react-query"
+import { useKnowledgeEvents } from "../hooks/useKnowledgeEvents"
 import { toast } from "sonner"
 import { FetchingBar } from "@/components/ui/FetchingBar"
 import {
@@ -34,17 +35,14 @@ import {
     FileType2,
     FileSpreadsheet,
     Layers,
-    Activity,
 } from "lucide-react"
 import { useAuthStore } from "@/stores/auth-store"
 import { useDepartmentsLookup, useDepartmentCategories } from "../hooks/use-departments"
 import { useSearchDocuments, useUpdateDocument, useDeleteDocuments } from "../hooks/use-documents"
 import { usePrefetchDocuments } from "../hooks/use-prefetch"
 import {
-    trainDataRequest,
     trainTxtRequest,
     trainCsvRequest,
-    checkDataModelHealth,
     addDataJson,
 } from "../services/knowledge-service"
 import type {
@@ -104,18 +102,23 @@ const TextModal = memo(function TextModal({ text, onClose }: { text: string; onC
 
     return (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={onClose}>
-            <div className="mx-4 max-h-[80vh] w-full max-w-2xl overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl" onClick={(e) => e.stopPropagation()} style={{ animation: "modalIn .18s ease-out" }}>
-                <div className="flex items-center justify-between border-b border-gray-100 px-5 py-3">
-                    <h3 className="text-sm font-bold text-gray-700">محتوى المستند</h3>
-                    <div className="flex items-center gap-2">
-                        <button onClick={copy} className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${copied ? "bg-emerald-50 text-emerald-600" : "bg-gray-100 text-gray-500 hover:bg-gray-200"}`}>
-                            {copied ? <Check size={12} /> : <Copy size={12} />}
+            <div className="mx-4 max-h-[80vh] w-full max-w-2xl overflow-hidden bg-white" onClick={(e) => e.stopPropagation()} style={{ animation: "modalIn .18s ease-out", borderRadius: 12, border: "1px solid var(--t-border-light, #e5e7eb)" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 20px", borderBottom: "1px solid var(--t-border-light, #f0f0f0)" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <div style={{ width: 30, height: 30, borderRadius: 8, background: "linear-gradient(135deg, #004786, #0098d6)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                            <Eye size={14} style={{ color: "#fff" }} />
+                        </div>
+                        <h3 style={{ fontSize: 14, fontWeight: 600, color: "var(--t-text, #1f2937)" }}>محتوى المستند</h3>
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                        <button onClick={copy} style={{ display: "flex", alignItems: "center", gap: 5, borderRadius: 6, padding: "5px 12px", border: "1px solid var(--t-border-light, #e5e7eb)", background: copied ? "rgba(16,185,129,0.05)" : "var(--t-card, #fff)", fontSize: 11, fontWeight: 500, color: copied ? "#059669" : "var(--t-text-secondary, #6b7280)", cursor: "pointer", transition: "all 0.12s" }}>
+                            {copied ? <Check size={11} /> : <Copy size={11} />}
                             {copied ? "تم النسخ" : "نسخ"}
                         </button>
-                        <button onClick={onClose} className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100"><X size={16} /></button>
+                        <button onClick={onClose} style={{ borderRadius: 6, padding: 5, border: "none", background: "transparent", cursor: "pointer", color: "var(--t-text-faint, #9ca3af)", transition: "color 0.12s" }}><X size={16} /></button>
                     </div>
                 </div>
-                <div className="max-h-[60vh] overflow-y-auto p-5 text-sm leading-relaxed text-gray-700 whitespace-pre-wrap" dir="auto">{text}</div>
+                <div style={{ maxHeight: "60vh", overflowY: "auto", padding: 20, fontSize: 13, lineHeight: 1.8, color: "var(--t-text, #374151)", whiteSpace: "pre-wrap" }} dir="auto">{text}</div>
             </div>
         </div>
     )
@@ -128,18 +131,26 @@ const EditModal = memo(function EditModal({ doc, onClose, onSave, saving }: { do
 
     return (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={onClose}>
-            <div className="mx-4 w-full max-w-2xl overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl" onClick={(e) => e.stopPropagation()} style={{ animation: "modalIn .18s ease-out" }}>
-                <div className="border-b border-gray-100 px-5 py-3">
-                    <h3 className="text-sm font-bold text-gray-700">تعديل المستند</h3>
-                    <p className="mt-0.5 text-xs text-gray-400 font-mono">#{doc.doc_id}</p>
+            <div className="mx-4 w-full max-w-2xl overflow-hidden bg-white" onClick={(e) => e.stopPropagation()} style={{ animation: "modalIn .18s ease-out", borderRadius: 12, border: "1px solid var(--t-border-light, #e5e7eb)" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 20px", borderBottom: "1px solid var(--t-border-light, #f0f0f0)" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <div style={{ width: 30, height: 30, borderRadius: 8, background: "linear-gradient(135deg, #004786, #0098d6)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                            <Pencil size={14} style={{ color: "#fff" }} />
+                        </div>
+                        <div>
+                            <h3 style={{ fontSize: 14, fontWeight: 600, color: "var(--t-text, #1f2937)" }}>تعديل المستند</h3>
+                            <p style={{ fontSize: 10, color: "var(--t-text-faint, #9ca3af)", fontFamily: "monospace", marginTop: 1 }}>#{doc.doc_id}</p>
+                        </div>
+                    </div>
+                    <button onClick={onClose} style={{ borderRadius: 6, padding: 5, border: "none", background: "transparent", cursor: "pointer", color: "var(--t-text-faint, #9ca3af)" }}><X size={16} /></button>
                 </div>
-                <div className="p-5">
-                    <label className="mb-1.5 block text-xs font-semibold text-gray-500">النص الجديد</label>
-                    <textarea value={newText} onChange={(e) => setNewText(e.target.value)} rows={10} dir="auto" className="w-full rounded-xl border border-gray-200 bg-gray-50 p-3 text-sm text-gray-700 outline-none transition-all focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-100 resize-y" />
+                <div style={{ padding: 20 }}>
+                    <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: "var(--t-text-faint, #9ca3af)", marginBottom: 6 }}>النص الجديد</label>
+                    <textarea value={newText} onChange={(e) => setNewText(e.target.value)} rows={10} dir="auto" style={{ width: "100%", borderRadius: 8, border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-surface, #f9fafb)", padding: 12, fontSize: 13, color: "var(--t-text, #374151)", outline: "none", resize: "vertical", transition: "border-color 0.15s", lineHeight: 1.7 }} onFocus={e => { e.currentTarget.style.borderColor = "#004786" }} onBlur={e => { e.currentTarget.style.borderColor = "var(--t-border-light, #e5e7eb)" }} />
                 </div>
-                <div className="flex items-center justify-end gap-2 border-t border-gray-100 px-5 py-3">
-                    <button onClick={onClose} disabled={saving} className="rounded-xl border border-gray-200 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50">إلغاء</button>
-                    <button onClick={() => onSave(newText)} disabled={saving || !changed} className="flex items-center gap-2 rounded-xl bg-gray-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50 disabled:cursor-not-allowed">
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 8, borderTop: "1px solid var(--t-border-light, #f0f0f0)", padding: "12px 20px" }}>
+                    <button onClick={onClose} disabled={saving} style={{ padding: "7px 16px", borderRadius: 7, border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-card, #fff)", fontSize: 13, fontWeight: 500, color: "var(--t-text-secondary, #6b7280)", cursor: "pointer" }}>إلغاء</button>
+                    <button onClick={() => onSave(newText)} disabled={saving || !changed} style={{ display: "flex", alignItems: "center", gap: 6, padding: "7px 18px", borderRadius: 7, border: "none", background: "#004786", color: "#fff", fontSize: 13, fontWeight: 500, cursor: "pointer", opacity: (saving || !changed) ? 0.5 : 1 }}>
                         {saving && <Loader2 size={14} className="animate-spin" />}
                         حفظ التعديل
                     </button>
@@ -153,15 +164,18 @@ const EditModal = memo(function EditModal({ doc, onClose, onSave, saving }: { do
 const DeleteModal = memo(function DeleteModal({ count, onClose, onConfirm, deleting }: { count: number; onClose: () => void; onConfirm: () => void; deleting: boolean }) {
     return (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={onClose}>
-            <div className="mx-4 w-full max-w-md overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl" onClick={(e) => e.stopPropagation()} style={{ animation: "modalIn .18s ease-out" }}>
-                <div className="p-6 text-center">
-                    <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-red-50"><Trash2 size={24} className="text-red-500" /></div>
-                    <h3 className="text-lg font-bold text-gray-800">تأكيد الحذف</h3>
-                    <p className="mt-2 text-sm text-gray-500">هل أنت متأكد من حذف <span className="font-bold text-red-600">{count}</span> {count === 1 ? "مستند" : "مستندات"}؟<br /><span className="text-xs text-gray-400">لا يمكن التراجع عن هذا الإجراء</span></p>
+            <div className="mx-4 w-full max-w-md overflow-hidden bg-white" onClick={(e) => e.stopPropagation()} style={{ animation: "modalIn .18s ease-out", borderRadius: 12, border: "1px solid var(--t-border-light, #e5e7eb)" }}>
+                <div style={{ padding: "28px 24px 20px", textAlign: "center" }}>
+                    <div style={{ width: 52, height: 52, borderRadius: 14, background: "rgba(220,38,38,0.06)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 14px" }}>
+                        <Trash2 size={22} style={{ color: "#dc2626" }} />
+                    </div>
+                    <h3 style={{ fontSize: 16, fontWeight: 700, color: "var(--t-text, #1f2937)" }}>تأكيد الحذف</h3>
+                    <p style={{ fontSize: 13, color: "var(--t-text-secondary, #6b7280)", marginTop: 8 }}>هل أنت متأكد من حذف <span style={{ fontWeight: 700, color: "#dc2626" }}>{count}</span> {count === 1 ? "مستند" : "مستندات"}؟</p>
+                    <p style={{ fontSize: 11, color: "var(--t-text-faint, #9ca3af)", marginTop: 4 }}>لا يمكن التراجع عن هذا الإجراء</p>
                 </div>
-                <div className="flex items-center justify-center gap-3 border-t border-gray-100 px-6 py-4">
-                    <button onClick={onClose} disabled={deleting} className="rounded-xl border border-gray-200 px-5 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50">إلغاء</button>
-                    <button onClick={onConfirm} disabled={deleting} className="flex items-center gap-2 rounded-xl bg-gray-800 px-5 py-2.5 text-sm font-medium text-white  disabled:opacity-50">
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, borderTop: "1px solid var(--t-border-light, #f0f0f0)", padding: "14px 24px" }}>
+                    <button onClick={onClose} disabled={deleting} style={{ padding: "8px 20px", borderRadius: 7, border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-card, #fff)", fontSize: 13, fontWeight: 500, color: "var(--t-text-secondary, #6b7280)", cursor: "pointer" }}>إلغاء</button>
+                    <button onClick={onConfirm} disabled={deleting} style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 20px", borderRadius: 7, border: "none", background: "#dc2626", color: "#fff", fontSize: 13, fontWeight: 500, cursor: "pointer", opacity: deleting ? 0.5 : 1 }}>
                         {deleting && <Loader2 size={14} className="animate-spin" />}
                         حذف
                     </button>
@@ -172,9 +186,8 @@ const DeleteModal = memo(function DeleteModal({ count, onClose, onConfirm, delet
 })
 
 /* ── Upload Training Modal — Tabbed (General / TXT / CSV) ── */
-type TrainTab = "general" | "txt" | "csv"
+type TrainTab = "txt" | "csv"
 const TRAIN_TABS: { key: TrainTab; label: string; icon: typeof Layers; accept: string; desc: string }[] = [
-    { key: "general", label: "عام", icon: Layers, accept: ".txt,.csv", desc: "TXT و CSV" },
     { key: "txt", label: "TXT", icon: FileType2, accept: ".txt", desc: "ملفات نصية فقط" },
     { key: "csv", label: "CSV", icon: FileSpreadsheet, accept: ".csv", desc: "ملفات CSV فقط" },
 ]
@@ -183,7 +196,7 @@ const TrainUploadModal = memo(function TrainUploadModal({ categories, activeDept
     categories: CategoryItem[]; activeDeptId: string; activeDeptName: string
     onClose: () => void; onSuccess: () => void; tenantId: string
 }) {
-    const [tab, setTab] = useState<TrainTab>("general")
+    const [tab, setTab] = useState<TrainTab>("txt")
     const [files, setFiles] = useState<File[]>([])
     const [categoryId, setCategoryId] = useState("")
     const [url, setUrl] = useState("")
@@ -199,16 +212,7 @@ const TrainUploadModal = memo(function TrainUploadModal({ categories, activeDept
     const [questionCol, setQuestionCol] = useState(0)
     const [answerCol, setAnswerCol] = useState(1)
 
-    // Health check
-    const [health, setHealth] = useState<"loading" | "healthy" | "unhealthy" | null>(null)
-    useEffect(() => {
-        let cancel = false
-        setHealth("loading")
-        checkDataModelHealth(tenantId)
-            .then(r => { if (!cancel) setHealth(r.success ? "healthy" : "unhealthy") })
-            .catch(() => { if (!cancel) setHealth("unhealthy") })
-        return () => { cancel = true }
-    }, [tenantId])
+
 
     // Reset files when switching tabs
     useEffect(() => { setFiles([]); setResult(null); setUrl("") }, [tab])
@@ -250,14 +254,14 @@ const TrainUploadModal = memo(function TrainUploadModal({ categories, activeDept
             if (categoryId) fd.append("category_id", categoryId)
             if (url) fd.append("url", url)
             // CSV-specific params
-            if (tab === "csv" || tab === "general") {
+            if (tab === "csv") {
                 fd.append("has_header", String(hasHeader))
                 fd.append("delimiter", delimiter)
                 fd.append("encoding", encoding)
                 fd.append("question_col", String(questionCol))
                 fd.append("answer_col", String(answerCol))
             }
-            const fn = tab === "txt" ? trainTxtRequest : tab === "csv" ? trainCsvRequest : trainDataRequest
+            const fn = tab === "txt" ? trainTxtRequest : trainCsvRequest
             const res = await fn(fd, tenantId)
             if (res.success) {
                 const total = res.data?.total_files ?? files.length
@@ -265,10 +269,10 @@ const TrainUploadModal = memo(function TrainUploadModal({ categories, activeDept
                 const failedMessages = res.data?.failed_files?.map(f => `${f.filename}: ${f.error}`) ?? []
                 setResult({ success: total - failedCount, failed: failedCount, errors: failedMessages })
                 if (failedCount === 0) {
-                    toast.success(`تم رفع ومعالجة ${total} ملف بنجاح`)
+                    toast.success(`تم رفع ومعالجة ${total} ملف بنجاح — سيظهر في الطلبات المعلقة`)
                     onSuccess()
                 } else {
-                    toast.warning(`تم معالجة ${total - failedCount} ملف، فشل ${failedCount}`)
+                    toast.warning(`تم معالجة ${total - failedCount} ملف — فشل ${failedCount} — تحقق من الطلبات المعلقة`)
                     onSuccess()
                 }
             } else {
@@ -285,44 +289,34 @@ const TrainUploadModal = memo(function TrainUploadModal({ categories, activeDept
 
     return (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={onClose}>
-            <div className="mx-4 w-full max-w-2xl overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl" onClick={e => e.stopPropagation()} style={{ animation: "modalIn .18s ease-out" }}>
+            <div className="mx-4 w-full max-w-2xl overflow-hidden bg-white" onClick={e => e.stopPropagation()} style={{ animation: "modalIn .18s ease-out", borderRadius: 12, border: "1px solid var(--t-border-light, #e5e7eb)" }}>
                 {/* ── Header ── */}
-                <div className="border-b border-gray-100 px-5 py-4 flex items-center justify-between">
-                    <div>
-                        <h3 className="text-sm font-bold text-gray-800 flex items-center gap-2">
-                            <Upload size={16} className="text-blue-500" /> رفع ملفات التدريب
-                        </h3>
-                        <p className="mt-0.5 text-xs text-gray-400">
-                            القسم: <span className="font-semibold text-blue-600">{activeDeptName}</span>
-                        </p>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 20px", borderBottom: "1px solid var(--t-border-light, #f0f0f0)" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <div style={{ width: 30, height: 30, borderRadius: 8, background: "linear-gradient(135deg, #004786, #0098d6)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                            <Upload size={14} style={{ color: "#fff" }} />
+                        </div>
+                        <div>
+                            <h3 style={{ fontSize: 14, fontWeight: 600, color: "var(--t-text, #1f2937)" }}>رفع ملفات التدريب</h3>
+                            <p style={{ fontSize: 10, color: "var(--t-text-faint, #9ca3af)", marginTop: 1 }}>القسم: <span style={{ fontWeight: 600, color: "#004786" }}>{activeDeptName}</span></p>
+                        </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                        {health && (
-                            <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold ${health === "healthy" ? "bg-emerald-50 text-emerald-600" :
-                                health === "unhealthy" ? "bg-red-50 text-red-500" :
-                                    "bg-gray-50 text-gray-400"
-                                }`}>
-                                {health === "loading" ? <Loader2 size={10} className="animate-spin" /> :
-                                    health === "healthy" ? <Activity size={10} /> : <XCircle size={10} />}
-                                {health === "loading" ? "فحص..." : health === "healthy" ? "API متصل" : "API غير متصل"}
-                            </span>
-                        )}
-                        <button onClick={onClose} className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors">
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <button onClick={onClose} style={{ borderRadius: 6, padding: 5, border: "none", background: "transparent", cursor: "pointer", color: "var(--t-text-faint, #9ca3af)", transition: "color 0.12s" }}>
                             <X size={16} />
                         </button>
                     </div>
                 </div>
 
                 {/* ── Tabs ── */}
-                <div className="flex border-b border-gray-100 px-5">
+                <div style={{ display: "flex", borderBottom: "1px solid var(--t-border-light, #f0f0f0)", padding: "0 20px" }}>
                     {TRAIN_TABS.map(t => {
                         const Icon = t.icon
                         const on = tab === t.key
                         return (
                             <button key={t.key} onClick={() => setTab(t.key)}
-                                className={`flex items-center gap-1.5 px-4 py-2.5 text-xs font-semibold border-b-2 transition-all ${on ? "border-blue-500 text-blue-600" : "border-transparent text-gray-400 hover:text-gray-600 hover:border-gray-200"
-                                    }`}>
-                                <Icon size={14} />
+                                style={{ display: "flex", alignItems: "center", gap: 5, padding: "8px 14px", fontSize: 12, fontWeight: on ? 600 : 500, borderBottom: on ? "2px solid #004786" : "2px solid transparent", color: on ? "#004786" : "var(--t-text-faint, #9ca3af)", background: "transparent", border: "none", borderBottomStyle: "solid", borderBottomWidth: 2, borderBottomColor: on ? "#004786" : "transparent", cursor: "pointer", transition: "all 0.12s" }}>
+                                <Icon size={13} />
                                 {t.label}
                             </button>
                         )
@@ -341,14 +335,7 @@ const TrainUploadModal = memo(function TrainUploadModal({ categories, activeDept
                         </select>
                     </div>
 
-                    {/* URL — General tab only */}
-                    {tab === "general" && (
-                        <div>
-                            <label className="mb-1.5 block text-xs font-semibold text-gray-500 flex items-center gap-1"><Link2 size={11} /> رابط مباشر <span className="text-gray-300">(اختياري)</span></label>
-                            <input value={url} onChange={e => setUrl(e.target.value)} placeholder="https://example.com/data.csv" dir="ltr"
-                                className="w-full rounded-xl border border-gray-200 bg-gray-50 py-2 px-3 text-sm text-gray-700 outline-none focus:border-blue-400 focus:bg-white font-mono" />
-                        </div>
-                    )}
+
 
                     {/* URL — CSV tab too */}
                     {tab === "csv" && (
@@ -399,7 +386,7 @@ const TrainUploadModal = memo(function TrainUploadModal({ categories, activeDept
                     )}
 
                     {/* CSV options */}
-                    {(tab === "csv" || (tab === "general" && files.some(f => /\.csv$/i.test(f.name)))) && (
+                    {tab === "csv" && (
                         <div className="rounded-xl border border-gray-200 bg-gray-50/50 p-4 space-y-3">
                             <div className="flex items-center gap-2 text-xs font-bold text-gray-600 uppercase tracking-wide">
                                 <Settings2 size={13} className="text-gray-400" /> إعدادات CSV
@@ -477,14 +464,14 @@ const TrainUploadModal = memo(function TrainUploadModal({ categories, activeDept
                 </div>
 
                 {/* ── Footer ── */}
-                <div className="flex items-center justify-between border-t border-gray-100 px-5 py-3">
-                    <p className="text-[10px] text-gray-300">
-                        {tab === "general" ? "train-data-request" : tab === "txt" ? "train-txt-request" : "train-csv-request"}
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderTop: "1px solid var(--t-border-light, #f0f0f0)", padding: "12px 20px" }}>
+                    <p style={{ fontSize: 10, color: "var(--t-text-faint, #d1d5db)" }}>
+                        {tab === "txt" ? "train-txt-request" : "train-csv-request"}
                     </p>
-                    <div className="flex items-center gap-2">
-                        <button onClick={onClose} disabled={uploading} className="rounded-xl border border-gray-200 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">إلغاء</button>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <button onClick={onClose} disabled={uploading} style={{ padding: "7px 16px", borderRadius: 7, border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-card, #fff)", fontSize: 13, fontWeight: 500, color: "var(--t-text-secondary, #6b7280)", cursor: "pointer" }}>إلغاء</button>
                         <button onClick={result ? onClose : handleUpload} disabled={uploading || (!canUpload && !result)}
-                            className="flex items-center gap-2 rounded-xl bg-gray-900 px-5 py-2 text-sm font-semibold text-white hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+                            style={{ display: "flex", alignItems: "center", gap: 6, padding: "7px 20px", borderRadius: 7, border: "none", background: "#004786", color: "#fff", fontSize: 13, fontWeight: 500, cursor: "pointer", opacity: (uploading || (!canUpload && !result)) ? 0.4 : 1, transition: "all 0.15s" }}>
                             {uploading && <Loader2 size={14} className="animate-spin" />}
                             {result ? "إغلاق" : `رفع${files.length > 0 ? ` (${files.length})` : ""}`}
                         </button>
@@ -506,7 +493,11 @@ const AddTextModal = memo(function AddTextModal({ categories, activeDeptId, acti
         setSubmitting(true)
         try {
             const res = await addDataJson({ text: text.trim(), department_id: activeDeptId, category_id: categoryId || undefined }, tenantId)
-            if (res.success) { toast.success("تم إضافة النص بنجاح"); onSuccess(); onClose() }
+            if (res.success) {
+                toast.success("تم تقديم الطلب بنجاح — سيظهر في الطلبات المعلقة للمراجعة")
+                onSuccess()
+                onClose()
+            }
             else toast.error(res.message || "فشل إضافة النص")
         } catch { toast.error("حدث خطأ أثناء إضافة النص") }
         finally { setSubmitting(false) }
@@ -514,28 +505,36 @@ const AddTextModal = memo(function AddTextModal({ categories, activeDeptId, acti
 
     return (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={onClose}>
-            <div className="mx-4 w-full max-w-lg overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl" onClick={(e) => e.stopPropagation()} style={{ animation: "modalIn .18s ease-out" }}>
-                <div className="border-b border-gray-100 px-5 py-3">
-                    <h3 className="text-sm font-bold text-gray-700">إضافة نص جديد</h3>
-                    <p className="mt-0.5 text-xs text-gray-400">القسم: <span className="font-semibold text-blue-600">{activeDeptName}</span></p>
+            <div className="mx-4 w-full max-w-lg overflow-hidden bg-white" onClick={(e) => e.stopPropagation()} style={{ animation: "modalIn .18s ease-out", borderRadius: 12, border: "1px solid var(--t-border-light, #e5e7eb)" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 20px", borderBottom: "1px solid var(--t-border-light, #f0f0f0)" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <div style={{ width: 30, height: 30, borderRadius: 8, background: "linear-gradient(135deg, #004786, #0098d6)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                            <Plus size={14} style={{ color: "#fff" }} />
+                        </div>
+                        <div>
+                            <h3 style={{ fontSize: 14, fontWeight: 600, color: "var(--t-text, #1f2937)" }}>إضافة نص جديد</h3>
+                            <p style={{ fontSize: 10, color: "var(--t-text-faint, #9ca3af)", marginTop: 1 }}>القسم: <span style={{ fontWeight: 600, color: "#004786" }}>{activeDeptName}</span></p>
+                        </div>
+                    </div>
+                    <button onClick={onClose} style={{ borderRadius: 6, padding: 5, border: "none", background: "transparent", cursor: "pointer", color: "var(--t-text-faint, #9ca3af)" }}><X size={16} /></button>
                 </div>
-                <div className="space-y-4 p-5">
+                <div style={{ padding: 20, display: "flex", flexDirection: "column", gap: 16 }}>
                     <div>
-                        <label className="mb-1.5 block text-xs font-semibold text-gray-500">الفئة</label>
-                        <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)} className="w-full rounded-xl border border-gray-200 bg-gray-50 py-2.5 px-3 text-sm text-gray-700 outline-none focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-100">
+                        <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: "var(--t-text-faint, #9ca3af)", marginBottom: 6 }}>الفئة</label>
+                        <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)} style={{ width: "100%", borderRadius: 8, border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-surface, #f9fafb)", padding: "8px 12px", fontSize: 13, color: "var(--t-text, #374151)", outline: "none" }}>
                             <option value="">بدون فئة</option>
                             {categories.map((c) => <option key={c.category_id} value={c.category_id}>{c.icon} {c.name_ar || c.name}</option>)}
                         </select>
                     </div>
                     <div>
-                        <label className="mb-1.5 block text-xs font-semibold text-gray-500">المحتوى النصي</label>
-                        <textarea value={text} onChange={(e) => setText(e.target.value)} rows={8} dir="auto" placeholder="اكتب أو الصق النص هنا..." className="w-full rounded-xl border border-gray-200 bg-gray-50 p-3 text-sm text-gray-700 outline-none transition-all focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-100 resize-y" />
-                        <p className="mt-1 text-left text-xs text-gray-400">{text.length.toLocaleString()} / 100,000</p>
+                        <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: "var(--t-text-faint, #9ca3af)", marginBottom: 6 }}>المحتوى النصي</label>
+                        <textarea value={text} onChange={(e) => setText(e.target.value)} rows={8} dir="auto" placeholder="اكتب أو الصق النص هنا..." style={{ width: "100%", borderRadius: 8, border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-surface, #f9fafb)", padding: 12, fontSize: 13, color: "var(--t-text, #374151)", outline: "none", resize: "vertical", transition: "border-color 0.15s", lineHeight: 1.7 }} onFocus={e => { e.currentTarget.style.borderColor = "#004786" }} onBlur={e => { e.currentTarget.style.borderColor = "var(--t-border-light, #e5e7eb)" }} />
+                        <p style={{ marginTop: 4, textAlign: "left", fontSize: 11, color: "var(--t-text-faint, #9ca3af)" }}>{text.length.toLocaleString()} / 100,000</p>
                     </div>
                 </div>
-                <div className="flex items-center justify-end gap-2 border-t border-gray-100 px-5 py-3">
-                    <button onClick={onClose} disabled={submitting} className="rounded-xl border border-gray-200 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50">إلغاء</button>
-                    <button onClick={handleSubmit} disabled={submitting || !text.trim()} className="flex items-center gap-2 rounded-xl bg-gray-900 px-4 py-2 text-sm font-medium text-white  disabled:opacity-50 disabled:cursor-not-allowed">
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 8, borderTop: "1px solid var(--t-border-light, #f0f0f0)", padding: "12px 20px" }}>
+                    <button onClick={onClose} disabled={submitting} style={{ padding: "7px 16px", borderRadius: 7, border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-card, #fff)", fontSize: 13, fontWeight: 500, color: "var(--t-text-secondary, #6b7280)", cursor: "pointer" }}>إلغاء</button>
+                    <button onClick={handleSubmit} disabled={submitting || !text.trim()} style={{ display: "flex", alignItems: "center", gap: 6, padding: "7px 18px", borderRadius: 7, border: "none", background: "#004786", color: "#fff", fontSize: 13, fontWeight: 500, cursor: "pointer", opacity: (submitting || !text.trim()) ? 0.5 : 1 }}>
                         {submitting && <Loader2 size={14} className="animate-spin" />}
                         إضافة النص
                     </button>
@@ -554,28 +553,36 @@ const DocRow = memo(function DocRow({
     onToggle: (id: string) => void; onView: (d: SearchDocumentResult) => void; onEdit: (d: SearchDocumentResult) => void; onDelete: (id: string) => void
 }) {
     return (
-        <tr className={`group transition-colors ${isSelected ? "bg-blue-50/60" : "hover:bg-gray-50/80"}`} style={{ animation: `rowFade .2s ease-out ${idx * 0.025}s both` }}>
-            <td className="px-4 py-3">
-                <button onClick={() => onToggle(doc.doc_id)} className="text-gray-400 hover:text-blue-500 transition-colors">{isSelected ? <CheckSquare size={16} className="text-blue-500" /> : <Square size={16} />}</button>
+        <tr
+            className={`group transition-colors ${isSelected ? "" : ""}`}
+            style={{
+                animation: `rowFade .2s ease-out ${idx * 0.025}s both`,
+                background: isSelected ? "rgba(0,71,134,0.03)" : "transparent",
+            }}
+            onMouseEnter={e => { if (!isSelected) e.currentTarget.style.background = "var(--t-card-hover, #f9fafb)" }}
+            onMouseLeave={e => { if (!isSelected) e.currentTarget.style.background = "transparent" }}
+        >
+            <td style={{ padding: "10px 14px" }}>
+                <button onClick={() => onToggle(doc.doc_id)} style={{ color: isSelected ? "#004786" : "var(--t-text-faint, #9ca3af)", border: "none", background: "transparent", cursor: "pointer" }}>{isSelected ? <CheckSquare size={16} /> : <Square size={16} />}</button>
             </td>
-            <td className="px-4 py-3">
-                <span className="inline-flex items-center gap-1 font-mono text-[11px] text-gray-500 bg-gray-50 rounded px-1.5 py-0.5"><Hash size={9} className="text-gray-400" />{truncateId(doc.doc_id)}</span>
+            <td style={{ padding: "10px 14px" }}>
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 4, fontFamily: "monospace", fontSize: 11, color: "var(--t-text-secondary, #6b7280)", background: "var(--t-surface, #f3f4f6)", borderRadius: 4, padding: "2px 6px" }}><Hash size={9} style={{ color: "var(--t-text-faint, #9ca3af)" }} />{truncateId(doc.doc_id)}</span>
             </td>
-            <td className="max-w-xs px-4 py-3">
-                <button onClick={() => onView(doc)} className="text-right text-sm text-gray-600 hover:text-blue-600 transition-colors leading-relaxed line-clamp-2" title="انقر لعرض المحتوى الكامل">{truncate(doc.text)}</button>
+            <td style={{ maxWidth: 280, padding: "10px 14px" }}>
+                <button onClick={() => onView(doc)} className="line-clamp-2" style={{ textAlign: "right", fontSize: 13, color: "var(--t-text, #374151)", border: "none", background: "transparent", cursor: "pointer", lineHeight: 1.6, transition: "color 0.12s" }} title="انقر لعرض المحتوى الكامل" onMouseEnter={e => { e.currentTarget.style.color = "#004786" }} onMouseLeave={e => { e.currentTarget.style.color = "var(--t-text, #374151)" }}>{truncate(doc.text)}</button>
             </td>
-            <td className="px-4 py-3"><span className="inline-flex items-center gap-1.5 text-xs text-gray-500"><User size={11} className="text-gray-400" />{doc.user || "—"}</span></td>
-            <td className="px-4 py-3"><span className="rounded-full bg-purple-50 px-2.5 py-1 text-[10px] font-semibold text-purple-600 whitespace-nowrap">{catLabel}</span></td>
-            <td className="px-4 py-3">
-                <div className="flex items-center justify-center gap-1">
+            <td style={{ padding: "10px 14px" }}><span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 12, color: "var(--t-text-secondary, #6b7280)" }}><User size={11} style={{ color: "var(--t-text-faint, #9ca3af)" }} />{doc.user || "—"}</span></td>
+            <td style={{ padding: "10px 14px" }}><span style={{ background: "rgba(0,71,134,0.05)", padding: "3px 10px", borderRadius: 12, fontSize: 10, fontWeight: 600, color: "#004786", whiteSpace: "nowrap" }}>{catLabel}</span></td>
+            <td style={{ padding: "10px 14px" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 2 }}>
                     <ActionGuard pageBit={PAGE_BITS.DOCUMENTS} actionBit={ACTION_BITS.GET_DOCUMENT}>
-                        <button onClick={() => onView(doc)} className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-blue-50 hover:text-blue-500" title="عرض"><Eye size={14} /></button>
+                        <button onClick={() => onView(doc)} style={{ borderRadius: 6, padding: 5, border: "none", background: "transparent", cursor: "pointer", color: "var(--t-text-faint, #9ca3af)", transition: "all 0.12s" }} title="عرض" onMouseEnter={e => { e.currentTarget.style.background = "rgba(0,71,134,0.06)"; e.currentTarget.style.color = "#004786" }} onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--t-text-faint, #9ca3af)" }}><Eye size={14} /></button>
                     </ActionGuard>
                     <ActionGuard pageBit={PAGE_BITS.DOCUMENTS} actionBit={ACTION_BITS.UPDATE_DOCUMENT}>
-                        <button onClick={() => onEdit(doc)} className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-amber-50 hover:text-amber-500" title="تعديل"><Pencil size={14} /></button>
+                        <button onClick={() => onEdit(doc)} style={{ borderRadius: 6, padding: 5, border: "none", background: "transparent", cursor: "pointer", color: "var(--t-text-faint, #9ca3af)", transition: "all 0.12s" }} title="تعديل" onMouseEnter={e => { e.currentTarget.style.background = "rgba(245,158,11,0.08)"; e.currentTarget.style.color = "#d97706" }} onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--t-text-faint, #9ca3af)" }}><Pencil size={14} /></button>
                     </ActionGuard>
                     <ActionGuard pageBit={PAGE_BITS.DOCUMENTS} actionBit={ACTION_BITS.DELETE_DOCUMENT}>
-                        <button onClick={() => onDelete(doc.doc_id)} className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-500" title="حذف"><Trash2 size={14} /></button>
+                        <button onClick={() => onDelete(doc.doc_id)} style={{ borderRadius: 6, padding: 5, border: "none", background: "transparent", cursor: "pointer", color: "var(--t-text-faint, #9ca3af)", transition: "all 0.12s" }} title="حذف" onMouseEnter={e => { e.currentTarget.style.background = "rgba(220,38,38,0.06)"; e.currentTarget.style.color = "#dc2626" }} onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--t-text-faint, #9ca3af)" }}><Trash2 size={14} /></button>
                     </ActionGuard>
                 </div>
             </td>
@@ -588,6 +595,7 @@ const DocRow = memo(function DocRow({
 export function DataManagementTab({ onNavigateToTab }: { onNavigateToTab?: (tab: string) => void }) {
     const { user } = useAuthStore()
     const tenantId = user?.tenant_id || ""
+    const knowledgeEvents = useKnowledgeEvents(tenantId)
 
     // ── Search ──
     const [query, setQuery] = useState("")
@@ -717,18 +725,23 @@ export function DataManagementTab({ onNavigateToTab }: { onNavigateToTab?: (tab:
     return (
         <div className="space-y-5">
             {/* Header */}
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                    <h2 className="text-xl font-bold text-gray-800">إدارة البيانات</h2>
-                    <p className="mt-1 text-sm text-gray-400">تصفح وإدارة المستندات حسب الأقسام</p>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                    <div style={{ width: 40, height: 40, borderRadius: 10, background: "linear-gradient(135deg, #004786, #0098d6)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <Database size={20} style={{ color: "#fff" }} />
+                    </div>
+                    <div>
+                        <h2 style={{ fontSize: 18, fontWeight: 700, color: "var(--t-text, #1f2937)", margin: 0 }}>إدارة البيانات</h2>
+                        <p style={{ fontSize: 12, color: "var(--t-text-faint, #9ca3af)", marginTop: 2 }}>تصفح وإدارة المستندات حسب الأقسام</p>
+                    </div>
                 </div>
                 {activeDeptId && (
-                    <div className="flex items-center gap-2">
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                         <ActionGuard pageBit={PAGE_BITS.DOCUMENTS} actionBit={ACTION_BITS.UPLOAD_DOCUMENT}>
-                            <button onClick={() => setShowUpload(true)} className="flex items-center gap-2 rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-medium text-white  transition-transform hover:scale-[1.02] active:scale-[0.98]"><Upload size={15} />رفع ملف</button>
+                            <button onClick={() => setShowUpload(true)} style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 16px", borderRadius: 8, border: "none", background: "#004786", color: "#fff", fontSize: 13, fontWeight: 500, cursor: "pointer", transition: "all 0.15s" }} onMouseEnter={e => { e.currentTarget.style.background = "#003b6f" }} onMouseLeave={e => { e.currentTarget.style.background = "#004786" }}><Upload size={14} />رفع ملف</button>
                         </ActionGuard>
                         <ActionGuard pageBit={PAGE_BITS.DOCUMENTS} actionBit={ACTION_BITS.UPLOAD_DOCUMENT_JSON}>
-                            <button onClick={() => setShowAddText(true)} className="flex items-center gap-2 rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-medium text-white  transition-transform hover:scale-[1.02] active:scale-[0.98]"><Plus size={15} />إضافة نص</button>
+                            <button onClick={() => setShowAddText(true)} style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 16px", borderRadius: 8, border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-card, #fff)", color: "var(--t-text-secondary, #6b7280)", fontSize: 13, fontWeight: 500, cursor: "pointer", transition: "all 0.15s" }} onMouseEnter={e => { e.currentTarget.style.borderColor = "#004786"; e.currentTarget.style.color = "#004786" }} onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--t-border-light, #e5e7eb)"; e.currentTarget.style.color = "var(--t-text-secondary, #6b7280)" }}><Plus size={14} />إضافة نص</button>
                         </ActionGuard>
                     </div>
                 )}
@@ -789,19 +802,38 @@ export function DataManagementTab({ onNavigateToTab }: { onNavigateToTab?: (tab:
                     </div>
                 </div>
             ) : (
-                <div className="hide-scrollbar flex items-center gap-2 overflow-x-auto pb-1">
-                    {departments.map((dept) => (
-                        <button key={dept.department_id} onClick={() => switchDept(dept.department_id)}
-                            className={`flex shrink-0 items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-200 ${activeDeptId === dept.department_id ? "bg-gray-900 text-white " : "border border-gray-200 bg-white text-gray-600 hover:border-blue-300 hover:text-blue-600"}`}>
-                            <span className="text-base leading-none">{dept.icon || "📁"}</span>
-                            <span>{dept.name_ar || dept.name}</span>
-                        </button>
-                    ))}
+                <div className="hide-scrollbar" style={{ display: "flex", alignItems: "center", gap: 6, overflowX: "auto", paddingBottom: 2 }}>
+                    {departments.map((dept) => {
+                        const isActive = activeDeptId === dept.department_id
+                        return (
+                            <button key={dept.department_id} onClick={() => switchDept(dept.department_id)}
+                                style={{
+                                    display: "flex", alignItems: "center", gap: 8, flexShrink: 0,
+                                    padding: "8px 16px", borderRadius: 8,
+                                    border: isActive ? "1px solid #004786" : "1px solid var(--t-border-light, #e5e7eb)",
+                                    background: isActive ? "rgba(0,71,134,0.06)" : "var(--t-card, #fff)",
+                                    color: isActive ? "#004786" : "var(--t-text-secondary, #6b7280)",
+                                    fontSize: 13, fontWeight: isActive ? 600 : 500,
+                                    cursor: "pointer", transition: "all 0.15s",
+                                }}>
+                                <span style={{ fontSize: 15, lineHeight: 1 }}>{dept.icon || "📁"}</span>
+                                <span>{dept.name_ar || dept.name}</span>
+                            </button>
+                        )
+                    })}
                     {onNavigateToTab && (
                         <button onClick={() => onNavigateToTab("departments")}
-                            className="flex shrink-0 items-center gap-1.5 rounded-xl border border-dashed border-gray-300 bg-white px-3 py-2.5 text-sm font-medium text-gray-400 transition-all duration-200 hover:border-blue-400 hover:bg-blue-50 hover:text-blue-600"
+                            style={{
+                                display: "flex", alignItems: "center", gap: 5, flexShrink: 0,
+                                padding: "8px 12px", borderRadius: 8,
+                                border: "1px dashed var(--t-text-faint, #d1d5db)",
+                                background: "transparent",
+                                color: "var(--t-text-faint, #9ca3af)",
+                                fontSize: 12, fontWeight: 500,
+                                cursor: "pointer", transition: "all 0.15s",
+                            }}
                             title="إضافة قسم جديد">
-                            <Plus size={15} />
+                            <Plus size={14} />
                             <span>إضافة قسم</span>
                         </button>
                     )}
@@ -829,10 +861,10 @@ export function DataManagementTab({ onNavigateToTab }: { onNavigateToTab?: (tab:
 
             {/* Bulk actions */}
             {selected.size > 0 && (
-                <div className="flex items-center justify-between rounded-xl bg-gray-50 border border-gray-200 px-4 py-2.5" style={{ animation: "fadeIn .2s ease-out" }}>
-                    <p className="text-sm font-medium text-blue-700">تم تحديد <span className="font-bold">{selected.size}</span> مستند</p>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderRadius: 8, background: "rgba(0,71,134,0.03)", border: "1px solid rgba(0,71,134,0.1)", padding: "8px 14px", animation: "fadeIn .2s ease-out" }}>
+                    <p style={{ fontSize: 13, fontWeight: 500, color: "#004786" }}>تم تحديد <span style={{ fontWeight: 700 }}>{selected.size}</span> مستند</p>
                     <ActionGuard pageBit={PAGE_BITS.DOCUMENTS} actionBit={ACTION_BITS.DELETE_DOCUMENT}>
-                        <button onClick={() => setDeleteTargets([...selected])} className="flex items-center gap-1.5 rounded-lg bg-red-500 px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-red-600"><Trash2 size={12} /> حذف المحدد</button>
+                        <button onClick={() => setDeleteTargets([...selected])} style={{ display: "flex", alignItems: "center", gap: 5, borderRadius: 6, padding: "5px 12px", border: "none", background: "#dc2626", color: "#fff", fontSize: 12, fontWeight: 500, cursor: "pointer", transition: "background 0.12s" }} onMouseEnter={e => { e.currentTarget.style.background = "#b91c1c" }} onMouseLeave={e => { e.currentTarget.style.background = "#dc2626" }}><Trash2 size={12} /> حذف المحدد</button>
                     </ActionGuard>
                 </div>
             )}
@@ -842,29 +874,33 @@ export function DataManagementTab({ onNavigateToTab }: { onNavigateToTab?: (tab:
                 <>
                     {/* Info bar */}
                     {!loadingDocs && results.length > 0 && (
-                        <div className="flex items-center justify-between rounded-xl bg-white border border-gray-100 px-4 py-2.5 shadow-sm">
-                            <p className="text-xs text-gray-500"><span className="font-bold text-gray-700">{pagination?.totalCount ?? results.length}</span> مستند{debouncedQuery ? ` • "${debouncedQuery}"` : ""}</p>
-                            <p className="text-xs text-gray-400">صفحة {pagination?.currentPage || 1} من {pagination?.totalPages || 1}</p>
+                        <div style={{
+                            display: "flex", alignItems: "center", justifyContent: "space-between",
+                            borderRadius: 8, background: "var(--t-card, #fff)",
+                            border: "1px solid var(--t-border-light, #e5e7eb)",
+                            padding: "8px 14px",
+                        }}>
+                            <p style={{ fontSize: 12, color: "var(--t-text-secondary, #6b7280)" }}><span style={{ fontWeight: 700, color: "#004786" }}>{pagination?.totalCount ?? results.length}</span> مستند{debouncedQuery ? ` • "${debouncedQuery}"` : ""}</p>
+                            <p style={{ fontSize: 11, color: "var(--t-text-faint, #9ca3af)" }}>صفحة {pagination?.currentPage || 1} من {pagination?.totalPages || 1}</p>
                         </div>
                     )}
 
-                    <div className="relative overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
+                    <div style={{ position: "relative", overflow: "hidden", borderRadius: 10, border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-card, #fff)" }}>
                         <FetchingBar visible={fetchingDocs && !loadingDocs} />
 
                         <div className="overflow-x-auto" style={{ opacity: fetchingDocs && !loadingDocs ? 0.6 : 1, transition: 'opacity 0.2s ease' }}>
-                            <table className="w-full">
+                            <table style={{ width: "100%", borderCollapse: "collapse" }}>
                                 <thead>
-                                    <tr className="border-b border-gray-100 bg-gray-50/80">
-                                        <th className="w-10 px-4 py-3">
-                                            <button onClick={toggleAll} className="text-gray-400 hover:text-blue-500 transition-colors" disabled={results.length === 0 || loadingDocs}>
-                                                {allSelected ? <CheckSquare size={16} className="text-blue-500" /> : someSelected ? <MinusSquare size={16} className="text-blue-400" /> : <Square size={16} />}
+                                    <tr style={{ borderBottom: "1px solid var(--t-border-light, #f0f0f0)", background: "var(--t-surface, #fafafa)" }}>
+                                        <th style={{ width: 40, padding: "10px 14px" }}>
+                                            <button onClick={toggleAll} style={{ color: allSelected ? "#004786" : "var(--t-text-faint, #9ca3af)", border: "none", background: "transparent", cursor: "pointer", transition: "color 0.12s" }} disabled={results.length === 0 || loadingDocs}>
+                                                {allSelected ? <CheckSquare size={16} /> : someSelected ? <MinusSquare size={16} /> : <Square size={16} />}
                                             </button>
                                         </th>
-                                        <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-400">المعرف</th>
-                                        <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-400">المحتوى</th>
-                                        <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-400">المستخدم</th>
-                                        <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-400">الفئة</th>
-                                        <th className="w-32 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-400">الإجراءات</th>
+                                        {["المعرف", "المحتوى", "المستخدم", "الفئة"].map(h => (
+                                            <th key={h} style={{ padding: "10px 14px", textAlign: "right", fontSize: 11, fontWeight: 600, color: "var(--t-text-faint, #9ca3af)", letterSpacing: "0.3px" }}>{h}</th>
+                                        ))}
+                                        <th style={{ width: 120, padding: "10px 14px", textAlign: "center", fontSize: 11, fontWeight: 600, color: "var(--t-text-faint, #9ca3af)", letterSpacing: "0.3px" }}>الإجراءات</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-50">
@@ -905,16 +941,16 @@ export function DataManagementTab({ onNavigateToTab }: { onNavigateToTab?: (tab:
 
                     {/* Pagination */}
                     {pagination && pagination.totalPages > 1 && (
-                        <div className="flex items-center justify-center gap-2 pt-2">
-                            <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={!pagination.hasPrevious} className="flex items-center gap-1 rounded-lg border border-gray-200 px-3 py-2 text-xs font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"><ChevronRight size={14} /> السابق</button>
-                            <div className="flex items-center gap-1">
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, paddingTop: 8 }}>
+                            <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={!pagination.hasPrevious} style={{ display: "flex", alignItems: "center", gap: 4, padding: "6px 12px", borderRadius: 7, border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-card, #fff)", fontSize: 12, fontWeight: 500, color: "var(--t-text-secondary, #6b7280)", cursor: "pointer", opacity: !pagination.hasPrevious ? 0.4 : 1 }}><ChevronRight size={13} /> السابق</button>
+                            <div style={{ display: "flex", alignItems: "center", gap: 2 }}>
                                 {pageNums(pagination.currentPage, pagination.totalPages).map((pn, i) =>
-                                    pn === "..." ? <span key={`e${i}`} className="px-1 text-gray-300">…</span> : (
-                                        <button key={pn} onClick={() => setPage(pn as number)} className={`flex h-8 w-8 items-center justify-center rounded-lg text-xs font-medium transition-all ${page === pn ? "bg-gray-900 text-white " : "text-gray-500 hover:bg-gray-100"}`}>{pn}</button>
+                                    pn === "..." ? <span key={`e${i}`} style={{ padding: "0 4px", color: "var(--t-text-faint, #d1d5db)" }}>…</span> : (
+                                        <button key={pn} onClick={() => setPage(pn as number)} style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 30, height: 30, borderRadius: 7, border: "none", fontSize: 12, fontWeight: 500, cursor: "pointer", transition: "all 0.12s", background: page === pn ? "#004786" : "transparent", color: page === pn ? "#fff" : "var(--t-text-secondary, #6b7280)" }}>{pn}</button>
                                     )
                                 )}
                             </div>
-                            <button onClick={() => setPage((p) => Math.min(pagination.totalPages, p + 1))} onMouseEnter={() => pagination.hasNext && prefetchNextDocs()} disabled={!pagination.hasNext} className="flex items-center gap-1 rounded-lg border border-gray-200 px-3 py-2 text-xs font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed">التالي <ChevronLeft size={14} /></button>
+                            <button onClick={() => setPage((p) => Math.min(pagination.totalPages, p + 1))} onMouseEnter={() => pagination.hasNext && prefetchNextDocs()} disabled={!pagination.hasNext} style={{ display: "flex", alignItems: "center", gap: 4, padding: "6px 12px", borderRadius: 7, border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-card, #fff)", fontSize: 12, fontWeight: 500, color: "var(--t-text-secondary, #6b7280)", cursor: "pointer", opacity: !pagination.hasNext ? 0.4 : 1 }}>التالي <ChevronLeft size={13} /></button>
                         </div>
                     )}
                 </>
@@ -924,8 +960,8 @@ export function DataManagementTab({ onNavigateToTab }: { onNavigateToTab?: (tab:
             {viewDoc && <TextModal text={viewDoc.text} onClose={() => setViewDoc(null)} />}
             {editDoc && <EditModal doc={editDoc} onClose={() => setEditDoc(null)} onSave={handleUpdate} saving={saving} />}
             {deleteTargets && <DeleteModal count={deleteTargets.length} onClose={() => setDeleteTargets(null)} onConfirm={handleDelete} deleting={deleting} />}
-            {showUpload && activeDeptId && <TrainUploadModal categories={categories} activeDeptId={activeDeptId} activeDeptName={activeDeptName} onClose={() => setShowUpload(false)} onSuccess={() => queryClient.invalidateQueries({ queryKey: ["knowledge", "documents"] })} tenantId={tenantId} />}
-            {showAddText && activeDeptId && <AddTextModal categories={categories} activeDeptId={activeDeptId} activeDeptName={activeDeptName} onClose={() => setShowAddText(false)} onSuccess={() => queryClient.invalidateQueries({ queryKey: ["knowledge", "documents"] })} tenantId={tenantId} />}
+            {showUpload && activeDeptId && <TrainUploadModal categories={categories} activeDeptId={activeDeptId} activeDeptName={activeDeptName} onClose={() => setShowUpload(false)} onSuccess={() => knowledgeEvents.onFileUploaded()} tenantId={tenantId} />}
+            {showAddText && activeDeptId && <AddTextModal categories={categories} activeDeptId={activeDeptId} activeDeptName={activeDeptName} onClose={() => setShowAddText(false)} onSuccess={() => knowledgeEvents.onDataAdded()} tenantId={tenantId} />}
 
             <style>{`
                 @keyframes rowFade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}

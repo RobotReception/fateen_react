@@ -1,7 +1,14 @@
 // ============================================================
-// Types: Teams, Tags, Snippets, Lifecycles
+// Types: Teams + backward-compatible re-exports
 // API: /api/backend/v2  — v3.0
 // ============================================================
+
+// ── Backward-compatible re-exports ──
+// These allow existing "import ... from 'teams-tags'" to keep working
+export type { Tag, TagsListData, TagsFlatData, CreateTagPayload, UpdateTagPayload } from "./tags.types"
+export type { Snippet, SnippetContent, SnippetMessageType, SnippetsListData, CreateSnippetPayload, UpdateSnippetPayload, MediaUploadResponse } from "./snippets.types"
+export type { Lifecycle, LifecyclesListData, CreateLifecyclePayload, UpdateLifecyclePayload, DeleteLifecycleParams, ChangeCustomerLifecyclePayload, ChangeCustomerLifecycleResponse } from "./lifecycles.types"
+export type { DynamicField, DynamicFieldType, DynamicFieldsListData, CreateDynamicFieldPayload, UpdateDynamicFieldPayload } from "./contact-fields.types"
 
 /* ── Shared wrapper ── */
 export interface ApiResponse<T> {
@@ -44,9 +51,12 @@ export interface Team {
     name_en?: string
     description?: string
     members?: string[]
+    is_active?: boolean          // soft-delete flag
+    deactivated_at?: string      // timestamp when deactivated
     created_at?: string
     updated_at?: string
 }
+
 
 /* Statistics ── GET /teams/statistics */
 export interface TeamStatRow {
@@ -187,271 +197,4 @@ export interface TeamMembersResponse {
     team_name: string
     members: TeamMemberDetail[]
     total_members: number
-}
-
-/* ════════════════════════════════════
-   TAGS
-════════════════════════════════════ */
-export interface Tag {
-    id: string          // MongoDB _id
-    tag_id?: string          // legacy field (may not be present)
-    name: string          // localised name
-    name_ar?: string
-    name_en?: string
-    emoji?: string
-    description?: string
-    category?: string
-    source?: string
-    created_by?: string
-    created_at?: string
-    last_edited_by?: string
-    last_edited_at?: string
-    // legacy compat
-    updated_at?: string
-}
-
-/** Paginated response — GET /tags */
-export interface TagsListData {
-    items: Tag[]
-    total: number
-    page: number
-    page_size: number
-    total_pages: number
-}
-
-/** @deprecated use TagsListData (paginated) */
-export interface TagsFlatData {
-    tags: Tag[]
-}
-
-export interface CreateTagPayload {
-    name: string          // required
-    name_ar?: string
-    name_en?: string
-    emoji?: string          // max 8 bytes
-    description?: string          // max 200 chars
-    category?: string          // max 30 chars
-    source?: string          // default: "User", max 30 chars
-    // NOTE: do NOT send id — generated server-side
-    // created_by injected from JWT
-}
-
-export interface UpdateTagPayload {
-    name?: string          // max 50 chars
-    name_ar?: string          // max 50 chars
-    name_en?: string          // max 50 chars
-    emoji?: string          // max 8 bytes
-    description?: string          // max 200 chars
-    category?: string          // max 30 chars
-    source?: string          // max 30 chars
-    // last_edited_by injected from JWT
-}
-
-/* ════════════════════════════════════
-   SNIPPETS
-════════════════════════════════════ */
-export type SnippetMessageType = "text" | "image" | "audio" | "video" | "file" | "document"
-
-export interface SnippetContent {
-    // text
-    text?: string
-    // media
-    url?: string
-    caption?: string
-    filename?: string
-    size?: number
-    mime_type?: string
-    // audio/video extras
-    duration?: number
-    transcript?: string
-    // any other keys
-    [key: string]: unknown
-}
-
-export interface Snippet {
-    id: string          // MongoDB _id
-    field_id: string          // e.g. "snip_193a8ce7" (auto-generated)
-    name: string
-    title?: string          // localised title
-    title_ar?: string
-    title_en?: string
-    topic?: string
-    created_by?: string
-    message_type: SnippetMessageType
-    content?: SnippetContent
-    content_ar?: string          // localised text shorthand
-    content_en?: string
-    created_at?: string
-    updated_at?: string
-    // legacy compat
-    message?: string
-}
-
-/** Paginated list — GET /snippets */
-export interface SnippetsListData {
-    items: Snippet[]
-    total: number
-}
-
-export interface CreateSnippetPayload {
-    name: string              // required
-    title_ar?: string
-    title_en?: string
-    message_type: SnippetMessageType  // required
-    content: SnippetContent      // required, shape depends on message_type
-    content_ar?: string
-    content_en?: string
-    topic?: string
-    // NOTE: do NOT send field_id — server generates "snip_<8hex>"
-    // created_by injected from JWT
-}
-
-export interface UpdateSnippetPayload {
-    name?: string
-    title_ar?: string
-    title_en?: string
-    message_type?: SnippetMessageType
-    content?: SnippetContent
-    content_ar?: string
-    content_en?: string
-    topic?: string
-}
-
-/* Media Upload — POST /media/upload */
-export interface MediaUploadResponse {
-    media_id: string
-    proxy_url: string
-    public_url: string
-    filename: string
-    original_filename: string
-    saved_filename: string
-    file_size: number
-}
-
-
-/* ════════════════════════════════════
-   LIFECYCLES
-════════════════════════════════════ */
-export interface Lifecycle {
-    id: string          // MongoDB _id
-    code: string          // e.g. "lc_c384f0ab" (auto-generated)
-    name: string          // localised name
-    name_ar?: string
-    name_en?: string
-    description?: string          // localised description
-    description_ar?: string
-    description_en?: string
-    icon?: string
-    color?: string          // HEX, e.g. "#53b1df"
-    order?: number
-    is_active?: boolean
-    created_at?: string
-    updated_at?: string
-}
-
-/** Full list — GET /lifecycles */
-export interface LifecyclesListData {
-    items: Lifecycle[]
-    total: number
-}
-
-export interface CreateLifecyclePayload {
-    name: string          // required
-    name_ar?: string
-    name_en?: string
-    description?: string
-    description_ar?: string
-    description_en?: string
-    icon?: string          // default: ""
-    color?: string          // HEX, default: "#53b1df"
-    order?: number          // default: 1
-    // NOTE: do NOT send code — generated server-side as "lc_<8hex>"
-}
-
-export interface UpdateLifecyclePayload {
-    name?: string
-    name_ar?: string
-    name_en?: string
-    description?: string
-    description_ar?: string
-    description_en?: string
-    icon?: string
-    color?: string          // must start with # and be 7 chars
-    order?: number
-    is_active?: boolean
-}
-
-/** DELETE /lifecycles/{code} uses query param */
-export interface DeleteLifecycleParams {
-    reassign_to?: string            // code of fallback lifecycle
-}
-
-/** PATCH /lifecycles/customers/{customer_id}/lifecycle */
-export interface ChangeCustomerLifecyclePayload {
-    lifecycle_code: string          // required
-    performed_by?: string          // injected from JWT if omitted
-}
-
-export interface ChangeCustomerLifecycleResponse {
-    success: boolean
-    customer_id: string
-    new_lifecycle: string
-}
-
-/* ════════════════════════════════════
-   DYNAMIC FIELDS (Contact Fields)
-════════════════════════════════════ */
-export type DynamicFieldType =
-    | "text" | "number" | "email" | "phone"
-    | "date" | "boolean" | "select" | "multi_select"
-    | "url" | "textarea"
-
-export interface DynamicField {
-    id: string
-    field_name: string
-    field_label: string
-    label?: string           // resolved by Accept-Language
-    label_ar?: string
-    label_en?: string
-    field_type: DynamicFieldType
-    required: boolean
-    default_value?: string | null
-    options?: string[] | null
-    validation_rules?: Record<string, unknown> | null
-    is_active: boolean
-    display_order?: number | null
-    description?: string | null
-    created_at?: string
-    updated_at?: string
-}
-
-/** GET /contacts/dynamic-fields returns array directly */
-export type DynamicFieldsListData = DynamicField[]
-
-export interface CreateDynamicFieldPayload {
-    field_name: string            // required, snake_case, 1-50
-    field_label: string           // required, 1-100
-    label_ar?: string
-    label_en?: string
-    field_type?: DynamicFieldType  // default: "text"
-    required?: boolean             // default: false
-    default_value?: string         // max 500
-    options?: string[]             // required for select / multi_select
-    validation_rules?: Record<string, unknown>
-    is_active?: boolean            // default: true
-    display_order?: number
-    description?: string           // max 500
-}
-
-export interface UpdateDynamicFieldPayload {
-    field_label?: string
-    label_ar?: string
-    label_en?: string
-    required?: boolean
-    default_value?: string
-    options?: string[]
-    is_active?: boolean
-    display_order?: number
-    description?: string
-    // NOTE: field_name, field_type, validation_rules cannot be changed after creation
 }

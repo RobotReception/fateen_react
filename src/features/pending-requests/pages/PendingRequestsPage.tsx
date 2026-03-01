@@ -90,10 +90,15 @@ const SkeletonRow = memo(function SkeletonRow({ delay = 0 }: { delay?: number })
 const DetailsModal = memo(function DetailsModal({ details, loading, onClose }: { details: RequestDetails | null; loading: boolean; onClose: () => void }) {
     return (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={onClose}>
-            <div className="mx-4 w-full max-w-lg overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl" onClick={(e) => e.stopPropagation()} style={{ animation: "prModalIn .18s ease-out" }}>
-                <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
-                    <h3 className="text-base font-bold text-gray-800">تفاصيل الطلب</h3>
-                    <button onClick={onClose} className="rounded-lg p-1 text-gray-400 hover:text-gray-600"><X size={18} /></button>
+            <div className="mx-4 w-full max-w-lg overflow-hidden bg-white" onClick={(e) => e.stopPropagation()} style={{ animation: "prModalIn .18s ease-out", borderRadius: 12, border: "1px solid var(--t-border-light, #e5e7eb)" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 20px", borderBottom: "1px solid var(--t-border-light, #f0f0f0)" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <div style={{ width: 30, height: 30, borderRadius: 8, background: "linear-gradient(135deg, #004786, #0098d6)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                            <ClipboardList size={14} style={{ color: "#fff" }} />
+                        </div>
+                        <h3 style={{ fontSize: 14, fontWeight: 600, color: "var(--t-text, #1f2937)" }}>تفاصيل الطلب</h3>
+                    </div>
+                    <button onClick={onClose} style={{ borderRadius: 6, padding: 5, border: "none", background: "transparent", cursor: "pointer", color: "var(--t-text-faint, #9ca3af)" }}><X size={16} /></button>
                 </div>
                 {loading || !details ? (
                     <div className="flex items-center justify-center py-16"><Loader2 size={28} className="animate-spin text-blue-500" /></div>
@@ -137,17 +142,17 @@ function InfoField({ icon: Icon, label, value, mono }: { icon: typeof Hash; labe
 const ApproveModal = memo(function ApproveModal({ order, onClose, onConfirm, loading }: { order: PendingOrder; onClose: () => void; onConfirm: () => void; loading: boolean }) {
     return (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={onClose}>
-            <div className="mx-4 w-full max-w-md overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl" onClick={(e) => e.stopPropagation()} style={{ animation: "prModalIn .18s ease-out" }}>
-                <div className="p-6 text-center">
-                    <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-50">
-                        <CheckCircle2 size={28} className="text-emerald-500" />
+            <div className="mx-4 w-full max-w-md overflow-hidden bg-white" onClick={(e) => e.stopPropagation()} style={{ animation: "prModalIn .18s ease-out", borderRadius: 12, border: "1px solid var(--t-border-light, #e5e7eb)" }}>
+                <div style={{ padding: "28px 24px 20px", textAlign: "center" }}>
+                    <div style={{ width: 52, height: 52, borderRadius: 14, background: "rgba(16,185,129,0.06)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 14px" }}>
+                        <CheckCircle2 size={24} style={{ color: "#059669" }} />
                     </div>
-                    <h3 className="text-lg font-bold text-gray-800">الموافقة على الطلب</h3>
-                    <p className="mt-2 text-sm text-gray-500">هل أنت متأكد من الموافقة على طلب <span className="font-semibold text-gray-700">{order.username}</span>؟</p>
-                    <p className="mt-1 text-xs text-gray-400">نوع العملية: {operationLabel(order.operation)}</p>
-                    <div className="mt-6 flex items-center justify-center gap-3">
-                        <button onClick={onClose} disabled={loading} className="rounded-xl border border-gray-200 px-5 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50">إلغاء</button>
-                        <button onClick={onConfirm} disabled={loading} className="flex items-center gap-2 rounded-xl bg-gray-900 px-5 py-2.5 text-sm font-medium text-white  transition-transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50">
+                    <h3 style={{ fontSize: 16, fontWeight: 700, color: "var(--t-text, #1f2937)" }}>الموافقة على الطلب</h3>
+                    <p style={{ fontSize: 13, color: "var(--t-text-secondary, #6b7280)", marginTop: 8 }}>هل أنت متأكد من الموافقة على طلب <span style={{ fontWeight: 600, color: "var(--t-text, #374151)" }}>{order.username}</span>؟</p>
+                    <p style={{ fontSize: 11, color: "var(--t-text-faint, #9ca3af)", marginTop: 4 }}>نوع العملية: {operationLabel(order.operation)}</p>
+                    <div style={{ marginTop: 20, display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
+                        <button onClick={onClose} disabled={loading} style={{ padding: "8px 20px", borderRadius: 7, border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-card, #fff)", fontSize: 13, fontWeight: 500, color: "var(--t-text-secondary, #6b7280)", cursor: "pointer" }}>إلغاء</button>
+                        <button onClick={onConfirm} disabled={loading} style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 20px", borderRadius: 7, border: "none", background: "#004786", color: "#fff", fontSize: 13, fontWeight: 500, cursor: "pointer", opacity: loading ? 0.5 : 1 }}>
                             {loading && <Loader2 size={14} className="animate-spin" />}
                             موافقة
                         </button>
@@ -163,22 +168,22 @@ const RejectModal = memo(function RejectModal({ order, onClose, onConfirm, loadi
     const [reason, setReason] = useState("")
     return (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={onClose}>
-            <div className="mx-4 w-full max-w-md overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl" onClick={(e) => e.stopPropagation()} style={{ animation: "prModalIn .18s ease-out" }}>
-                <div className="p-6">
-                    <div className="text-center">
-                        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-red-50">
-                            <XCircle size={28} className="text-red-500" />
+            <div className="mx-4 w-full max-w-md overflow-hidden bg-white" onClick={(e) => e.stopPropagation()} style={{ animation: "prModalIn .18s ease-out", borderRadius: 12, border: "1px solid var(--t-border-light, #e5e7eb)" }}>
+                <div style={{ padding: 24 }}>
+                    <div style={{ textAlign: "center" }}>
+                        <div style={{ width: 52, height: 52, borderRadius: 14, background: "rgba(220,38,38,0.06)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 14px" }}>
+                            <XCircle size={24} style={{ color: "#dc2626" }} />
                         </div>
-                        <h3 className="text-lg font-bold text-gray-800">رفض الطلب</h3>
-                        <p className="mt-2 text-sm text-gray-500">رفض طلب <span className="font-semibold text-gray-700">{order.username}</span></p>
+                        <h3 style={{ fontSize: 16, fontWeight: 700, color: "var(--t-text, #1f2937)" }}>رفض الطلب</h3>
+                        <p style={{ fontSize: 13, color: "var(--t-text-secondary, #6b7280)", marginTop: 8 }}>رفض طلب <span style={{ fontWeight: 600, color: "var(--t-text, #374151)" }}>{order.username}</span></p>
                     </div>
-                    <div className="mt-4">
-                        <label className="mb-1.5 block text-sm font-medium text-gray-700">سبب الرفض <span className="text-red-400">*</span></label>
-                        <textarea value={reason} onChange={(e) => setReason(e.target.value)} rows={3} placeholder="اكتب سبب الرفض..." className="w-full rounded-xl border border-gray-200 bg-white p-3 text-sm text-gray-700 outline-none focus:border-red-300 focus:ring-2 focus:ring-red-100 resize-none" dir="rtl" />
+                    <div style={{ marginTop: 16 }}>
+                        <label style={{ display: "block", marginBottom: 6, fontSize: 13, fontWeight: 500, color: "var(--t-text, #374151)" }}>سبب الرفض <span style={{ color: "#dc2626" }}>*</span></label>
+                        <textarea value={reason} onChange={(e) => setReason(e.target.value)} rows={3} placeholder="اكتب سبب الرفض..." style={{ width: "100%", borderRadius: 8, border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-card, #fff)", padding: 12, fontSize: 13, color: "var(--t-text, #374151)", outline: "none", resize: "none" }} dir="rtl" />
                     </div>
-                    <div className="mt-5 flex items-center justify-center gap-3">
-                        <button onClick={onClose} disabled={loading} className="rounded-xl border border-gray-200 px-5 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50">إلغاء</button>
-                        <button onClick={() => onConfirm(reason)} disabled={loading || !reason.trim()} className="flex items-center gap-2 rounded-xl bg-gray-800 px-5 py-2.5 text-sm font-medium text-white  transition-transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed">
+                    <div style={{ marginTop: 16, display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
+                        <button onClick={onClose} disabled={loading} style={{ padding: "8px 20px", borderRadius: 7, border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-card, #fff)", fontSize: 13, fontWeight: 500, color: "var(--t-text-secondary, #6b7280)", cursor: "pointer" }}>إلغاء</button>
+                        <button onClick={() => onConfirm(reason)} disabled={loading || !reason.trim()} style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 20px", borderRadius: 7, border: "none", background: "#dc2626", color: "#fff", fontSize: 13, fontWeight: 500, cursor: "pointer", opacity: (loading || !reason.trim()) ? 0.5 : 1 }}>
                             {loading && <Loader2 size={14} className="animate-spin" />}
                             رفض
                         </button>
@@ -365,14 +370,19 @@ export function PendingRequestsPage() {
     return (
         <div className="p-6 space-y-5" dir="rtl">
             {/* Header */}
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                    <h2 className="text-xl font-bold text-gray-800">الطلبات المعلقة</h2>
-                    <p className="mt-1 text-sm text-gray-400">مراجعة الطلبات والموافقة أو الرفض</p>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                    <div style={{ width: 40, height: 40, borderRadius: 10, background: "linear-gradient(135deg, #004786, #0098d6)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <ClipboardList size={20} style={{ color: "#fff" }} />
+                    </div>
+                    <div>
+                        <h2 style={{ fontSize: 18, fontWeight: 700, color: "var(--t-text, #1f2937)", margin: 0 }}>الطلبات المعلقة</h2>
+                        <p style={{ fontSize: 12, color: "var(--t-text-faint, #9ca3af)", marginTop: 2 }}>مراجعة الطلبات والموافقة أو الرفض</p>
+                    </div>
                 </div>
                 {pagination && (
-                    <div className="flex items-center gap-2">
-                        <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 border border-amber-200 px-3 py-1.5 text-xs font-semibold text-amber-700">
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: 5, borderRadius: 12, background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.15)", padding: "5px 12px", fontSize: 11, fontWeight: 600, color: "#d97706" }}>
                             <Clock size={12} />
                             {pagination.totalCount} طلب
                         </span>
@@ -408,27 +418,22 @@ export function PendingRequestsPage() {
 
             {/* Info bar */}
             {!loading && filtered.length > 0 && pagination && (
-                <div className="flex items-center justify-between rounded-xl bg-white border border-gray-100 px-4 py-2.5 shadow-sm">
-                    <p className="text-xs text-gray-500"><span className="font-bold text-gray-700">{pagination.totalCount}</span> طلب</p>
-                    <p className="text-xs text-gray-400">صفحة {page} من {totalPages}</p>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderRadius: 8, background: "var(--t-card, #fff)", border: "1px solid var(--t-border-light, #e5e7eb)", padding: "8px 14px" }}>
+                    <p style={{ fontSize: 12, color: "var(--t-text-secondary, #6b7280)" }}><span style={{ fontWeight: 700, color: "#004786" }}>{pagination.totalCount}</span> طلب</p>
+                    <p style={{ fontSize: 11, color: "var(--t-text-faint, #9ca3af)" }}>صفحة {page} من {totalPages}</p>
                 </div>
             )}
 
             {/* Table */}
-            <div className="relative overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
+            <div style={{ position: "relative", overflow: "hidden", borderRadius: 10, border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-card, #fff)" }}>
                 <FetchingBar visible={backgroundFetching} />
                 <div className="overflow-x-auto" style={{ opacity: backgroundFetching ? 0.6 : 1, transition: 'opacity 0.2s ease' }}>
-                    <table className="w-full">
+                    <table style={{ width: "100%", borderCollapse: "collapse" }}>
                         <thead>
-                            <tr className="border-b border-gray-100 text-right">
-                                <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-gray-400">#</th>
-                                <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-gray-400">المعرّف</th>
-                                <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-gray-400">العملية</th>
-                                <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-gray-400">المستخدم</th>
-                                <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-gray-400">الحالة</th>
-                                <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-gray-400">التاريخ</th>
-                                <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-gray-400">المحتوى</th>
-                                <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-gray-400">الإجراءات</th>
+                            <tr style={{ borderBottom: "1px solid var(--t-border-light, #f0f0f0)", background: "var(--t-surface, #fafafa)", textAlign: "right" }}>
+                                {["#", "المعرّف", "العملية", "المستخدم", "الحالة", "التاريخ", "المحتوى", "الإجراءات"].map(h => (
+                                    <th key={h} style={{ padding: "10px 16px", fontSize: 11, fontWeight: 600, color: "var(--t-text-faint, #9ca3af)", letterSpacing: "0.3px" }}>{h}</th>
+                                ))}
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-50">
@@ -463,15 +468,15 @@ export function PendingRequestsPage() {
 
             {/* Pagination */}
             {totalPages > 1 && (
-                <div className="flex items-center justify-center gap-2 pt-2">
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, paddingTop: 8 }}>
                     <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1}
-                        className="flex items-center gap-1 rounded-lg border border-gray-200 px-3 py-2 text-xs font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed">
-                        <ChevronRight size={14} /> السابق
+                        style={{ display: "flex", alignItems: "center", gap: 4, padding: "6px 12px", borderRadius: 7, border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-card, #fff)", fontSize: 12, fontWeight: 500, color: "var(--t-text-secondary, #6b7280)", cursor: "pointer", opacity: page <= 1 ? 0.4 : 1 }}>
+                        <ChevronRight size={13} /> السابق
                     </button>
-                    <span className="flex h-8 items-center rounded-lg bg-gray-900 px-3 text-xs font-bold text-white ">{page}</span>
+                    <span style={{ display: "flex", height: 30, alignItems: "center", borderRadius: 7, background: "#004786", padding: "0 12px", fontSize: 12, fontWeight: 700, color: "#fff" }}>{page}</span>
                     <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} onMouseEnter={() => page < totalPages && prefetchNextPage()} disabled={page >= totalPages}
-                        className="flex items-center gap-1 rounded-lg border border-gray-200 px-3 py-2 text-xs font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed">
-                        التالي <ChevronLeft size={14} />
+                        style={{ display: "flex", alignItems: "center", gap: 4, padding: "6px 12px", borderRadius: 7, border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-card, #fff)", fontSize: 12, fontWeight: 500, color: "var(--t-text-secondary, #6b7280)", cursor: "pointer", opacity: page >= totalPages ? 0.4 : 1 }}>
+                        التالي <ChevronLeft size={13} />
                     </button>
                 </div>
             )}

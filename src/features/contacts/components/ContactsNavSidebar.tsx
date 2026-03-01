@@ -5,11 +5,31 @@ import {
     PanelLeftOpen,
     Users,
     Plus,
+    Workflow,
+    UsersRound,
 } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import { useContactsStore, type ContactsSection } from "../store/contacts.store"
 import { useContactsSidebarSummary } from "../hooks/use-contacts-summary"
 import type { ContactsSidebarLifecycle, ContactsSidebarTeam } from "../services/contacts-service"
+
+const CSS = `
+@keyframes cnFade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.cn-root{height:100%;display:flex;flex-direction:column;background:#fff;border-left:1px solid #ebeef2;overflow:hidden;transition:width .2s ease,min-width .2s ease}
+.cn-header{display:flex;align-items:center;padding:12px;flex-shrink:0;border-bottom:1px solid #f0f1f3}
+.cn-toggle{width:28px;height:28px;border-radius:7px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#9ca3af;transition:all .12s;flex-shrink:0}
+.cn-toggle:hover{background:#f5f6f8;color:#6b7280}
+.cn-nav{padding:4px;margin-bottom:2px;cursor:pointer;display:flex;align-items:center;border-radius:8px;font-size:12.5px;transition:all .12s;position:relative;gap:8px}
+.cn-nav:hover{background:#f5f6f8}
+.cn-nav.active{background:linear-gradient(135deg,#004786,#0072b5);color:#fff}
+.cn-nav.active:hover{background:linear-gradient(135deg,#004786,#0072b5)}
+.cn-count{font-size:9px;font-weight:700;padding:1px 6px;border-radius:10px;min-width:18px;text-align:center}
+.cn-sec-hdr{display:flex;align-items:center;justify-content:space-between;padding:8px 12px 4px}
+.cn-sec-btn{display:flex;align-items:center;gap:3px;background:none;border:none;font-size:9.5px;font-weight:700;color:#b0b7c3;cursor:pointer;text-transform:uppercase;letter-spacing:.08em;padding:0}
+.cn-sec-add{width:18px;height:18px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#b0b7c3;border-radius:4px;transition:all .1s}
+.cn-sec-add:hover{background:#f5f6f8;color:#004786}
+.cn-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+`
 
 export function ContactsNavSidebar() {
     const {
@@ -29,88 +49,59 @@ export function ContactsNavSidebar() {
     const isActive = (key: string) => activeSection === key
 
     return (
-        <aside style={{
-            width: collapsed ? 54 : 220,
-            minWidth: collapsed ? 54 : 220,
-            height: "100%",
-            display: "flex", flexDirection: "column",
-            background: "var(--t-card)",
-            borderLeft: "1px solid var(--t-border-light)",
-            overflow: "hidden",
-            transition: "width 0.2s ease, min-width 0.2s ease",
-        }}>
+        <aside className="cn-root" style={{ width: collapsed ? 52 : 210, minWidth: collapsed ? 52 : 210 }}>
+            <style>{CSS}</style>
+
             {/* Header */}
-            <div style={{
-                display: "flex", alignItems: "center",
-                justifyContent: collapsed ? "center" : "space-between",
-                padding: collapsed ? "14px 0 10px" : "14px 14px 10px",
-                flexShrink: 0,
-            }}>
+            <div className="cn-header" style={{ justifyContent: collapsed ? "center" : "space-between", padding: collapsed ? "12px 0" : "12px" }}>
                 {!collapsed && (
-                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        <span style={{ fontSize: 15, fontWeight: 700, color: "var(--t-text)" }}>Contacts</span>
+                    <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
+                        <div style={{ width: 26, height: 26, borderRadius: 7, background: "linear-gradient(135deg, #004786, #0072b5)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                            <Users size={12} style={{ color: "#fff" }} />
+                        </div>
+                        <span style={{ fontSize: 13, fontWeight: 700, color: "#111827" }}>جهات الاتصال</span>
                     </div>
                 )}
-                <button
-                    onClick={toggleSidebar}
-                    title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-                    style={{
-                        width: 28, height: 28, borderRadius: 6,
-                        border: "none", background: "transparent",
-                        cursor: "pointer", display: "flex",
-                        alignItems: "center", justifyContent: "center",
-                        color: "var(--t-text-muted)", transition: "background 0.12s",
-                        flexShrink: 0,
-                    }}
-                    onMouseEnter={(e) => { e.currentTarget.style.background = "var(--t-surface)" }}
-                    onMouseLeave={(e) => { e.currentTarget.style.background = "transparent" }}
-                >
-                    {collapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
+                <button className="cn-toggle" onClick={toggleSidebar} title={collapsed ? "توسيع" : "طي"}>
+                    {collapsed ? <PanelLeftOpen size={14} /> : <PanelLeftClose size={14} />}
                 </button>
             </div>
 
             {/* Scrollable body */}
-            <div style={{ flex: 1, overflowY: "auto", overflowX: "hidden", padding: "0 0 16px" }}>
-                {/* Top nav: All */}
-                <div style={{ padding: collapsed ? "0 4px" : "0 8px", marginBottom: 4 }}>
-                    <NavItem isActive={isActive("all")} collapsed={collapsed}
-                        onClick={() => setActiveSection("all")}
-                        title={collapsed ? "All" : undefined}>
-                        <Users size={14} style={{ flexShrink: 0, opacity: 0.8 }} />
-                        {!collapsed && <span style={{ flex: 1, fontWeight: isActive("all") ? 700 : 500 }}>All</span>}
+            <div style={{ flex: 1, overflowY: "auto", overflowX: "hidden", padding: "6px 0 12px" }}>
+                {/* All */}
+                <div style={{ padding: collapsed ? "0 4px" : "0 6px", marginBottom: 2 }}>
+                    <NavItem active={isActive("all")} collapsed={collapsed} onClick={() => setActiveSection("all")} title={collapsed ? "الكل" : undefined}>
+                        <Users size={13} style={{ flexShrink: 0, opacity: .8 }} />
+                        {!collapsed && <span style={{ flex: 1, fontWeight: isActive("all") ? 700 : 500 }}>الكل</span>}
                         {!collapsed && totalCount > 0 && <CountBadge count={totalCount} active={isActive("all")} />}
                         {collapsed && totalCount > 0 && (
                             <span style={{
-                                position: "absolute", top: 2, right: 2,
-                                fontSize: 8, fontWeight: 700,
-                                width: 14, height: 14, borderRadius: "50%",
-                                background: isActive("all") ? "rgba(255,255,255,0.3)" : "var(--t-accent)",
-                                color: "var(--t-text-on-accent)",
-                                display: "flex", alignItems: "center", justifyContent: "center",
+                                position: "absolute", top: 1, right: 1, fontSize: 7, fontWeight: 700,
+                                width: 13, height: 13, borderRadius: "50%",
+                                background: isActive("all") ? "rgba(255,255,255,.3)" : "#004786",
+                                color: "#fff", display: "flex", alignItems: "center", justifyContent: "center",
                             }}>{totalCount > 9 ? "9+" : totalCount}</span>
                         )}
                     </NavItem>
                 </div>
 
-                {/* ── Lifecycle (from /contacts/sidebar-summary) ── */}
+                {/* ── Lifecycle ── */}
                 {!collapsed && (
                     <>
-                        <SectionHeader
-                            label="Lifecycle"
+                        <SectionHeader label="مراحل الحياة" icon={<Workflow size={10} />}
                             collapsed={!!collapsedSections["lifecycle"]}
                             onToggle={() => toggleCollapsedSection("lifecycle")}
-                            onAdd={() => navigate("/dashboard/settings/organization?tab=lifecycles")}
-                        />
+                            onAdd={() => navigate("/dashboard/settings/organization?tab=lifecycles")} />
                         {!collapsedSections["lifecycle"] && (
-                            <div style={{ padding: "2px 8px 6px" }}>
+                            <div style={{ padding: "2px 6px 4px", animation: "cnFade .15s ease-out" }}>
                                 {lifecycles.length === 0 ? (
-                                    <EmptyLabel text="لا توجد مراحل" />
+                                    <p style={{ fontSize: 10.5, color: "#b0b7c3", padding: "3px 8px", margin: 0 }}>لا توجد مراحل</p>
                                 ) : lifecycles.map((lc) => {
                                     const key = `lc_${lc.code}`
                                     return (
-                                        <NavItem key={key} isActive={isActive(key)} collapsed={false}
-                                            onClick={() => setActiveSection(key as ContactsSection)}>
-                                            <span style={{ fontSize: 14, lineHeight: 1, flexShrink: 0 }}>{lc.icon || "📌"}</span>
+                                        <NavItem key={key} active={isActive(key)} collapsed={false} onClick={() => setActiveSection(key as ContactsSection)}>
+                                            <span style={{ fontSize: 13, lineHeight: 1, flexShrink: 0 }}>{lc.icon || "📌"}</span>
                                             <span style={{ flex: 1 }}>{lc.name}</span>
                                             <CountBadge count={lc.count} active={isActive(key)} />
                                         </NavItem>
@@ -119,26 +110,20 @@ export function ContactsNavSidebar() {
                             </div>
                         )}
 
-                        {/* ── Teams (from /contacts/sidebar-summary) ── */}
-                        <SectionHeader
-                            label="Team Inbox"
+                        {/* ── Teams ── */}
+                        <SectionHeader label="صندوق الفريق" icon={<UsersRound size={10} />}
                             collapsed={!!collapsedSections["team"]}
                             onToggle={() => toggleCollapsedSection("team")}
-                            onAdd={() => navigate("/dashboard/settings/organization?tab=teams")}
-                        />
+                            onAdd={() => navigate("/dashboard/settings/organization?tab=teams")} />
                         {!collapsedSections["team"] && (
-                            <div style={{ padding: "2px 8px 6px" }}>
+                            <div style={{ padding: "2px 6px 4px", animation: "cnFade .15s ease-out" }}>
                                 {teams.length === 0 ? (
-                                    <EmptyLabel text="No teams created" />
+                                    <p style={{ fontSize: 10.5, color: "#b0b7c3", padding: "3px 8px", margin: 0 }}>لا توجد فرق</p>
                                 ) : teams.map((team) => {
                                     const key = `team_${team.team_id}`
                                     return (
-                                        <NavItem key={key} isActive={isActive(key)} collapsed={false}
-                                            onClick={() => setActiveSection(key as ContactsSection)}>
-                                            <span style={{
-                                                width: 8, height: 8, borderRadius: "50%", flexShrink: 0,
-                                                background: team.color ?? "var(--t-text-faint)",
-                                            }} />
+                                        <NavItem key={key} active={isActive(key)} collapsed={false} onClick={() => setActiveSection(key as ContactsSection)}>
+                                            <span className="cn-dot" style={{ background: team.color ?? "#d1d5db" }} />
                                             <span style={{ flex: 1 }}>{team.name}</span>
                                             <CountBadge count={team.customers_count} active={isActive(key)} />
                                         </NavItem>
@@ -149,29 +134,22 @@ export function ContactsNavSidebar() {
                     </>
                 )}
 
-                {/* Collapsed mode: show lifecycle/team icons */}
+                {/* Collapsed mode icons */}
                 {collapsed && (
-                    <div style={{ padding: "4px 4px", borderTop: "1px solid var(--t-border-light)", marginTop: 4 }}>
+                    <div style={{ padding: "4px", borderTop: "1px solid #f0f1f3", marginTop: 4 }}>
                         {lifecycles.map((lc) => {
                             const key = `lc_${lc.code}`
                             return (
-                                <NavItem key={key} isActive={isActive(key)} collapsed={true}
-                                    onClick={() => setActiveSection(key as ContactsSection)}
-                                    title={lc.name}>
-                                    <span style={{ fontSize: 16, lineHeight: 1 }}>{lc.icon || "📌"}</span>
+                                <NavItem key={key} active={isActive(key)} collapsed={true} onClick={() => setActiveSection(key as ContactsSection)} title={lc.name}>
+                                    <span style={{ fontSize: 14, lineHeight: 1 }}>{lc.icon || "📌"}</span>
                                 </NavItem>
                             )
                         })}
                         {teams.map((team) => {
                             const key = `team_${team.team_id}`
                             return (
-                                <NavItem key={key} isActive={isActive(key)} collapsed={true}
-                                    onClick={() => setActiveSection(key as ContactsSection)}
-                                    title={team.name}>
-                                    <span style={{
-                                        width: 10, height: 10, borderRadius: "50%",
-                                        background: team.color ?? "var(--t-text-faint)",
-                                    }} />
+                                <NavItem key={key} active={isActive(key)} collapsed={true} onClick={() => setActiveSection(key as ContactsSection)} title={team.name}>
+                                    <span className="cn-dot" style={{ background: team.color ?? "#d1d5db", width: 9, height: 9 }} />
                                 </NavItem>
                             )
                         })}
@@ -182,74 +160,47 @@ export function ContactsNavSidebar() {
     )
 }
 
-// ── Helpers ───────────────────────────────────────────────
-
-function NavItem({ children, isActive, collapsed, onClick, title }: {
-    children: React.ReactNode; isActive: boolean; collapsed: boolean;
+/* ── Helpers ── */
+function NavItem({ children, active, collapsed, onClick, title }: {
+    children: React.ReactNode; active: boolean; collapsed: boolean;
     onClick: () => void; title?: string
 }) {
     return (
-        <div onClick={onClick} title={title} style={{
-            display: "flex", alignItems: "center",
-            gap: collapsed ? 0 : 8,
-            padding: collapsed ? "8px 0" : "7px 10px",
-            justifyContent: collapsed ? "center" : "flex-start",
-            borderRadius: 8,
-            cursor: "pointer", marginBottom: 2, fontSize: 13,
-            background: isActive ? "var(--t-accent)" : "transparent",
-            color: isActive ? "var(--t-text-on-accent)" : "var(--t-text-secondary)",
-            transition: "background 0.12s",
-            position: "relative",
-        }}
-            onMouseEnter={(e) => { if (!isActive) e.currentTarget.style.background = "var(--t-surface)" }}
-            onMouseLeave={(e) => { if (!isActive) e.currentTarget.style.background = "transparent" }}
-        >{children}</div>
+        <div className={`cn-nav ${active ? "active" : ""}`} onClick={onClick} title={title}
+            style={{
+                padding: collapsed ? "7px 0" : "6px 10px",
+                justifyContent: collapsed ? "center" : "flex-start",
+                gap: collapsed ? 0 : 8,
+            }}
+            onMouseEnter={(e) => { if (!active) e.currentTarget.style.background = "#f5f6f8" }}
+            onMouseLeave={(e) => { if (!active) e.currentTarget.style.background = "transparent" }}>
+            {children}
+        </div>
     )
 }
 
 function CountBadge({ count, active }: { count: number; active: boolean }) {
     return (
-        <span style={{
-            fontSize: 10, fontWeight: 700,
-            padding: "1px 5px", borderRadius: 10,
-            background: active ? "rgba(255,255,255,0.25)" : "var(--t-surface)",
-            color: active ? "var(--t-text-on-accent)" : "var(--t-text-muted)",
-            minWidth: 18, textAlign: "center",
+        <span className="cn-count" style={{
+            background: active ? "rgba(255,255,255,.2)" : "#f5f6f8",
+            color: active ? "#fff" : "#9ca3af",
         }}>{count}</span>
     )
 }
 
-function SectionHeader({ label, collapsed, onToggle, onAdd }: {
-    label: string; collapsed: boolean; onToggle: () => void; onAdd?: () => void
+function SectionHeader({ label, icon, collapsed, onToggle, onAdd }: {
+    label: string; icon?: React.ReactNode; collapsed: boolean; onToggle: () => void; onAdd?: () => void
 }) {
     return (
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 14px 4px" }}>
-            <button onClick={onToggle} style={{
-                display: "flex", alignItems: "center", gap: 4,
-                background: "none", border: "none",
-                fontSize: 10, fontWeight: 700, color: "var(--t-text-faint)",
-                cursor: "pointer", textTransform: "uppercase", letterSpacing: "0.08em", padding: 0,
-            }}>
-                {collapsed ? <ChevronRight size={10} /> : <ChevronDown size={10} />}
+        <div className="cn-sec-hdr">
+            <button className="cn-sec-btn" onClick={onToggle}>
+                {collapsed ? <ChevronRight size={9} /> : <ChevronDown size={9} />}
+                {icon}
                 {label}
             </button>
             {onAdd && (
-                <button
-                    onClick={onAdd}
-                    title="إضافة"
-                    style={{
-                        width: 18, height: 18, border: "none", background: "transparent",
-                        cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
-                        color: "var(--t-text-faint)", borderRadius: 4,
-                    }}
-                    onMouseEnter={(e) => { e.currentTarget.style.background = "var(--t-surface)" }}
-                    onMouseLeave={(e) => { e.currentTarget.style.background = "transparent" }}
-                ><Plus size={12} /></button>
+                <button className="cn-sec-add" onClick={onAdd} title="إضافة"><Plus size={11} /></button>
             )}
         </div>
     )
-}
-
-function EmptyLabel({ text }: { text: string }) {
-    return <p style={{ fontSize: 11, color: "var(--t-text-faint)", padding: "4px 10px" }}>{text}</p>
 }

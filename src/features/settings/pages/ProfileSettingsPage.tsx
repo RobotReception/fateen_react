@@ -1,6 +1,6 @@
 import { useState } from "react"
 import {
-    User, ChevronLeft, KeyRound, Bell, Shield,
+    User, ChevronLeft, KeyRound, Bell, Shield, Zap, Settings,
 } from "lucide-react"
 import { Link } from "react-router-dom"
 import { ProfileTab } from "../components/ProfileTab"
@@ -18,23 +18,26 @@ type SidebarKey = (typeof SIDEBAR_ITEMS)[number]["key"]
 function ComingSoon({ title, desc }: { title: string; desc: string }) {
     return (
         <div style={{
-            background: "var(--t-card)", borderRadius: 12, border: "1px solid var(--t-border)",
+            background: "var(--t-card, #fff)", borderRadius: 14, border: "1px solid var(--t-border-light, #e8eaed)",
             padding: "56px 24px", textAlign: "center",
         }}>
             <div style={{
-                width: 48, height: 48, borderRadius: 12, background: "var(--t-surface)",
+                width: 52, height: 52, borderRadius: 14,
+                background: "linear-gradient(135deg, rgba(0,71,134,0.06), rgba(0,152,214,0.06))",
                 display: "inline-flex", alignItems: "center", justifyContent: "center",
                 marginBottom: 14,
             }}>
-                <Shield size={22} style={{ color: "var(--t-text-faint)" }} />
+                <Shield size={22} style={{ color: "#004786" }} />
             </div>
-            <h3 style={{ fontSize: 16, fontWeight: 700, color: "var(--t-text)", margin: "0 0 4px" }}>{title}</h3>
-            <p style={{ fontSize: 13, color: "var(--t-text-faint)", margin: 0, maxWidth: 320, marginInline: "auto" }}>{desc}</p>
+            <h3 style={{ fontSize: 16, fontWeight: 700, color: "var(--t-text, #1f2937)", margin: "0 0 4px" }}>{title}</h3>
+            <p style={{ fontSize: 13, color: "var(--t-text-faint, #9ca3af)", margin: 0, maxWidth: 320, marginInline: "auto" }}>{desc}</p>
             <div style={{
-                marginTop: 16, display: "inline-block",
-                padding: "6px 20px", borderRadius: 8, border: "1px solid var(--t-border)",
-                fontSize: 12, fontWeight: 600, color: "var(--t-text-muted)",
+                marginTop: 16, display: "inline-flex", alignItems: "center", gap: 5,
+                padding: "6px 20px", borderRadius: 8,
+                background: "rgba(0,71,134,0.04)", border: "1px solid rgba(0,71,134,0.1)",
+                fontSize: 12, fontWeight: 600, color: "#004786",
             }}>
+                <Zap size={10} style={{ color: "#0098d6" }} />
                 قريباً
             </div>
         </div>
@@ -43,157 +46,167 @@ function ComingSoon({ title, desc }: { title: string; desc: string }) {
 
 export function ProfileSettingsPage() {
     const [active, setActive] = useState<SidebarKey>("profile")
-    const [collapsed, setCollapsed] = useState(false)
+    const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
-    const activeItem = SIDEBAR_ITEMS.find(i => i.key === active)
 
     return (
-        <div style={{ display: "flex", height: "100%" }}>
+        <div className="flex h-full" dir="rtl">
 
-            {/* ── Internal Sidebar ── */}
-            <aside style={{
-                width: collapsed ? 56 : 220,
-                flexShrink: 0,
-                background: "var(--t-card)",
-                borderLeft: "1px solid var(--t-border)",
-                transition: "width 0.2s ease",
-                display: "flex",
-                flexDirection: "column",
-                overflow: "hidden",
-            }}>
-                {/* header */}
-                <div style={{
-                    display: "flex", alignItems: "center", justifyContent: "space-between",
-                    padding: collapsed ? "14px 8px" : "14px 12px",
-                    borderBottom: "1px solid var(--t-border-light)",
-                    minHeight: 56,
-                }}>
-                    {!collapsed && (
-                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                            <div style={{
-                                width: 30, height: 30, borderRadius: 8,
-                                background: "var(--t-accent)", display: "flex", alignItems: "center", justifyContent: "center",
-                            }}>
-                                <User size={14} style={{ color: "var(--t-text-on-accent)" }} />
-                            </div>
-                            <div>
-                                <div style={{ fontSize: 13, fontWeight: 700, color: "var(--t-text)", lineHeight: 1.2 }}>الإعدادات الشخصية</div>
-                                <div style={{ fontSize: 10, color: "var(--t-text-faint)" }}>حسابك الشخصي</div>
-                            </div>
-                        </div>
+            {/* ── Internal Sidebar (matches KB sidebar) ── */}
+            <aside
+                className={`shrink-0 bg-white transition-all duration-300 ${sidebarCollapsed ? "w-[60px]" : "w-52"}`}
+                style={{
+                    borderLeft: "1px solid var(--t-border-light, #f0f0f0)",
+                    borderRadius: "6px 6px 6px 6px",
+                    margin: "8px 0 8px 0",
+                    overflow: "hidden",
+                    display: "flex",
+                    flexDirection: "column",
+                }}
+            >
+                {/* ── Gradient Header ── */}
+                <div
+                    onClick={() => { if (sidebarCollapsed) setSidebarCollapsed(false) }}
+                    style={{
+                        background: "linear-gradient(135deg, #004786, #0072b5, #0098d6)",
+                        padding: sidebarCollapsed ? "12px 0" : "12px 14px",
+                        position: "relative",
+                        overflow: "hidden",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: sidebarCollapsed ? "center" : "space-between",
+                        cursor: sidebarCollapsed ? "pointer" : "default",
+                    }}>
+                    <div style={{
+                        position: "absolute", top: -15, left: -15,
+                        width: 60, height: 60, borderRadius: "50%",
+                        background: "rgba(255,255,255,0.06)",
+                    }} />
+                    <div style={{ position: "relative", zIndex: 1, display: "flex", alignItems: "center", gap: 7 }}>
+                        <Settings size={sidebarCollapsed ? 18 : 14} style={{ color: "rgba(255,255,255,0.85)" }} />
+                        {!sidebarCollapsed && (
+                            <span style={{ fontSize: 12.5, fontWeight: 700, color: "#fff" }}>الإعدادات الشخصية</span>
+                        )}
+                    </div>
+                    {!sidebarCollapsed && (
+                        <button
+                            onClick={() => setSidebarCollapsed(true)}
+                            style={{
+                                background: "rgba(255,255,255,0.12)",
+                                border: "none", borderRadius: 5,
+                                padding: 3, cursor: "pointer",
+                                display: "flex", alignItems: "center", justifyContent: "center",
+                                transition: "background 0.15s",
+                                position: "relative", zIndex: 1,
+                            }}
+                            onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.22)" }}
+                            onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.12)" }}
+                        >
+                            <ChevronLeft size={13} style={{ color: "rgba(255,255,255,0.8)" }} />
+                        </button>
                     )}
-                    <button
-                        onClick={() => setCollapsed(!collapsed)}
-                        style={{
-                            width: 26, height: 26, borderRadius: 6, border: "none",
-                            background: "transparent", cursor: "pointer",
-                            display: "flex", alignItems: "center", justifyContent: "center",
-                            color: "var(--t-text-faint)", transition: "background 0.12s",
-                            margin: collapsed ? "0 auto" : undefined,
-                        }}
-                        onMouseEnter={e => { e.currentTarget.style.background = "var(--t-surface)" }}
-                        onMouseLeave={e => { e.currentTarget.style.background = "transparent" }}
-                    >
-                        <ChevronLeft size={14} style={{
-                            transition: "transform 0.2s",
-                            transform: collapsed ? "rotate(180deg)" : "none",
-                        }} />
-                    </button>
                 </div>
 
-                {/* nav items */}
-                <nav style={{ flex: 1, padding: "6px 5px", display: "flex", flexDirection: "column", gap: 1, overflowY: "auto" }}>
+                {/* ── Sidebar Navigation ── */}
+                <nav style={{ padding: "6px 6px", flex: 1 }}>
                     {SIDEBAR_ITEMS.map(item => {
                         const Icon = item.icon
-                        const on = active === item.key
+                        const isActive = active === item.key
                         return (
                             <button
                                 key={item.key}
                                 onClick={() => setActive(item.key)}
-                                title={collapsed ? item.label : undefined}
+                                title={sidebarCollapsed ? item.label : undefined}
                                 style={{
-                                    display: "flex", alignItems: "center",
-                                    gap: 8,
-                                    padding: collapsed ? "9px 0" : "9px 10px",
-                                    borderRadius: 7, border: "none",
-                                    background: on ? "var(--t-accent)" : "transparent",
-                                    color: on ? "var(--t-text-on-accent)" : "var(--t-text-muted)",
-                                    fontSize: 13, fontWeight: on ? 600 : 500,
-                                    cursor: "pointer", transition: "all 0.1s",
-                                    textAlign: "right", width: "100%",
-                                    justifyContent: collapsed ? "center" : "flex-start",
+                                    display: "flex", width: "100%",
+                                    alignItems: "center", gap: 10,
+                                    padding: sidebarCollapsed ? "9px 0" : "7px 8px",
+                                    marginBottom: 2, borderRadius: 8, border: "none",
+                                    background: isActive ? "var(--t-card-hover, #f3f4f6)" : "transparent",
+                                    cursor: "pointer",
+                                    justifyContent: sidebarCollapsed ? "center" : "flex-start",
+                                    position: "relative", textAlign: "right",
+                                    transition: "background 0.12s", color: "inherit",
                                 }}
-                                onMouseEnter={e => { if (!on) e.currentTarget.style.background = "var(--t-card-hover)" }}
-                                onMouseLeave={e => { if (!on) e.currentTarget.style.background = "transparent" }}
+                                onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = "var(--t-card-hover, #f9fafb)" }}
+                                onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = isActive ? "var(--t-card-hover, #f3f4f6)" : "transparent" }}
                             >
-                                <Icon size={15} strokeWidth={on ? 2 : 1.5} style={{ flexShrink: 0 }} />
-                                {!collapsed && <span>{item.label}</span>}
+                                {/* Active indicator bar */}
+                                {isActive && !sidebarCollapsed && (
+                                    <div style={{
+                                        position: "absolute", right: 0,
+                                        top: "50%", transform: "translateY(-50%)",
+                                        width: 3, height: 18, borderRadius: 3,
+                                        background: "#004786",
+                                    }} />
+                                )}
+                                <div style={{
+                                    width: sidebarCollapsed ? 28 : 26,
+                                    height: sidebarCollapsed ? 28 : 26,
+                                    borderRadius: 7,
+                                    background: isActive ? "rgba(0,71,134,0.1)" : "var(--t-surface, #f3f4f6)",
+                                    display: "flex", alignItems: "center", justifyContent: "center",
+                                    flexShrink: 0, transition: "all 0.15s",
+                                }}>
+                                    <Icon
+                                        size={sidebarCollapsed ? 15 : 13}
+                                        strokeWidth={isActive ? 2.2 : 1.6}
+                                        style={{
+                                            color: isActive ? "#004786" : "var(--t-text-muted, #9ca3af)",
+                                            transition: "color 0.15s",
+                                        }}
+                                    />
+                                </div>
+                                {!sidebarCollapsed && (
+                                    <span style={{
+                                        fontSize: 12.5, fontWeight: isActive ? 600 : 500,
+                                        color: isActive ? "var(--t-text, #1f2937)" : "var(--t-text-secondary, #6b7280)",
+                                        transition: "color 0.15s",
+                                    }}>{item.label}</span>
+                                )}
                             </button>
                         )
                     })}
                 </nav>
 
-                {/* back link */}
-                {!collapsed && (
-                    <div style={{ padding: "10px 8px", borderTop: "1px solid var(--t-border-light)" }}>
-                        <Link
-                            to="/dashboard"
-                            style={{
-                                display: "flex", alignItems: "center", gap: 6,
-                                fontSize: 12, color: "var(--t-text-faint)", textDecoration: "none",
-                                padding: "7px 8px", borderRadius: 7,
-                                transition: "background 0.1s",
-                            }}
-                            onMouseEnter={e => { e.currentTarget.style.background = "var(--t-surface)" }}
-                            onMouseLeave={e => { e.currentTarget.style.background = "transparent" }}
-                        >
-                            <ChevronLeft size={12} style={{ transform: "rotate(180deg)" }} />
-                            العودة للوحة التحكم
-                        </Link>
-                    </div>
-                )}
+                {/* ── Footer: back link ── */}
+                <div style={{ padding: "6px 6px", borderTop: "1px solid var(--t-border-light, #f0f0f0)" }}>
+                    <Link to="/dashboard" style={{
+                        display: "flex", alignItems: "center", gap: 6,
+                        justifyContent: sidebarCollapsed ? "center" : "flex-start",
+                        fontSize: 11, color: "var(--t-text-faint, #9ca3af)", textDecoration: "none",
+                        padding: "7px 8px", borderRadius: 7,
+                        transition: "background 0.1s",
+                    }}
+                        onMouseEnter={e => { e.currentTarget.style.background = "var(--t-card-hover, #f9fafb)" }}
+                        onMouseLeave={e => { e.currentTarget.style.background = "transparent" }}
+                    >
+                        <ChevronLeft size={12} style={{ transform: "rotate(180deg)" }} />
+                        {!sidebarCollapsed && "العودة للوحة التحكم"}
+                    </Link>
+                </div>
             </aside>
 
             {/* ── Main Content ── */}
-            <main style={{ flex: 1, minWidth: 0, overflowY: "auto", padding: "20px 24px" }}>
-
-                {/* breadcrumb */}
-                <div style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 12, color: "var(--t-text-faint)", marginBottom: 4 }}>
-                    <Link to="/dashboard" style={{ color: "var(--t-text-faint)", textDecoration: "none" }}>لوحة التحكم</Link>
-                    <ChevronLeft size={11} style={{ color: "var(--t-text-faint)" }} />
-                    <span>الإعدادات الشخصية</span>
-                    <ChevronLeft size={11} style={{ color: "var(--t-text-faint)" }} />
-                    <span style={{ color: "var(--t-text-secondary)", fontWeight: 500 }}>{activeItem?.label}</span>
+            <div className="flex-1 overflow-y-auto">
+                <div className="p-6">
+                    <div key={active} style={{ animation: "profileFade .18s ease-out" }}>
+                        {active === "profile" && <ProfileTab />}
+                        {active === "security" && (
+                            <ComingSoon
+                                title="الأمان وكلمة المرور"
+                                desc="تغيير كلمة المرور، تفعيل المصادقة الثنائية، وإدارة جلسات تسجيل الدخول."
+                            />
+                        )}
+                        {active === "notifications" && (
+                            <ComingSoon
+                                title="تفضيلات الإشعارات"
+                                desc="التحكم في أنواع الإشعارات التي تصلك عبر البريد والتطبيق."
+                            />
+                        )}
+                    </div>
                 </div>
-
-                {/* page title */}
-                <h1 style={{
-                    fontSize: 20, fontWeight: 700, color: "var(--t-text)",
-                    margin: "0 0 2px", letterSpacing: "-0.01em",
-                }}>
-                    {activeItem?.label}
-                </h1>
-                <p style={{ fontSize: 13, color: "var(--t-text-faint)", margin: "0 0 20px" }}>
-                    {activeItem?.desc}
-                </p>
-
-                {/* content */}
-                <div key={active} style={{ animation: "profileFade .18s ease-out" }}>
-                    {active === "profile" && <ProfileTab />}
-                    {active === "security" && (
-                        <ComingSoon
-                            title="الأمان وكلمة المرور"
-                            desc="تغيير كلمة المرور، تفعيل المصادقة الثنائية، وإدارة جلسات تسجيل الدخول."
-                        />
-                    )}
-                    {active === "notifications" && (
-                        <ComingSoon
-                            title="تفضيلات الإشعارات"
-                            desc="التحكم في أنواع الإشعارات التي تصلك عبر البريد والتطبيق."
-                        />
-                    )}
-                </div>
-            </main>
+            </div>
 
             <style>{`@keyframes profileFade{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}`}</style>
         </div>

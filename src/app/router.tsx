@@ -17,12 +17,13 @@ import { UsersPage } from "@/features/users/pages/UsersPage"
 import { KnowledgeBasePage } from "@/features/knowledge/pages/KnowledgeBasePage"
 import { OrganizationSettingsPage } from "@/features/settings/pages/OrganizationSettingsPage"
 import { ProfileSettingsPage } from "@/features/settings/pages/ProfileSettingsPage"
-import { AISettingsPage } from "@/features/ai-settings/pages/AISettingsPage"
+import { AgentDetailPage } from "@/features/ai-settings/pages/AgentDetailPage"
 import { RolesPage } from "@/features/roles/pages/RolesPage"
 import { ChannelsPage } from "@/features/channels/pages/ChannelsPage"
 import { InboxPage } from "@/features/inbox/pages/InboxPage"
 import { ConversationPage } from "@/features/inbox/pages/ConversationPage"
 import { ContactsPage } from "@/features/contacts/pages/ContactsPage"
+import { MenuManagerPage } from "@/features/menu-manager/pages/MenuManagerPage"
 
 /** يتحقق من تسجيل الدخول — يحوّل لصفحة Login إذا لم يكن مسجلاً */
 function AuthGuard({ children }: { children: React.ReactNode }) {
@@ -57,6 +58,11 @@ export function AppRouter() {
                         <KnowledgeBasePage />
                     </PermissionGuard>
                 } />
+                <Route path="menu-manager" element={
+                    <PermissionGuard pageBit={PAGE_BITS.MENUS}>
+                        <MenuManagerPage />
+                    </PermissionGuard>
+                } />
                 <Route path="roles" element={
                     <PermissionGuard pageBit={PAGE_BITS.ROLES}>
                         <RolesPage />
@@ -85,7 +91,8 @@ export function AppRouter() {
                 <Route path="settings" element={<Navigate to="/dashboard/settings/organization" replace />} />
                 <Route path="settings/organization" element={<OrganizationSettingsPage />} />
                 <Route path="settings/profile" element={<ProfileSettingsPage />} />
-                <Route path="settings/ai" element={<AISettingsPage />} />
+                <Route path="settings/ai" element={<Navigate to="/dashboard/settings/organization?tab=ai" replace />} />
+                <Route path="settings/ai/:agentId" element={<AgentDetailPage />} />
             </Route>
 
             {/* Catch-all — redirect to login */}

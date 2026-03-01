@@ -1,6 +1,7 @@
-import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query"
+import { useQuery, useMutation, keepPreviousData } from "@tanstack/react-query"
 import { toast } from "sonner"
 import { pendingKeys } from "./query-keys"
+import { useKnowledgeEvents } from "@/features/knowledge/hooks/useKnowledgeEvents"
 import {
     searchPendingOrders,
     processApprove,
@@ -24,13 +25,13 @@ export function usePendingOrders(tenantId: string, params: SearchPendingOrdersPa
 /* ─── Mutations ─── */
 
 export function useApproveRequest(tenantId: string) {
-    const qc = useQueryClient()
+    const events = useKnowledgeEvents(tenantId)
     return useMutation({
         mutationFn: (requestId: string) => processApprove(requestId, tenantId),
         onSuccess: (res) => {
             if (res.success) {
                 toast.success(res.message || "تمت الموافقة على الطلب بنجاح")
-                qc.invalidateQueries({ queryKey: pendingKeys.all(tenantId) })
+                events.onRequestApproved()
             } else {
                 toast.error(res.message || "فشلت عملية الموافقة")
             }
@@ -40,14 +41,14 @@ export function useApproveRequest(tenantId: string) {
 }
 
 export function useRejectRequest(tenantId: string) {
-    const qc = useQueryClient()
+    const events = useKnowledgeEvents(tenantId)
     return useMutation({
         mutationFn: ({ requestId, reason }: { requestId: string; reason: string }) =>
             processReject(requestId, reason, tenantId),
         onSuccess: (res) => {
             if (res.success) {
                 toast.success(res.message || "تم رفض الطلب")
-                qc.invalidateQueries({ queryKey: pendingKeys.all(tenantId) })
+                events.onRequestRejected()
             } else {
                 toast.error(res.message || "فشلت عملية الرفض")
             }

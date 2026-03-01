@@ -5,19 +5,11 @@ import {
     getTeamStatistics, createTeam, updateTeam, updateTeamMembers, deleteTeam,
     assignCustomerToTeams, assignCustomersBulk, getCustomersByTeam,
     getTeamsCacheView, getTeamMembers, addTeamMember, removeTeamMember,
-    getAllTags, getTagById, createTag, updateTag, deleteTag,
-    getAllSnippets, createSnippet, updateSnippet, deleteSnippet,
-    getAllLifecycles, createLifecycle, updateLifecycle, deleteLifecycle, changeCustomerLifecycle,
-    getAllDynamicFields, createDynamicField, updateDynamicField, deleteDynamicField,
+    getDeletedTeams, restoreTeam,
 } from "../services/teams-tags-service"
 import type {
     CreateTeamPayload, UpdateTeamPayload, UpdateTeamMembersPayload,
     AssignCustomerPayload, AssignCustomersBulkPayload, CustomersByTeamParams,
-    CreateTagPayload, UpdateTagPayload,
-    CreateSnippetPayload, UpdateSnippetPayload,
-    CreateLifecyclePayload, UpdateLifecyclePayload,
-    DeleteLifecycleParams, ChangeCustomerLifecyclePayload,
-    CreateDynamicFieldPayload, UpdateDynamicFieldPayload,
 } from "../types/teams-tags"
 
 
@@ -31,11 +23,8 @@ const keys = {
     teamStats: (tid: string) => ["teams-stats", tid] as const,
     teamsCacheView: (tid: string) => ["teams-cache-view", tid] as const,
     teamMembers: (tid: string, teamId: string) => ["team-members", tid, teamId] as const,
+    deletedTeams: (tid: string, page: number, size: number) => ["deleted-teams", tid, page, size] as const,
     customersByTeam: (tid: string, teamName: string) => ["customers-by-team", tid, teamName] as const,
-    tags: (tid: string) => ["tags", tid] as const,
-    snippets: (tid: string, topic?: string) => ["snippets", tid, topic] as const,
-    lifecycles: (tid: string) => ["lifecycles", tid] as const,
-    dynamicFields: (tid: string) => ["dynamic-fields", tid] as const,
 }
 
 /* ════════════════════════════════════════════
@@ -140,13 +129,42 @@ export function useDeleteTeam(tid: string) {
         mutationFn: (teamId: string) => deleteTeam(teamId, tid),
         onSuccess: r => {
             if (r.success) {
-                toast.success("تم حذف الفريق")
+                toast.success("تم تعطيل الفريق")
                 qc.invalidateQueries({ queryKey: keys.teams(tid) })
                 qc.invalidateQueries({ queryKey: ["teams-paginated", tid] })
                 qc.invalidateQueries({ queryKey: keys.teamStats(tid) })
+                qc.invalidateQueries({ queryKey: ["deleted-teams", tid] })
             } else toast.error(r.message)
         },
-        onError: () => toast.error("حدث خطأ أثناء حذف الفريق"),
+        onError: () => toast.error("حدث خطأ أثناء تعطيل الفريق"),
+    })
+}
+
+/** الفرق المحذوفة (GET /teams/deleted) */
+export function useDeletedTeams(tid: string, page = 1, pageSize = 20) {
+    return useQuery({
+        queryKey: keys.deletedTeams(tid, page, pageSize),
+        queryFn: () => getDeletedTeams(tid, page, pageSize),
+        enabled: !!tid,
+        select: r => r.data,
+    })
+}
+
+/** استعادة فريق معطّل (PATCH /teams/{team_id}/restore) */
+export function useRestoreTeam(tid: string) {
+    const qc = useQueryClient()
+    return useMutation({
+        mutationFn: (teamId: string) => restoreTeam(teamId, tid),
+        onSuccess: r => {
+            if (r.success) {
+                toast.success("تم استعادة الفريق")
+                qc.invalidateQueries({ queryKey: keys.teams(tid) })
+                qc.invalidateQueries({ queryKey: ["teams-paginated", tid] })
+                qc.invalidateQueries({ queryKey: keys.teamStats(tid) })
+                qc.invalidateQueries({ queryKey: ["deleted-teams", tid] })
+            } else toast.error(r.message)
+        },
+        onError: () => toast.error("حدث خطأ أثناء استعادة الفريق"),
     })
 }
 
@@ -251,234 +269,11 @@ export function useRemoveTeamMember(tid: string) {
     })
 }
 
-/* ════════════════════════════════════════════
-   TAGS
-════════════════════════════════════════════ */
-/** جميع التاجات (GET /tags) */
-export function useTags(tid: string, page = 1, pageSize = 100) {
-    return useQuery({
-        queryKey: keys.tags(tid),
-        queryFn: () => getAllTags(tid, page, pageSize),
-        enabled: !!tid,
-        select: r => r.data?.items ?? [],
-    })
-}
-
-/** تاج محدد (GET /tags/{tag_id}) */
-export function useTagById(tid: string, tagId: string) {
-    return useQuery({
-        queryKey: [...keys.tags(tid), tagId],
-        queryFn: () => getTagById(tagId, tid),
-        enabled: !!tid && !!tagId,
-        select: r => r.data,
-    })
-}
-
-
-
-export function useCreateTag(tid: string) {
-    const qc = useQueryClient()
-    return useMutation({
-        mutationFn: (p: CreateTagPayload) => createTag(p, tid),
-        onSuccess: r => {
-            if (r.success) { toast.success("تم إنشاء التاج"); qc.invalidateQueries({ queryKey: keys.tags(tid) }) }
-            else toast.error(r.message)
-        },
-        onError: () => toast.error("حدث خطأ أثناء إنشاء التاج"),
-    })
-}
-
-export function useUpdateTag(tid: string) {
-    const qc = useQueryClient()
-    return useMutation({
-        mutationFn: ({ tagId, payload }: { tagId: string; payload: UpdateTagPayload }) =>
-            updateTag(tagId, payload, tid),
-        onSuccess: r => {
-            if (r.success) { toast.success("تم تحديث التاج"); qc.invalidateQueries({ queryKey: keys.tags(tid) }) }
-            else toast.error(r.message)
-        },
-        onError: () => toast.error("حدث خطأ أثناء تحديث التاج"),
-    })
-}
-
-export function useDeleteTag(tid: string) {
-    const qc = useQueryClient()
-    return useMutation({
-        mutationFn: (tagId: string) => deleteTag(tagId, tid),
-        onSuccess: r => {
-            if (r.success) { toast.success("تم حذف التاج"); qc.invalidateQueries({ queryKey: keys.tags(tid) }) }
-            else toast.error(r.message)
-        },
-        onError: () => toast.error("حدث خطأ أثناء حذف التاج"),
-    })
-}
-
-/* ════════════════════════════════════════════
-   SNIPPETS
-════════════════════════════════════════════ */
-export function useSnippets(tid: string, topic?: string) {
-    return useQuery({
-        queryKey: keys.snippets(tid, topic),
-        queryFn: () => getAllSnippets(tid, topic),
-        enabled: !!tid,
-        select: r => r.data?.items ?? [],
-    })
-}
-
-
-export function useCreateSnippet(tid: string) {
-    const qc = useQueryClient()
-    return useMutation({
-        mutationFn: (p: CreateSnippetPayload) => createSnippet(p, tid),
-        onSuccess: r => {
-            if (r.success) { toast.success("تم إنشاء الـ Snippet"); qc.invalidateQueries({ queryKey: keys.snippets(tid) }) }
-            else toast.error(r.message)
-        },
-        onError: () => toast.error("حدث خطأ أثناء إنشاء الـ Snippet"),
-    })
-}
-
-export function useUpdateSnippet(tid: string) {
-    const qc = useQueryClient()
-    return useMutation({
-        mutationFn: ({ fieldId, payload }: { fieldId: string; payload: UpdateSnippetPayload }) =>
-            updateSnippet(fieldId, payload, tid),
-        onSuccess: r => {
-            if (r.success) { toast.success("تم تحديث الـ Snippet"); qc.invalidateQueries({ queryKey: keys.snippets(tid) }) }
-            else toast.error(r.message)
-        },
-        onError: () => toast.error("حدث خطأ أثناء تحديث الـ Snippet"),
-    })
-}
-
-export function useDeleteSnippet(tid: string) {
-    const qc = useQueryClient()
-    return useMutation({
-        mutationFn: (fieldId: string) => deleteSnippet(fieldId, tid),
-        onSuccess: r => {
-            if (r.success) { toast.success("تم حذف الـ Snippet"); qc.invalidateQueries({ queryKey: keys.snippets(tid) }) }
-            else toast.error(r.message)
-        },
-        onError: () => toast.error("حدث خطأ أثناء حذف الـ Snippet"),
-    })
-}
-
-/* ════════════════════════════════════════════
-   LIFECYCLES
-════════════════════════════════════════════ */
-export function useLifecycles(tid: string) {
-    return useQuery({
-        queryKey: keys.lifecycles(tid),
-        queryFn: () => getAllLifecycles(tid),
-        enabled: !!tid,
-        select: r => r.data?.items ?? [],
-    })
-}
-
-export function useCreateLifecycle(tid: string) {
-    const qc = useQueryClient()
-    return useMutation({
-        mutationFn: (p: CreateLifecyclePayload) => createLifecycle(p, tid),
-        onSuccess: r => {
-            if (r.success) { toast.success("تم إنشاء دورة الحياة"); qc.invalidateQueries({ queryKey: keys.lifecycles(tid) }) }
-            else toast.error(r.message)
-        },
-        onError: () => toast.error("حدث خطأ أثناء إنشاء دورة الحياة"),
-    })
-}
-
-export function useUpdateLifecycle(tid: string) {
-    const qc = useQueryClient()
-    return useMutation({
-        mutationFn: ({ code, payload }: { code: string; payload: UpdateLifecyclePayload }) =>
-            updateLifecycle(code, payload, tid),
-        onSuccess: r => {
-            if (r.success) { toast.success("تم تحديث دورة الحياة"); qc.invalidateQueries({ queryKey: keys.lifecycles(tid) }) }
-            else toast.error(r.message)
-        },
-        onError: () => toast.error("حدث خطأ أثناء تحديث دورة الحياة"),
-    })
-}
-
-export function useDeleteLifecycle(tid: string) {
-    const qc = useQueryClient()
-    return useMutation({
-        mutationFn: ({ code, params }: { code: string; params: DeleteLifecycleParams }) =>
-            deleteLifecycle(code, params, tid),
-        onSuccess: r => {
-            if (r.success) { toast.success("تم حذف دورة الحياة"); qc.invalidateQueries({ queryKey: keys.lifecycles(tid) }) }
-            else toast.error(r.message)
-        },
-        onError: () => toast.error("حدث خطأ أثناء حذف دورة الحياة"),
-    })
-}
-
-/** PATCH /lifecycles/customers/{customer_id}/lifecycle */
-export function useChangeCustomerLifecycle(tid: string) {
-    const qc = useQueryClient()
-    return useMutation({
-        mutationFn: ({ customerId, payload }: { customerId: string; payload: ChangeCustomerLifecyclePayload }) =>
-            changeCustomerLifecycle(customerId, payload, tid),
-        onSuccess: r => {
-            if (r.success) { toast.success("تم تغيير مرحلة العميل"); qc.invalidateQueries({ queryKey: keys.lifecycles(tid) }) }
-            else toast.error(r.message)
-        },
-        onError: () => toast.error("حدث خطأ أثناء تغيير مرحلة العميل"),
-    })
-}
-
-/* ════════════════════════════════════════════
-   DYNAMIC FIELDS (Contact Fields)
-════════════════════════════════════════════ */
-
-/** جميع الحقول الديناميكية (GET /contacts/dynamic-fields) */
-export function useDynamicFields(tid: string) {
-    return useQuery({
-        queryKey: keys.dynamicFields(tid),
-        queryFn: () => getAllDynamicFields(tid),
-        enabled: !!tid,
-        select: r => {
-            const d = r.data
-            if (Array.isArray(d)) return d
-            if (d && typeof d === "object" && "items" in d) return (d as any).items ?? []
-            return []
-        },
-    })
-}
-
-export function useCreateDynamicField(tid: string) {
-    const qc = useQueryClient()
-    return useMutation({
-        mutationFn: (p: CreateDynamicFieldPayload) => createDynamicField(p, tid),
-        onSuccess: r => {
-            if (r.success) { toast.success("تم إنشاء الحقل"); qc.invalidateQueries({ queryKey: keys.dynamicFields(tid) }) }
-            else toast.error(r.message)
-        },
-        onError: () => toast.error("حدث خطأ أثناء إنشاء الحقل"),
-    })
-}
-
-export function useUpdateDynamicField(tid: string) {
-    const qc = useQueryClient()
-    return useMutation({
-        mutationFn: ({ fieldName, payload }: { fieldName: string; payload: UpdateDynamicFieldPayload }) =>
-            updateDynamicField(fieldName, payload, tid),
-        onSuccess: r => {
-            if (r.success) { toast.success("تم تحديث الحقل"); qc.invalidateQueries({ queryKey: keys.dynamicFields(tid) }) }
-            else toast.error(r.message)
-        },
-        onError: () => toast.error("حدث خطأ أثناء تحديث الحقل"),
-    })
-}
-
-export function useDeleteDynamicField(tid: string) {
-    const qc = useQueryClient()
-    return useMutation({
-        mutationFn: (fieldName: string) => deleteDynamicField(fieldName, tid),
-        onSuccess: r => {
-            if (r.success) { toast.success("تم حذف الحقل"); qc.invalidateQueries({ queryKey: keys.dynamicFields(tid) }) }
-            else toast.error(r.message)
-        },
-        onError: () => toast.error("حدث خطأ أثناء حذف الحقل"),
-    })
-}
+/* ═════════════════════════════════════
+   BACKWARD-COMPATIBLE RE-EXPORTS
+   (so existing imports from this file don't break)
+═════════════════════════════════════ */
+export { useTags, useTagById, useCreateTag, useUpdateTag, useDeleteTag, useDeletedTags, useRestoreTag } from "./use-tags"
+export { useSnippets, useCreateSnippet, useUpdateSnippet, useDeleteSnippet } from "./use-snippets"
+export { useLifecycles, useCreateLifecycle, useUpdateLifecycle, useDeleteLifecycle, useDeletedLifecycles, useRestoreLifecycle, useChangeCustomerLifecycle } from "./use-lifecycles"
+export { useDynamicFields, useCreateDynamicField, useUpdateDynamicField, useDeleteDynamicField } from "./use-contact-fields"

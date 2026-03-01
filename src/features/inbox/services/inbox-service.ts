@@ -146,19 +146,26 @@ export async function updateSessionStatus(customerId: string, sessionStatus: Ses
     return data.data
 }
 
-// POST /customers/{id}/teams
+// PUT /customers/{id}/teams — assign teams
 export async function assignCustomerTeams(customerId: string, teamIds: string[]) {
-    const { data } = await apiClient.post(`/customers/${customerId}/teams`, {
-        teams: teamIds, is_assigned_team: true,
+    const { data } = await apiClient.put(`/customers/${customerId}/teams`, {
+        teams: teamIds,
+        is_assigned_team: true,
     })
     return data.data
 }
 
-// DELETE /customers/{id}/teams
+// DELETE /customers/{id}/teams — remove teams
 export async function removeCustomerTeams(customerId: string, teamIds: string[]) {
     const { data } = await apiClient.delete(`/customers/${customerId}/teams`, {
         data: { teams: teamIds },
     })
+    return data.data
+}
+
+// GET /customers/{id}/teams — fetch customer teams
+export async function getCustomerTeams(customerId: string) {
+    const { data } = await apiClient.get(`/customers/${customerId}/teams`)
     return data.data
 }
 

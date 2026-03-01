@@ -39,8 +39,22 @@ export interface CustomerAssignment {
     updated_at?: string
 }
 
+export interface TeamDetail {
+    team_id: string
+    name: string
+    name_ar?: string
+    name_en?: string
+}
+
+export interface TagDetail {
+    id: string
+    name: string
+    name_ar?: string | null
+    emoji?: string | null
+}
+
 export interface CustomerTeamIds {
-    teams: string[]
+    teams: TeamDetail[]
     is_assigned_team: boolean
 }
 
@@ -88,7 +102,7 @@ export interface Customer {
     created_at: string
     updated_at?: string
     tenant_id?: string
-    tags?: string[]
+    tags?: TagDetail[]
     account_id?: string           // platform_id — required for send-message v2
     custom_fields?: Record<string, string>
     contact_fields?: Record<string, string>
@@ -107,6 +121,8 @@ export interface SidebarSummary { all: number; mine: number; unassigned: number;
 // ─── Available Filters ────────────────────
 export interface AvailableFilters {
     platforms: string[]; assigned_to: string[]; lifecycles: string[]; teams: string[]; tags: string[]
+    tags_details?: TagDetail[]
+    team_details?: TeamDetail[]
 }
 
 // ─── Message Content ──────────────────────

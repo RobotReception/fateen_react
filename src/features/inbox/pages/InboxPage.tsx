@@ -89,18 +89,18 @@ function InboxEmptyState() {
                     position:absolute; inset:-20px;
                     border-radius:50%;
                     background:radial-gradient(circle,
-                        rgba(99,102,241,.08) 0%,
-                        rgba(99,102,241,.03) 50%,
+                        rgba(0,114,181,.1) 0%,
+                        rgba(0,71,134,.04) 50%,
                         transparent 70%
                     );
                     animation:iePulseGlow 3s ease-in-out infinite;
                 }
                 .ie-icon-circle {
                     width:80px; height:80px; border-radius:50%;
-                    background:var(--t-surface);
+                    background:linear-gradient(135deg, #004786, #0072b5);
                     display:flex; align-items:center; justify-content:center;
-                    color:var(--t-accent);
-                    box-shadow:0 4px 20px var(--t-shadow);
+                    color:#fff;
+                    box-shadow:0 6px 24px rgba(0,71,134,0.2);
                     animation:ieFloat 4s ease-in-out infinite;
                     position:relative; z-index:1;
                 }
@@ -111,26 +111,26 @@ function InboxEmptyState() {
                 }
                 .ie-dot-1 {
                     width:10px; height:10px;
-                    background:var(--t-surface-deep); top:8px; right:14px;
+                    background:rgba(0,114,181,0.15); top:8px; right:14px;
                     animation:ieDotFloat 3.5s ease-in-out infinite;
                 }
                 .ie-dot-2 {
                     width:7px; height:7px;
-                    background:var(--t-text-faint); bottom:14px; left:10px;
+                    background:rgba(0,71,134,0.12); bottom:14px; left:10px;
                     animation:ieDotFloat 4s ease-in-out infinite .5s;
                 }
                 .ie-dot-3 {
                     width:5px; height:5px;
-                    background:var(--t-text-muted); top:28px; left:6px;
+                    background:rgba(0,114,181,0.1); top:28px; left:6px;
                     animation:ieDotFloat 3s ease-in-out infinite 1s;
                 }
 
                 /* ── Text ── */
                 .ie-text { display:flex; flex-direction:column; gap:6px; }
                 .ie-title {
-                    font-size:18px; font-weight:700;
+                    font-size:18px; font-weight:800;
                     color:var(--t-text);
-                    margin:0; letter-spacing:-.01em;
+                    margin:0; letter-spacing:-.02em;
                 }
                 .ie-subtitle {
                     font-size:13px; font-weight:400;
@@ -147,12 +147,14 @@ function InboxEmptyState() {
                     display:flex; align-items:center; gap:8px;
                     font-size:11.5px; font-weight:500;
                     color:var(--t-text-faint);
-                    padding:6px 14px; border-radius:8px;
+                    padding:7px 14px; border-radius:9px;
                     background:var(--t-surface);
-                    transition:all .15s;
+                    border:1px solid var(--t-border-light);
+                    transition:all .18s;
                 }
                 .ie-tip:hover {
-                    background:var(--t-accent-muted);
+                    background:rgba(0,114,181,0.06);
+                    border-color:rgba(0,114,181,0.15);
                     color:var(--t-text-muted);
                 }
                 .ie-tip-icon { font-size:13px; flex-shrink:0; }

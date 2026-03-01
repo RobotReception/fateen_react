@@ -1,6 +1,7 @@
-import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query"
+import { useQuery, useMutation, keepPreviousData } from "@tanstack/react-query"
 import { toast } from "sonner"
 import { knowledgeKeys } from "./query-keys"
+import { useKnowledgeEvents } from "./useKnowledgeEvents"
 import {
     searchDocuments,
     updateDocument,
@@ -28,13 +29,13 @@ export function useSearchDocuments(tenantId: string, params: SearchDocumentsPara
 /* ── Mutations ──────────────────────────────────────────── */
 
 export function useUpdateDocument(tenantId: string) {
-    const qc = useQueryClient()
+    const events = useKnowledgeEvents(tenantId)
     return useMutation({
         mutationFn: (payload: UpdateDocumentPayload) => updateDocument(payload, tenantId),
         onSuccess: (res) => {
             if (res.success) {
-                toast.success("تم إرسال طلب التحديث بنجاح")
-                qc.invalidateQueries({ queryKey: knowledgeKeys.documents.all(tenantId) })
+                toast.success("تم تقديم طلب التحديث بنجاح — يمكنك متابعته من الطلبات المعلقة")
+                events.onDocumentUpdated()
             } else {
                 toast.error(res.message || "فشل التحديث")
             }
@@ -44,14 +45,14 @@ export function useUpdateDocument(tenantId: string) {
 }
 
 export function useDeleteDocuments(tenantId: string) {
-    const qc = useQueryClient()
+    const events = useKnowledgeEvents(tenantId)
     return useMutation({
         mutationFn: (payload: DeleteDocumentPayload) => deleteDocuments(payload, tenantId),
         onSuccess: (res, payload) => {
             const count = Array.isArray(payload.doc_id) ? payload.doc_id.length : 1
             if (res.success) {
                 toast.success(`تم حذف ${count} مستند بنجاح`)
-                qc.invalidateQueries({ queryKey: knowledgeKeys.documents.all(tenantId) })
+                events.onDocumentDeleted()
             } else {
                 toast.error(res.message || "فشل الحذف")
             }

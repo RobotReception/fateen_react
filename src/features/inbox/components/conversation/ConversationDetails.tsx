@@ -9,7 +9,8 @@ import { toast } from "sonner"
 import type { Customer } from "../../types/inbox.types"
 import { Avatar } from "../ui/Avatar"
 import { addCustomerTags, removeCustomerTags, updateContactCustomFields } from "../../services/inbox-service"
-import { useTags, useDynamicFields } from "../../../settings/hooks/use-teams-tags"
+import { useTags } from "../../../settings/hooks/use-tags"
+import { useDynamicFields } from "../../../settings/hooks/use-contact-fields"
 import { useAuthStore } from "@/stores/auth-store"
 import type { Tag as TagType, DynamicField } from "../../../settings/types/teams-tags"
 
@@ -201,9 +202,6 @@ function ContactTab({ customer: c }: { customer: Customer }) {
     const { data: dynamicFields = [] } = useDynamicFields(tid)
     const queryClient = useQueryClient()
 
-    // Local state for inline editing
-    const [editingField, setEditingField] = useState<string | null>(null)
-    const [editValue, setEditValue] = useState("")
     const [saving, setSaving] = useState(false)
 
     // Merge custom_fields + contact_fields into one object for display
@@ -212,37 +210,45 @@ function ContactTab({ customer: c }: { customer: Customer }) {
         ...(c.custom_fields ?? {}),
     }
 
-    const startEdit = (fieldName: string, currentValue: string) => {
-        setEditingField(fieldName)
-        setEditValue(currentValue)
-    }
+    // Local edits — only stores fields the user has changed
+    const [localFields, setLocalFields] = useState<Record<string, string>>({})
 
-    const cancelEdit = () => {
-        setEditingField(null)
-        setEditValue("")
-    }
+    // Reset local edits when customer changes
+    useEffect(() => {
+        setLocalFields({})
+    }, [c.customer_id])
 
-    const saveField = async (fieldName: string) => {
-        if (saving) return
+    // Detect if any field has changed from server value
+    const hasChanges = useMemo(() => {
+        return Object.entries(localFields).some(([key, val]) => {
+            const original = fieldValues[key] ?? ""
+            return val !== original
+        })
+    }, [localFields, fieldValues])
+
+    // Save all changed fields in one API call
+    const saveAllFields = async () => {
+        if (saving || !hasChanges) return
         setSaving(true)
+
+        // Collect only changed fields
+        const changedFields: Record<string, string> = {}
+        for (const [key, val] of Object.entries(localFields)) {
+            const original = fieldValues[key] ?? ""
+            if (val !== original) changedFields[key] = val
+        }
+
         try {
-            await updateContactCustomFields(c.customer_id, {
-                [fieldName]: editValue,
-            })
-            // Invalidate inbox queries to refresh customer data
+            await updateContactCustomFields(c.customer_id, changedFields)
             queryClient.invalidateQueries({ queryKey: ["inbox-customers"] })
-            toast.success("تم حفظ التغيير")
+            queryClient.invalidateQueries({ queryKey: ["inbox-summary"] })
+            setLocalFields({})
+            toast.success("تم تحديث الحقول بنجاح")
         } catch {
             toast.error("حدث خطأ أثناء الحفظ")
         } finally {
             setSaving(false)
-            setEditingField(null)
         }
-    }
-
-    const handleKeyDown = (e: React.KeyboardEvent, fieldName: string) => {
-        if (e.key === "Enter") { e.preventDefault(); saveField(fieldName) }
-        if (e.key === "Escape") cancelEdit()
     }
 
     // Get icon for a field type
@@ -295,7 +301,7 @@ function ContactTab({ customer: c }: { customer: Customer }) {
             <div className="cd-divider" />
 
             {/* Dynamic Contact fields */}
-            <div className="cd-section-header">
+            <div className="cd-section-header" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <h3 className="cd-section-title">حقول جهة الاتصال</h3>
             </div>
 
@@ -303,28 +309,38 @@ function ContactTab({ customer: c }: { customer: Customer }) {
                 <div style={{ padding: "8px 14px", fontSize: 11, color: "var(--t-text-faint)", fontStyle: "italic" }}>
                     لا توجد حقول مخصصة
                 </div>
-            ) : activeFields.map((field: DynamicField) => {
-                const val = fieldValues[field.field_name] ?? ""
-                const isEditing = editingField === field.field_name
-                const label = field.label_ar || field.field_label
+            ) : (
+                <div style={{ padding: "4px 10px 6px" }}>
+                    {activeFields.map((field: DynamicField) => {
+                        const originalVal = fieldValues[field.field_name] ?? ""
+                        const currentVal = localFields[field.field_name] ?? originalVal
+                        const label = field.label_ar || field.field_label
+                        const inputDir = field.field_type === "email" || field.field_type === "phone" || field.field_type === "url" || field.field_type === "number" ? "ltr" : "rtl"
 
-                return (
-                    <div key={field.field_name} className="cd-field">
-                        <p className="cd-field-label">{typeIcon(field.field_type)} {label}</p>
-                        {isEditing ? (
-                            <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
+                        const sharedStyle: React.CSSProperties = {
+                            width: "100%", padding: "6px 8px",
+                            border: "1px solid var(--t-border-light, #e5e7eb)",
+                            borderRadius: 7, fontSize: 12, fontFamily: "inherit",
+                            background: "var(--t-surface, #fafbfc)", color: "var(--t-text, #111827)",
+                            outline: "none", transition: "border-color .15s",
+                        }
+
+                        return (
+                            <div key={field.field_name} style={{ marginBottom: 10 }}>
+                                <label style={{
+                                    display: "flex", alignItems: "center", gap: 4,
+                                    fontSize: 10.5, fontWeight: 600, color: "var(--t-text-muted, #6b7280)",
+                                    marginBottom: 3, paddingRight: 2,
+                                }}>
+                                    <span style={{ display: "flex", color: "var(--t-text-faint, #9ca3af)" }}>{typeIcon(field.field_type)}</span>
+                                    {label}
+                                </label>
+
                                 {field.field_type === "boolean" ? (
                                     <select
-                                        autoFocus
-                                        value={editValue}
-                                        onChange={e => setEditValue(e.target.value)}
-                                        onBlur={() => saveField(field.field_name)}
-                                        style={{
-                                            flex: 1, padding: "4px 6px", border: "1.5px solid var(--t-accent)",
-                                            borderRadius: 6, fontSize: 12, fontFamily: "inherit",
-                                            background: "var(--t-surface)", color: "var(--t-text)",
-                                            outline: "none",
-                                        }}
+                                        value={currentVal}
+                                        onChange={e => setLocalFields(prev => ({ ...prev, [field.field_name]: e.target.value }))}
+                                        style={{ ...sharedStyle, cursor: "pointer" }}
                                     >
                                         <option value="">—</option>
                                         <option value="true">نعم</option>
@@ -332,16 +348,9 @@ function ContactTab({ customer: c }: { customer: Customer }) {
                                     </select>
                                 ) : field.field_type === "select" ? (
                                     <select
-                                        autoFocus
-                                        value={editValue}
-                                        onChange={e => { setEditValue(e.target.value) }}
-                                        onBlur={() => saveField(field.field_name)}
-                                        style={{
-                                            flex: 1, padding: "4px 6px", border: "1.5px solid var(--t-accent)",
-                                            borderRadius: 6, fontSize: 12, fontFamily: "inherit",
-                                            background: "var(--t-surface)", color: "var(--t-text)",
-                                            outline: "none",
-                                        }}
+                                        value={currentVal}
+                                        onChange={e => setLocalFields(prev => ({ ...prev, [field.field_name]: e.target.value }))}
+                                        style={{ ...sharedStyle, cursor: "pointer" }}
                                     >
                                         <option value="">—</option>
                                         {(field.options ?? []).map(opt => (
@@ -350,51 +359,48 @@ function ContactTab({ customer: c }: { customer: Customer }) {
                                     </select>
                                 ) : field.field_type === "textarea" ? (
                                     <textarea
-                                        autoFocus
-                                        value={editValue}
-                                        onChange={e => setEditValue(e.target.value)}
-                                        onBlur={() => saveField(field.field_name)}
-                                        onKeyDown={e => { if (e.key === "Escape") cancelEdit() }}
-                                        rows={3}
-                                        style={{
-                                            flex: 1, padding: "4px 6px", border: "1.5px solid var(--t-accent)",
-                                            borderRadius: 6, fontSize: 12, fontFamily: "inherit",
-                                            background: "var(--t-surface)", color: "var(--t-text)",
-                                            outline: "none", resize: "vertical",
-                                        }}
+                                        value={currentVal}
+                                        onChange={e => setLocalFields(prev => ({ ...prev, [field.field_name]: e.target.value }))}
+                                        rows={2}
+                                        placeholder={`إضافة ${label}`}
+                                        style={{ ...sharedStyle, resize: "vertical", minHeight: 40 }}
                                     />
                                 ) : (
                                     <input
-                                        autoFocus
                                         type={field.field_type === "number" ? "number" : field.field_type === "date" ? "date" : field.field_type === "email" ? "email" : "text"}
-                                        dir={field.field_type === "email" || field.field_type === "phone" || field.field_type === "url" || field.field_type === "number" ? "ltr" : "rtl"}
-                                        value={editValue}
-                                        onChange={e => setEditValue(e.target.value)}
-                                        onBlur={() => saveField(field.field_name)}
-                                        onKeyDown={e => handleKeyDown(e, field.field_name)}
-                                        style={{
-                                            flex: 1, padding: "4px 6px", border: "1.5px solid var(--t-accent)",
-                                            borderRadius: 6, fontSize: 12, fontFamily: "inherit",
-                                            background: "var(--t-surface)", color: "var(--t-text)",
-                                            outline: "none",
-                                        }}
+                                        dir={inputDir}
+                                        value={currentVal}
+                                        onChange={e => setLocalFields(prev => ({ ...prev, [field.field_name]: e.target.value }))}
+                                        placeholder={`إضافة ${label}`}
+                                        style={sharedStyle}
                                     />
                                 )}
-                                {saving && <Loader2 size={12} className="animate-spin" style={{ color: "var(--t-accent)", flexShrink: 0 }} />}
                             </div>
-                        ) : (
-                            <p
-                                className={val ? "cd-field-value" : "cd-field-empty"}
-                                onClick={() => startEdit(field.field_name, val)}
-                                style={{ cursor: "pointer" }}
-                                title="اضغط للتعديل"
-                            >
-                                {val || (field.field_type === "boolean" ? "—" : `إضافة ${label}`)}
-                            </p>
-                        )}
-                    </div>
-                )
-            })}
+                        )
+                    })}
+
+                    {/* Bulk Update Button — only shown if there are changes */}
+                    {hasChanges && (
+                        <button
+                            onClick={saveAllFields}
+                            disabled={saving}
+                            style={{
+                                width: "100%", padding: "8px 0",
+                                border: "none", borderRadius: 8,
+                                background: saving ? "#94a3b8" : "linear-gradient(135deg, #0072b5, #004786)",
+                                color: "#fff", fontSize: 12.5, fontWeight: 700,
+                                fontFamily: "inherit", cursor: saving ? "not-allowed" : "pointer",
+                                display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+                                transition: "all .15s", marginTop: 4, marginBottom: 2,
+                                boxShadow: saving ? "none" : "0 2px 8px rgba(0,71,134,0.18)",
+                            }}
+                        >
+                            {saving && <Loader2 size={13} className="animate-spin" />}
+                            {saving ? "جاري الحفظ..." : "تحديث الحقول"}
+                        </button>
+                    )}
+                </div>
+            )}
 
             <div className="cd-divider" />
 
@@ -416,15 +422,15 @@ function ContactTab({ customer: c }: { customer: Customer }) {
             )}
 
             {/* Teams */}
-            {c.team_ids?.teams && c.team_ids.teams.length > 0 && (
+            {(c.team_ids?.teams && c.team_ids.teams.length > 0) && (
                 <>
                     <div className="cd-section-header">
                         <h3 className="cd-section-title">الفرق</h3>
                     </div>
                     <div style={{ padding: "4px 14px 10px", display: "flex", flexWrap: "wrap", gap: 4 }}>
                         {c.team_ids.teams.map(t => (
-                            <span key={t} className="cd-badge" style={{ background: "var(--t-surface)", color: "var(--t-text-secondary)" }}>
-                                {t}
+                            <span key={t.team_id} className="cd-badge" style={{ background: "var(--t-surface)", color: "var(--t-text-secondary)" }}>
+                                {t.name}
                             </span>
                         ))}
                     </div>
@@ -450,12 +456,12 @@ function TagsSection({ customer }: { customer: Customer }) {
     const [search, setSearch] = useState("")
     const popoverRef = useRef<HTMLDivElement>(null)
 
-    // Local optimistic tags state
-    const [localTags, setLocalTags] = useState<string[]>(customer.tags ?? [])
+    // Local optimistic tags state — store IDs only
+    const [localTags, setLocalTags] = useState<string[]>(() => (customer.tags ?? []).map(t => t.id))
 
     // Sync local state when customer.tags changes from server
     useEffect(() => {
-        setLocalTags(customer.tags ?? [])
+        setLocalTags((customer.tags ?? []).map(t => t.id))
     }, [customer.tags])
 
     // Current customer tags (use local state for instant UI)
@@ -489,6 +495,7 @@ function TagsSection({ customer }: { customer: Customer }) {
         addCustomerTags(customer.customer_id, [tagId])
             .then(() => {
                 queryClient.invalidateQueries({ queryKey: ["inbox-customers"] })
+                queryClient.invalidateQueries({ queryKey: ["inbox-summary"] })
             })
             .catch(() => {
                 // Rollback on error
@@ -505,6 +512,7 @@ function TagsSection({ customer }: { customer: Customer }) {
         removeCustomerTags(customer.customer_id, [tagId])
             .then(() => {
                 queryClient.invalidateQueries({ queryKey: ["inbox-customers"] })
+                queryClient.invalidateQueries({ queryKey: ["inbox-summary"] })
             })
             .catch(() => {
                 // Rollback on error

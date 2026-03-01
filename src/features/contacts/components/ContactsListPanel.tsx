@@ -1,4 +1,4 @@
-import { Search, SlidersHorizontal, ChevronLeft, ChevronRight, RefreshCw } from "lucide-react"
+import { Search, SlidersHorizontal, ChevronLeft, ChevronRight, RefreshCw, Users } from "lucide-react"
 import { useContactsStore } from "../store/contacts.store"
 import { useContacts } from "../hooks/use-contacts"
 import { useContactLookups } from "../hooks/use-contact-lookups"
@@ -11,21 +11,19 @@ interface TableColumn {
     sortable?: boolean
 }
 
-// Static columns (always shown)
 const STATIC_COLUMNS_LEFT: TableColumn[] = [
-    { key: "check", label: "", width: "40px" },
-    { key: "name", label: "Name", sortable: true },
-    { key: "channels", label: "Channel(s)" },
-    { key: "lifecycle", label: "Lifecycle" },
+    { key: "check", label: "", width: "36px" },
+    { key: "name", label: "الاسم", sortable: true },
+    { key: "channels", label: "القناة" },
+    { key: "lifecycle", label: "المرحلة" },
 ]
 
 const STATIC_COLUMNS_RIGHT: TableColumn[] = [
-    { key: "tags", label: "Tags" },
-    { key: "teams", label: "Teams" },
-    { key: "status", label: "Conversation Status" },
+    { key: "tags", label: "الوسوم" },
+    { key: "teams", label: "الفرق" },
+    { key: "status", label: "حالة المحادثة" },
 ]
 
-/** Pretty-print a custom_fields key as a column header */
 function formatFieldLabel(key: string): string {
     return key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, " ")
 }
@@ -44,13 +42,10 @@ export function ContactsListPanel() {
         filterPanelOpen, toggleFilterPanel,
     } = useContactsStore()
 
-    // Build query params
     const skip = (currentPage - 1) * pageSize
-    const lifecycleFilter = activeSection.startsWith("lc_")
-        ? activeSection.slice(3) : filters.lifecycle
+    const lifecycleFilter = activeSection.startsWith("lc_") ? activeSection.slice(3) : filters.lifecycle
     const queryParams = {
-        skip,
-        limit: pageSize,
+        skip, limit: pageSize,
         search: searchQuery || undefined,
         platform: filters.platform,
         session_status: filters.session_status,
@@ -59,8 +54,7 @@ export function ContactsListPanel() {
         tags: filters.tags,
         enable_ai: filters.enable_ai,
         conversation_status: filters.conversation_status,
-        sort_by: sortBy,
-        sort_order: sortOrder,
+        sort_by: sortBy, sort_order: sortOrder,
     }
 
     const { data, isLoading, isFetching, refetch } = useContacts(queryParams)
@@ -71,12 +65,10 @@ export function ContactsListPanel() {
     const totalCount = pagination?.totalCount ?? 0
     const totalPages = pagination?.totalPages ?? 1
 
-    // Dynamically detect all custom_fields keys across all contacts
     const customFieldKeys = Array.from(
         new Set(contacts.flatMap(c => Object.keys(c.custom_fields ?? {})))
     )
 
-    // Build full columns: static left + dynamic custom_fields + static right
     const TABLE_COLUMNS: TableColumn[] = [
         ...STATIC_COLUMNS_LEFT,
         ...customFieldKeys.map(key => ({ key: `cf_${key}`, label: formatFieldLabel(key) })),
@@ -86,86 +78,68 @@ export function ContactsListPanel() {
     const endItem = Math.min(skip + pageSize, totalCount)
 
     return (
-        <div className="clp2-root">
+        <div className="cl-root">
             {/* ── Top Bar ── */}
-            <div className="clp2-topbar">
-                {/* Search */}
-                <div className="clp2-search-wrap">
-                    <Search size={14} className="clp2-search-icon" />
-                    <input
-                        type="text"
-                        placeholder="Search Contacts"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="clp2-search-input"
-                    />
+            <div className="cl-topbar">
+                <div className="cl-search-wrap">
+                    <Search size={13} className="cl-search-icon" />
+                    <input type="text" placeholder="بحث في جهات الاتصال..." value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)} className="cl-search-input" />
                 </div>
 
-                {/* Right actions */}
-                <div className="clp2-actions">
-                    <button
-                        className="clp2-filter-btn"
-                        onClick={toggleFilterPanel}
-                        style={{
-                            background: filterPanelOpen ? "var(--t-accent-muted)" : "transparent",
-                            color: filterPanelOpen ? "var(--t-accent)" : "var(--t-text-muted)",
-                        }}
-                        title="فلترة"
-                    >
-                        <SlidersHorizontal size={14} />
+                <div className="cl-topbar-right">
+                    <span className="cl-count-label">
+                        <Users size={11} /> {totalCount} جهة اتصال
+                    </span>
+                    <button className="cl-icon-btn" onClick={toggleFilterPanel} title="فلترة"
+                        style={{ background: filterPanelOpen ? "rgba(0,71,134,.06)" : undefined, color: filterPanelOpen ? "#004786" : undefined }}>
+                        <SlidersHorizontal size={13} />
                     </button>
-
-                    <button
-                        className="clp2-filter-btn"
-                        onClick={() => refetch()}
-                        title="تحديث"
-                        style={{
-                            background: isFetching ? "var(--t-accent-muted)" : "transparent",
-                            color: isFetching ? "var(--t-accent)" : "var(--t-text-muted)",
-                        }}
-                    >
-                        <RefreshCw size={14} className={isFetching ? "clp2-spin" : ""} />
+                    <button className="cl-icon-btn" onClick={() => refetch()} title="تحديث"
+                        style={{ background: isFetching ? "rgba(0,71,134,.06)" : undefined, color: isFetching ? "#004786" : undefined }}>
+                        <RefreshCw size={13} className={isFetching ? "cl-spin" : ""} />
                     </button>
-
-
                 </div>
             </div>
 
             {/* ── Loading bar ── */}
-            <div className={`clp2-progress ${isFetching ? "clp2-progress-active" : ""}`} />
+            {isFetching && (
+                <div style={{ height: 2, background: "#ebeef2", overflow: "hidden", position: "relative" }}>
+                    <div style={{ position: "absolute", inset: 0, background: "linear-gradient(90deg, transparent, #004786, transparent)", animation: "clSweep 1.3s ease-in-out infinite" }} />
+                </div>
+            )}
 
             {/* ── Table ── */}
-            <div className="clp2-table-wrap">
+            <div className="cl-table-wrap">
                 {isLoading ? (
-                    <div className="clp2-loading">
-                        <div className="clp2-spinner" />
-                        <span>جاري تحميل جهات الاتصال…</span>
+                    <div className="cl-loading">
+                        <div className="cl-spinner" />
+                        <span style={{ fontSize: 12, color: "#9ca3af" }}>جاري تحميل جهات الاتصال…</span>
                     </div>
                 ) : contacts.length === 0 ? (
-                    <div className="clp2-empty">
-                        <div className="clp2-empty-icon">👥</div>
-                        <p className="clp2-empty-title">
+                    <div className="cl-empty">
+                        <div style={{ width: 52, height: 52, borderRadius: 14, background: "#f5f6f8", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 8 }}>
+                            <Users size={22} style={{ color: "#d1d5db" }} />
+                        </div>
+                        <div style={{ fontSize: 14, fontWeight: 700, color: "#111827", marginBottom: 3 }}>
                             {searchQuery ? "لا توجد نتائج" : "لا توجد جهات اتصال"}
-                        </p>
-                        <p className="clp2-empty-sub">
-                            {searchQuery ? "حاول تغيير البحث" : "جهات الاتصال الجديدة ستظهر هنا"}
-                        </p>
+                        </div>
+                        <div style={{ fontSize: 11, color: "#9ca3af" }}>
+                            {searchQuery ? "حاول تغيير كلمات البحث" : "جهات الاتصال الجديدة ستظهر هنا"}
+                        </div>
                     </div>
                 ) : (
-                    <table className="clp2-table">
+                    <table className="cl-table">
                         <thead>
-                            <tr className="clp2-thead-row">
+                            <tr className="cl-thead-row">
                                 {TABLE_COLUMNS.map((col) => (
-                                    <th key={col.key} className="clp2-th"
-                                        style={col.width ? { width: col.width } : undefined}>
+                                    <th key={col.key} className="cl-th" style={col.width ? { width: col.width } : undefined}>
                                         {col.key === "check" ? (
-                                            <input type="checkbox" className="ct-checkbox" />
+                                            <input type="checkbox" className="cl-checkbox" />
                                         ) : (
-                                            <div className="clp2-th-inner">
+                                            <div className="cl-th-inner">
                                                 <span>{col.label}</span>
-                                                {col.sortable && (
-                                                    <span className="clp2-sort-icon">⇅</span>
-                                                )}
+                                                {col.sortable && <span className="cl-sort-icon">⇅</span>}
                                             </div>
                                         )}
                                     </th>
@@ -193,226 +167,55 @@ export function ContactsListPanel() {
 
             {/* ── Pagination Footer ── */}
             {!isLoading && contacts.length > 0 && (
-                <div className="clp2-footer">
-                    <div className="clp2-page-size">
-                        <span>Contacts per page:</span>
-                        <select
-                            value={pageSize}
-                            onChange={(e) => setPageSize(Number(e.target.value))}
-                            className="clp2-page-select"
-                        >
-                            {PAGE_SIZES.map((s) => (
-                                <option key={s} value={s}>{s}</option>
-                            ))}
+                <div className="cl-footer">
+                    <div className="cl-page-size">
+                        <span>لكل صفحة:</span>
+                        <select value={pageSize} onChange={(e) => setPageSize(Number(e.target.value))} className="cl-page-select">
+                            {PAGE_SIZES.map((s) => <option key={s} value={s}>{s}</option>)}
                         </select>
                     </div>
-
-                    <div className="clp2-page-info">
-                        <span>{startItem}–{endItem} of {totalCount}</span>
-                        <button
-                            className="clp2-page-btn"
-                            disabled={currentPage <= 1}
-                            onClick={() => setCurrentPage(currentPage - 1)}
-                        >
-                            <ChevronLeft size={16} />
-                        </button>
-                        <button
-                            className="clp2-page-btn"
-                            disabled={currentPage >= totalPages}
-                            onClick={() => setCurrentPage(currentPage + 1)}
-                        >
-                            <ChevronRight size={16} />
-                        </button>
+                    <div className="cl-page-info">
+                        <span style={{ fontVariantNumeric: "tabular-nums" }}>{startItem}–{endItem} من {totalCount}</span>
+                        <button className="cl-page-btn" disabled={currentPage <= 1} onClick={() => setCurrentPage(currentPage - 1)}><ChevronRight size={14} /></button>
+                        <button className="cl-page-btn" disabled={currentPage >= totalPages} onClick={() => setCurrentPage(currentPage + 1)}><ChevronLeft size={14} /></button>
                     </div>
                 </div>
             )}
 
             <style>{`
-                .clp2-root {
-                    flex:1; display:flex; flex-direction:column;
-                    background:var(--t-page);
-                    overflow:hidden; min-width:0;
-                }
-
-                /* Top bar */
-                .clp2-topbar {
-                    display:flex; align-items:center;
-                    justify-content:space-between;
-                    padding:10px 16px;
-                    background:var(--t-card);
-                    border-bottom:1px solid var(--t-border-light);
-                    gap:12px; flex-shrink:0;
-                }
-                .clp2-search-wrap {
-                    display:flex; align-items:center; gap:8px;
-                    background:var(--t-surface);
-                    border:1px solid var(--t-border-light);
-                    border-radius:8px; padding:6px 10px;
-                    flex:0 0 220px;
-                    transition:border-color .2s;
-                }
-                .clp2-search-wrap:focus-within {
-                    border-color:var(--t-accent);
-                }
-                .clp2-search-icon { color:var(--t-text-faint); flex-shrink:0; }
-                .clp2-search-input {
-                    border:none; background:transparent; outline:none;
-                    font-size:13px; color:var(--t-text);
-                    width:100%;
-                }
-                .clp2-search-input::placeholder { color:var(--t-text-faint); }
-
-                .clp2-actions {
-                    display:flex; align-items:center; gap:6px;
-                }
-                .clp2-filter-btn {
-                    width:32px; height:32px; border-radius:8px;
-                    border:1px solid var(--t-border-light);
-                    display:flex; align-items:center; justify-content:center;
-                    cursor:pointer; transition:all .12s;
-                }
-                .clp2-filter-btn:hover {
-                    background:var(--t-surface);
-                }
-                .clp2-add-btn {
-                    display:flex; align-items:center; gap:6px;
-                    padding:6px 14px; border-radius:8px;
-                    background:var(--t-accent);
-                    color:var(--t-text-on-accent);
-                    border:none; cursor:pointer;
-                    font-size:13px; font-weight:600;
-                    transition:opacity .15s;
-                }
-                .clp2-add-btn:hover { opacity:0.9; }
-                .clp2-add-dropdown {
-                    padding:6px 6px; border-radius:0 8px 8px 0;
-                    background:var(--t-accent);
-                    color:var(--t-text-on-accent);
-                    border:none; border-left:1px solid rgba(255,255,255,0.2);
-                    cursor:pointer; display:flex; align-items:center;
-                    margin-left:-6px;
-                    transition:opacity .15s;
-                }
-                .clp2-add-dropdown:hover { opacity:0.9; }
-
-                /* Progress */
-                .clp2-progress {
-                    height:2px; flex-shrink:0;
-                    background:transparent; transition:background .2s;
-                }
-                .clp2-progress-active {
-                    background:linear-gradient(90deg, transparent, var(--t-accent), transparent);
-                    animation:clp2Shimmer 1.5s ease-in-out infinite;
-                }
-
-                /* Table */
-                .clp2-table-wrap {
-                    flex:1; overflow:auto;
-                }
-                .clp2-table-wrap::-webkit-scrollbar { width:4px; height:4px; }
-                .clp2-table-wrap::-webkit-scrollbar-thumb {
-                    background:rgba(0,0,0,.12); border-radius:4px;
-                }
-                .clp2-table {
-                    width:100%; border-collapse:collapse; min-width:900px;
-                }
-                .clp2-thead-row {
-                    position:sticky; top:0; z-index:2;
-                    background:var(--t-card);
-                    border-bottom:1px solid var(--t-border);
-                }
-                .clp2-th {
-                    padding:10px 12px; text-align:left;
-                    font-size:12px; font-weight:600;
-                    color:var(--t-text-muted);
-                    white-space:nowrap;
-                    user-select:none;
-                }
-                .clp2-th-inner {
-                    display:flex; align-items:center; gap:4px;
-                }
-                .clp2-sort-icon {
-                    font-size:10px; color:var(--t-text-faint);
-                    cursor:pointer;
-                }
-
-                /* Loading & Empty */
-                .clp2-loading {
-                    display:flex; flex-direction:column;
-                    align-items:center; justify-content:center;
-                    height:100%; gap:10px;
-                }
-                .clp2-spinner {
-                    width:28px; height:28px; border-radius:50%;
-                    border:3px solid var(--t-border-light);
-                    border-top-color:var(--t-accent);
-                    animation:spin 0.7s linear infinite;
-                }
-                .clp2-empty {
-                    display:flex; flex-direction:column;
-                    align-items:center; justify-content:center;
-                    height:100%; gap:8px; padding:24px; text-align:center;
-                }
-                .clp2-empty-icon {
-                    width:56px; height:56px; border-radius:50%;
-                    background:var(--t-surface); display:flex;
-                    align-items:center; justify-content:center; font-size:26px;
-                }
-                .clp2-empty-title {
-                    font-size:14px; font-weight:600;
-                    color:var(--t-text-secondary); margin:0;
-                }
-                .clp2-empty-sub {
-                    font-size:12px; color:var(--t-text-faint); margin:0;
-                }
-
-                /* Footer */
-                .clp2-footer {
-                    display:flex; align-items:center;
-                    justify-content:flex-end;
-                    padding:8px 16px; gap:20px;
-                    border-top:1px solid var(--t-border-light);
-                    background:var(--t-card);
-                    flex-shrink:0;
-                }
-                .clp2-page-size {
-                    display:flex; align-items:center; gap:6px;
-                    font-size:12px; color:var(--t-text-muted);
-                }
-                .clp2-page-select {
-                    border:1px solid var(--t-border-light);
-                    border-radius:6px; padding:2px 6px;
-                    font-size:12px; background:var(--t-card);
-                    color:var(--t-text); outline:none;
-                    cursor:pointer;
-                }
-                .clp2-page-info {
-                    display:flex; align-items:center; gap:8px;
-                    font-size:12px; color:var(--t-text-muted);
-                }
-                .clp2-page-btn {
-                    width:28px; height:28px; border-radius:6px;
-                    border:1px solid var(--t-border-light);
-                    background:var(--t-card); cursor:pointer;
-                    display:flex; align-items:center; justify-content:center;
-                    color:var(--t-text-muted); transition:all .12s;
-                }
-                .clp2-page-btn:hover:not(:disabled) {
-                    background:var(--t-surface);
-                    color:var(--t-text);
-                }
-                .clp2-page-btn:disabled {
-                    opacity:0.4; cursor:not-allowed;
-                }
-
-                @keyframes spin { to { transform:rotate(360deg) } }
-                @keyframes clp2Shimmer {
-                    0% { background-position:-200px 0; }
-                    100% { background-position:200px 0; }
-                }
-                .clp2-spin {
-                    animation:spin 0.8s linear infinite;
-                }
+                .cl-root{flex:1;display:flex;flex-direction:column;background:#fafbfc;overflow:hidden;min-width:0}
+                .cl-topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#fff;border-bottom:1px solid #ebeef2;gap:10px;flex-shrink:0}
+                .cl-search-wrap{display:flex;align-items:center;gap:7px;background:#f5f6f8;border:1.5px solid #ebeef2;border-radius:8px;padding:6px 10px;flex:0 0 220px;transition:border-color .2s}
+                .cl-search-wrap:focus-within{border-color:#004786;background:#fff}
+                .cl-search-icon{color:#b0b7c3;flex-shrink:0}
+                .cl-search-input{border:none;background:transparent;outline:none;font-size:12px;color:#111827;width:100%;font-family:inherit}
+                .cl-search-input::placeholder{color:#b0b7c3}
+                .cl-topbar-right{display:flex;align-items:center;gap:6px}
+                .cl-count-label{display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:#9ca3af;padding:0 6px}
+                .cl-icon-btn{width:30px;height:30px;border-radius:7px;border:1px solid #ebeef2;background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#9ca3af;transition:all .12s}
+                .cl-icon-btn:hover{background:#f5f6f8;color:#6b7280;border-color:#d1d5db}
+                .cl-table-wrap{flex:1;overflow:auto}
+                .cl-table-wrap::-webkit-scrollbar{width:3px;height:3px}
+                .cl-table-wrap::-webkit-scrollbar-thumb{background:rgba(0,0,0,.1);border-radius:3px}
+                .cl-table{width:100%;border-collapse:collapse;min-width:850px}
+                .cl-thead-row{position:sticky;top:0;z-index:2;background:#fff;border-bottom:1.5px solid #ebeef2}
+                .cl-th{padding:9px 12px;text-align:right;font-size:11px;font-weight:700;color:#9ca3af;white-space:nowrap;user-select:none}
+                .cl-th-inner{display:flex;align-items:center;gap:3px}
+                .cl-sort-icon{font-size:9px;color:#d1d5db;cursor:pointer}
+                .cl-checkbox{width:14px;height:14px;border-radius:3px;cursor:pointer;accent-color:#004786}
+                .cl-loading{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:10px}
+                .cl-spinner{width:26px;height:26px;border-radius:50%;border:2.5px solid #ebeef2;border-top-color:#004786;animation:spin .7s linear infinite}
+                .cl-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:24px;text-align:center}
+                .cl-footer{display:flex;align-items:center;justify-content:flex-end;padding:8px 14px;gap:16px;border-top:1px solid #ebeef2;background:#fff;flex-shrink:0}
+                .cl-page-size{display:flex;align-items:center;gap:5px;font-size:11px;color:#9ca3af}
+                .cl-page-select{border:1px solid #ebeef2;border-radius:6px;padding:2px 6px;font-size:11px;background:#fff;color:#111827;outline:none;cursor:pointer;font-family:inherit}
+                .cl-page-info{display:flex;align-items:center;gap:6px;font-size:11px;color:#9ca3af}
+                .cl-page-btn{width:26px;height:26px;border-radius:6px;border:1px solid #ebeef2;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#9ca3af;transition:all .12s}
+                .cl-page-btn:hover:not(:disabled){background:#f5f6f8;color:#111827}
+                .cl-page-btn:disabled{opacity:.35;cursor:not-allowed}
+                @keyframes spin{to{transform:rotate(360deg)}}
+                @keyframes clSweep{0%{transform:translateX(-100%)}100%{transform:translateX(200%)}}
+                .cl-spin{animation:spin .8s linear infinite}
             `}</style>
         </div>
     )

@@ -18,23 +18,53 @@ import { SnippetsTab } from "../components/SnippetsTab"
 import { LifecyclesTab } from "../components/LifecyclesTab"
 import { ContactFieldsTab } from "../components/ContactFieldsTab"
 
-/* ── sidebar items ── */
-const SIDEBAR_ITEMS = [
-    { key: "general", label: "الإعدادات العامة", icon: Settings, desc: "إدارة وتحديث بيانات المؤسسة الأساسية" },
-    { key: "users", label: "إدارة المستخدمين", icon: Users, desc: "إضافة وإدارة مستخدمي المؤسسة وصلاحياتهم" },
-    { key: "roles", label: "الأدوار والصلاحيات", icon: Shield, desc: "إنشاء الأدوار وإدارة الصلاحيات وتعيين المستخدمين" },
-    { key: "channels", label: "القنوات", icon: MessageSquare, desc: "إعداد وإدارة قنوات التواصل المختلفة" },
-    { key: "teams", label: "الفرق", icon: UsersRound, desc: "إدارة فرق العمل وتوزيع الأعضاء" },
-    { key: "tags", label: "التاجات", icon: Tag, desc: "إنشاء وإدارة تاجات تصنيف العملاء والمحادثات" },
-    { key: "snippets", label: "Snippets", icon: FileText, desc: "جمل وردود جاهزة للاستخدام السريع في المحادثات" },
-    { key: "lifecycles", label: "دورات الحياة", icon: RefreshCw, desc: "تحديد مراحل دورة حياة العميل من من تحويل لعملية" },
-    { key: "contact-fields", label: "حقول جهات الاتصال", icon: FileSliders, desc: "إنشاء وإدارة الحقول الديناميكية لجهات الاتصال" },
-    { key: "ai", label: "الذكاء الاصطناعي", icon: Brain, desc: "إعدادات الذكاء الاصطناعي والتوجيه وتحويل النص لكلام" },
-    { key: "theme", label: "تخصيص المظهر", icon: Palette, desc: "تغيير ألوان الواجهة لتتناسب مع هوية مؤسستك" },
-    { key: "billing", label: "الاشتراك والدفع", icon: CreditCard, desc: "إدارة خطتك الحالية وعرض الفواتير" },
-] as const
+/* ── sidebar sections ── */
+type SidebarKey = "general" | "users" | "roles" | "channels" | "teams" | "tags" | "snippets" | "lifecycles" | "contact-fields" | "ai" | "theme" | "billing"
 
-type SidebarKey = (typeof SIDEBAR_ITEMS)[number]["key"]
+interface SidebarItem { key: SidebarKey; label: string; icon: typeof Settings; desc: string }
+interface SidebarSection { title: string; items: SidebarItem[] }
+
+const SIDEBAR_SECTIONS: SidebarSection[] = [
+    {
+        title: "عام",
+        items: [
+            { key: "general", label: "الإعدادات العامة", icon: Settings, desc: "إدارة بيانات المؤسسة الأساسية" },
+        ],
+    },
+    {
+        title: "المستخدمين والصلاحيات",
+        items: [
+            { key: "users", label: "إدارة المستخدمين", icon: Users, desc: "إضافة وإدارة المستخدمين" },
+            { key: "roles", label: "الأدوار والصلاحيات", icon: Shield, desc: "إنشاء الأدوار وإدارة الصلاحيات" },
+            { key: "teams", label: "الفرق", icon: UsersRound, desc: "إدارة فرق العمل" },
+        ],
+    },
+    {
+        title: "التطبيقات",
+        items: [
+            { key: "channels", label: "القنوات", icon: MessageSquare, desc: "إعداد قنوات التواصل" },
+            { key: "ai", label: "الذكاء الاصطناعي", icon: Brain, desc: "إعدادات AI والتوجيه" },
+        ],
+    },
+    {
+        title: "إعدادات صندوق الوارد",
+        items: [
+            { key: "contact-fields", label: "حقول جهات الاتصال", icon: FileSliders, desc: "حقول ديناميكية لجهات الاتصال" },
+            { key: "lifecycles", label: "دورات الحياة", icon: RefreshCw, desc: "مراحل دورة حياة العميل" },
+            { key: "snippets", label: "Snippets", icon: FileText, desc: "ردود جاهزة للاستخدام السريع" },
+            { key: "tags", label: "التاجات", icon: Tag, desc: "تصنيف العملاء والمحادثات" },
+        ],
+    },
+    {
+        title: "النظام والفوترة",
+        items: [
+            { key: "theme", label: "تخصيص المظهر", icon: Palette, desc: "ألوان وهوية المؤسسة" },
+            { key: "billing", label: "الاشتراك والدفع", icon: CreditCard, desc: "إدارة الخطة والفواتير" },
+        ],
+    },
+]
+
+const SIDEBAR_ITEMS = SIDEBAR_SECTIONS.flatMap(s => s.items)
 
 
 export function OrganizationSettingsPage() {
@@ -43,7 +73,6 @@ export function OrganizationSettingsPage() {
     const [active, setActive] = useState<SidebarKey>(tabParam && SIDEBAR_ITEMS.some(i => i.key === tabParam) ? tabParam : "general")
     const [collapsed, setCollapsed] = useState(false)
 
-    // Sync with URL tab param when it changes (e.g. navigating from another page)
     useEffect(() => {
         if (tabParam && SIDEBAR_ITEMS.some(i => i.key === tabParam)) {
             setActive(tabParam)
@@ -53,132 +82,181 @@ export function OrganizationSettingsPage() {
     const activeItem = SIDEBAR_ITEMS.find(i => i.key === active)
 
     return (
-        <div style={{ display: "flex", height: "100%" }}>
+        <div className="flex h-full" dir="rtl">
 
-            {/* ── Internal Sidebar ── */}
-            <aside style={{
-                width: collapsed ? 56 : 220,
-                flexShrink: 0,
-                background: "var(--t-card)",
-                borderLeft: "1px solid var(--t-border)",
-                transition: "width 0.2s ease",
-                display: "flex",
-                flexDirection: "column",
-                overflow: "hidden",
-            }}>
-                {/* header */}
-                <div style={{
-                    display: "flex", alignItems: "center", justifyContent: "space-between",
-                    padding: collapsed ? "14px 8px" : "14px 12px",
-                    borderBottom: "1px solid var(--t-border-light)",
-                    minHeight: 56,
-                }}>
+            {/* ── Internal Sidebar (Fateen brand pattern) ── */}
+            <aside
+                className={`shrink-0 bg-white transition-all duration-300 ${collapsed ? "w-[60px]" : "w-56"}`}
+                style={{
+                    borderLeft: "1px solid var(--t-border-light, #f0f0f0)",
+                    borderRadius: "6px",
+                    margin: "8px 0",
+                    overflow: "hidden",
+                    display: "flex",
+                    flexDirection: "column",
+                }}
+            >
+                {/* ── Gradient Header ── */}
+                <div
+                    onClick={() => { if (collapsed) setCollapsed(false) }}
+                    style={{
+                        background: "linear-gradient(135deg, #004786, #0072b5, #0098d6)",
+                        padding: collapsed ? "12px 0" : "12px 14px",
+                        position: "relative",
+                        overflow: "hidden",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: collapsed ? "center" : "space-between",
+                        cursor: collapsed ? "pointer" : "default",
+                    }}>
+                    <div style={{
+                        position: "absolute", top: -15, left: -15,
+                        width: 60, height: 60, borderRadius: "50%",
+                        background: "rgba(255,255,255,0.06)",
+                    }} />
+                    <div style={{ position: "relative", zIndex: 1, display: "flex", alignItems: "center", gap: 7 }}>
+                        <Building2 size={collapsed ? 18 : 14} style={{ color: "rgba(255,255,255,0.85)" }} />
+                        {!collapsed && (
+                            <span style={{ fontSize: 12.5, fontWeight: 700, color: "#fff" }}>إعدادات المؤسسة</span>
+                        )}
+                    </div>
                     {!collapsed && (
-                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                            <div style={{
-                                width: 30, height: 30, borderRadius: 8,
-                                background: "var(--t-accent)", display: "flex", alignItems: "center", justifyContent: "center",
-                            }}>
-                                <Building2 size={14} style={{ color: "var(--t-text-on-accent)" }} />
-                            </div>
-                            <div>
-                                <div style={{ fontSize: 13, fontWeight: 700, color: "var(--t-text)", lineHeight: 1.2 }}>إعدادات المؤسسة</div>
-                                <div style={{ fontSize: 10, color: "var(--t-text-faint)" }}>إدارة كاملة</div>
-                            </div>
-                        </div>
+                        <button
+                            onClick={() => setCollapsed(true)}
+                            style={{
+                                background: "rgba(255,255,255,0.12)",
+                                border: "none", borderRadius: 5,
+                                padding: 3, cursor: "pointer",
+                                display: "flex", alignItems: "center", justifyContent: "center",
+                                transition: "background 0.15s",
+                                position: "relative", zIndex: 1,
+                            }}
+                            onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.22)" }}
+                            onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.12)" }}
+                        >
+                            <ChevronLeft size={13} style={{ color: "rgba(255,255,255,0.8)" }} />
+                        </button>
                     )}
-                    <button
-                        onClick={() => setCollapsed(!collapsed)}
-                        style={{
-                            width: 26, height: 26, borderRadius: 6, border: "none",
-                            background: "transparent", cursor: "pointer",
-                            display: "flex", alignItems: "center", justifyContent: "center",
-                            color: "var(--t-text-faint)", transition: "background 0.12s",
-                            margin: collapsed ? "0 auto" : undefined,
-                        }}
-                        onMouseEnter={e => { e.currentTarget.style.background = "var(--t-surface)" }}
-                        onMouseLeave={e => { e.currentTarget.style.background = "transparent" }}
-                    >
-                        <ChevronLeft size={14} style={{
-                            transition: "transform 0.2s",
-                            transform: collapsed ? "rotate(180deg)" : "none",
-                        }} />
-                    </button>
                 </div>
 
-                {/* nav items */}
-                <nav style={{ flex: 1, padding: "6px 5px", display: "flex", flexDirection: "column", gap: 1, overflowY: "auto" }}>
-                    {SIDEBAR_ITEMS.map(item => {
-                        const Icon = item.icon
-                        const on = active === item.key
-                        return (
-                            <button
-                                key={item.key}
-                                onClick={() => setActive(item.key)}
-                                title={collapsed ? item.label : undefined}
-                                style={{
-                                    display: "flex", alignItems: "center",
-                                    gap: 8,
-                                    padding: collapsed ? "9px 0" : "9px 10px",
-                                    borderRadius: 7, border: "none",
-                                    background: on ? "var(--t-accent)" : "transparent",
-                                    color: on ? "var(--t-text-on-accent)" : "var(--t-text-muted)",
-                                    fontSize: 13, fontWeight: on ? 600 : 500,
-                                    cursor: "pointer", transition: "all 0.1s",
-                                    textAlign: "right", width: "100%",
-                                    justifyContent: collapsed ? "center" : "flex-start",
-                                }}
-                                onMouseEnter={e => { if (!on) e.currentTarget.style.background = "var(--t-card-hover)" }}
-                                onMouseLeave={e => { if (!on) e.currentTarget.style.background = "transparent" }}
-                            >
-                                <Icon size={15} strokeWidth={on ? 2 : 1.5} style={{ flexShrink: 0 }} />
-                                {!collapsed && <span>{item.label}</span>}
-                            </button>
-                        )
-                    })}
+                {/* ── Sidebar Navigation ── */}
+                <nav style={{ padding: "4px 6px", flex: 1, overflowY: "auto" }}>
+                    {SIDEBAR_SECTIONS.map((section, si) => (
+                        <div key={si}>
+                            {/* Section header */}
+                            {!collapsed && (
+                                <div style={{
+                                    fontSize: 10, fontWeight: 600, color: "var(--t-text-faint, #9ca3af)",
+                                    padding: si === 0 ? "8px 8px 4px" : "12px 8px 4px",
+                                    letterSpacing: "0.02em",
+                                }}>{section.title}</div>
+                            )}
+                            {collapsed && si > 0 && (
+                                <div style={{
+                                    height: 1, background: "var(--t-border-light, #eaedf0)",
+                                    margin: "6px 8px",
+                                }} />
+                            )}
+                            {section.items.map(item => {
+                                const Icon = item.icon
+                                const isActive = active === item.key
+                                return (
+                                    <button
+                                        key={item.key}
+                                        onClick={() => setActive(item.key)}
+                                        title={collapsed ? item.label : undefined}
+                                        style={{
+                                            display: "flex", width: "100%",
+                                            alignItems: "center", gap: 10,
+                                            padding: collapsed ? "8px 0" : "6px 8px",
+                                            marginBottom: 1, borderRadius: 8, border: "none",
+                                            background: isActive ? "var(--t-card-hover, #f3f4f6)" : "transparent",
+                                            cursor: "pointer",
+                                            justifyContent: collapsed ? "center" : "flex-start",
+                                            position: "relative", textAlign: "right",
+                                            transition: "background 0.12s", color: "inherit",
+                                        }}
+                                        onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = "var(--t-card-hover, #f9fafb)" }}
+                                        onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = isActive ? "var(--t-card-hover, #f3f4f6)" : "transparent" }}
+                                    >
+                                        {isActive && !collapsed && (
+                                            <div style={{
+                                                position: "absolute", right: 0,
+                                                top: "50%", transform: "translateY(-50%)",
+                                                width: 3, height: 16, borderRadius: 3,
+                                                background: "#004786",
+                                            }} />
+                                        )}
+                                        <div style={{
+                                            width: collapsed ? 28 : 24,
+                                            height: collapsed ? 28 : 24,
+                                            borderRadius: 6,
+                                            background: isActive ? "rgba(0,71,134,0.1)" : "transparent",
+                                            display: "flex", alignItems: "center", justifyContent: "center",
+                                            flexShrink: 0, transition: "all 0.15s",
+                                        }}>
+                                            <Icon
+                                                size={collapsed ? 15 : 14}
+                                                strokeWidth={isActive ? 2.2 : 1.6}
+                                                style={{
+                                                    color: isActive ? "#004786" : "var(--t-text-muted, #9ca3af)",
+                                                    transition: "color 0.15s",
+                                                }}
+                                            />
+                                        </div>
+                                        {!collapsed && (
+                                            <span style={{
+                                                fontSize: 12.5, fontWeight: isActive ? 600 : 500,
+                                                color: isActive ? "var(--t-text, #1f2937)" : "var(--t-text-secondary, #6b7280)",
+                                                transition: "color 0.15s",
+                                                overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                                            }}>{item.label}</span>
+                                        )}
+                                    </button>
+                                )
+                            })}
+                        </div>
+                    ))}
                 </nav>
 
-                {/* back link */}
-                {!collapsed && (
-                    <div style={{ padding: "10px 8px", borderTop: "1px solid var(--t-border-light)" }}>
-                        <Link
-                            to="/dashboard"
-                            style={{
-                                display: "flex", alignItems: "center", gap: 6,
-                                fontSize: 12, color: "var(--t-text-faint)", textDecoration: "none",
-                                padding: "7px 8px", borderRadius: 7,
-                                transition: "background 0.1s",
-                            }}
-                            onMouseEnter={e => { e.currentTarget.style.background = "var(--t-surface)" }}
-                            onMouseLeave={e => { e.currentTarget.style.background = "transparent" }}
-                        >
-                            <ChevronLeft size={12} style={{ transform: "rotate(180deg)" }} />
-                            العودة للوحة التحكم
-                        </Link>
-                    </div>
-                )}
+                {/* ── Footer: back link ── */}
+                <div style={{ padding: "6px 6px", borderTop: "1px solid var(--t-border-light, #f0f0f0)" }}>
+                    <Link to="/dashboard" style={{
+                        display: "flex", alignItems: "center", gap: 6,
+                        justifyContent: collapsed ? "center" : "flex-start",
+                        fontSize: 11, color: "var(--t-text-faint, #9ca3af)", textDecoration: "none",
+                        padding: "7px 8px", borderRadius: 7,
+                        transition: "background 0.1s",
+                    }}
+                        onMouseEnter={e => { e.currentTarget.style.background = "var(--t-card-hover, #f9fafb)" }}
+                        onMouseLeave={e => { e.currentTarget.style.background = "transparent" }}
+                    >
+                        <ChevronLeft size={12} style={{ transform: "rotate(180deg)" }} />
+                        {!collapsed && "العودة للوحة التحكم"}
+                    </Link>
+                </div>
             </aside>
 
             {/* ── Main Content ── */}
             <main style={{ flex: 1, minWidth: 0, overflowY: "auto", padding: "20px 24px" }}>
 
                 {/* breadcrumb */}
-                <div style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 12, color: "var(--t-text-faint)", marginBottom: 4 }}>
-                    <Link to="/dashboard" style={{ color: "var(--t-text-faint)", textDecoration: "none" }}>لوحة التحكم</Link>
-                    <ChevronLeft size={11} style={{ color: "var(--t-text-faint)" }} />
+                <div style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 12, color: "var(--t-text-faint, #9ca3af)", marginBottom: 4 }}>
+                    <Link to="/dashboard" style={{ color: "var(--t-text-faint, #9ca3af)", textDecoration: "none" }}>لوحة التحكم</Link>
+                    <ChevronLeft size={11} style={{ color: "var(--t-text-faint, #9ca3af)" }} />
                     <span>إعدادات المؤسسة</span>
-                    <ChevronLeft size={11} style={{ color: "var(--t-text-faint)" }} />
-                    <span style={{ color: "var(--t-text-secondary)", fontWeight: 500 }}>{activeItem?.label}</span>
+                    <ChevronLeft size={11} style={{ color: "var(--t-text-faint, #9ca3af)" }} />
+                    <span style={{ color: "var(--t-text-secondary, #6b7280)", fontWeight: 500 }}>{activeItem?.label}</span>
                 </div>
 
                 {/* page title */}
                 <h1 style={{
-                    fontSize: 20, fontWeight: 700, color: "var(--t-text)",
+                    fontSize: 20, fontWeight: 700, color: "var(--t-text, #1f2937)",
                     margin: "0 0 2px", letterSpacing: "-0.01em",
                 }}>
                     {activeItem?.label}
                 </h1>
-                <p style={{ fontSize: 13, color: "var(--t-text-faint)", margin: "0 0 20px" }}>
+                <p style={{ fontSize: 13, color: "var(--t-text-faint, #9ca3af)", margin: "0 0 20px" }}>
                     {activeItem?.desc}
                 </p>
 

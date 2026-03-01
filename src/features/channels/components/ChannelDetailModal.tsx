@@ -14,19 +14,19 @@ import { AgentMultiSelect } from "./AgentMultiSelect"
 const CSS = `
 @keyframes mdlIn{from{opacity:0;transform:scale(.96) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
 @keyframes mdlFade{from{opacity:0}to{opacity:1}}
-.mdl-field{width:100%;padding:9px 12px;border-radius:9px;border:1.5px solid var(--t-border);background:var(--t-surface);font-size:13px;color:var(--t-text);outline:none;transition:border-color .15s;box-sizing:border-box;}
-.mdl-field:focus{border-color:var(--t-accent);}
-.mdl-label{font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--t-text-faint);display:block;margin-bottom:5px;}
-.mdl-tab{padding:9px 18px;border-radius:8px;border:1.5px solid transparent;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;background:transparent;}
-.mdl-tab.active{background:var(--t-accent);color:var(--t-text-on-accent);border-color:var(--t-accent);}
-.mdl-tab:not(.active){color:var(--t-text-faint);}
-.mdl-tab:not(.active):hover{border-color:var(--t-border);background:var(--t-surface);}
+.mdl-field{width:100%;padding:9px 12px;border-radius:9px;border:1.5px solid #e0e3e7;background:#fafafa;font-size:13px;color:var(--t-text,#111827);outline:none;transition:border-color .15s,box-shadow .15s;box-sizing:border-box;font-family:inherit;}
+.mdl-field:focus{border-color:#004786;box-shadow:0 0 0 3px rgba(0,71,134,.06);}
+.mdl-label{font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:#6b7280;display:block;margin-bottom:5px;}
+.mdl-tab{padding:9px 18px;border-radius:8px;border:1.5px solid transparent;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;background:transparent;font-family:inherit;}
+.mdl-tab.active{background:#004786;color:#fff;border-color:#004786;box-shadow:0 1px 3px rgba(0,71,134,.15);}
+.mdl-tab:not(.active){color:#9ca3af;}
+.mdl-tab:not(.active):hover{border-color:#e0e3e7;background:#f5f6f8;}
 `
 
 function Toggle({ on, onToggle, loading }: { on: boolean; onToggle: () => void; loading?: boolean }) {
-    if (loading) return <Loader2 size={18} style={{ color: "var(--t-text-faint)", animation: "spin 1s linear infinite" }} />
+    if (loading) return <Loader2 size={18} style={{ color: "#004786", animation: "spin 1s linear infinite" }} />
     return (
-        <button onClick={onToggle} style={{ background: "none", border: "none", cursor: "pointer", color: on ? "var(--t-success)" : "var(--t-text-faint)", display: "flex", padding: 0 }}>
+        <button onClick={onToggle} style={{ background: "none", border: "none", cursor: "pointer", color: on ? "#16a34a" : "#9ca3af", display: "flex", padding: 0 }}>
             {on ? <ToggleRight size={24} /> : <ToggleLeft size={24} />}
         </button>
     )
@@ -40,7 +40,14 @@ function SecretField({ label, value, onChange }: { label: string; value: string;
             <div style={{ display: "flex", gap: 6 }}>
                 <input type={show ? "text" : "password"} className="mdl-field" dir="ltr" style={{ flex: 1, fontFamily: "monospace" }}
                     value={value} onChange={e => onChange(e.target.value)} />
-                <button type="button" onClick={() => setShow(!show)} style={{ width: 38, height: 38, borderRadius: 9, border: "1.5px solid var(--t-border)", flexShrink: 0, background: "var(--t-surface)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--t-text-faint)" }}>
+                <button type="button" onClick={() => setShow(!show)} style={{
+                    width: 38, height: 38, borderRadius: 9, border: "1.5px solid #e0e3e7", flexShrink: 0,
+                    background: "#fafafa", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+                    color: "#9ca3af", transition: "all .12s",
+                }}
+                    onMouseEnter={e => { e.currentTarget.style.borderColor = "#004786"; e.currentTarget.style.color = "#004786" }}
+                    onMouseLeave={e => { e.currentTarget.style.borderColor = "#e0e3e7"; e.currentTarget.style.color = "#9ca3af" }}
+                >
                     {show ? <EyeOff size={14} /> : <Eye size={14} />}
                 </button>
             </div>
@@ -87,24 +94,28 @@ function SettingsTab({ channel, tenantId }: { channel: Channel; tenantId: string
 
     return (
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-            {/* Name */}
             <div>
                 <label className="mdl-label">الاسم</label>
                 <input className="mdl-field" dir="rtl" value={name} onChange={e => setName(e.target.value)} placeholder="اسم القناة" />
             </div>
 
-            {/* Identifier (readonly) */}
             <div>
                 <label className="mdl-label">المعرّف (identifier)</label>
                 <div style={{ display: "flex", gap: 6 }}>
                     <input className="mdl-field" dir="ltr" value={channel.identifier} readOnly style={{ fontFamily: "monospace", opacity: 0.7, cursor: "default" }} />
-                    <button type="button" onClick={() => { navigator.clipboard.writeText(channel.identifier); toast.success("تم النسخ") }} style={{ width: 38, height: 38, borderRadius: 9, border: "1.5px solid var(--t-border)", flexShrink: 0, background: "var(--t-surface)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--t-text-faint)" }}>
+                    <button type="button" onClick={() => { navigator.clipboard.writeText(channel.identifier); toast.success("تم النسخ") }} style={{
+                        width: 38, height: 38, borderRadius: 9, border: "1.5px solid #e0e3e7", flexShrink: 0,
+                        background: "#fafafa", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+                        color: "#9ca3af", transition: "all .12s",
+                    }}
+                        onMouseEnter={e => { e.currentTarget.style.borderColor = "#004786"; e.currentTarget.style.color = "#004786" }}
+                        onMouseLeave={e => { e.currentTarget.style.borderColor = "#e0e3e7"; e.currentTarget.style.color = "#9ca3af" }}
+                    >
                         <Copy size={14} />
                     </button>
                 </div>
             </div>
 
-            {/* Credentials */}
             {hasToken && (
                 <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                     <SecretField label="Access Token" value={token} onChange={setToken} />
@@ -112,20 +123,25 @@ function SettingsTab({ channel, tenantId }: { channel: Channel; tenantId: string
                 </div>
             )}
 
-            {/* Webchat-specific */}
             {channel.platform === "webchat" && channel.script_url && (
                 <div>
                     <label className="mdl-label" style={{ display: "flex", alignItems: "center", gap: 5 }}><Globe size={10} /> رابط التضمين (Script URL)</label>
                     <div style={{ display: "flex", gap: 6 }}>
                         <input className="mdl-field" dir="ltr" value={channel.script_url} readOnly style={{ fontFamily: "monospace", fontSize: 11, opacity: 0.7 }} />
-                        <button type="button" onClick={() => { navigator.clipboard.writeText(channel.script_url!); toast.success("تم نسخ الرابط") }} style={{ width: 38, height: 38, borderRadius: 9, border: "1.5px solid var(--t-border)", flexShrink: 0, background: "var(--t-surface)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--t-text-faint)" }}>
+                        <button type="button" onClick={() => { navigator.clipboard.writeText(channel.script_url!); toast.success("تم نسخ الرابط") }} style={{
+                            width: 38, height: 38, borderRadius: 9, border: "1.5px solid #e0e3e7", flexShrink: 0,
+                            background: "#fafafa", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+                            color: "#9ca3af", transition: "all .12s",
+                        }}
+                            onMouseEnter={e => { e.currentTarget.style.borderColor = "#004786"; e.currentTarget.style.color = "#004786" }}
+                            onMouseLeave={e => { e.currentTarget.style.borderColor = "#e0e3e7"; e.currentTarget.style.color = "#9ca3af" }}
+                        >
                             <Copy size={14} />
                         </button>
                     </div>
                 </div>
             )}
 
-            {/* Icon + Color for webchat */}
             {channel.platform === "webchat" && (
                 <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 10 }}>
                     <div>
@@ -134,12 +150,11 @@ function SettingsTab({ channel, tenantId }: { channel: Channel; tenantId: string
                     </div>
                     <div>
                         <label className="mdl-label">اللون</label>
-                        <input type="color" value={color} onChange={e => setColor(e.target.value)} style={{ width: 38, height: 38, borderRadius: 9, border: "1.5px solid var(--t-border)", padding: 2, cursor: "pointer" }} />
+                        <input type="color" value={color} onChange={e => setColor(e.target.value)} style={{ width: 38, height: 38, borderRadius: 9, border: "1.5px solid #e0e3e7", padding: 2, cursor: "pointer" }} />
                     </div>
                 </div>
             )}
 
-            {/* Allowed origins */}
             {hasOrigins && (
                 <div>
                     <label className="mdl-label">النطاقات المسموحة (مفصولة بفاصلة)</label>
@@ -147,18 +162,18 @@ function SettingsTab({ channel, tenantId }: { channel: Channel; tenantId: string
                 </div>
             )}
 
-            {/* Agents multi-select */}
             <div>
                 <label className="mdl-label" style={{ display: "flex", alignItems: "center", gap: 5 }}><Bot size={10} /> الوكلاء المرتبطون</label>
                 <AgentMultiSelect value={agentIds} onChange={setAgentIds} />
             </div>
 
-            {/* Save */}
             {isDirty && (
                 <button type="button" onClick={save} disabled={updateMut.isPending} style={{
                     display: "inline-flex", alignItems: "center", gap: 7, padding: "9px 18px", borderRadius: 9,
-                    border: "none", background: "var(--t-accent)", color: "var(--t-text-on-accent)",
-                    fontSize: 13, fontWeight: 700, cursor: "pointer", opacity: updateMut.isPending ? 0.7 : 1, alignSelf: "flex-start",
+                    border: "none", background: "#004786", color: "#fff",
+                    fontSize: 13, fontWeight: 700, cursor: "pointer", opacity: updateMut.isPending ? 0.7 : 1,
+                    alignSelf: "flex-start", fontFamily: "inherit",
+                    boxShadow: "0 1px 3px rgba(0,71,134,.15)",
                 }}>
                     {updateMut.isPending ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
                     حفظ التغييرات
@@ -171,21 +186,31 @@ function SettingsTab({ channel, tenantId }: { channel: Channel; tenantId: string
 /* ─── Flags Tab ─── */
 function FlagRow({ label, effective, override, onToggle }: { label: string; effective: boolean; override: boolean | null; onToggle: () => void }) {
     return (
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid var(--t-border-light)" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "9px 0", borderBottom: "1px solid #f0f1f3" }}>
             <div>
-                <div style={{ fontSize: 12, fontWeight: 700, color: "var(--t-text)" }}>{label}</div>
-                <div style={{ fontSize: 10, color: override !== null ? "var(--t-warning)" : "var(--t-text-faint)" }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: "var(--t-text, #111827)" }}>{label}</div>
+                <div style={{ fontSize: 10, color: override !== null ? "#f59e0b" : "#9ca3af" }}>
                     {override !== null ? `مخصص: ${override ? "مفعّل" : "معطّل"}` : "يرث من الإعدادات العامة"}
                 </div>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <span style={{ fontSize: 10, fontWeight: 700, color: effective ? "var(--t-success)" : "var(--t-danger)" }}>
-                    {effective ? "✓ مفعّل" : "✗ معطّل"}
+                <span style={{
+                    display: "inline-flex", alignItems: "center", gap: 3,
+                    fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 12,
+                    background: effective ? "rgba(22,163,74,.06)" : "rgba(220,38,38,.06)",
+                    color: effective ? "#16a34a" : "#dc2626",
+                }}>
+                    <span style={{ width: 4, height: 4, borderRadius: "50%", background: effective ? "#16a34a" : "#dc2626" }} />
+                    {effective ? "مفعّل" : "معطّل"}
                 </span>
                 <button type="button" onClick={onToggle} style={{
-                    padding: "4px 10px", borderRadius: 7, border: "1px solid var(--t-border)",
-                    background: "var(--t-surface)", fontSize: 11, fontWeight: 700, cursor: "pointer", color: "var(--t-text-faint)",
-                }}>
+                    padding: "4px 10px", borderRadius: 7, border: "1px solid #e0e3e7",
+                    background: "#fafafa", fontSize: 11, fontWeight: 700, cursor: "pointer",
+                    color: "#6b7280", fontFamily: "inherit", transition: "all .12s",
+                }}
+                    onMouseEnter={e => { e.currentTarget.style.borderColor = "#004786"; e.currentTarget.style.color = "#004786" }}
+                    onMouseLeave={e => { e.currentTarget.style.borderColor = "#e0e3e7"; e.currentTarget.style.color = "#6b7280" }}
+                >
                     {override !== null ? "إعادة" : "تخصيص"}
                 </button>
             </div>
@@ -198,23 +223,29 @@ function FlagsTab({ channel, tenantId }: { channel: Channel; tenantId: string })
     const updateFlags = useUpdateChannelFlags(tenantId)
 
     if (isLoading) return (
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 0", gap: 10, color: "var(--t-text-faint)" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 0", gap: 10, color: "#004786" }}>
             <Loader2 size={18} className="animate-spin" /> جاري التحميل...
         </div>
     )
 
     const flags: ChannelFlagsData | null = flagsRes?.data || null
     if (!flags) return (
-        <div style={{ textAlign: "center", padding: "40px 0", color: "var(--t-text-faint)" }}>
-            <Flag size={24} style={{ margin: "0 auto 10px", display: "block", opacity: 0.3 }} />
-            <div style={{ fontSize: 13, fontWeight: 700 }}>لا تتوفر بيانات Flags</div>
+        <div style={{ textAlign: "center", padding: "40px 0" }}>
+            <div style={{
+                width: 44, height: 44, borderRadius: 12,
+                background: "rgba(0,71,134,.06)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                margin: "0 auto 10px",
+            }}>
+                <Flag size={20} style={{ color: "#004786" }} />
+            </div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "#9ca3af" }}>لا تتوفر بيانات Flags</div>
         </div>
     )
 
     const { communication_flags, global_flags, effective_flags } = flags
     const overrides = communication_flags.overrides || {}
 
-    // Merge global + effective for display keys
     const allMsgTypes = { ...(global_flags.message_types || {}), ...(effective_flags.message_types || {}) }
     const allResTypes = { ...(global_flags.response_types || {}), ...(effective_flags.response_types || {}) }
     const allResCaps = { ...(global_flags.response_capabilities || {}), ...(effective_flags.response_capabilities || {}) }
@@ -241,12 +272,15 @@ function FlagsTab({ channel, tenantId }: { channel: Channel; tenantId: string })
 
     return (
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-
             {/* Inherit toggle */}
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 14px", borderRadius: 10, background: "var(--t-surface)", border: "1px solid var(--t-border-light)" }}>
+            <div style={{
+                display: "flex", alignItems: "center", justifyContent: "space-between",
+                padding: "12px 14px", borderRadius: 10,
+                background: "rgba(0,71,134,.03)", border: "1px solid rgba(0,71,134,.08)",
+            }}>
                 <div>
-                    <div style={{ fontSize: 13, fontWeight: 800, color: "var(--t-text)" }}>وراثة الإعدادات العامة</div>
-                    <div style={{ fontSize: 11, color: "var(--t-text-faint)", marginTop: 2 }}>
+                    <div style={{ fontSize: 13, fontWeight: 800, color: "var(--t-text, #111827)" }}>وراثة الإعدادات العامة</div>
+                    <div style={{ fontSize: 11, color: "#9ca3af", marginTop: 2 }}>
                         {communication_flags.inherit ? "الإعدادات تُدمج مع الـ global flags" : "الإعدادات المخصصة فقط"}
                     </div>
                 </div>
@@ -257,7 +291,7 @@ function FlagsTab({ channel, tenantId }: { channel: Channel; tenantId: string })
             {/* Message types */}
             {Object.keys(allMsgTypes).length > 0 && (
                 <div>
-                    <div style={{ fontSize: 11, fontWeight: 800, color: "var(--t-text-faint)", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 8 }}>أنواع الرسائل</div>
+                    <div style={{ fontSize: 11, fontWeight: 800, color: "#004786", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 8 }}>أنواع الرسائل</div>
                     {Object.entries(allMsgTypes).map(([key]) => (
                         <FlagRow key={key} label={key}
                             effective={!!effective_flags.message_types?.[key]}
@@ -270,7 +304,7 @@ function FlagsTab({ channel, tenantId }: { channel: Channel; tenantId: string })
             {/* Response types */}
             {Object.keys(allResTypes).length > 0 && (
                 <div>
-                    <div style={{ fontSize: 11, fontWeight: 800, color: "var(--t-text-faint)", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 8 }}>أنواع الردود</div>
+                    <div style={{ fontSize: 11, fontWeight: 800, color: "#004786", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 8 }}>أنواع الردود</div>
                     {Object.entries(allResTypes).map(([key]) => (
                         <FlagRow key={key} label={key}
                             effective={!!effective_flags.response_types?.[key]}
@@ -280,10 +314,10 @@ function FlagsTab({ channel, tenantId }: { channel: Channel; tenantId: string })
                 </div>
             )}
 
-            {/* Response capabilities (ai_generation, tts) */}
+            {/* Response capabilities */}
             {Object.keys(allResCaps).length > 0 && (
                 <div>
-                    <div style={{ fontSize: 11, fontWeight: 800, color: "var(--t-text-faint)", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 8 }}>القدرات</div>
+                    <div style={{ fontSize: 11, fontWeight: 800, color: "#004786", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 8 }}>القدرات</div>
                     {Object.entries(allResCaps).map(([key]) => {
                         const effEnabled = !!effective_flags.response_capabilities?.[key]?.enabled
                         const overrideVal = (overrides.response_capabilities as Record<string, { enabled: boolean }> | undefined)?.[key]?.enabled
@@ -311,53 +345,76 @@ export function ChannelDetailModal({ channel, onClose }: { channel: Channel; onC
     const [tab, setTab] = useState<"settings" | "flags">("settings")
 
     return (
-        <div onClick={onClose} style={{ position: "fixed", inset: 0, zIndex: 80, background: "rgba(0,0,0,.5)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div onClick={onClose} style={{ position: "fixed", inset: 0, zIndex: 80, background: "rgba(0,0,0,.45)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <style>{CSS}</style>
             <div onClick={e => e.stopPropagation()} dir="rtl" style={{
-                borderRadius: 18, background: "var(--t-card)", border: "1px solid var(--t-border)",
+                borderRadius: 18, background: "#fff", overflow: "hidden",
                 width: "100%", maxWidth: 560, margin: 16, maxHeight: "90vh",
                 display: "flex", flexDirection: "column", animation: "mdlIn .18s ease-out",
+                boxShadow: "0 12px 40px rgba(0,0,0,.12)",
             }}>
-                {/* Header */}
-                <div style={{ padding: "20px 24px 0", borderBottom: "1px solid var(--t-border-light)", paddingBottom: 16 }}>
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+                {/* Gradient Header */}
+                <div style={{
+                    background: "linear-gradient(135deg, #004786, #0072b5)",
+                    padding: "18px 24px 0",
+                }}>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
                         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                            <div style={{ width: 44, height: 44, borderRadius: 12, flexShrink: 0, background: m.color, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>
+                            <div style={{
+                                width: 44, height: 44, borderRadius: 12, flexShrink: 0,
+                                background: "rgba(255,255,255,.15)", border: "1px solid rgba(255,255,255,.2)",
+                                display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22,
+                            }}>
                                 {m.icon}
                             </div>
                             <div>
-                                <div style={{ fontSize: 16, fontWeight: 800, color: "var(--t-text)" }}>{channel.name || m.labelAr}</div>
-                                <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 20, background: `${m.color}18`, color: m.color }}>{m.label}</span>
+                                <div style={{ fontSize: 16, fontWeight: 800, color: "#fff" }}>{channel.name || m.labelAr}</div>
+                                <span style={{
+                                    fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 20,
+                                    background: "rgba(255,255,255,.15)", color: "rgba(255,255,255,.8)",
+                                }}>{m.label}</span>
                             </div>
                         </div>
                         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                             <Toggle on={channel.enabled ?? false} loading={toggleMut.isPending}
                                 onToggle={() => toggleMut.mutate({ platform: channel.platform, identifier: channel.identifier, payload: { enabled: !(channel.enabled ?? false) } })} />
-                            <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--t-text-faint)", display: "flex", padding: 4 }}>
-                                <X size={18} />
+                            <button onClick={onClose} style={{
+                                width: 28, height: 28, borderRadius: 8,
+                                background: "rgba(255,255,255,.12)", border: "none", cursor: "pointer",
+                                color: "#fff", display: "flex", alignItems: "center", justifyContent: "center",
+                                transition: "background .12s",
+                            }}
+                                onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,.25)" }}
+                                onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,.12)" }}
+                            >
+                                <X size={16} />
                             </button>
                         </div>
                     </div>
 
                     {/* Status row */}
                     <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 14, fontSize: 11 }}>
-                        <span style={{ display: "flex", alignItems: "center", gap: 4, color: channel.enabled ? "var(--t-success)" : "var(--t-danger)", fontWeight: 700 }}>
+                        <span style={{ display: "flex", alignItems: "center", gap: 4, color: channel.enabled ? "#4ade80" : "rgba(255,255,255,.5)", fontWeight: 700 }}>
                             {channel.enabled ? <Wifi size={11} /> : <WifiOff size={11} />}
                             {channel.enabled ? "نشطة" : "موقوفة"}
                         </span>
                         {channel.agent_ids?.length ? (
-                            <span style={{ display: "flex", alignItems: "center", gap: 4, color: "var(--t-text-faint)" }}>
+                            <span style={{ display: "flex", alignItems: "center", gap: 4, color: "rgba(255,255,255,.6)" }}>
                                 <Bot size={11} /> {channel.agent_ids.length} وكيل
                             </span>
                         ) : null}
                     </div>
 
                     {/* Tab bar */}
-                    <div style={{ display: "flex", gap: 6 }}>
-                        <button className={`mdl-tab ${tab === "settings" ? "active" : ""}`} onClick={() => setTab("settings")}>
+                    <div style={{ display: "flex", gap: 6, paddingBottom: 14 }}>
+                        <button className={`mdl-tab ${tab === "settings" ? "active" : ""}`} onClick={() => setTab("settings")}
+                            style={tab === "settings" ? { background: "rgba(255,255,255,.2)", color: "#fff", borderColor: "rgba(255,255,255,.2)" } : { color: "rgba(255,255,255,.6)" }}
+                        >
                             <Settings2 size={12} style={{ display: "inline", marginLeft: 5 }} /> الإعدادات
                         </button>
-                        <button className={`mdl-tab ${tab === "flags" ? "active" : ""}`} onClick={() => setTab("flags")}>
+                        <button className={`mdl-tab ${tab === "flags" ? "active" : ""}`} onClick={() => setTab("flags")}
+                            style={tab === "flags" ? { background: "rgba(255,255,255,.2)", color: "#fff", borderColor: "rgba(255,255,255,.2)" } : { color: "rgba(255,255,255,.6)" }}
+                        >
                             <Flag size={12} style={{ display: "inline", marginLeft: 5 }} /> الـ Flags
                         </button>
                     </div>

@@ -8,7 +8,7 @@ import { useSendMessage } from "../../hooks/use-send-message"
 import { useConversationStore } from "../../store/conversation.store"
 import { useAuthStore } from "@/stores/auth-store"
 import { uploadMedia, addComment, getBriefUsers } from "../../services/inbox-service"
-import { getAllSnippets } from "@/features/settings/services/teams-tags-service"
+import { getAllSnippets } from "@/features/settings/services/snippets-service"
 import { toast } from "sonner"
 import type { Customer } from "../../types/inbox.types"
 import type { Snippet } from "@/features/settings/types/teams-tags"
@@ -576,31 +576,71 @@ export function MessageComposer({ customerId, customer }: Props) {
                                         if (recordingTimerRef.current) clearInterval(recordingTimerRef.current)
                                         setRecordingTime(0)
                                     } else {
-                                        // Start recording
+                                        // Start recording — guard for secure context
+                                        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                                            toast.error("تسجيل الصوت يتطلب اتصال HTTPS آمن")
+                                            return
+                                        }
                                         navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
                                             const mr = new MediaRecorder(stream)
                                             mediaRecorderRef.current = mr
                                             const chunks: BlobPart[] = []
                                             mr.ondataavailable = (e) => chunks.push(e.data)
-                                            mr.onstop = () => {
+                                            mr.onstop = async () => {
                                                 stream.getTracks().forEach((t) => t.stop())
-                                                const blob = new Blob(chunks, { type: "audio/webm" })
-                                                const file = new File([blob], `voice_${Date.now()}.webm`, { type: "audio/webm" })
-                                                // Directly set attachment and upload (can't fake a ChangeEvent)
-                                                setAttachment({ file, type: "audio" })
-                                                setIsUploading(true)
-                                                uploadMedia(file, { platform: customer?.platform ?? "whatsapp" })
-                                                    .then((res) => {
-                                                        const mId = res.media_id || (res as any).id || ""
-                                                        const mUrl = res.public_url || res.proxy_url || ""
-                                                        setAttachment((prev) => prev ? { ...prev, mediaId: mId, mediaUrl: mUrl } : null)
-                                                        setIsUploading(false)
-                                                    })
-                                                    .catch(() => {
-                                                        toast.error("فشل رفع التسجيل الصوتي")
-                                                        setAttachment(null)
-                                                        setIsUploading(false)
-                                                    })
+                                                const webmBlob = new Blob(chunks, { type: "audio/webm" })
+
+                                                // Convert webm → MP3 via AudioContext + lamejs
+                                                try {
+                                                    const arrayBuf = await webmBlob.arrayBuffer()
+                                                    const audioCtx = new AudioContext()
+                                                    const decoded = await audioCtx.decodeAudioData(arrayBuf)
+                                                    audioCtx.close()
+
+                                                    const sampleRate = decoded.sampleRate
+                                                    const samples = decoded.getChannelData(0) // mono
+
+                                                    // @ts-ignore — lamejs has no TS types
+                                                    const lamejs = await import("lamejs")
+                                                    const mp3enc = new lamejs.Mp3Encoder(1, sampleRate, 128)
+
+                                                    // Convert Float32 → Int16
+                                                    const int16 = new Int16Array(samples.length)
+                                                    for (let i = 0; i < samples.length; i++) {
+                                                        const s = Math.max(-1, Math.min(1, samples[i]))
+                                                        int16[i] = s < 0 ? s * 0x8000 : s * 0x7FFF
+                                                    }
+
+                                                    const mp3Parts: Uint8Array[] = []
+                                                    const blockSize = 1152
+                                                    for (let i = 0; i < int16.length; i += blockSize) {
+                                                        const chunk = int16.subarray(i, i + blockSize)
+                                                        const buf = mp3enc.encodeBuffer(chunk)
+                                                        if (buf.length > 0) mp3Parts.push(new Uint8Array(buf))
+                                                    }
+                                                    const end = mp3enc.flush()
+                                                    if (end.length > 0) mp3Parts.push(new Uint8Array(end))
+
+                                                    const mp3Blob = new Blob(mp3Parts as BlobPart[], { type: "audio/mpeg" })
+                                                    const file = new File([mp3Blob], `voice_${Date.now()}.mp3`, { type: "audio/mpeg" })
+
+                                                    setAttachment({ file, type: "audio" })
+                                                    setIsUploading(true)
+                                                    uploadMedia(file, { platform: customer?.platform ?? "whatsapp" })
+                                                        .then((res) => {
+                                                            const mId = res.media_id || (res as any).id || ""
+                                                            const mUrl = res.public_url || res.proxy_url || ""
+                                                            setAttachment((prev) => prev ? { ...prev, mediaId: mId, mediaUrl: mUrl } : null)
+                                                            setIsUploading(false)
+                                                        })
+                                                        .catch(() => {
+                                                            toast.error("فشل رفع التسجيل الصوتي")
+                                                            setAttachment(null)
+                                                            setIsUploading(false)
+                                                        })
+                                                } catch {
+                                                    toast.error("فشل تحويل التسجيل إلى MP3")
+                                                }
                                             }
                                             mr.start()
                                             setIsRecording(true)
@@ -701,8 +741,8 @@ export function MessageComposer({ customerId, customer }: Props) {
             {/* ═══ COMMENT MODE ═══ */}
             {mode === "comment" && (
                 <div style={{
-                    background: "#fef3c7",
-                    border: "2px solid #fbbf24",
+                    background: "rgba(0,114,181,0.04)",
+                    border: "2px solid rgba(0,71,134,0.15)",
                     borderRadius: 0,
                     position: "relative",
                 }}>
@@ -786,16 +826,16 @@ export function MessageComposer({ customerId, customer }: Props) {
                             style={{
                                 flex: 1, border: "none", outline: "none", resize: "none",
                                 background: "transparent", fontSize: 13,
-                                color: "#92400e", fontFamily: "inherit",
+                                color: "#1a3a5c", fontFamily: "inherit",
                                 lineHeight: 1.6, minHeight: 24, maxHeight: 120,
                             }}
                         />
                         <button onClick={() => { setMode("reply"); setCommentText(""); setMentionIds([]) }}
                             style={{
                                 width: 24, height: 24, borderRadius: "50%", border: "none",
-                                background: "rgba(0,0,0,0.08)", cursor: "pointer", flexShrink: 0,
+                                background: "rgba(0,71,134,0.08)", cursor: "pointer", flexShrink: 0,
                                 display: "flex", alignItems: "center", justifyContent: "center",
-                                color: "#92400e", marginTop: 2,
+                                color: "#004786", marginTop: 2,
                             }}>
                             <X size={14} />
                         </button>
@@ -809,12 +849,12 @@ export function MessageComposer({ customerId, customer }: Props) {
                                 return (
                                     <span key={uid} style={{
                                         fontSize: 10, padding: "2px 8px", borderRadius: 10,
-                                        background: "#fde68a", color: "#92400e", fontWeight: 600,
+                                        background: "rgba(0,114,181,0.1)", color: "#004786", fontWeight: 600,
                                         display: "inline-flex", alignItems: "center", gap: 3,
                                     }}>
                                         @{u?.name || uid}
                                         <button onClick={() => setMentionIds((p) => p.filter((x) => x !== uid))}
-                                            style={{ background: "none", border: "none", cursor: "pointer", padding: 0, color: "#92400e", fontSize: 10, lineHeight: 1 }}>✕</button>
+                                            style={{ background: "none", border: "none", cursor: "pointer", padding: 0, color: "#004786", fontSize: 10, lineHeight: 1 }}>✕</button>
                                     </span>
                                 )
                             })}
@@ -833,7 +873,7 @@ export function MessageComposer({ customerId, customer }: Props) {
                                     width: 30, height: 30, border: "none",
                                     background: "transparent", cursor: "pointer",
                                     display: "flex", alignItems: "center", justifyContent: "center",
-                                    color: "#92400e", borderRadius: 6,
+                                    color: "#004786", borderRadius: 6,
                                 }}>
                                 <AtSign size={15} />
                             </button>
@@ -843,7 +883,7 @@ export function MessageComposer({ customerId, customer }: Props) {
                             disabled={!commentText.trim() || isSendingComment}
                             style={{
                                 width: 30, height: 30, borderRadius: "50%", border: "none",
-                                background: commentText.trim() && !isSendingComment ? "#d97706" : "#e5e7eb",
+                                background: commentText.trim() && !isSendingComment ? "linear-gradient(135deg, #0072b5, #004786)" : "#e5e7eb",
                                 cursor: commentText.trim() && !isSendingComment ? "pointer" : "not-allowed",
                                 display: "flex", alignItems: "center", justifyContent: "center",
                                 color: "#fff", transition: "all .15s",
@@ -866,7 +906,7 @@ export function MessageComposer({ customerId, customer }: Props) {
                     style={{
                         ...linkBtnDark,
                         fontWeight: mode === "comment" ? 700 : 500,
-                        color: mode === "comment" ? "#d97706" : "var(--t-text-secondary)",
+                        color: mode === "comment" ? "#004786" : "var(--t-text-secondary)",
                     }}>
                     <MessageSquare size={13} />
                     {mode === "comment" ? "Back to reply" : "Add comment"}

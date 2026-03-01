@@ -12,163 +12,86 @@ interface ContactItemProps {
 export function ContactItem({ contact: c, isSelected, onClick, lifecycleMap, customFieldKeys }: ContactItemProps) {
     const name = c.sender_name?.trim() || c.customer_id
     const initials = name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase()
-
-    // Resolve lifecycle code → name + icon
     const lc = c.lifecycle ? lifecycleMap.get(c.lifecycle) : null
-
     const isClosed = c.conversation_status?.is_closed
 
     return (
-        <tr
-            className={`ct-row ${isSelected ? "ct-row-selected" : ""}`}
-            onClick={onClick}
-        >
-            {/* Checkbox */}
-            <td className="ct-td ct-td-check">
-                <input type="checkbox" className="ct-checkbox" onClick={(e) => e.stopPropagation()} />
+        <tr className={`ci-row ${isSelected ? "ci-sel" : ""}`} onClick={onClick}>
+            <td className="ci-td ci-td-chk">
+                <input type="checkbox" className="ci-chk" onClick={(e) => e.stopPropagation()} />
             </td>
 
-            {/* Name */}
-            <td className="ct-td ct-td-name">
-                <div className="ct-name-cell">
+            <td className="ci-td ci-td-name">
+                <div className="ci-name-cell">
                     {c.platform_icon ? (
-                        <img src={c.platform_icon} alt="" className="ct-avatar-img"
+                        <img src={c.platform_icon} alt="" className="ci-avatar-img"
                             onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none" }} />
                     ) : (
-                        <div className="ct-avatar">{initials}</div>
+                        <div className="ci-avatar">{initials}</div>
                     )}
-                    <span className="ct-name-text">{name}</span>
+                    <span className="ci-name-text">{name}</span>
                 </div>
             </td>
 
-            {/* Channel(s) */}
-            <td className="ct-td">
+            <td className="ci-td">
                 {c.platform_icon ? (
-                    <img src={c.platform_icon} alt={c.platform} className="ct-channel-icon" />
+                    <img src={c.platform_icon} alt={c.platform} className="ci-channel" />
                 ) : (
-                    <span className="ct-channel-text">{c.platform || "—"}</span>
+                    <span className="ci-channel-text">{c.platform || "—"}</span>
                 )}
             </td>
 
-            {/* Lifecycle (resolved name) */}
-            <td className="ct-td">
+            <td className="ci-td">
                 {lc ? (
-                    <span className="ct-lifecycle-badge" style={{
-                        background: lc.color ? `${lc.color}18` : undefined,
-                        color: lc.color || undefined,
+                    <span className="ci-lc" style={{
+                        background: lc.color ? `${lc.color}14` : "rgba(0,71,134,.05)",
+                        color: lc.color || "#004786",
+                        borderColor: lc.color ? `${lc.color}25` : "rgba(0,71,134,.1)",
                     }}>
                         {lc.icon && <span style={{ marginLeft: 2 }}>{lc.icon}</span>}
                         {lc.name}
                     </span>
-                ) : "—"}
+                ) : <span className="ci-muted">—</span>}
             </td>
 
-            {/* ── Dynamic custom_fields columns ── */}
-            {customFieldKeys.map((key) => {
-                const val = c.custom_fields?.[key] ?? ""
-                return (
-                    <td key={key} className="ct-td ct-td-secondary">
-                        {val || "—"}
-                    </td>
-                )
-            })}
+            {customFieldKeys.map((key) => (
+                <td key={key} className="ci-td ci-muted">{c.custom_fields?.[key] || "—"}</td>
+            ))}
 
-            {/* Tags (count) */}
-            <td className="ct-td ct-td-secondary">
-                {(c.tags?.length ?? 0) > 0 ? `${c.tags!.length} تاج` : "—"}
+            <td className="ci-td ci-muted">
+                {(c.tags?.length ?? 0) > 0 ? `${c.tags!.length} وسم` : "—"}
             </td>
 
-            {/* Teams (count) */}
-            <td className="ct-td ct-td-secondary">
-                {(c.team_ids?.teams?.length ?? 0) > 0
-                    ? `${c.team_ids!.teams.length} فريق`
-                    : "—"
-                }
+            <td className="ci-td ci-muted">
+                {(c.team_ids?.teams?.length ?? 0) > 0 ? `${c.team_ids!.teams.length} فريق` : "—"}
             </td>
 
-            {/* Conversation Status */}
-            <td className="ct-td">
-                <span className={`ct-status ${isClosed ? "ct-status-closed" : "ct-status-open"}`}>
-                    {isClosed ? "Closed" : "Open"}
+            <td className="ci-td">
+                <span className={`ci-status ${isClosed ? "ci-status-closed" : "ci-status-open"}`}>
+                    {isClosed ? "مغلقة" : "مفتوحة"}
                 </span>
             </td>
 
             <style>{`
-                .ct-row {
-                    cursor:pointer;
-                    transition:background .12s;
-                    border-bottom:1px solid var(--t-border-light);
-                }
-                .ct-row:hover {
-                    background:var(--t-surface);
-                }
-                .ct-row-selected {
-                    background:var(--t-accent-muted) !important;
-                }
-                .ct-td {
-                    padding:10px 12px;
-                    font-size:13px;
-                    color:var(--t-text-secondary);
-                    white-space:nowrap;
-                    vertical-align:middle;
-                }
-                .ct-td-check {
-                    width:40px; text-align:center;
-                }
-                .ct-checkbox {
-                    width:15px; height:15px;
-                    border-radius:3px; cursor:pointer;
-                    accent-color:var(--t-accent);
-                }
-                .ct-td-name { min-width:180px; }
-                .ct-name-cell {
-                    display:flex; align-items:center; gap:10px;
-                }
-                .ct-avatar {
-                    width:32px; height:32px; border-radius:50%;
-                    background:var(--t-accent);
-                    color:var(--t-text-on-accent);
-                    display:flex; align-items:center; justify-content:center;
-                    font-size:11px; font-weight:700; flex-shrink:0;
-                }
-                .ct-avatar-img {
-                    width:32px; height:32px; border-radius:50%;
-                    object-fit:cover; flex-shrink:0;
-                }
-                .ct-name-text {
-                    font-weight:600; color:var(--t-text);
-                    overflow:hidden; text-overflow:ellipsis;
-                }
-                .ct-channel-icon {
-                    width:20px; height:20px; object-fit:contain;
-                }
-                .ct-channel-text {
-                    font-size:12px; color:var(--t-text-faint);
-                    text-transform:capitalize;
-                }
-                .ct-lifecycle-badge {
-                    display:inline-flex; align-items:center; gap:4px;
-                    padding:3px 10px; border-radius:12px;
-                    font-size:11px; font-weight:600;
-                    background:var(--t-info-soft, rgba(59,130,246,0.1));
-                    color:var(--t-info, #3b82f6);
-                }
-                .ct-td-secondary {
-                    color:var(--t-text-muted);
-                    font-size:12px;
-                }
-                .ct-status {
-                    font-size:11px; font-weight:600;
-                    padding:3px 10px; border-radius:12px;
-                }
-                .ct-status-open {
-                    background:var(--t-success-soft, rgba(34,197,94,0.1));
-                    color:var(--t-success, #22c55e);
-                }
-                .ct-status-closed {
-                    background:var(--t-danger-soft, rgba(239,68,68,0.1));
-                    color:var(--t-danger, #ef4444);
-                }
+                .ci-row{cursor:pointer;transition:background .1s;border-bottom:1px solid #f0f1f3}
+                .ci-row:hover{background:#f9fafb}
+                .ci-sel{background:rgba(0,71,134,.03)!important}
+                .ci-sel:hover{background:rgba(0,71,134,.05)!important}
+                .ci-td{padding:9px 12px;font-size:12px;color:#6b7280;white-space:nowrap;vertical-align:middle}
+                .ci-td-chk{width:36px;text-align:center}
+                .ci-chk{width:13px;height:13px;border-radius:3px;cursor:pointer;accent-color:#004786}
+                .ci-td-name{min-width:160px}
+                .ci-name-cell{display:flex;align-items:center;gap:8px}
+                .ci-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#004786,#0072b5);color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
+                .ci-avatar-img{width:30px;height:30px;border-radius:50%;object-fit:cover;flex-shrink:0}
+                .ci-name-text{font-weight:600;color:#111827;overflow:hidden;text-overflow:ellipsis;font-size:12.5px}
+                .ci-channel{width:18px;height:18px;object-fit:contain}
+                .ci-channel-text{font-size:11px;color:#b0b7c3;text-transform:capitalize}
+                .ci-lc{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:600;border:1px solid}
+                .ci-muted{color:#b0b7c3;font-size:11px}
+                .ci-status{font-size:10px;font-weight:700;padding:2px 8px;border-radius:6px}
+                .ci-status-open{background:rgba(22,163,74,.06);color:#16a34a}
+                .ci-status-closed{background:rgba(239,68,68,.06);color:#ef4444}
             `}</style>
         </tr>
     )

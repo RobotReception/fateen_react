@@ -24,12 +24,12 @@ const OperationHistoryTab = lazy(() => import("../components/OperationHistoryTab
 
 type TabKey = "data" | "analytics" | "departments" | "categories" | "doc-analytics" | "pending-requests" | "operation-history"
 
-const TABS: { key: TabKey; title: string; icon: typeof Database; description: string; pageBit?: number }[] = [
-    { key: "doc-analytics", title: "تحليلات المستندات", icon: PieChart, description: "إحصائيات وتقارير" },
-    { key: "data", title: "إدارة البيانات", icon: Database, description: "إدارة الملفات والمستندات" },
-    { key: "analytics", title: "ملفات المستخدمين", icon: BarChart3, description: "عرض ملفات المستخدمين" },
-    { key: "departments", title: "الأقسام", icon: Building2, description: "إدارة أقسام المؤسسة" },
-    { key: "categories", title: "الفئات", icon: FolderTree, description: "تصنيف المستندات" },
+const TABS: { key: TabKey; title: string; icon: typeof Database; description: string; pageBit: number }[] = [
+    { key: "doc-analytics", title: "تحليلات المستندات", icon: PieChart, description: "إحصائيات وتقارير", pageBit: PAGE_BITS.DOCUMENT_ANALYTICS },
+    { key: "data", title: "إدارة البيانات", icon: Database, description: "إدارة الملفات والمستندات", pageBit: PAGE_BITS.DOCUMENTS },
+    { key: "analytics", title: "ملفات المستخدمين", icon: BarChart3, description: "عرض ملفات المستخدمين", pageBit: PAGE_BITS.DOCUMENTS },
+    { key: "departments", title: "الأقسام", icon: Building2, description: "إدارة أقسام المؤسسة", pageBit: PAGE_BITS.DEPARTMENTS },
+    { key: "categories", title: "الفئات", icon: FolderTree, description: "تصنيف المستندات", pageBit: PAGE_BITS.DEPARTMENTS },
     { key: "pending-requests", title: "الطلبات المعلقة", icon: ClipboardList, description: "مراجعة الطلبات والموافقة", pageBit: PAGE_BITS.PENDING_REQUESTS },
     { key: "operation-history", title: "سجل العمليات", icon: History, description: "تتبع العمليات المنفذة", pageBit: PAGE_BITS.OPERATION_HISTORY },
 ]
@@ -62,18 +62,20 @@ const TAB_COMPONENTS: { key: TabKey; Component: React.LazyExoticComponent<React.
 ]
 
 export function KnowledgeBasePage() {
-    const [activeTab, setActiveTab] = useState<TabKey>("doc-analytics")
-    const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
-    // Track which tabs have been visited — only mount a tab once it's been clicked
-    const [visitedTabs, setVisitedTabs] = useState<Set<TabKey>>(new Set(["doc-analytics"]))
     const { canAccessPage, hasPermissionData } = usePermissions()
 
     // ── Filter tabs by page-level permission ──
     const visibleTabs = useMemo(() => TABS.filter(tab => {
-        if (!tab.pageBit) return true              // no restriction
         if (!hasPermissionData) return true         // owner / no restrictions
         return canAccessPage(tab.pageBit)
     }), [canAccessPage, hasPermissionData])
+
+    // ── Default to first accessible tab ──
+    const defaultTab = visibleTabs.length > 0 ? visibleTabs[0].key : "doc-analytics"
+
+    const [activeTab, setActiveTab] = useState<TabKey>(defaultTab)
+    const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+    const [visitedTabs, setVisitedTabs] = useState<Set<TabKey>>(new Set([defaultTab]))
 
     const visibleTabKeys = useMemo(() => new Set(visibleTabs.map(t => t.key)), [visibleTabs])
 
@@ -95,32 +97,65 @@ export function KnowledgeBasePage() {
         <div className="flex h-full" dir="rtl">
             {/* ── Internal Sidebar ── */}
             <aside
-                className={`shrink-0 border-l border-gray-200 bg-white transition-all duration-300 ${sidebarCollapsed ? "w-[68px]" : "w-64"
+                className={`shrink-0 bg-white transition-all duration-300 ${sidebarCollapsed ? "w-[60px]" : "w-52"
                     }`}
+                style={{
+                    borderLeft: "1px solid var(--t-border-light, #f0f0f0)",
+                    borderRadius: "6px 6px 6px 6px",
+                    margin: "8px 0 8px 0",
+                    overflow: "hidden",
+                }}
             >
-                {/* Sidebar Header */}
-                <div className="flex h-14 items-center justify-between border-b border-gray-100 px-4">
+                {/* ── Gradient Header ── */}
+                <div
+                    onClick={() => { if (sidebarCollapsed) setSidebarCollapsed(false) }}
+                    style={{
+                        background: "linear-gradient(135deg, #004786, #0072b5, #0098d6)",
+                        padding: sidebarCollapsed ? "12px 0" : "12px 14px",
+                        position: "relative",
+                        overflow: "hidden",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: sidebarCollapsed ? "center" : "space-between",
+                        cursor: sidebarCollapsed ? "pointer" : "default",
+                    }}>
+                    <div style={{
+                        position: "absolute", top: -15, left: -15,
+                        width: 60, height: 60, borderRadius: "50%",
+                        background: "rgba(255,255,255,0.06)",
+                    }} />
+                    <div style={{ position: "relative", zIndex: 1, display: "flex", alignItems: "center", gap: 7 }}>
+                        <BookOpen size={sidebarCollapsed ? 18 : 14} style={{ color: "rgba(255,255,255,0.85)" }} />
+                        {!sidebarCollapsed && (
+                            <span style={{ fontSize: 12.5, fontWeight: 700, color: "#fff" }}>قاعدة المعرفة</span>
+                        )}
+                    </div>
                     {!sidebarCollapsed && (
-                        <div className="flex items-center gap-2">
-                            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gray-900">
-                                <BookOpen size={14} className="text-white" />
-                            </div>
-                            <span className="text-sm font-bold text-gray-700">قاعدة المعرفة</span>
-                        </div>
+                        <button
+                            onClick={() => setSidebarCollapsed(true)}
+                            style={{
+                                background: "rgba(255,255,255,0.12)",
+                                border: "none",
+                                borderRadius: 5,
+                                padding: 3,
+                                cursor: "pointer",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                transition: "background 0.15s",
+                                position: "relative",
+                                zIndex: 1,
+                            }}
+                            onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.22)" }}
+                            onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.12)" }}
+                        >
+                            <ChevronLeft size={13} style={{ color: "rgba(255,255,255,0.8)" }} />
+                        </button>
                     )}
-                    <button
-                        onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-                        className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
-                    >
-                        <ChevronLeft
-                            size={16}
-                            className={`transition-transform duration-300 ${sidebarCollapsed ? "rotate-180" : ""}`}
-                        />
-                    </button>
                 </div>
 
-                {/* Sidebar Navigation */}
-                <nav className="space-y-1 p-3">
+                {/* ── Sidebar Navigation ── */}
+                <nav style={{ padding: "6px 6px" }}>
                     {visibleTabs.map((tab) => {
                         const Icon = tab.icon
                         const isActive = activeTab === tab.key
@@ -129,29 +164,67 @@ export function KnowledgeBasePage() {
                                 key={tab.key}
                                 onClick={() => handleTabChange(tab.key)}
                                 title={sidebarCollapsed ? tab.title : undefined}
-                                className={`group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-right transition-all duration-200 ${isActive
-                                    ? "bg-gray-100 text-gray-800 shadow-sm"
-                                    : "text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                                    }`}
+                                style={{
+                                    display: "flex",
+                                    width: "100%",
+                                    alignItems: "center",
+                                    gap: 10,
+                                    padding: sidebarCollapsed ? "9px 0" : "7px 8px",
+                                    marginBottom: 2,
+                                    borderRadius: 8,
+                                    border: "none",
+                                    background: isActive ? "var(--t-card-hover, #f3f4f6)" : "transparent",
+                                    cursor: "pointer",
+                                    justifyContent: sidebarCollapsed ? "center" : "flex-start",
+                                    position: "relative",
+                                    textAlign: "right",
+                                    transition: "background 0.12s",
+                                    color: "inherit",
+                                }}
+                                onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = "var(--t-card-hover, #f9fafb)" }}
+                                onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = isActive ? "var(--t-card-hover, #f3f4f6)" : "transparent" }}
                             >
-                                <div
-                                    className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-all ${isActive
-                                        ? "bg-gray-900 text-white "
-                                        : "bg-gray-100 text-gray-400 group-hover:bg-gray-200 group-hover:text-gray-600"
-                                        }`}
-                                >
-                                    <Icon size={16} />
+                                {/* Active indicator bar */}
+                                {isActive && !sidebarCollapsed && (
+                                    <div style={{
+                                        position: "absolute",
+                                        right: 0,
+                                        top: "50%",
+                                        transform: "translateY(-50%)",
+                                        width: 3,
+                                        height: 18,
+                                        borderRadius: 3,
+                                        background: "#004786",
+                                    }} />
+                                )}
+                                <div style={{
+                                    width: sidebarCollapsed ? 28 : 26,
+                                    height: sidebarCollapsed ? 28 : 26,
+                                    borderRadius: 7,
+                                    background: isActive ? "rgba(0,71,134,0.1)" : "var(--t-surface, #f3f4f6)",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    flexShrink: 0,
+                                    transition: "all 0.15s",
+                                }}>
+                                    <Icon
+                                        size={sidebarCollapsed ? 15 : 13}
+                                        strokeWidth={isActive ? 2.2 : 1.6}
+                                        style={{
+                                            color: isActive ? "#004786" : "var(--t-text-muted, #9ca3af)",
+                                            transition: "color 0.15s",
+                                        }}
+                                    />
                                 </div>
                                 {!sidebarCollapsed && (
-                                    <div className="min-w-0 flex-1">
-                                        <p className={`truncate text-sm font-medium ${isActive ? "text-blue-700" : ""}`}>
-                                            {tab.title}
-                                        </p>
-                                        <p className="truncate text-[10px] text-gray-400">{tab.description}</p>
-                                    </div>
-                                )}
-                                {!sidebarCollapsed && isActive && (
-                                    <div className="h-5 w-1 rounded-full bg-gray-900" />
+                                    <span style={{
+                                        fontSize: 12.5,
+                                        fontWeight: isActive ? 600 : 500,
+                                        color: isActive ? "var(--t-text, #1f2937)" : "var(--t-text-secondary, #6b7280)",
+                                        transition: "color 0.15s",
+                                        overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                                    }}>{tab.title}</span>
                                 )}
                             </button>
                         )

@@ -4,115 +4,174 @@ import { useAuthStore } from "@/stores/auth-store"
 import {
     useTeams, useCreateTeam, useUpdateTeam, useDeleteTeam,
     useTeamMembers, useAddTeamMember, useRemoveTeamMember,
+    useDeletedTeams, useRestoreTeam,
 } from "../hooks/use-teams-tags"
 import type { Team } from "../types/teams-tags"
 import { getBriefUsers } from "@/features/inbox/services/inbox-service"
 import {
     Plus, Trash2, Pencil, Users, X, Loader2, Search, AlertTriangle, Check,
     MoreVertical, UserPlus, Mail, Shield, ChevronDown,
-    ArrowUpDown,
+    ArrowUpDown, RotateCcw, ChevronLeft, ChevronRight,
 } from "lucide-react"
 import { ActionGuard } from "@/components/guards/ActionGuard"
 import { PAGE_BITS, ACTION_BITS } from "@/lib/permissions"
 
 /* ═══════════════════════════════════════
-   CSS
+   CSS — Fateen branded
 ═══════════════════════════════════════ */
 const CSS = `
 .tt-table { width:100%; border-collapse:separate; border-spacing:0; }
 .tt-table thead th {
-    padding:8px 12px; font-size:11px; font-weight:600; color:var(--t-text-secondary);
-    text-align:right; border-bottom:1px solid var(--t-border); white-space:nowrap;
-    background:var(--t-surface);
+    padding:10px 14px; font-size:10.5px; font-weight:700; color:#6b7280;
+    text-align:right; border-bottom:1px solid #eaedf0; white-space:nowrap;
+    background:#fafbfc; text-transform:uppercase; letter-spacing:.03em;
 }
+.tt-table thead th:first-child { border-radius:0 8px 0 0; }
+.tt-table thead th:last-child { border-radius:8px 0 0 0; }
 .tt-table tbody td {
-    padding:9px 12px; font-size:12px; color:var(--t-text); border-bottom:1px solid var(--t-border-light);
+    padding:11px 14px; font-size:12px; color:var(--t-text,#111827); border-bottom:1px solid #f0f1f3;
     vertical-align:middle;
 }
 .tt-table tbody tr { transition:background .1s; }
-.tt-table tbody tr:hover { background:color-mix(in srgb,var(--t-accent) 3%,transparent); }
+.tt-table tbody tr:hover { background:rgba(0,71,134,.02); }
 .tt-table tbody tr:last-child td { border-bottom:none; }
 .tt-th-sort { display:inline-flex; align-items:center; gap:3px; cursor:pointer; user-select:none; }
-.tt-th-sort:hover { color:var(--t-accent); }
+.tt-th-sort:hover { color:#004786; }
 
 .tt-field {
-    width:100%; padding:8px 11px; border-radius:8px; border:1.5px solid var(--t-border);
-    background:var(--t-surface); font-size:12px; color:var(--t-text); outline:none;
+    width:100%; padding:8px 11px; border-radius:8px; border:1.5px solid #e0e3e7;
+    background:#fafafa; font-size:12px; color:var(--t-text,#111827); outline:none;
     transition:border-color .15s,box-shadow .15s; box-sizing:border-box; font-family:inherit;
 }
-.tt-field:focus { border-color:var(--t-accent); box-shadow:0 0 0 2px color-mix(in srgb,var(--t-accent) 10%,transparent); }
-.tt-field::placeholder { color:var(--t-text-faint); opacity:.6; }
+.tt-field:focus { border-color:#004786; box-shadow:0 0 0 3px rgba(0,71,134,.06); }
+.tt-field::placeholder { color:#9ca3af; opacity:.7; }
 
-.tt-label { font-size:11px; font-weight:700; color:var(--t-text-secondary); display:block; margin-bottom:4px; }
+.tt-label { font-size:11px; font-weight:700; color:#6b7280; display:block; margin-bottom:5px; }
 
 .tt-btn-primary {
     display:inline-flex; align-items:center; gap:5px; padding:7px 14px; border-radius:8px;
-    border:none; background:var(--t-accent); color:var(--t-text-on-accent); font-size:12px;
-    font-weight:700; cursor:pointer; transition:opacity .12s; font-family:inherit;
+    border:none; background:#004786; color:#fff; font-size:12px;
+    font-weight:700; cursor:pointer; transition:all .12s; font-family:inherit;
+    box-shadow:0 1px 3px rgba(0,71,134,.15);
 }
-.tt-btn-primary:hover:not(:disabled) { opacity:.88; }
+.tt-btn-primary:hover:not(:disabled) { background:#003d73; }
 .tt-btn-primary:disabled { opacity:.5; cursor:not-allowed; }
 
 .tt-btn-ghost {
     display:inline-flex; align-items:center; gap:5px; padding:6px 12px; border-radius:8px;
-    border:1.5px solid var(--t-border); background:transparent; color:var(--t-text);
+    border:1.5px solid #e0e3e7; background:transparent; color:var(--t-text,#374151);
     font-size:11px; font-weight:600; cursor:pointer; transition:all .12s; font-family:inherit;
 }
-.tt-btn-ghost:hover { border-color:var(--t-accent); color:var(--t-accent); }
+.tt-btn-ghost:hover { border-color:#004786; color:#004786; }
 
 .tt-actions-btn {
-    width:26px; height:26px; border-radius:6px; border:none; background:transparent;
+    width:28px; height:28px; border-radius:7px; border:none; background:transparent;
     cursor:pointer; display:flex; align-items:center; justify-content:center;
-    color:var(--t-text-faint); transition:all .1s;
+    color:#9ca3af; transition:all .1s;
 }
-.tt-actions-btn:hover { background:var(--t-surface); color:var(--t-text); }
+.tt-actions-btn:hover { background:#f3f4f6; color:#004786; }
 
 .tt-actions-menu {
     position:absolute; left:0; top:100%; margin-top:2px; z-index:20;
-    background:var(--t-card); border:1px solid var(--t-border); border-radius:8px;
-    box-shadow:0 6px 20px rgba(0,0,0,.1); min-width:130px; padding:3px;
+    background:#fff; border:1px solid #eaedf0; border-radius:10px;
+    box-shadow:0 6px 20px rgba(0,0,0,.08); min-width:140px; padding:4px;
     animation:ttMenuIn .1s ease-out;
 }
 .tt-actions-menu button {
-    width:100%; padding:6px 10px; border:none; background:transparent; cursor:pointer;
-    display:flex; align-items:center; gap:6px; border-radius:6px;
-    font-size:11px; font-weight:600; color:var(--t-text); transition:background .08s;
+    width:100%; padding:7px 10px; border:none; background:transparent; cursor:pointer;
+    display:flex; align-items:center; gap:6px; border-radius:7px;
+    font-size:11px; font-weight:600; color:var(--t-text,#374151); transition:background .08s;
     font-family:inherit; text-align:right;
 }
-.tt-actions-menu button:hover { background:var(--t-surface); }
-.tt-actions-menu button.danger { color:var(--t-danger); }
-.tt-actions-menu button.danger:hover { background:rgba(239,68,68,.06); }
+.tt-actions-menu button:hover { background:#f5f6f8; }
+.tt-actions-menu button.danger { color:#dc2626; }
+.tt-actions-menu button.danger:hover { background:rgba(239,68,68,.04); }
 
-/* Member chip */
 .tt-member-chip {
     display:inline-flex; align-items:center; gap:4px; padding:3px 8px 3px 4px;
-    border-radius:6px; background:var(--t-surface); border:1px solid var(--t-border-light);
-    font-size:11px; font-weight:600; color:var(--t-text);
+    border-radius:6px; background:rgba(0,71,134,.04); border:1px solid rgba(0,71,134,.1);
+    font-size:11px; font-weight:600; color:#004786;
 }
 .tt-member-chip button {
     display:flex; align-items:center; justify-content:center; width:14px; height:14px;
     border-radius:4px; border:none; background:transparent; cursor:pointer;
-    color:var(--t-text-faint); transition:all .1s; padding:0;
+    color:rgba(0,71,134,.4); transition:all .1s; padding:0;
 }
-.tt-member-chip button:hover { background:rgba(239,68,68,.1); color:var(--t-danger); }
+.tt-member-chip button:hover { background:rgba(239,68,68,.1); color:#dc2626; }
 
-/* Members selector */
 .tt-members-dropdown {
     position:absolute; left:0; right:0; top:100%; margin-top:2px; z-index:10;
-    background:var(--t-card); border:1px solid var(--t-border); border-radius:8px;
-    box-shadow:0 6px 20px rgba(0,0,0,.1); max-height:180px; overflow-y:auto;
+    background:#fff; border:1px solid #eaedf0; border-radius:10px;
+    box-shadow:0 6px 20px rgba(0,0,0,.08); max-height:180px; overflow-y:auto;
     animation:ttMenuIn .1s ease-out;
 }
 .tt-members-dropdown button {
     width:100%; padding:7px 10px; border:none; background:transparent; cursor:pointer;
     display:flex; align-items:center; gap:8px; font-size:11px; font-weight:500;
-    color:var(--t-text); transition:background .08s; font-family:inherit; text-align:right;
+    color:var(--t-text,#374151); transition:background .08s; font-family:inherit; text-align:right;
 }
-.tt-members-dropdown button:hover { background:var(--t-surface); }
+.tt-members-dropdown button:hover { background:#fafbfc; }
+
+.tt-tab-bar { display:flex; gap:2px; background:#f0f1f3; border-radius:10px; padding:3px; }
+.tt-tab {
+    padding:6px 16px; border-radius:8px; border:none; background:transparent;
+    font-size:11px; font-weight:700; color:#6b7280; cursor:pointer;
+    transition:all .12s; font-family:inherit; display:inline-flex; align-items:center; gap:5px;
+}
+.tt-tab:hover { color:#004786; }
+.tt-tab.active { background:#fff; color:#004786; box-shadow:0 1px 3px rgba(0,0,0,.06); }
+.tt-tab .tt-tab-count {
+    font-size:9px; font-weight:800; padding:1px 6px; border-radius:10px;
+    background:rgba(0,71,134,.08); color:#004786;
+}
+.tt-tab.active .tt-tab-count { background:rgba(0,71,134,.12); }
+
+.tt-status-badge {
+    display:inline-flex; align-items:center; gap:3px;
+    font-size:9.5px; font-weight:700; padding:2px 8px; border-radius:6px;
+}
+.tt-status-badge.active { background:rgba(22,163,74,.08); color:#16a34a; }
+.tt-status-badge.inactive { background:rgba(239,68,68,.06); color:#dc2626; }
+
+.tt-restore-btn {
+    display:inline-flex; align-items:center; gap:5px; padding:6px 14px; border-radius:8px;
+    border:1.5px solid rgba(0,71,134,.15); background:rgba(0,71,134,.03);
+    color:#004786; font-size:11px; font-weight:700; cursor:pointer;
+    transition:all .12s; font-family:inherit;
+}
+.tt-restore-btn:hover { background:rgba(0,71,134,.08); border-color:#004786; }
+.tt-restore-btn:disabled { opacity:.5; cursor:not-allowed; }
+
+.tt-pagination {
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    padding:12px 0; font-size:11px; color:#6b7280;
+}
+.tt-pagination button {
+    display:inline-flex; align-items:center; gap:4px; padding:5px 12px;
+    border-radius:7px; border:1.5px solid #e0e3e7; background:#fff;
+    font-size:11px; font-weight:600; color:var(--t-text,#374151);
+    cursor:pointer; transition:all .12s; font-family:inherit;
+}
+.tt-pagination button:hover:not(:disabled) { border-color:#004786; color:#004786; }
+.tt-pagination button:disabled { opacity:.4; cursor:not-allowed; }
 
 @keyframes ttIn { from{opacity:0;transform:scale(.97) translateY(6px)} to{opacity:1;transform:scale(1) translateY(0)} }
 @keyframes ttMenuIn { from{opacity:0;transform:translateY(-3px)} to{opacity:1;transform:translateY(0)} }
 `
+
+const AVATAR_GRADIENTS = [
+    "linear-gradient(135deg, #004786, #0072b5)",
+    "linear-gradient(135deg, #0072b5, #0098d6)",
+    "linear-gradient(135deg, #7c3aed, #a855f7)",
+    "linear-gradient(135deg, #0891b2, #06b6d4)",
+    "linear-gradient(135deg, #004786, #0098d6)",
+]
+
+function hashCode(s: string): number {
+    let h = 0
+    for (let i = 0; i < s.length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0
+    return Math.abs(h)
+}
 
 function fmtDate(d?: string) {
     if (!d) return "—"
@@ -126,33 +185,36 @@ function Modal({ title, subtitle, width = 440, onClose, children }: {
     title: string; subtitle?: string; width?: number; onClose: () => void; children: React.ReactNode
 }) {
     return (
-        <div onClick={onClose} style={{ position: "fixed", inset: 0, zIndex: 90, background: "rgba(0,0,0,.4)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div onClick={onClose} style={{ position: "fixed", inset: 0, zIndex: 90, background: "rgba(0,0,0,.45)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <div onClick={e => e.stopPropagation()} dir="rtl" style={{
-                borderRadius: 14, background: "var(--t-card)", border: "1px solid var(--t-border)",
+                borderRadius: 16, background: "#fff", overflow: "hidden",
                 width: "100%", maxWidth: width, margin: 16, animation: "ttIn .15s ease-out",
                 maxHeight: "88vh", display: "flex", flexDirection: "column",
-                boxShadow: "0 12px 40px rgba(0,0,0,.1)",
+                boxShadow: "0 12px 40px rgba(0,0,0,.12)",
             }}>
+                {/* Gradient header */}
                 <div style={{
+                    background: "linear-gradient(135deg, #004786, #0072b5)",
+                    padding: "14px 16px",
                     display: "flex", alignItems: "flex-start", justifyContent: "space-between",
-                    padding: "14px 16px", borderBottom: "1px solid var(--t-border-light)", flexShrink: 0,
                 }}>
                     <div>
-                        <div style={{ fontSize: 14, fontWeight: 800, color: "var(--t-text)" }}>{title}</div>
-                        {subtitle && <div style={{ fontSize: 11, color: "var(--t-text-faint)", marginTop: 2 }}>{subtitle}</div>}
+                        <div style={{ fontSize: 14, fontWeight: 800, color: "#fff" }}>{title}</div>
+                        {subtitle && <div style={{ fontSize: 10.5, color: "rgba(255,255,255,.65)", marginTop: 2, lineHeight: 1.4 }}>{subtitle}</div>}
                     </div>
                     <button onClick={onClose} style={{
-                        width: 24, height: 24, borderRadius: 6, background: "transparent",
-                        border: "none", cursor: "pointer", color: "var(--t-text-faint)",
-                        display: "flex", alignItems: "center", justifyContent: "center",
+                        width: 26, height: 26, borderRadius: 7,
+                        background: "rgba(255,255,255,.12)", border: "none", cursor: "pointer",
+                        color: "#fff", display: "flex", alignItems: "center", justifyContent: "center",
+                        transition: "background .12s",
                     }}
-                        onMouseEnter={e => { e.currentTarget.style.background = "var(--t-surface)" }}
-                        onMouseLeave={e => { e.currentTarget.style.background = "transparent" }}
+                        onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,.25)" }}
+                        onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,.12)" }}
                     >
                         <X size={14} />
                     </button>
                 </div>
-                <div style={{ padding: "14px 16px", overflowY: "auto", flex: 1 }}>{children}</div>
+                <div style={{ padding: "16px 18px", overflowY: "auto", flex: 1 }}>{children}</div>
             </div>
         </div>
     )
@@ -171,14 +233,12 @@ function TeamFormModal({ team, onClose, tenantId }: { team?: Team; onClose: () =
     const [showDropdown, setShowDropdown] = useState(false)
     const [memberSearch, setMemberSearch] = useState("")
 
-    // Fetch brief users for the members selector
     const { data: briefData } = useQuery({
         queryKey: ["brief-users"],
         queryFn: () => getBriefUsers(1, 100),
         staleTime: 5 * 60 * 1000,
     })
 
-    // Fetch current members if editing
     const { data: membersData } = useTeamMembers(tenantId, isEdit ? team.team_id : "")
 
     const currentMembers = membersData?.members ?? []
@@ -209,14 +269,11 @@ function TeamFormModal({ team, onClose, tenantId }: { team?: Team; onClose: () =
             onClose={onClose}
         >
             <form onSubmit={submit} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-                {/* Team Name */}
                 <div>
                     <label className="tt-label">اسم الفريق</label>
                     <input className="tt-field" value={name} onChange={e => setName(e.target.value)}
                         placeholder="الاستقبال" required />
                 </div>
-
-                {/* Description */}
                 <div>
                     <label className="tt-label">وصف الفريق</label>
                     <textarea className="tt-field" rows={3} value={desc} onChange={e => setDesc(e.target.value)}
@@ -224,20 +281,17 @@ function TeamFormModal({ team, onClose, tenantId }: { team?: Team; onClose: () =
                         style={{ resize: "vertical", lineHeight: 1.4 }} />
                 </div>
 
-                {/* Team Members (only in edit mode) */}
                 {isEdit && (
                     <div>
                         <label className="tt-label">أعضاء الفريق</label>
-
-                        {/* Selected members chips */}
                         <div style={{ position: "relative" }}>
                             <div
                                 onClick={() => setShowDropdown(!showDropdown)}
                                 style={{
                                     display: "flex", flexWrap: "wrap", gap: 5, alignItems: "center",
                                     padding: "6px 10px", minHeight: 36,
-                                    borderRadius: 8, border: "1.5px solid var(--t-border)",
-                                    background: "var(--t-surface)", cursor: "pointer",
+                                    borderRadius: 8, border: "1.5px solid #e0e3e7",
+                                    background: "#fafafa", cursor: "pointer",
                                     transition: "border-color .15s",
                                 }}
                             >
@@ -253,23 +307,22 @@ function TeamFormModal({ team, onClose, tenantId }: { team?: Team; onClose: () =
                                     </span>
                                 ))}
                                 {currentMembers.length === 0 && (
-                                    <span style={{ fontSize: 11, color: "var(--t-text-faint)" }}>اختر أعضاء...</span>
+                                    <span style={{ fontSize: 11, color: "#9ca3af" }}>اختر أعضاء...</span>
                                 )}
-                                <ChevronDown size={13} style={{ marginRight: "auto", color: "var(--t-text-faint)" }} />
+                                <ChevronDown size={13} style={{ marginRight: "auto", color: "#9ca3af" }} />
                             </div>
 
-                            {/* Dropdown */}
                             {showDropdown && (
                                 <>
                                     <div style={{ position: "fixed", inset: 0, zIndex: 9 }} onClick={() => setShowDropdown(false)} />
                                     <div className="tt-members-dropdown">
-                                        <div style={{ padding: "6px 8px", borderBottom: "1px solid var(--t-border-light)" }}>
+                                        <div style={{ padding: "6px 8px", borderBottom: "1px solid #f0f1f3" }}>
                                             <input className="tt-field" value={memberSearch} onChange={e => setMemberSearch(e.target.value)}
                                                 placeholder="ابحث عن عضو..." style={{ fontSize: 11, padding: "6px 10px" }} autoFocus
                                                 onClick={e => e.stopPropagation()} />
                                         </div>
                                         {available.length === 0 ? (
-                                            <div style={{ textAlign: "center", padding: "12px 0", fontSize: 11, color: "var(--t-text-faint)" }}>
+                                            <div style={{ textAlign: "center", padding: "12px 0", fontSize: 11, color: "#9ca3af" }}>
                                                 لا يوجد أعضاء متاحين
                                             </div>
                                         ) : available.map(u => (
@@ -278,7 +331,7 @@ function TeamFormModal({ team, onClose, tenantId }: { team?: Team; onClose: () =
                                                 disabled={addMemberMut.isPending}>
                                                 <div style={{
                                                     width: 22, height: 22, borderRadius: "50%", flexShrink: 0,
-                                                    background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
+                                                    background: AVATAR_GRADIENTS[hashCode(u.user_id) % AVATAR_GRADIENTS.length],
                                                     display: "flex", alignItems: "center", justifyContent: "center",
                                                     fontSize: 9, fontWeight: 700, color: "#fff",
                                                 }}>
@@ -294,10 +347,9 @@ function TeamFormModal({ team, onClose, tenantId }: { team?: Team; onClose: () =
                     </div>
                 )}
 
-                {/* Actions */}
                 <div style={{
                     display: "flex", gap: 8, justifyContent: "flex-end",
-                    paddingTop: 6, borderTop: "1px solid var(--t-border-light)", marginTop: 2,
+                    paddingTop: 8, borderTop: "1px solid #eaedf0", marginTop: 2,
                 }}>
                     <button type="button" className="tt-btn-ghost" onClick={onClose}>إلغاء</button>
                     <button type="submit" className="tt-btn-primary" disabled={isPending || !name.trim()}>
@@ -370,50 +422,52 @@ function MembersModal({ team, onClose, tenantId }: { team: Team; onClose: () => 
         <Modal title={`أعضاء — ${team.name}`} width={480} onClose={onClose}>
             {/* Add button */}
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
-                <span style={{ fontSize: 11, fontWeight: 700, color: "var(--t-text-faint)" }}>
+                <span style={{ fontSize: 11, fontWeight: 700, color: "#9ca3af" }}>
                     {members.length} عضو
                 </span>
                 <button className="tt-btn-primary" style={{ padding: "5px 12px", fontSize: 11 }}
                     onClick={() => setShowAdd(!showAdd)}>
-                    <UserPlus size={12} /> إضافة
+                    {showAdd ? <X size={12} /> : <UserPlus size={12} />}
+                    {showAdd ? "إلغاء" : "إضافة"}
                 </button>
             </div>
 
             {/* Add dropdown */}
             {showAdd && (
                 <div style={{
-                    marginBottom: 10, padding: 8, borderRadius: 8,
-                    border: "1px solid var(--t-border-light)", background: "var(--t-surface)",
+                    marginBottom: 10, padding: 10, borderRadius: 10,
+                    border: "1px solid #eaedf0", background: "#fafbfc",
+                    animation: "ttMenuIn .15s ease-out",
                 }}>
                     <input className="tt-field" value={addSearch} onChange={e => setAddSearch(e.target.value)}
-                        placeholder="ابحث عن موظف..." style={{ fontSize: 11, padding: "6px 10px", marginBottom: 6 }} autoFocus />
+                        placeholder="ابحث عن موظف..." style={{ fontSize: 11, padding: "7px 10px", marginBottom: 6 }} autoFocus />
                     <div style={{ maxHeight: 140, overflowY: "auto", display: "flex", flexDirection: "column", gap: 2 }}>
                         {available.length === 0 ? (
-                            <div style={{ textAlign: "center", padding: "8px 0", fontSize: 10, color: "var(--t-text-faint)" }}>لا يوجد</div>
+                            <div style={{ textAlign: "center", padding: "10px 0", fontSize: 10, color: "#9ca3af" }}>لا يوجد</div>
                         ) : available.map(u => (
                             <button key={u.user_id}
                                 onClick={() => addMut.mutate({ teamId: team.team_id, userId: u.user_id })}
                                 disabled={addMut.isPending}
                                 style={{
                                     display: "flex", alignItems: "center", gap: 7,
-                                    padding: "6px 8px", borderRadius: 6, border: "none",
+                                    padding: "6px 8px", borderRadius: 7, border: "none",
                                     background: "transparent", cursor: "pointer",
-                                    fontSize: 11, color: "var(--t-text)", fontFamily: "inherit",
+                                    fontSize: 11, color: "var(--t-text, #374151)", fontFamily: "inherit",
                                     textAlign: "right", width: "100%", transition: "background .08s",
                                 }}
-                                onMouseEnter={e => { e.currentTarget.style.background = "var(--t-card)" }}
+                                onMouseEnter={e => { e.currentTarget.style.background = "#f0f1f3" }}
                                 onMouseLeave={e => { e.currentTarget.style.background = "transparent" }}
                             >
                                 <div style={{
                                     width: 22, height: 22, borderRadius: "50%", flexShrink: 0,
-                                    background: "linear-gradient(135deg, #10b981, #059669)",
+                                    background: AVATAR_GRADIENTS[hashCode(u.user_id) % AVATAR_GRADIENTS.length],
                                     display: "flex", alignItems: "center", justifyContent: "center",
                                     fontSize: 9, fontWeight: 700, color: "#fff",
                                 }}>
                                     {u.name.charAt(0).toUpperCase()}
                                 </div>
                                 <span style={{ flex: 1 }}>{u.name}</span>
-                                <UserPlus size={10} style={{ color: "var(--t-text-faint)" }} />
+                                <UserPlus size={10} style={{ color: "#004786" }} />
                             </button>
                         ))}
                     </div>
@@ -422,32 +476,44 @@ function MembersModal({ team, onClose, tenantId }: { team: Team; onClose: () => 
 
             {/* Members list */}
             {isLoading ? (
-                <div style={{ textAlign: "center", padding: "24px 0", color: "var(--t-text-faint)", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, fontSize: 11 }}>
+                <div style={{ textAlign: "center", padding: "28px 0", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, color: "#004786", fontSize: 11 }}>
                     <Loader2 size={14} className="animate-spin" /> جاري التحميل...
                 </div>
             ) : members.length === 0 ? (
-                <div style={{ textAlign: "center", padding: "24px 0" }}>
-                    <Users size={24} style={{ margin: "0 auto 6px", display: "block", opacity: .2 }} />
-                    <div style={{ fontSize: 11, color: "var(--t-text-faint)" }}>لا يوجد أعضاء</div>
+                <div style={{ textAlign: "center", padding: "28px 0" }}>
+                    <div style={{
+                        width: 44, height: 44, borderRadius: 12,
+                        background: "rgba(0,71,134,.06)",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        margin: "0 auto 8px",
+                    }}>
+                        <Users size={20} style={{ color: "#004786" }} />
+                    </div>
+                    <div style={{ fontSize: 12, color: "#9ca3af" }}>لا يوجد أعضاء</div>
                 </div>
             ) : (
-                <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
                     {members.map(member => {
                         const initials = member.full_name.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2)
+                        const gradient = AVATAR_GRADIENTS[hashCode(member.user_id) % AVATAR_GRADIENTS.length]
                         return (
                             <div key={member.user_id} style={{
                                 display: "flex", alignItems: "center", justifyContent: "space-between",
-                                padding: "8px 10px", borderRadius: 8,
-                                border: "1px solid var(--t-border-light)", background: "var(--t-surface)",
-                            }}>
+                                padding: "9px 12px", borderRadius: 10,
+                                border: "1px solid #eaedf0", background: "#fff",
+                                transition: "all .12s",
+                            }}
+                                onMouseEnter={e => { e.currentTarget.style.borderColor = "#d1d5db"; e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,.03)" }}
+                                onMouseLeave={e => { e.currentTarget.style.borderColor = "#eaedf0"; e.currentTarget.style.boxShadow = "none" }}
+                            >
                                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                                     {member.profile_picture ? (
-                                        <img src={member.profile_picture} alt="" style={{ width: 28, height: 28, borderRadius: "50%", objectFit: "cover" }}
+                                        <img src={member.profile_picture} alt="" style={{ width: 30, height: 30, borderRadius: 8, objectFit: "cover" }}
                                             onError={e => { (e.target as HTMLImageElement).style.display = "none" }} />
                                     ) : (
                                         <div style={{
-                                            width: 28, height: 28, borderRadius: "50%",
-                                            background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
+                                            width: 30, height: 30, borderRadius: 8,
+                                            background: gradient,
                                             display: "flex", alignItems: "center", justifyContent: "center",
                                             fontSize: 10, fontWeight: 700, color: "#fff",
                                         }}>
@@ -456,19 +522,24 @@ function MembersModal({ team, onClose, tenantId }: { team: Team; onClose: () => 
                                     )}
                                     <div>
                                         <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-                                            <span style={{ fontSize: 12, fontWeight: 600, color: "var(--t-text)" }}>{member.full_name}</span>
+                                            <span style={{ fontSize: 12, fontWeight: 600, color: "var(--t-text, #111827)" }}>{member.full_name}</span>
                                             {!member.is_active && (
-                                                <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 4, background: "rgba(239,68,68,.1)", color: "#ef4444", fontWeight: 700 }}>غير نشط</span>
+                                                <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 4, background: "rgba(239,68,68,.06)", color: "#dc2626", fontWeight: 700 }}>غير نشط</span>
                                             )}
                                         </div>
                                         <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 1 }}>
                                             {member.email && (
-                                                <span style={{ display: "flex", alignItems: "center", gap: 2, fontSize: 10, color: "var(--t-text-faint)" }}>
+                                                <span style={{ display: "flex", alignItems: "center", gap: 2, fontSize: 10, color: "#9ca3af" }}>
                                                     <Mail size={9} /> {member.email}
                                                 </span>
                                             )}
                                             {member.role && (
-                                                <span style={{ display: "flex", alignItems: "center", gap: 2, fontSize: 9, fontWeight: 700, padding: "1px 6px", borderRadius: 4, background: "var(--t-card)", color: "var(--t-text-faint)", border: "1px solid var(--t-border-light)" }}>
+                                                <span style={{
+                                                    display: "flex", alignItems: "center", gap: 2,
+                                                    fontSize: 9, fontWeight: 700,
+                                                    padding: "1px 6px", borderRadius: 4,
+                                                    background: "rgba(0,71,134,.04)", color: "#004786",
+                                                }}>
                                                     <Shield size={8} /> {member.role}
                                                 </span>
                                             )}
@@ -479,10 +550,13 @@ function MembersModal({ team, onClose, tenantId }: { team: Team; onClose: () => 
                                     onClick={() => removeMut.mutate({ teamId: team.team_id, userId: member.user_id })}
                                     disabled={removeMut.isPending}
                                     style={{
-                                        width: 24, height: 24, borderRadius: 6, border: "none",
-                                        background: "rgba(239,68,68,.08)", color: "var(--t-danger)",
+                                        width: 26, height: 26, borderRadius: 7, border: "none",
+                                        background: "rgba(239,68,68,.06)", color: "#dc2626",
                                         cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+                                        transition: "all .12s",
                                     }}
+                                    onMouseEnter={e => { e.currentTarget.style.background = "rgba(239,68,68,.12)" }}
+                                    onMouseLeave={e => { e.currentTarget.style.background = "rgba(239,68,68,.06)" }}
                                     title="إزالة"
                                 >
                                     {removeMut.isPending ? <Loader2 size={10} className="animate-spin" /> : <Trash2 size={11} />}
@@ -513,8 +587,15 @@ export function TeamsTab() {
     const [membersTeam, setMembersTeam] = useState<Team | null>(null)
     const [sortField, setSortField] = useState<"name" | "created_at">("name")
     const [sortDir, setSortDir] = useState<"asc" | "desc">("asc")
+    const [searchFocused, setSearchFocused] = useState(false)
+    const [activeTab, setActiveTab] = useState<"active" | "deleted">("active")
+    const [deletedPage, setDeletedPage] = useState(1)
 
-    const filtered = teams
+    const { data: deletedData, isLoading: isLoadingDeleted } = useDeletedTeams(tid, deletedPage, 20)
+    const restoreMut = useRestoreTeam(tid)
+
+    const activeTeams = teams.filter(t => t.is_active !== false)
+    const filtered = activeTeams
         .filter(t =>
             !search ||
             t.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -536,104 +617,225 @@ export function TeamsTab() {
             <style>{CSS}</style>
 
             {/* Toolbar */}
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-                <div style={{ position: "relative", width: 200 }}>
-                    <Search size={13} style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", color: "var(--t-text-faint)", pointerEvents: "none" }} />
-                    <input className="tt-field" value={search} onChange={e => setSearch(e.target.value)}
-                        placeholder="بحث في الفرق" style={{ paddingInlineEnd: 32, fontSize: 11 }} />
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    {/* Tab Switcher */}
+                    <div className="tt-tab-bar">
+                        <button className={`tt-tab ${activeTab === "active" ? "active" : ""}`}
+                            onClick={() => setActiveTab("active")}>
+                            نشطة <span className="tt-tab-count">{activeTeams.length}</span>
+                        </button>
+                        <button className={`tt-tab ${activeTab === "deleted" ? "active" : ""}`}
+                            onClick={() => { setActiveTab("deleted"); setDeletedPage(1) }}>
+                            معطلة {deletedData?.total ? <span className="tt-tab-count">{deletedData.total}</span> : null}
+                        </button>
+                    </div>
+                    {activeTab === "active" && (
+                        <div style={{ position: "relative", width: 200 }}>
+                            <Search size={13} style={{
+                                position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)",
+                                color: searchFocused ? "#004786" : "#9ca3af",
+                                pointerEvents: "none", transition: "color .15s",
+                            }} />
+                            <input className="tt-field" value={search}
+                                onChange={e => setSearch(e.target.value)}
+                                onFocus={() => setSearchFocused(true)}
+                                onBlur={() => setSearchFocused(false)}
+                                placeholder="بحث في الفرق" style={{ paddingInlineEnd: 32, fontSize: 11 }} />
+                        </div>
+                    )}
                 </div>
-                <ActionGuard pageBit={PAGE_BITS.TEAMS} actionBit={ACTION_BITS.CREATE_TEAM}>
-                    <button className="tt-btn-primary" onClick={() => { setEditTeam(undefined); setShowForm(true) }}>
-                        <Plus size={13} /> + فريق جديد
-                    </button>
-                </ActionGuard>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <ActionGuard pageBit={PAGE_BITS.TEAMS} actionBit={ACTION_BITS.CREATE_TEAM}>
+                        <button className="tt-btn-primary" onClick={() => { setEditTeam(undefined); setShowForm(true) }}>
+                            <Plus size={13} /> فريق جديد
+                        </button>
+                    </ActionGuard>
+                </div>
             </div>
 
-            {/* Table */}
-            <div style={{ borderRadius: 10, border: "1px solid var(--t-border)", background: "var(--t-card)", overflow: "visible" }}>
-                {isLoading ? (
-                    <div style={{ textAlign: "center", padding: "40px 0", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, color: "var(--t-text-faint)", fontSize: 12 }}>
-                        <Loader2 size={15} className="animate-spin" /> جاري التحميل...
-                    </div>
-                ) : filtered.length === 0 ? (
-                    <div style={{ textAlign: "center", padding: "40px 0" }}>
-                        <Users size={28} style={{ margin: "0 auto 8px", display: "block", color: "var(--t-text-faint)", opacity: .25 }} />
-                        <div style={{ fontSize: 13, color: "var(--t-text-secondary)", fontWeight: 600 }}>
-                            {search ? "لا توجد نتائج" : "لا توجد فرق بعد"}
+            {/* Content */}
+            {activeTab === "active" ? (
+                <div style={{ borderRadius: 12, border: "1px solid #eaedf0", background: "#fff", overflow: "visible" }}>
+                    {isLoading ? (
+                        <div style={{ textAlign: "center", padding: "48px 0", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, color: "#004786", fontSize: 12 }}>
+                            <Loader2 size={16} className="animate-spin" /> جاري التحميل...
                         </div>
-                        {!search && (
-                            <button className="tt-btn-primary" onClick={() => { setEditTeam(undefined); setShowForm(true) }} style={{ marginTop: 10 }}>
-                                <Plus size={13} /> أضف أول فريق
-                            </button>
-                        )}
-                    </div>
-                ) : (
-                    <table className="tt-table">
-                        <thead>
-                            <tr>
-                                <th><span className="tt-th-sort" onClick={() => toggleSort("name")}>الاسم <ArrowUpDown size={10} style={{ opacity: sortField === "name" ? 1 : .3 }} /></span></th>
-                                <th>الوصف</th>
-                                <th>الأعضاء</th>
-                                <th><span className="tt-th-sort" onClick={() => toggleSort("created_at")}>تاريخ الإنشاء <ArrowUpDown size={10} style={{ opacity: sortField === "created_at" ? 1 : .3 }} /></span></th>
-                                <th>إجراءات</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {filtered.map(team => (
-                                <tr key={team.id ?? team.team_id}>
-                                    <td>
-                                        <div style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-                                            <div style={{
-                                                width: 24, height: 24, borderRadius: 7, flexShrink: 0,
-                                                background: "color-mix(in srgb, var(--t-accent) 12%, transparent)",
-                                                display: "flex", alignItems: "center", justifyContent: "center",
-                                            }}>
-                                                <Users size={11} style={{ color: "var(--t-accent)" }} />
-                                            </div>
-                                            <span style={{ fontWeight: 600, fontSize: 12 }}>{team.name}</span>
-                                        </div>
-                                    </td>
-                                    <td><span style={{ color: "var(--t-text-secondary)", fontSize: 11 }}>{team.description || "—"}</span></td>
-                                    <td>
-                                        <button className="tt-btn-ghost" style={{ padding: "3px 8px", gap: 3, fontSize: 10 }}
-                                            onClick={() => setMembersTeam(team)}>
-                                            <Users size={10} /> {team.members?.length ?? 0}
-                                        </button>
-                                    </td>
-                                    <td><span style={{ fontSize: 11, color: "var(--t-text-secondary)", whiteSpace: "nowrap" }}>{fmtDate(team.created_at)}</span></td>
-                                    <td>
-                                        <ActionsDropdown
-                                            onEdit={() => { setEditTeam(team); setShowForm(true) }}
-                                            onMembers={() => setMembersTeam(team)}
-                                            onDelete={() => setDeleteTarget(team)}
-                                            memberCount={team.members?.length ?? 0}
-                                        />
-                                    </td>
+                    ) : filtered.length === 0 ? (
+                        <div style={{ textAlign: "center", padding: "48px 0" }}>
+                            <div style={{
+                                width: 52, height: 52, borderRadius: 14,
+                                background: "rgba(0,71,134,.06)",
+                                display: "flex", alignItems: "center", justifyContent: "center",
+                                margin: "0 auto 10px",
+                            }}>
+                                <Users size={24} style={{ color: "#004786" }} />
+                            </div>
+                            <div style={{ fontSize: 13, color: "var(--t-text, #111827)", fontWeight: 600 }}>
+                                {search ? "لا توجد نتائج" : "لا توجد فرق بعد"}
+                            </div>
+                            {!search && (
+                                <button className="tt-btn-primary" onClick={() => { setEditTeam(undefined); setShowForm(true) }} style={{ marginTop: 12 }}>
+                                    <Plus size={13} /> أضف أول فريق
+                                </button>
+                            )}
+                        </div>
+                    ) : (
+                        <table className="tt-table">
+                            <thead>
+                                <tr>
+                                    <th><span className="tt-th-sort" onClick={() => toggleSort("name")}>الاسم <ArrowUpDown size={10} style={{ opacity: sortField === "name" ? 1 : .3 }} /></span></th>
+                                    <th>الوصف</th>
+                                    <th>الأعضاء</th>
+                                    <th><span className="tt-th-sort" onClick={() => toggleSort("created_at")}>تاريخ الإنشاء <ArrowUpDown size={10} style={{ opacity: sortField === "created_at" ? 1 : .3 }} /></span></th>
+                                    <th>الحالة</th>
+                                    <th>إجراءات</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                )}
-            </div>
+                            </thead>
+                            <tbody>
+                                {filtered.map(team => (
+                                    <tr key={team.id ?? team.team_id}>
+                                        <td>
+                                            <div style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+                                                <div style={{
+                                                    width: 28, height: 28, borderRadius: 8, flexShrink: 0,
+                                                    background: AVATAR_GRADIENTS[hashCode(team.team_id) % AVATAR_GRADIENTS.length],
+                                                    display: "flex", alignItems: "center", justifyContent: "center",
+                                                }}>
+                                                    <Users size={12} style={{ color: "#fff" }} />
+                                                </div>
+                                                <span style={{ fontWeight: 600, fontSize: 12 }}>{team.name}</span>
+                                            </div>
+                                        </td>
+                                        <td><span style={{ color: "#6b7280", fontSize: 11 }}>{team.description || "—"}</span></td>
+                                        <td>
+                                            <button className="tt-btn-ghost" style={{ padding: "3px 8px", gap: 3, fontSize: 10 }}
+                                                onClick={() => setMembersTeam(team)}>
+                                                <Users size={10} /> {team.members?.length ?? 0}
+                                            </button>
+                                        </td>
+                                        <td><span style={{ fontSize: 11, color: "#6b7280", whiteSpace: "nowrap" }}>{fmtDate(team.created_at)}</span></td>
+                                        <td>
+                                            <span className={`tt-status-badge ${team.is_active !== false ? "active" : "inactive"}`}>
+                                                {team.is_active !== false ? "نشط" : "معطّل"}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <ActionsDropdown
+                                                onEdit={() => { setEditTeam(team); setShowForm(true) }}
+                                                onMembers={() => setMembersTeam(team)}
+                                                onDelete={() => setDeleteTarget(team)}
+                                                memberCount={team.members?.length ?? 0}
+                                            />
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    )}
+                </div>
+            ) : (
+                /* ─── Deleted Teams View ─── */
+                <div style={{ borderRadius: 12, border: "1px solid #eaedf0", background: "#fff", overflow: "visible" }}>
+                    {isLoadingDeleted ? (
+                        <div style={{ textAlign: "center", padding: "48px 0", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, color: "#004786", fontSize: 12 }}>
+                            <Loader2 size={16} className="animate-spin" /> جاري التحميل...
+                        </div>
+                    ) : !deletedData?.items?.length ? (
+                        <div style={{ textAlign: "center", padding: "48px 0" }}>
+                            <div style={{
+                                width: 52, height: 52, borderRadius: 14,
+                                background: "rgba(0,71,134,.06)",
+                                display: "flex", alignItems: "center", justifyContent: "center",
+                                margin: "0 auto 10px",
+                            }}>
+                                <Trash2 size={24} style={{ color: "#9ca3af" }} />
+                            </div>
+                            <div style={{ fontSize: 13, color: "#9ca3af", fontWeight: 600 }}>
+                                لا توجد فرق معطلة
+                            </div>
+                        </div>
+                    ) : (
+                        <>
+                            <table className="tt-table">
+                                <thead>
+                                    <tr>
+                                        <th>الاسم</th>
+                                        <th>الوصف</th>
+                                        <th>الأعضاء</th>
+                                        <th>تاريخ التعطيل</th>
+                                        <th>إجراءات</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {deletedData.items.map(team => (
+                                        <tr key={team.id ?? team.team_id} style={{ opacity: .75 }}>
+                                            <td>
+                                                <div style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+                                                    <div style={{
+                                                        width: 28, height: 28, borderRadius: 8, flexShrink: 0,
+                                                        background: "#d1d5db",
+                                                        display: "flex", alignItems: "center", justifyContent: "center",
+                                                    }}>
+                                                        <Users size={12} style={{ color: "#fff" }} />
+                                                    </div>
+                                                    <span style={{ fontWeight: 600, fontSize: 12 }}>{team.name}</span>
+                                                </div>
+                                            </td>
+                                            <td><span style={{ color: "#6b7280", fontSize: 11 }}>{team.description || "—"}</span></td>
+                                            <td><span style={{ fontSize: 11, color: "#6b7280" }}>{team.members?.length ?? 0}</span></td>
+                                            <td><span style={{ fontSize: 11, color: "#6b7280", whiteSpace: "nowrap" }}>{fmtDate(team.deactivated_at ?? team.updated_at)}</span></td>
+                                            <td>
+                                                <ActionGuard pageBit={PAGE_BITS.TEAMS} actionBit={ACTION_BITS.UPDATE_TEAM}>
+                                                    <button className="tt-restore-btn"
+                                                        disabled={restoreMut.isPending}
+                                                        onClick={() => restoreMut.mutate(team.team_id)}>
+                                                        {restoreMut.isPending ? <Loader2 size={11} className="animate-spin" /> : <RotateCcw size={11} />}
+                                                        استعادة
+                                                    </button>
+                                                </ActionGuard>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                            {/* Pagination */}
+                            {deletedData.total_pages > 1 && (
+                                <div className="tt-pagination">
+                                    <button disabled={!deletedData.has_previous}
+                                        onClick={() => setDeletedPage(p => Math.max(1, p - 1))}>
+                                        <ChevronRight size={12} /> السابق
+                                    </button>
+                                    <span>{deletedData.page} / {deletedData.total_pages}</span>
+                                    <button disabled={!deletedData.has_next}
+                                        onClick={() => setDeletedPage(p => p + 1)}>
+                                        التالي <ChevronLeft size={12} />
+                                    </button>
+                                </div>
+                            )}
+                        </>
+                    )}
+                </div>
+            )}
 
             {/* Modals */}
             {showForm && <TeamFormModal team={editTeam} tenantId={tid} onClose={() => setShowForm(false)} />}
 
             {deleteTarget && (
-                <Modal title="تأكيد الحذف" width={360} onClose={() => setDeleteTarget(null)}>
+                <Modal title="تأكيد التعطيل" width={360} onClose={() => setDeleteTarget(null)}>
                     <div style={{ textAlign: "center", padding: "4px 0" }}>
                         <div style={{
                             width: 44, height: 44, borderRadius: 12,
                             background: "rgba(239,68,68,.08)", margin: "0 auto 12px",
                             display: "flex", alignItems: "center", justifyContent: "center",
                         }}>
-                            <AlertTriangle size={20} style={{ color: "var(--t-danger)" }} />
+                            <AlertTriangle size={20} style={{ color: "#dc2626" }} />
                         </div>
-                        <div style={{ fontSize: 13, fontWeight: 700, color: "var(--t-text)", marginBottom: 4 }}>
-                            حذف فريق «{deleteTarget.name}»؟
+                        <div style={{ fontSize: 13, fontWeight: 700, color: "var(--t-text, #111827)", marginBottom: 4 }}>
+                            تعطيل فريق «{deleteTarget.name}»؟
                         </div>
-                        <div style={{ fontSize: 11, color: "var(--t-text-faint)", marginBottom: 16 }}>
-                            لا يمكن التراجع عن هذا الإجراء
+                        <div style={{ fontSize: 11, color: "#9ca3af", marginBottom: 16 }}>
+                            سيتم تعطيل الفريق ويمكنك استعادته لاحقاً
                         </div>
                         <div style={{ display: "flex", gap: 8, justifyContent: "center" }}>
                             <button className="tt-btn-ghost" onClick={() => setDeleteTarget(null)}>إلغاء</button>
@@ -643,10 +845,11 @@ export function TeamsTab() {
                                 style={{
                                     display: "inline-flex", alignItems: "center", gap: 5,
                                     padding: "7px 18px", borderRadius: 8, border: "none",
-                                    background: "var(--t-danger)", color: "#fff",
+                                    background: "#dc2626", color: "#fff",
                                     fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
+                                    boxShadow: "0 1px 3px rgba(220,38,38,.15)",
                                 }}>
-                                {deleteMut.isPending ? <Loader2 size={12} className="animate-spin" /> : <Trash2 size={12} />} حذف
+                                {deleteMut.isPending ? <Loader2 size={12} className="animate-spin" /> : <Trash2 size={12} />} تعطيل
                             </button>
                         </div>
                     </div>

@@ -107,7 +107,7 @@ export function CustomerActionsMenu({ customer: c, open, onClose, anchorRef }: P
 
     const lifecycles: SidebarLifecycle[] = summary?.lifecycles ?? []
     const teams: SidebarTeam[] = summary?.teams ?? []
-    const currentTeamIds = c.team_ids?.teams ?? []
+    const currentTeamIds = (c.team_ids?.teams ?? []).map(t => t.team_id)
 
     const portal = (
         <div id="cam-root">

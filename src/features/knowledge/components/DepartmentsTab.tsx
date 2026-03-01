@@ -90,9 +90,16 @@ const DepartmentFormModal = memo(function DepartmentFormModal({
     return (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={onClose}>
             <div className="mx-4 w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl border border-gray-200 bg-white shadow-2xl" onClick={(e) => e.stopPropagation()} style={{ animation: "deptModalIn .18s ease-out" }}>
-                <div className="sticky top-0 z-10 border-b border-gray-100 bg-white px-5 py-3">
-                    <h3 className="text-sm font-bold text-gray-700">{mode === "create" ? "إنشاء قسم جديد" : "تعديل القسم"}</h3>
-                    {initial && <p className="mt-0.5 text-xs text-gray-400 font-mono">#{initial.department_id}</p>}
+                <div className="sticky top-0 z-10 bg-white px-5 py-3" style={{ borderBottom: "1px solid var(--t-border-light, #f0f0f0)" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <div style={{ width: 30, height: 30, borderRadius: 8, background: "linear-gradient(135deg, #004786, #0098d6)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                            <Building2 size={14} style={{ color: "#fff" }} />
+                        </div>
+                        <div>
+                            <h3 style={{ fontSize: 14, fontWeight: 600, color: "var(--t-text, #1f2937)" }}>{mode === "create" ? "إنشاء قسم جديد" : "تعديل القسم"}</h3>
+                            {initial && <p style={{ fontSize: 10, color: "var(--t-text-faint, #9ca3af)", fontFamily: "monospace", marginTop: 1 }}>#{initial.department_id}</p>}
+                        </div>
+                    </div>
                 </div>
                 <div className="space-y-4 p-5">
                     {mode === "create" && (
@@ -152,9 +159,9 @@ const DepartmentFormModal = memo(function DepartmentFormModal({
                         </div>
                     </div>
                 </div>
-                <div className="sticky bottom-0 flex items-center justify-end gap-2 border-t border-gray-100 bg-white px-5 py-3">
-                    <button onClick={onClose} disabled={saving} className="rounded-xl border border-gray-200 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50">إلغاء</button>
-                    <button onClick={handleSubmit} disabled={saving || !canSubmit} className="flex items-center gap-2 rounded-xl bg-gray-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50 disabled:cursor-not-allowed">
+                <div className="sticky bottom-0 flex items-center justify-end gap-2 bg-white px-5 py-3" style={{ borderTop: "1px solid var(--t-border-light, #f0f0f0)" }}>
+                    <button onClick={onClose} disabled={saving} style={{ padding: "7px 16px", borderRadius: 7, border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-card, #fff)", fontSize: 13, fontWeight: 500, color: "var(--t-text-secondary, #6b7280)", cursor: "pointer" }}>إلغاء</button>
+                    <button onClick={handleSubmit} disabled={saving || !canSubmit} style={{ display: "flex", alignItems: "center", gap: 6, padding: "7px 18px", borderRadius: 7, border: "none", background: "#004786", color: "#fff", fontSize: 13, fontWeight: 500, cursor: "pointer", opacity: (saving || !canSubmit) ? 0.5 : 1 }}>
                         {saving && <Loader2 size={14} className="animate-spin" />}
                         {mode === "create" ? "إنشاء القسم" : "حفظ التعديلات"}
                     </button>
@@ -168,19 +175,19 @@ const DepartmentFormModal = memo(function DepartmentFormModal({
 const DeleteDeptModal = memo(function DeleteDeptModal({ dept, onClose, onConfirm, deleting }: { dept: DepartmentDetail; onClose: () => void; onConfirm: () => void; deleting: boolean }) {
     return (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={onClose}>
-            <div className="mx-4 w-full max-w-md rounded-2xl border border-gray-200 bg-white shadow-2xl" onClick={(e) => e.stopPropagation()} style={{ animation: "deptModalIn .18s ease-out" }}>
-                <div className="p-6 text-center">
-                    <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-red-50"><Trash2 size={24} className="text-red-500" /></div>
-                    <h3 className="text-lg font-bold text-gray-800">حذف القسم</h3>
-                    <p className="mt-2 text-sm text-gray-500">هل أنت متأكد من حذف <span className="font-bold text-red-600">{dept.name_ar || dept.name}</span>؟</p>
-                    <div className="mx-auto mt-3 flex items-start gap-2 rounded-xl bg-amber-50 border border-amber-200 p-3 text-right">
-                        <AlertTriangle size={16} className="text-amber-500 mt-0.5 shrink-0" />
-                        <p className="text-xs text-amber-700 leading-relaxed">سيتم حذف القسم نهائياً مع جميع ربطات الفئات — لا يمكن التراجع</p>
+            <div className="mx-4 w-full max-w-md overflow-hidden bg-white" onClick={(e) => e.stopPropagation()} style={{ animation: "deptModalIn .18s ease-out", borderRadius: 12, border: "1px solid var(--t-border-light, #e5e7eb)" }}>
+                <div style={{ padding: "28px 24px 20px", textAlign: "center" }}>
+                    <div style={{ width: 52, height: 52, borderRadius: 14, background: "rgba(220,38,38,0.06)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 14px" }}><Trash2 size={22} style={{ color: "#dc2626" }} /></div>
+                    <h3 style={{ fontSize: 16, fontWeight: 700, color: "var(--t-text, #1f2937)" }}>حذف القسم</h3>
+                    <p style={{ fontSize: 13, color: "var(--t-text-secondary, #6b7280)", marginTop: 8 }}>هل أنت متأكد من حذف <span style={{ fontWeight: 700, color: "#dc2626" }}>{dept.name_ar || dept.name}</span>؟</p>
+                    <div style={{ margin: "12px auto 0", display: "flex", alignItems: "flex-start", gap: 8, borderRadius: 8, background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.15)", padding: 10, textAlign: "right" }}>
+                        <AlertTriangle size={14} style={{ color: "#d97706", marginTop: 2, flexShrink: 0 }} />
+                        <p style={{ fontSize: 11, color: "#92400e", lineHeight: 1.6 }}>سيتم حذف القسم نهائياً مع جميع ربطات الفئات — لا يمكن التراجع</p>
                     </div>
                 </div>
-                <div className="flex items-center justify-center gap-3 border-t border-gray-100 px-6 py-4">
-                    <button onClick={onClose} disabled={deleting} className="rounded-xl border border-gray-200 px-5 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50">إلغاء</button>
-                    <button onClick={onConfirm} disabled={deleting} className="flex items-center gap-2 rounded-xl bg-gray-800 px-5 py-2.5 text-sm font-medium text-white  disabled:opacity-50">
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, borderTop: "1px solid var(--t-border-light, #f0f0f0)", padding: "14px 24px" }}>
+                    <button onClick={onClose} disabled={deleting} style={{ padding: "8px 20px", borderRadius: 7, border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-card, #fff)", fontSize: 13, fontWeight: 500, color: "var(--t-text-secondary, #6b7280)", cursor: "pointer" }}>إلغاء</button>
+                    <button onClick={onConfirm} disabled={deleting} style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 20px", borderRadius: 7, border: "none", background: "#dc2626", color: "#fff", fontSize: 13, fontWeight: 500, cursor: "pointer", opacity: deleting ? 0.5 : 1 }}>
                         {deleting && <Loader2 size={14} className="animate-spin" />}
                         حذف نهائي
                     </button>
@@ -199,19 +206,19 @@ const DeleteDataConfirmModal = memo(function DeleteDataConfirmModal({
 }) {
     return (
         <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={onClose}>
-            <div className="mx-4 w-full max-w-md rounded-2xl border border-gray-200 bg-white shadow-2xl" onClick={(e) => e.stopPropagation()} style={{ animation: "deptModalIn .18s ease-out" }}>
-                <div className="p-6 text-center">
-                    <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-red-50"><Database size={24} className="text-red-500" /></div>
-                    <h3 className="text-lg font-bold text-gray-800">{title}</h3>
-                    <p className="mt-2 text-sm text-gray-500">{subtitle}</p>
-                    <div className="mx-auto mt-3 flex items-start gap-2 rounded-xl bg-amber-50 border border-amber-200 p-3 text-right">
-                        <AlertTriangle size={16} className="text-amber-500 mt-0.5 shrink-0" />
-                        <p className="text-xs text-amber-700 leading-relaxed">{warning}</p>
+            <div className="mx-4 w-full max-w-md overflow-hidden bg-white" onClick={(e) => e.stopPropagation()} style={{ animation: "deptModalIn .18s ease-out", borderRadius: 12, border: "1px solid var(--t-border-light, #e5e7eb)" }}>
+                <div style={{ padding: "28px 24px 20px", textAlign: "center" }}>
+                    <div style={{ width: 52, height: 52, borderRadius: 14, background: "rgba(220,38,38,0.06)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 14px" }}><Database size={22} style={{ color: "#dc2626" }} /></div>
+                    <h3 style={{ fontSize: 16, fontWeight: 700, color: "var(--t-text, #1f2937)" }}>{title}</h3>
+                    <p style={{ fontSize: 13, color: "var(--t-text-secondary, #6b7280)", marginTop: 8 }}>{subtitle}</p>
+                    <div style={{ margin: "12px auto 0", display: "flex", alignItems: "flex-start", gap: 8, borderRadius: 8, background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.15)", padding: 10, textAlign: "right" }}>
+                        <AlertTriangle size={14} style={{ color: "#d97706", marginTop: 2, flexShrink: 0 }} />
+                        <p style={{ fontSize: 11, color: "#92400e", lineHeight: 1.6 }}>{warning}</p>
                     </div>
                 </div>
-                <div className="flex items-center justify-center gap-3 border-t border-gray-100 px-6 py-4">
-                    <button onClick={onClose} disabled={deleting} className="rounded-xl border border-gray-200 px-5 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50">إلغاء</button>
-                    <button onClick={onConfirm} disabled={deleting} className="flex items-center gap-2 rounded-xl bg-gray-800 px-5 py-2.5 text-sm font-medium text-white  disabled:opacity-50">
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, borderTop: "1px solid var(--t-border-light, #f0f0f0)", padding: "14px 24px" }}>
+                    <button onClick={onClose} disabled={deleting} style={{ padding: "8px 20px", borderRadius: 7, border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-card, #fff)", fontSize: 13, fontWeight: 500, color: "var(--t-text-secondary, #6b7280)", cursor: "pointer" }}>إلغاء</button>
+                    <button onClick={onConfirm} disabled={deleting} style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 20px", borderRadius: 7, border: "none", background: "#dc2626", color: "#fff", fontSize: 13, fontWeight: 500, cursor: "pointer", opacity: deleting ? 0.5 : 1 }}>
                         {deleting && <Loader2 size={14} className="animate-spin" />}
                         حذف البيانات
                     </button>
@@ -234,6 +241,7 @@ const CategoryLinkPanel = memo(function CategoryLinkPanel({
     const deleteCatDataMutation = useDeleteCategoryData(tenantId)
 
     const [deleteCatTarget, setDeleteCatTarget] = useState<CategoryItem | null>(null)
+    const [removingCatId, setRemovingCatId] = useState<string | null>(null)
 
     const allCats = catRes?.success ? catRes.data?.categories ?? [] : []
     const linkedCats = linkedRes?.success ? linkedRes.data?.categories ?? [] : []
@@ -244,67 +252,120 @@ const CategoryLinkPanel = memo(function CategoryLinkPanel({
         linkMutation.mutate({ departmentId: deptId, payload: { category_id: catId } })
     }
 
-    const handleUnlink = (catId: string) => {
-        unlinkMutation.mutate({ departmentId: deptId, categoryId: catId })
+    /* Merged: delete data + unlink in one action */
+    const handleRemoveCategory = async () => {
+        if (!deleteCatTarget) return
+        const catId = deleteCatTarget.category_id
+        setRemovingCatId(catId)
+        try {
+            // 1. Delete category data first
+            await new Promise<void>((resolve, reject) => {
+                deleteCatDataMutation.mutate(
+                    { category_id: catId, username: null },
+                    { onSuccess: () => resolve(), onError: () => reject() }
+                )
+            })
+            // 2. Then unlink
+            unlinkMutation.mutate({ departmentId: deptId, categoryId: catId })
+        } catch {
+            // If data delete fails, still try to unlink
+            unlinkMutation.mutate({ departmentId: deptId, categoryId: catId })
+        } finally {
+            setRemovingCatId(null)
+            setDeleteCatTarget(null)
+        }
     }
 
-    const handleDeleteCatData = () => {
-        if (!deleteCatTarget) return
-        deleteCatDataMutation.mutate({ category_id: deleteCatTarget.category_id, username: null }, {
-            onSuccess: (res) => { if (res.success) setDeleteCatTarget(null) },
-        })
-    }
+    const isRemoving = removingCatId !== null || deleteCatDataMutation.isPending
 
     return (
-        <div className="space-y-3 px-1 py-3" style={{ animation: "deptFadeIn .2s ease-out" }}>
-            {/* Linked categories */}
-            <div>
-                <p className="mb-2 text-xs font-semibold text-gray-500">الفئات المرتبطة ({linkedCats.length})</p>
-                {linkedCats.length === 0 ? (
-                    <p className="text-xs text-gray-400 italic">لا توجد فئات مرتبطة بهذا القسم</p>
-                ) : (
-                    <div className="flex flex-wrap gap-1.5">
-                        {linkedCats.map((c) => (
-                            <span key={c.category_id} className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 border border-blue-200 px-2.5 py-1 text-xs font-medium text-blue-700">
-                                <span>{c.icon || "📋"}</span>
-                                {c.name_ar || c.name}
-                                <button onClick={() => setDeleteCatTarget(c)} disabled={deleteCatDataMutation.isPending} className="mr-0.5 rounded-full p-0.5 text-blue-400 hover:bg-red-100 hover:text-red-500 disabled:opacity-50" title="حذف بيانات الفئة">
-                                    <Database size={10} />
+        <div style={{ padding: "14px 4px", animation: "deptFadeIn .2s ease-out" }}>
+            <div style={{ display: "flex", gap: 16 }}>
+                {/* Linked categories section */}
+                <div style={{ flex: 1 }}>
+                    <p style={{ fontSize: 11, fontWeight: 600, color: "var(--t-text-faint, #9ca3af)", marginBottom: 8, display: "flex", alignItems: "center", gap: 5 }}>
+                        <Tag size={11} />
+                        الفئات المرتبطة ({linkedCats.length})
+                    </p>
+                    {linkedCats.length === 0 ? (
+                        <p style={{ fontSize: 11, color: "var(--t-text-faint, #d1d5db)", fontStyle: "italic" }}>لا توجد فئات مرتبطة</p>
+                    ) : (
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                            {linkedCats.map((c) => (
+                                <div key={c.category_id} style={{
+                                    display: "flex", alignItems: "center", gap: 6,
+                                    borderRadius: 8, border: "1px solid var(--t-border-light, #e5e7eb)",
+                                    background: "var(--t-card, #fff)", padding: "5px 8px 5px 10px",
+                                    transition: "all 0.15s",
+                                }}>
+                                    <span style={{ fontSize: 13 }}>{c.icon || "📋"}</span>
+                                    <span style={{ fontSize: 12, fontWeight: 500, color: "var(--t-text, #374151)" }}>{c.name_ar || c.name}</span>
+                                    <button
+                                        onClick={() => setDeleteCatTarget(c)}
+                                        disabled={isRemoving}
+                                        title="حذف الفئة وبياناتها"
+                                        style={{
+                                            display: "flex", alignItems: "center", justifyContent: "center",
+                                            width: 20, height: 20, borderRadius: 5, border: "none",
+                                            background: "transparent", cursor: "pointer",
+                                            color: "var(--t-text-faint, #d1d5db)", transition: "all 0.15s",
+                                            opacity: isRemoving ? 0.3 : 1,
+                                        }}
+                                        className="hover:!bg-red-50 hover:!text-red-500"
+                                    >
+                                        {removingCatId === c.category_id ? <Loader2 size={11} className="animate-spin" /> : <X size={12} />}
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+
+                {/* Available categories section */}
+                {!loading && unlinked.length > 0 && (
+                    <div style={{ borderRight: "1px solid var(--t-border-light, #e5e7eb)", paddingRight: 16 }}>
+                        <p style={{ fontSize: 11, fontWeight: 600, color: "var(--t-text-faint, #9ca3af)", marginBottom: 8, display: "flex", alignItems: "center", gap: 5 }}>
+                            <Link2 size={11} />
+                            متاحة للربط
+                        </p>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                            {unlinked.map((c) => (
+                                <button key={c.category_id} onClick={() => handleLink(c.category_id)} disabled={linkMutation.isPending}
+                                    style={{
+                                        display: "flex", alignItems: "center", gap: 5,
+                                        borderRadius: 8, border: "1px dashed var(--t-border-light, #d1d5db)",
+                                        background: "transparent", padding: "5px 10px",
+                                        fontSize: 12, fontWeight: 500, color: "var(--t-text-faint, #9ca3af)",
+                                        cursor: "pointer", transition: "all 0.15s",
+                                        opacity: linkMutation.isPending ? 0.4 : 1,
+                                    }}
+                                    className="hover:!border-emerald-300 hover:!bg-emerald-50 hover:!text-emerald-600"
+                                >
+                                    {linkMutation.isPending ? <Loader2 size={10} className="animate-spin" /> : <Plus size={11} />}
+                                    <span style={{ fontSize: 12 }}>{c.icon || "📋"}</span>
+                                    {c.name_ar || c.name}
                                 </button>
-                                <button onClick={() => handleUnlink(c.category_id)} disabled={unlinkMutation.isPending} className="mr-0.5 rounded-full p-0.5 text-blue-400 hover:bg-blue-100 hover:text-red-500 disabled:opacity-50" title="فك الربط">
-                                    {unlinkMutation.isPending ? <Loader2 size={10} className="animate-spin" /> : <X size={10} />}
-                                </button>
-                            </span>
-                        ))}
+                            ))}
+                        </div>
+                    </div>
+                )}
+                {loading && (
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: "var(--t-text-faint, #9ca3af)" }}>
+                        <Loader2 size={12} className="animate-spin" />
+                        جاري التحميل...
                     </div>
                 )}
             </div>
-            {/* Available to link */}
-            {loading ? (
-                <div className="flex items-center gap-2 text-xs text-gray-400"><Loader2 size={12} className="animate-spin" />جاري تحميل الفئات...</div>
-            ) : unlinked.length > 0 && (
-                <div>
-                    <p className="mb-2 text-xs font-semibold text-gray-500">فئات متاحة للربط</p>
-                    <div className="flex flex-wrap gap-1.5">
-                        {unlinked.map((c) => (
-                            <button key={c.category_id} onClick={() => handleLink(c.category_id)} disabled={linkMutation.isPending}
-                                className="inline-flex items-center gap-1.5 rounded-full border border-dashed border-gray-300 bg-white px-2.5 py-1 text-xs font-medium text-gray-500 hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700 transition-colors disabled:opacity-50">
-                                {linkMutation.isPending ? <Loader2 size={10} className="animate-spin" /> : <Link2 size={10} />}
-                                {c.icon || "📋"} {c.name_ar || c.name}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-            )}
-            {/* Delete category data confirm */}
+
+            {/* Delete + Unlink confirm */}
             {deleteCatTarget && (
                 <DeleteDataConfirmModal
-                    title="حذف بيانات الفئة"
-                    subtitle={`هل أنت متأكد من حذف جميع بيانات الفئة "${deleteCatTarget.name_ar || deleteCatTarget.name}"؟`}
-                    warning="سيتم حذف جميع المستندات والسجلات المرتبطة بهذه الفئة نهائياً — لا يمكن التراجع"
+                    title="حذف الفئة وبياناتها"
+                    subtitle={`سيتم إلغاء ربط الفئة "${deleteCatTarget.name_ar || deleteCatTarget.name}" وحذف جميع بياناتها`}
+                    warning="سيتم حذف جميع المستندات والسجلات المرتبطة بهذه الفئة نهائياً ثم إلغاء ربطها — لا يمكن التراجع"
                     onClose={() => setDeleteCatTarget(null)}
-                    onConfirm={handleDeleteCatData}
-                    deleting={deleteCatDataMutation.isPending}
+                    onConfirm={handleRemoveCategory}
+                    deleting={isRemoving}
                 />
             )}
         </div>
@@ -475,13 +536,18 @@ export function DepartmentsTab() {
     return (
         <div className="space-y-5">
             {/* Header */}
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                    <h2 className="text-xl font-bold text-gray-800">الأقسام</h2>
-                    <p className="mt-1 text-sm text-gray-400">إدارة أقسام المؤسسة وربط الفئات بها</p>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                    <div style={{ width: 40, height: 40, borderRadius: 10, background: "linear-gradient(135deg, #004786, #0098d6)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <Building2 size={20} style={{ color: "#fff" }} />
+                    </div>
+                    <div>
+                        <h2 style={{ fontSize: 18, fontWeight: 700, color: "var(--t-text, #1f2937)", margin: 0 }}>الأقسام</h2>
+                        <p style={{ fontSize: 12, color: "var(--t-text-faint, #9ca3af)", marginTop: 2 }}>إدارة أقسام المؤسسة وربط الفئات بها</p>
+                    </div>
                 </div>
                 <ActionGuard pageBit={PAGE_BITS.DEPARTMENTS} actionBit={ACTION_BITS.CREATE_DEPARTMENT}>
-                    <button onClick={() => setCreateModal(true)} className="flex items-center gap-2 rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-medium text-white  transition-transform hover:scale-[1.02] active:scale-[0.98]">
+                    <button onClick={() => setCreateModal(true)} style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 18px", borderRadius: 8, border: "none", background: "#004786", color: "#fff", fontSize: 13, fontWeight: 500, cursor: "pointer", transition: "all 0.15s" }}>
                         <Plus size={15} />إنشاء قسم
                     </button>
                 </ActionGuard>
@@ -503,26 +569,22 @@ export function DepartmentsTab() {
 
             {/* Info bar */}
             {!loading && filtered.length > 0 && (
-                <div className="flex items-center justify-between rounded-xl bg-white border border-gray-100 px-4 py-2.5 shadow-sm">
-                    <p className="text-xs text-gray-500"><span className="font-bold text-gray-700">{total}</span> قسم</p>
-                    <p className="text-xs text-gray-400">صفحة {page} من {totalPages}</p>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderRadius: 8, background: "var(--t-card, #fff)", border: "1px solid var(--t-border-light, #e5e7eb)", padding: "8px 14px" }}>
+                    <p style={{ fontSize: 12, color: "var(--t-text-secondary, #6b7280)" }}><span style={{ fontWeight: 700, color: "#004786" }}>{total}</span> قسم</p>
+                    <p style={{ fontSize: 11, color: "var(--t-text-faint, #9ca3af)" }}>صفحة {page} من {totalPages}</p>
                 </div>
             )}
 
             {/* Table */}
-            <div className="relative overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
+            <div style={{ position: "relative", overflow: "hidden", borderRadius: 10, border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-card, #fff)" }}>
                 <FetchingBar visible={backgroundFetching} />
                 <div className="overflow-x-auto" style={{ opacity: backgroundFetching ? 0.6 : 1, transition: 'opacity 0.2s ease' }}>
-                    <table className="w-full">
+                    <table style={{ width: "100%", borderCollapse: "collapse" }}>
                         <thead>
-                            <tr className="border-b border-gray-100 text-right">
-                                <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-gray-400">القسم</th>
-                                <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-gray-400">المعرّف</th>
-                                <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-gray-400">الوصف</th>
-                                <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-gray-400">الحالة</th>
-                                <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-gray-400">الفئات</th>
-                                <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-gray-400">الترتيب</th>
-                                <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-gray-400">الإجراءات</th>
+                            <tr style={{ borderBottom: "1px solid var(--t-border-light, #f0f0f0)", background: "var(--t-surface, #fafafa)", textAlign: "right" }}>
+                                {["القسم", "المعرّف", "الوصف", "الحالة", "الفئات", "الترتيب", "الإجراءات"].map(h => (
+                                    <th key={h} style={{ padding: "10px 16px", fontSize: 11, fontWeight: 600, color: "var(--t-text-faint, #9ca3af)", letterSpacing: "0.3px" }}>{h}</th>
+                                ))}
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-50">
@@ -556,10 +618,10 @@ export function DepartmentsTab() {
 
             {/* Pagination */}
             {totalPages > 1 && (
-                <div className="flex items-center justify-center gap-2 pt-2">
-                    <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1} className="flex items-center gap-1 rounded-lg border border-gray-200 px-3 py-2 text-xs font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"><ChevronRight size={14} /> السابق</button>
-                    <span className="flex h-8 items-center rounded-lg bg-gray-900 px-3 text-xs font-bold text-white ">{page}</span>
-                    <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} onMouseEnter={() => page < totalPages && prefetchDepts(page + 1, PAGE_SIZE)} disabled={page >= totalPages} className="flex items-center gap-1 rounded-lg border border-gray-200 px-3 py-2 text-xs font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed">التالي <ChevronLeft size={14} /></button>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, paddingTop: 8 }}>
+                    <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1} style={{ display: "flex", alignItems: "center", gap: 4, padding: "6px 12px", borderRadius: 7, border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-card, #fff)", fontSize: 12, fontWeight: 500, color: "var(--t-text-secondary, #6b7280)", cursor: "pointer", opacity: page <= 1 ? 0.4 : 1 }}><ChevronRight size={13} /> السابق</button>
+                    <span style={{ display: "flex", height: 30, alignItems: "center", borderRadius: 7, background: "#004786", padding: "0 12px", fontSize: 12, fontWeight: 700, color: "#fff" }}>{page}</span>
+                    <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} onMouseEnter={() => page < totalPages && prefetchDepts(page + 1, PAGE_SIZE)} disabled={page >= totalPages} style={{ display: "flex", alignItems: "center", gap: 4, padding: "6px 12px", borderRadius: 7, border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-card, #fff)", fontSize: 12, fontWeight: 500, color: "var(--t-text-secondary, #6b7280)", cursor: "pointer", opacity: page >= totalPages ? 0.4 : 1 }}>التالي <ChevronLeft size={13} /></button>
                 </div>
             )}
 

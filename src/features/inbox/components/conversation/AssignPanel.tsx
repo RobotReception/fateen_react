@@ -9,7 +9,7 @@ import type { Customer, SidebarLifecycle, SidebarTeam } from "../../types/inbox.
 import { useAuthStore } from "@/stores/auth-store"
 import {
     useCloseConversation, useReopenConversation, useAssignAgent,
-    useUpdateLifecycle, useToggleAI, useAssignTeams,
+    useUpdateLifecycle, useToggleAI, useAssignTeams, useRemoveTeams,
 } from "../../hooks/use-customer-actions"
 import { useInboxSummary } from "../../hooks/use-inbox-summary"
 import { getBriefUsers } from "../../services/inbox-service"
@@ -29,6 +29,7 @@ export function AssignPanel({ customer: c }: Props) {
     const lifecycleMut = useUpdateLifecycle(c.customer_id)
     const aiMut = useToggleAI(c.customer_id)
     const teamMut = useAssignTeams(c.customer_id)
+    const unassignTeamMut = useRemoveTeams(c.customer_id)
 
     const { data: briefData } = useQuery({
         queryKey: ["brief-users"],
@@ -142,20 +143,36 @@ export function AssignPanel({ customer: c }: Props) {
                 active={openDrop === "team"}
             />
             {openDrop === "team" && (
-                <DropPanel anchorRef={teamRef} onClose={closeDrop} width={210}>
+                <DropPanel anchorRef={teamRef} onClose={closeDrop} width={220}>
                     <p className="ap-drop-title">تحويل لفريق</p>
                     {teams.length === 0 && (
                         <p style={{ fontSize: 11, color: "#9ca3af", padding: "8px 12px", margin: 0, textAlign: "center" }}>لا توجد فرق</p>
                     )}
                     {teams.map(t => {
-                        const isActive = c.team_ids?.teams?.includes(t.team_id) ?? false
+                        const isActive = c.team_ids?.teams?.some(tm => tm.team_id === t.team_id) ?? false
+                        const isLoading = teamMut.isPending || unassignTeamMut.isPending
                         return (
-                            <DropItem key={t.team_id}
-                                icon={<span style={{ fontSize: 11 }}>{t.icon || "👥"}</span>}
-                                label={t.name}
-                                active={isActive}
-                                onClick={() => { teamMut.mutate([t.team_id]); closeDrop() }}
-                            />
+                            <button key={t.team_id} className="ap-drop-item" onClick={() => {
+                                if (isActive) unassignTeamMut.mutate([t.team_id])
+                                else teamMut.mutate([t.team_id])
+                            }} disabled={isLoading} style={{ opacity: isLoading ? 0.6 : 1 }}>
+                                <span style={{
+                                    width: 16, height: 16, borderRadius: 4, flexShrink: 0,
+                                    border: isActive ? "none" : "1.5px solid #cbd5e1",
+                                    background: isActive ? "linear-gradient(135deg, #0072b5, #004786)" : "#fff",
+                                    display: "flex", alignItems: "center", justifyContent: "center",
+                                    transition: "all .15s ease",
+                                    boxShadow: isActive ? "0 1px 4px rgba(0,71,134,0.25)" : "none",
+                                }}>
+                                    {isActive && (
+                                        <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                                            <path d="M2 5.5L4 7.5L8 3" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                        </svg>
+                                    )}
+                                </span>
+                                <span style={{ fontSize: 11, lineHeight: 1 }}>{t.icon || "👥"}</span>
+                                <span style={{ flex: 1, fontSize: 12, fontWeight: isActive ? 600 : 500, color: isActive ? "#004786" : "#374151" }}>{t.name}</span>
+                            </button>
                         )
                     })}
                 </DropPanel>
@@ -200,14 +217,14 @@ export function AssignPanel({ customer: c }: Props) {
                     background:transparent; cursor:pointer;
                     font-size:11.5px; font-weight:500;
                     color:var(--t-text-muted, #6b7280);
-                    transition:all .12s ease; font-family:inherit;
+                    transition:all .15s ease; font-family:inherit;
                     white-space:nowrap; height:28px;
                 }
-                .ap-compact-btn:hover { background:#f0f4ff; border-color:#c7d2fe; color:#4f46e5; }
-                .ap-compact-btn[data-active="true"] { background:#eef2ff; border-color:#818cf8; color:#4f46e5; }
-                .ap-compact-btn[data-accent="true"] { color:#059669; border-color:#a7f3d0; }
-                .ap-compact-btn[data-accent="true"]:hover { background:#ecfdf5; border-color:#6ee7b7; }
-                .ap-compact-chevron { color:inherit; opacity:.5; flex-shrink:0; transition:transform .12s; }
+                .ap-compact-btn:hover { background:rgba(0,114,181,0.06); border-color:rgba(0,71,134,0.2); color:#004786; }
+                .ap-compact-btn[data-active="true"] { background:rgba(0,114,181,0.08); border-color:#0072b5; color:#004786; }
+                .ap-compact-btn[data-accent="true"] { color:#004786; border-color:rgba(0,71,134,0.25); }
+                .ap-compact-btn[data-accent="true"]:hover { background:rgba(0,114,181,0.06); border-color:#0072b5; }
+                .ap-compact-chevron { color:inherit; opacity:.5; flex-shrink:0; transition:transform .15s; }
                 .ap-compact-btn[data-active="true"] .ap-compact-chevron { transform:rotate(180deg); opacity:1; }
 
                 .ap-icon-btn {
@@ -215,11 +232,11 @@ export function AssignPanel({ customer: c }: Props) {
                     border:1px solid var(--t-border-light, #e5e7eb);
                     background:transparent; cursor:pointer;
                     display:inline-flex; align-items:center; justify-content:center;
-                    color:var(--t-text-muted, #6b7280); transition:all .12s;
+                    color:var(--t-text-muted, #6b7280); transition:all .15s;
                     position:relative;
                 }
-                .ap-icon-btn:hover { background:#f5f3ff; border-color:#c4b5fd; color:#7c3aed; }
-                .ap-icon-active { background:#f5f3ff !important; border-color:#c4b5fd !important; color:#7c3aed !important; }
+                .ap-icon-btn:hover { background:rgba(0,114,181,0.06); border-color:rgba(0,71,134,0.2); color:#004786; }
+                .ap-icon-active { background:rgba(0,114,181,0.08) !important; border-color:#0072b5 !important; color:#004786 !important; }
                 .ap-icon-btn:disabled { opacity:.5; cursor:not-allowed; }
                 .ap-ai-dot-i {
                     position:absolute; bottom:2px; right:2px;
@@ -233,36 +250,37 @@ export function AssignPanel({ customer: c }: Props) {
                     padding:3px 10px; border-radius:6px; height:28px;
                     border:none; cursor:pointer;
                     font-size:11px; font-weight:600; font-family:inherit;
-                    transition:all .12s;
+                    transition:all .15s;
                 }
-                .ap-reopen-btn { background:#eff6ff; color:#3b82f6; }
-                .ap-reopen-btn:hover { background:#dbeafe; }
+                .ap-reopen-btn { background:rgba(0,114,181,0.08); color:#0072b5; }
+                .ap-reopen-btn:hover { background:rgba(0,114,181,0.14); }
                 .ap-reopen-btn:disabled { opacity:.5; cursor:not-allowed; }
 
                 .ap-drop {
-                    background:#fff; border:1px solid rgba(0,0,0,.08);
+                    background:#fff; border:1px solid rgba(0,0,0,.06);
                     border-radius:10px; padding:4px;
-                    box-shadow:0 10px 32px rgba(0,0,0,.10), 0 2px 8px rgba(0,0,0,.06);
-                    animation:apFadeIn .1s ease-out;
+                    box-shadow:0 12px 40px rgba(0,71,134,.08), 0 4px 12px rgba(0,0,0,.06);
+                    animation:apFadeIn .12s ease-out;
+                    backdrop-filter:blur(8px);
                 }
                 .ap-drop-title {
-                    font-size:10px; font-weight:700; color:#9ca3af;
+                    font-size:10px; font-weight:700; color:#6b7280;
                     text-transform:uppercase; letter-spacing:.04em;
-                    padding:5px 10px 2px; margin:0;
+                    padding:6px 10px 3px; margin:0;
                 }
                 .ap-drop-item {
                     display:flex; align-items:center; gap:7px;
                     width:100%; padding:6px 10px; border-radius:7px;
                     border:none; background:transparent; cursor:pointer;
                     font-size:12px; font-weight:500; color:#1f2937;
-                    text-align:right; transition:all .1s; font-family:inherit;
+                    text-align:right; transition:all .12s; font-family:inherit;
                 }
-                .ap-drop-item:hover { background:#f0f4ff; }
-                .ap-drop-item[data-active="true"] { background:#eef2ff; color:#4f46e5; }
+                .ap-drop-item:hover { background:rgba(0,114,181,0.06); }
+                .ap-drop-item[data-active="true"] { background:rgba(0,114,181,0.08); color:#004786; }
                 .ap-drop-item[data-danger="true"] { color:#ef4444; }
                 .ap-drop-item[data-danger="true"]:hover { background:#fef2f2; }
-                .ap-sep { height:1px; background:#e5e7eb; margin:3px 6px; }
-                .ap-search-wrap { display:flex; align-items:center; gap:6px; padding:5px 8px; }
+                .ap-sep { height:1px; background:#f0f0f0; margin:3px 6px; }
+                .ap-search-wrap { display:flex; align-items:center; gap:6px; padding:6px 8px; }
                 .ap-search-icon { color:#9ca3af; flex-shrink:0; }
                 .ap-search-input {
                     flex:1; border:none; outline:none;
@@ -273,13 +291,13 @@ export function AssignPanel({ customer: c }: Props) {
 
                 .ap-close-panel {
                     width:260px; background:#fff;
-                    border:1px solid rgba(0,0,0,.08);
+                    border:1px solid rgba(0,0,0,.06);
                     border-radius:12px; padding:14px;
-                    box-shadow:0 12px 40px rgba(0,0,0,.12);
+                    box-shadow:0 16px 48px rgba(0,71,134,.1), 0 4px 12px rgba(0,0,0,.06);
                     animation:apFadeIn .12s ease-out;
                 }
                 .ap-close-header { display:flex; align-items:center; gap:7px; margin-bottom:12px; }
-                .ap-close-header svg { color:#059669; }
+                .ap-close-header svg { color:#004786; }
                 .ap-close-title { font-size:13px; font-weight:700; color:#111827; margin:0; }
                 .ap-label { font-size:10px; font-weight:600; color:#374151; display:block; margin-bottom:4px; }
                 .ap-select {
@@ -288,28 +306,31 @@ export function AssignPanel({ customer: c }: Props) {
                     color:#111827; font-size:11.5px; outline:none;
                     margin-bottom:10px; cursor:pointer; font-family:inherit;
                 }
-                .ap-select:focus { border-color:#6366f1; }
+                .ap-select:focus { border-color:#0072b5; }
                 .ap-textarea {
                     width:100%; padding:7px 8px; border-radius:7px;
                     border:1px solid #e5e7eb; background:#fafbfc;
                     color:#111827; font-size:11.5px; outline:none; resize:vertical;
                     margin-bottom:12px; font-family:inherit; min-height:50px; line-height:1.5;
                 }
-                .ap-textarea:focus { border-color:#6366f1; }
+                .ap-textarea:focus { border-color:#0072b5; }
                 .ap-textarea::placeholder { color:#b0b6c0; }
                 .ap-close-actions { display:flex; justify-content:flex-end; gap:5px; }
                 .ap-btn-cancel {
                     padding:6px 12px; border-radius:7px; border:1px solid #e5e7eb;
                     background:#fff; color:#6b7280; font-size:11px;
                     cursor:pointer; font-weight:500; font-family:inherit;
+                    transition:all .12s;
                 }
                 .ap-btn-cancel:hover { background:#f3f4f6; }
                 .ap-btn-submit {
                     padding:6px 14px; border-radius:7px; border:none;
-                    background:#059669; color:#fff; font-size:11px;
+                    background:linear-gradient(135deg, #0072b5, #004786);
+                    color:#fff; font-size:11px;
                     font-weight:700; cursor:pointer; font-family:inherit;
+                    transition:all .15s;
                 }
-                .ap-btn-submit:hover { background:#047857; }
+                .ap-btn-submit:hover { background:linear-gradient(135deg, #005f9a, #003a6e); }
                 .ap-btn-submit:disabled { opacity:.6; cursor:not-allowed; }
 
                 @keyframes apFadeIn{from{opacity:0;transform:translateY(-3px)}to{opacity:1;transform:translateY(0)}}
@@ -375,9 +396,9 @@ function DropItem({ icon, label, active, danger, onClick }: {
     return (
         <button className="ap-drop-item" onClick={onClick}
             data-active={active} data-danger={danger}>
-            <span style={{ display: "flex", flexShrink: 0, color: danger ? "#ef4444" : active ? "#4f46e5" : "#6b7280" }}>{icon}</span>
+            <span style={{ display: "flex", flexShrink: 0, color: danger ? "#ef4444" : active ? "#004786" : "#6b7280" }}>{icon}</span>
             <span style={{ flex: 1 }}>{label}</span>
-            {active && <span style={{ fontSize: 10, color: "#059669", fontWeight: 700 }}>✓</span>}
+            {active && <span style={{ fontSize: 10, color: "#004786", fontWeight: 700 }}>✓</span>}
         </button>
     )
 }

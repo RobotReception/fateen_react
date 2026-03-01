@@ -2,6 +2,7 @@ import { useState, useMemo } from "react"
 import {
     FileText, Database, Users, Building2, FolderTree,
     Loader2, Filter, X, BarChart3, RefreshCw,
+    TrendingUp,
 } from "lucide-react"
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
@@ -15,21 +16,28 @@ import type { TenantAnalyticsParams } from "../types"
 import { ActionGuard } from "@/components/guards/ActionGuard"
 import { PAGE_BITS, ACTION_BITS } from "@/lib/permissions"
 
-/* ══════════ COLORS ══════════ */
+/* ══════════ COLORS — Fateen palette ══════════ */
 const CHART_COLORS = [
-    "#3b82f6", "#8b5cf6", "#10b981", "#f59e0b", "#ef4444",
-    "#ec4899", "#06b6d4", "#6366f1", "#14b8a6", "#f97316",
+    "#004786", "#0072b5", "#0098d6", "#2ab5e8",
+    "#005a9e", "#003b6f", "#00acc1", "#4fc3f7",
+    "#1565c0", "#0288d1",
 ]
 
 /* ══════════ CUSTOM TOOLTIP ══════════ */
 function ChartTooltip({ active, payload, label }: { active?: boolean; payload?: Array<{ value: number; name: string }>; label?: string }) {
     if (!active || !payload?.length) return null
     return (
-        <div className="rounded-xl border border-gray-100 bg-white px-4 py-3 shadow-xl" dir="rtl">
-            {label && <p className="mb-1.5 text-xs font-bold text-gray-700">{label}</p>}
+        <div dir="rtl" style={{
+            background: "#fff",
+            border: "1px solid var(--t-border-light, #e5e7eb)",
+            borderRadius: 10,
+            padding: "10px 14px",
+            boxShadow: "0 8px 24px -6px rgba(0,0,0,0.1)",
+        }}>
+            {label && <p style={{ fontSize: 12, fontWeight: 600, color: "var(--t-text, #374151)", marginBottom: 4 }}>{label}</p>}
             {payload.map((entry, i) => (
-                <p key={i} className="text-xs text-gray-500">
-                    <span className="font-semibold text-gray-700">{entry.value.toLocaleString()}</span> {entry.name}
+                <p key={i} style={{ fontSize: 11, color: "var(--t-text-secondary, #6b7280)" }}>
+                    <span style={{ fontWeight: 700, color: "#004786" }}>{entry.value.toLocaleString()}</span> {entry.name}
                 </p>
             ))}
         </div>
@@ -44,34 +52,60 @@ function renderPieLabel(props: any) {
     return `${name || ""} (${(percent * 100).toFixed(0)}%)`
 }
 
-/* ══════════ STAT CARD ══════════ */
-function StatCard({ title, value, icon: Icon, gradient, loading }: {
-    title: string; value: number | string; icon: React.ElementType; gradient: string; loading: boolean
+/* ══════════ STAT CARD — Formal ══════════ */
+function StatCard({ title, value, icon: Icon, loading }: {
+    title: string; value: number | string; icon: React.ElementType; loading: boolean
 }) {
     return (
-        <div className="group rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-all hover:shadow-md">
-            <div className="flex items-center justify-between">
+        <div style={{
+            background: "var(--t-card, #fff)",
+            border: "1px solid var(--t-border-light, #e5e7eb)",
+            borderRadius: 12,
+            padding: "18px 20px",
+            transition: "box-shadow 0.2s, border-color 0.2s",
+        }}
+            onMouseEnter={e => {
+                e.currentTarget.style.boxShadow = "0 4px 16px -4px rgba(0,71,134,0.08)"
+                e.currentTarget.style.borderColor = "rgba(0,71,134,0.15)"
+            }}
+            onMouseLeave={e => {
+                e.currentTarget.style.boxShadow = "none"
+                e.currentTarget.style.borderColor = "var(--t-border-light, #e5e7eb)"
+            }}
+        >
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <div>
-                    <p className="text-xs font-medium text-gray-400">{title}</p>
-                    <p className="mt-2 text-2xl font-bold text-gray-800">{loading ? "—" : value}</p>
+                    <p style={{ fontSize: 11, fontWeight: 500, color: "var(--t-text-faint, #9ca3af)", letterSpacing: "0.3px" }}>{title}</p>
+                    <p style={{ fontSize: 24, fontWeight: 700, color: "var(--t-text, #1f2937)", marginTop: 6 }}>
+                        {loading ? "—" : value}
+                    </p>
                 </div>
-                <div className={`flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br ${gradient} text-white transition-transform group-hover:scale-110`}>
-                    <Icon size={20} />
+                <div style={{
+                    width: 42, height: 42, borderRadius: 10,
+                    background: "rgba(0,71,134,0.06)",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                }}>
+                    <Icon size={20} strokeWidth={1.6} style={{ color: "#004786" }} />
                 </div>
             </div>
         </div>
     )
 }
 
-/* ══════════ CHART SECTION ══════════ */
+/* ══════════ CHART SECTION — Formal ══════════ */
 function ChartSection({ title, subtitle, children }: {
     title: string; subtitle: string; children: React.ReactNode
 }) {
     return (
-        <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-            <div className="mb-4">
-                <h3 className="text-sm font-bold text-gray-700">{title}</h3>
-                <p className="mt-0.5 text-xs text-gray-400">{subtitle}</p>
+        <div style={{
+            background: "var(--t-card, #fff)",
+            border: "1px solid var(--t-border-light, #e5e7eb)",
+            borderRadius: 12,
+            padding: "20px 24px",
+        }}>
+            <div style={{ marginBottom: 16 }}>
+                <h3 style={{ fontSize: 14, fontWeight: 600, color: "var(--t-text, #1f2937)" }}>{title}</h3>
+                <p style={{ fontSize: 11, color: "var(--t-text-faint, #9ca3af)", marginTop: 2 }}>{subtitle}</p>
             </div>
             {children}
         </div>
@@ -161,34 +195,77 @@ export function DocumentAnalyticsTab() {
 
     /* ═══════════════ RENDER ═══════════════ */
     return (
-        <div className="space-y-6">
-            {/* Header */}
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                    <h2 className="text-xl font-bold text-gray-800">تحليلات المستندات</h2>
-                    <p className="mt-1 text-sm text-gray-400">إحصائيات شاملة عن المستندات والملفات في قاعدة المعرفة</p>
+        <div className="space-y-5">
+            {/* ── Header ── */}
+            <div style={{
+                display: "flex", alignItems: "center", justifyContent: "space-between",
+                flexWrap: "wrap", gap: 12,
+            }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                    <div style={{
+                        width: 40, height: 40, borderRadius: 10,
+                        background: "linear-gradient(135deg, #004786, #0098d6)",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                    }}>
+                        <TrendingUp size={20} style={{ color: "#fff" }} />
+                    </div>
+                    <div>
+                        <h2 style={{ fontSize: 18, fontWeight: 700, color: "var(--t-text, #1f2937)", margin: 0 }}>تحليلات المستندات</h2>
+                        <p style={{ fontSize: 12, color: "var(--t-text-faint, #9ca3af)", marginTop: 2 }}>
+                            إحصائيات شاملة عن المستندات والملفات
+                        </p>
+                    </div>
                 </div>
                 <ActionGuard pageBit={PAGE_BITS.DOCUMENTS} actionBit={ACTION_BITS.GET_ALL_ANALYTICS_NEW}>
                     <button
                         onClick={handleRefresh}
                         disabled={isFetching}
-                        className="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-600 shadow-sm transition-all hover:bg-gray-50 hover:shadow-md disabled:opacity-50"
+                        style={{
+                            display: "flex", alignItems: "center", gap: 6,
+                            padding: "8px 16px", borderRadius: 8,
+                            border: "1px solid var(--t-border-light, #e5e7eb)",
+                            background: "var(--t-card, #fff)",
+                            fontSize: 13, fontWeight: 500, color: "var(--t-text-secondary, #6b7280)",
+                            cursor: "pointer",
+                            transition: "all 0.15s",
+                            opacity: isFetching ? 0.5 : 1,
+                        }}
+                        onMouseEnter={e => { e.currentTarget.style.borderColor = "#004786"; e.currentTarget.style.color = "#004786" }}
+                        onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--t-border-light, #e5e7eb)"; e.currentTarget.style.color = "var(--t-text-secondary, #6b7280)" }}
                     >
-                        <RefreshCw size={15} className={isFetching ? "animate-spin" : ""} />
+                        <RefreshCw size={14} className={isFetching ? "animate-spin" : ""} />
                         تحديث
                     </button>
                 </ActionGuard>
             </div>
 
-            {/* Filters */}
-            <div className="flex flex-wrap items-center gap-3">
+            {/* ── Filters ── */}
+            <div style={{
+                display: "flex", flexWrap: "wrap", alignItems: "center", gap: 10,
+                padding: "12px 16px",
+                background: "var(--t-card, #fff)",
+                border: "1px solid var(--t-border-light, #e5e7eb)",
+                borderRadius: 10,
+            }}>
+                <Filter size={14} style={{ color: "var(--t-text-faint, #9ca3af)" }} />
+                <span style={{ fontSize: 11, fontWeight: 600, color: "var(--t-text-faint, #9ca3af)", marginLeft: 4 }}>فلترة:</span>
+
                 {/* Department filter */}
                 <div className="relative shrink-0">
-                    <Building2 size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                    <Building2 size={13} className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: "var(--t-text-faint, #9ca3af)" }} />
                     <select
                         value={selectedDept}
                         onChange={(e) => { setSelectedDept(e.target.value); }}
-                        className={`appearance-none rounded-xl border bg-white py-2.5 pr-9 pl-4 text-sm font-medium outline-none cursor-pointer transition-colors focus:ring-2 focus:ring-blue-100 min-w-[150px] ${selectedDept ? "border-amber-300 text-amber-600 bg-amber-50" : "border-gray-200 text-gray-500 hover:border-gray-300"}`}
+                        style={{
+                            appearance: "none", borderRadius: 7,
+                            border: selectedDept ? "1px solid #004786" : "1px solid var(--t-border-light, #e5e7eb)",
+                            background: selectedDept ? "rgba(0,71,134,0.04)" : "var(--t-card, #fff)",
+                            padding: "6px 30px 6px 12px",
+                            fontSize: 12, fontWeight: 500,
+                            color: selectedDept ? "#004786" : "var(--t-text-secondary, #6b7280)",
+                            cursor: "pointer", outline: "none",
+                            minWidth: 130,
+                        }}
                     >
                         <option value="">كل الأقسام</option>
                         {departments.map((d) => (
@@ -201,11 +278,20 @@ export function DocumentAnalyticsTab() {
 
                 {/* Category filter */}
                 <div className="relative shrink-0">
-                    <FolderTree size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                    <FolderTree size={13} className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: "var(--t-text-faint, #9ca3af)" }} />
                     <select
                         value={selectedCat}
                         onChange={(e) => setSelectedCat(e.target.value)}
-                        className={`appearance-none rounded-xl border bg-white py-2.5 pr-9 pl-4 text-sm font-medium outline-none cursor-pointer transition-colors focus:ring-2 focus:ring-blue-100 min-w-[150px] ${selectedCat ? "border-purple-300 text-purple-600 bg-purple-50" : "border-gray-200 text-gray-500 hover:border-gray-300"}`}
+                        style={{
+                            appearance: "none", borderRadius: 7,
+                            border: selectedCat ? "1px solid #004786" : "1px solid var(--t-border-light, #e5e7eb)",
+                            background: selectedCat ? "rgba(0,71,134,0.04)" : "var(--t-card, #fff)",
+                            padding: "6px 30px 6px 12px",
+                            fontSize: 12, fontWeight: 500,
+                            color: selectedCat ? "#004786" : "var(--t-text-secondary, #6b7280)",
+                            cursor: "pointer", outline: "none",
+                            minWidth: 130,
+                        }}
                     >
                         <option value="">كل الفئات</option>
                         {categories.map((c) => (
@@ -218,11 +304,20 @@ export function DocumentAnalyticsTab() {
 
                 {/* User filter */}
                 <div className="relative shrink-0">
-                    <Users size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                    <Users size={13} className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: "var(--t-text-faint, #9ca3af)" }} />
                     <select
                         value={selectedUser}
                         onChange={(e) => setSelectedUser(e.target.value)}
-                        className={`appearance-none rounded-xl border bg-white py-2.5 pr-9 pl-4 text-sm font-medium outline-none cursor-pointer transition-colors focus:ring-2 focus:ring-blue-100 min-w-[180px] ${selectedUser ? "border-cyan-300 text-cyan-600 bg-cyan-50" : "border-gray-200 text-gray-500 hover:border-gray-300"}`}
+                        style={{
+                            appearance: "none", borderRadius: 7,
+                            border: selectedUser ? "1px solid #004786" : "1px solid var(--t-border-light, #e5e7eb)",
+                            background: selectedUser ? "rgba(0,71,134,0.04)" : "var(--t-card, #fff)",
+                            padding: "6px 30px 6px 12px",
+                            fontSize: 12, fontWeight: 500,
+                            color: selectedUser ? "#004786" : "var(--t-text-secondary, #6b7280)",
+                            cursor: "pointer", outline: "none",
+                            minWidth: 150,
+                        }}
                     >
                         <option value="">كل المستخدمين</option>
                         {uniqueUsers.map((u) => (
@@ -234,46 +329,69 @@ export function DocumentAnalyticsTab() {
                 {hasFilters && (
                     <button
                         onClick={clearFilters}
-                        className="flex items-center gap-1.5 rounded-xl border border-red-200 bg-red-50 px-3 py-2.5 text-xs font-medium text-red-500 transition-colors hover:bg-red-100"
+                        style={{
+                            display: "flex", alignItems: "center", gap: 4,
+                            padding: "5px 10px", borderRadius: 6,
+                            border: "1px solid rgba(220,38,38,0.2)",
+                            background: "rgba(220,38,38,0.04)",
+                            fontSize: 11, fontWeight: 500, color: "#dc2626",
+                            cursor: "pointer", transition: "all 0.12s",
+                        }}
+                        onMouseEnter={e => { e.currentTarget.style.background = "rgba(220,38,38,0.08)" }}
+                        onMouseLeave={e => { e.currentTarget.style.background = "rgba(220,38,38,0.04)" }}
                     >
-                        <X size={13} />
-                        مسح الفلاتر
+                        <X size={12} />
+                        مسح
                     </button>
                 )}
 
-                {loading && <Loader2 size={18} className="animate-spin text-gray-400" />}
+                {loading && <Loader2 size={16} className="animate-spin" style={{ color: "#004786" }} />}
             </div>
 
             {/* Active filters info */}
             {hasFilters && !loading && (
-                <div className="flex items-center gap-2 rounded-xl border border-blue-100 bg-blue-50 px-4 py-2.5">
-                    <Filter size={14} className="text-blue-500" />
-                    <p className="text-xs text-blue-600">
+                <div style={{
+                    display: "flex", alignItems: "center", gap: 8,
+                    padding: "10px 14px", borderRadius: 8,
+                    background: "rgba(0,71,134,0.03)",
+                    border: "1px solid rgba(0,71,134,0.08)",
+                }}>
+                    <Filter size={13} style={{ color: "#004786", flexShrink: 0 }} />
+                    <p style={{ fontSize: 12, color: "#004786" }}>
                         يتم عرض النتائج المفلترة
-                        {selectedDept && <span className="mx-1 rounded-full bg-amber-100 px-2 py-0.5 text-amber-700 font-medium">{selectedDept}</span>}
-                        {selectedCat && <span className="mx-1 rounded-full bg-purple-100 px-2 py-0.5 text-purple-700 font-medium">{selectedCat}</span>}
-                        {selectedUser && <span className="mx-1 rounded-full bg-cyan-100 px-2 py-0.5 text-cyan-700 font-medium">{selectedUser}</span>}
+                        {selectedDept && <span style={{ margin: "0 4px", background: "rgba(0,71,134,0.08)", padding: "2px 8px", borderRadius: 12, fontWeight: 600, fontSize: 11 }}>{selectedDept}</span>}
+                        {selectedCat && <span style={{ margin: "0 4px", background: "rgba(0,71,134,0.08)", padding: "2px 8px", borderRadius: 12, fontWeight: 600, fontSize: 11 }}>{selectedCat}</span>}
+                        {selectedUser && <span style={{ margin: "0 4px", background: "rgba(0,71,134,0.08)", padding: "2px 8px", borderRadius: 12, fontWeight: 600, fontSize: 11 }}>{selectedUser}</span>}
                     </p>
                 </div>
             )}
 
-            {/* Stat Cards */}
+            {/* ── Stat Cards ── */}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                <StatCard title="إجمالي الملفات" value={data?.total_files ?? 0} icon={FileText} gradient="from-blue-500 to-indigo-600" loading={loading} />
-                <StatCard title="إجمالي المستندات" value={(data?.total_documents ?? 0).toLocaleString()} icon={Database} gradient="from-purple-500 to-violet-600" loading={loading} />
-                <StatCard title="المستخدمين" value={data?.docs_per_user?.length ?? 0} icon={Users} gradient="from-emerald-500 to-teal-600" loading={loading} />
-                <StatCard title="الأقسام" value={data?.docs_per_department?.length ?? 0} icon={Building2} gradient="from-amber-500 to-orange-600" loading={loading} />
+                <StatCard title="إجمالي الملفات" value={data?.total_files ?? 0} icon={FileText} loading={loading} />
+                <StatCard title="إجمالي المستندات" value={(data?.total_documents ?? 0).toLocaleString()} icon={Database} loading={loading} />
+                <StatCard title="المستخدمين" value={data?.docs_per_user?.length ?? 0} icon={Users} loading={loading} />
+                <StatCard title="الأقسام" value={data?.docs_per_department?.length ?? 0} icon={Building2} loading={loading} />
             </div>
 
             {/* Loading state */}
             {loading && !data && (
-                <div className="flex flex-col items-center justify-center py-20">
-                    <div className="h-10 w-10 border-3 border-gray-200 border-t-blue-500 rounded-full animate-spin" />
-                    <p className="mt-4 text-sm text-gray-400 animate-pulse">جاري تحميل التحليلات...</p>
+                <div style={{
+                    display: "flex", flexDirection: "column", alignItems: "center",
+                    justifyContent: "center", padding: "60px 0",
+                }}>
+                    <div style={{
+                        width: 40, height: 40,
+                        border: "3px solid var(--t-border-light, #e5e7eb)",
+                        borderTop: "3px solid #004786",
+                        borderRadius: "50%",
+                        animation: "spin 0.8s linear infinite",
+                    }} />
+                    <p style={{ fontSize: 13, color: "var(--t-text-faint, #9ca3af)", marginTop: 16 }}>جاري تحميل التحليلات...</p>
                 </div>
             )}
 
-            {/* Charts */}
+            {/* ── Charts ── */}
             {data && (
                 <>
                     {/* Bar Chart — Docs per File */}
@@ -282,18 +400,18 @@ export function DocumentAnalyticsTab() {
                             <div style={{ width: "100%", height: 350 }}>
                                 <ResponsiveContainer>
                                     <BarChart data={barChartData} margin={{ top: 5, right: 5, left: 5, bottom: 60 }}>
-                                        <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
+                                        <CartesianGrid strokeDasharray="3 3" stroke="var(--t-border-light, #f0f0f0)" />
                                         <XAxis
                                             dataKey="name"
-                                            tick={{ fontSize: 11, fill: "#6b7280" }}
+                                            tick={{ fontSize: 11, fill: "var(--t-text-faint, #9ca3af)" }}
                                             angle={-35}
                                             textAnchor="end"
                                             interval={0}
                                             height={80}
                                         />
-                                        <YAxis tick={{ fontSize: 11, fill: "#6b7280" }} />
+                                        <YAxis tick={{ fontSize: 11, fill: "var(--t-text-faint, #9ca3af)" }} />
                                         <Tooltip content={<ChartTooltip />} />
-                                        <Bar dataKey="المستندات" radius={[6, 6, 0, 0]} maxBarSize={48}>
+                                        <Bar dataKey="المستندات" radius={[5, 5, 0, 0]} maxBarSize={44}>
                                             {barChartData.map((_, idx) => (
                                                 <Cell key={idx} fill={CHART_COLORS[idx % CHART_COLORS.length]} />
                                             ))}
@@ -305,7 +423,7 @@ export function DocumentAnalyticsTab() {
                     )}
 
                     {/* Pie Charts — Side by Side */}
-                    <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                    <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
                         {/* Docs per Department */}
                         {deptPieData.length > 0 && (
                             <ChartSection title="المستندات حسب القسم" subtitle={`${deptPieData.length} قسم`}>
@@ -331,9 +449,9 @@ export function DocumentAnalyticsTab() {
                                             </Pie>
                                             <Tooltip
                                                 formatter={(value: number | undefined) => [String(value ?? 0), "مستندات"]}
-                                                contentStyle={{ borderRadius: 12, border: "1px solid #e5e7eb", fontSize: 12 }}
+                                                contentStyle={{ borderRadius: 8, border: "1px solid var(--t-border-light, #e5e7eb)", fontSize: 12 }}
                                             />
-                                            <Legend wrapperStyle={{ fontSize: 12 }} />
+                                            <Legend wrapperStyle={{ fontSize: 11 }} />
                                         </PieChart>
                                     </ResponsiveContainer>
                                 </div>
@@ -365,9 +483,9 @@ export function DocumentAnalyticsTab() {
                                             </Pie>
                                             <Tooltip
                                                 formatter={(value: number | undefined) => [String(value ?? 0), "مستندات"]}
-                                                contentStyle={{ borderRadius: 12, border: "1px solid #e5e7eb", fontSize: 12 }}
+                                                contentStyle={{ borderRadius: 8, border: "1px solid var(--t-border-light, #e5e7eb)", fontSize: 12 }}
                                             />
-                                            <Legend wrapperStyle={{ fontSize: 12 }} />
+                                            <Legend wrapperStyle={{ fontSize: 11 }} />
                                         </PieChart>
                                     </ResponsiveContainer>
                                 </div>
@@ -375,20 +493,20 @@ export function DocumentAnalyticsTab() {
                         )}
                     </div>
 
-                    {/* Users Table */}
+                    {/* ── Users Table ── */}
                     {data.docs_per_user && data.docs_per_user.length > 0 && (
                         <ChartSection title="إحصائيات المستخدمين" subtitle={`${data.docs_per_user.length} مستخدم`}>
                             <div className="overflow-x-auto">
-                                <table className="w-full">
+                                <table style={{ width: "100%", borderCollapse: "collapse" }}>
                                     <thead>
-                                        <tr className="border-b border-gray-100 text-right">
-                                            <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-400">المستخدم</th>
-                                            <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-400">عدد الملفات</th>
-                                            <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-400">إجمالي المستندات</th>
-                                            <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-400">النسبة</th>
+                                        <tr style={{ borderBottom: "1px solid var(--t-border-light, #f0f0f0)" }}>
+                                            <th style={{ padding: "10px 14px", fontSize: 11, fontWeight: 600, color: "var(--t-text-faint, #9ca3af)", textAlign: "right", letterSpacing: "0.3px" }}>المستخدم</th>
+                                            <th style={{ padding: "10px 14px", fontSize: 11, fontWeight: 600, color: "var(--t-text-faint, #9ca3af)", textAlign: "right", letterSpacing: "0.3px" }}>الملفات</th>
+                                            <th style={{ padding: "10px 14px", fontSize: 11, fontWeight: 600, color: "var(--t-text-faint, #9ca3af)", textAlign: "right", letterSpacing: "0.3px" }}>المستندات</th>
+                                            <th style={{ padding: "10px 14px", fontSize: 11, fontWeight: 600, color: "var(--t-text-faint, #9ca3af)", textAlign: "right", letterSpacing: "0.3px" }}>النسبة</th>
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-gray-50">
+                                    <tbody>
                                         {data.docs_per_user.map((u, idx) => {
                                             const percentage = data.total_documents > 0
                                                 ? ((u.total_ids / data.total_documents) * 100).toFixed(1)
@@ -396,31 +514,58 @@ export function DocumentAnalyticsTab() {
                                             const hash = u.username.split("").reduce((a, c) => a + c.charCodeAt(0), 0)
                                             const avatarColor = CHART_COLORS[hash % CHART_COLORS.length]
                                             return (
-                                                <tr key={u.username} className="group transition-colors hover:bg-gray-50/80" style={{ animation: `daRowFade 0.3s ease-out ${idx * 0.04}s both` }}>
-                                                    <td className="px-4 py-3.5">
-                                                        <div className="flex items-center gap-3">
-                                                            <div className="flex h-8 w-8 items-center justify-center rounded-full text-white text-xs font-bold shrink-0" style={{ backgroundColor: avatarColor }}>
+                                                <tr
+                                                    key={u.username}
+                                                    style={{
+                                                        borderBottom: "1px solid var(--t-border-light, #f7f7f7)",
+                                                        transition: "background 0.12s",
+                                                        animation: `daRowFade 0.3s ease-out ${idx * 0.04}s both`,
+                                                    }}
+                                                    onMouseEnter={e => { e.currentTarget.style.background = "var(--t-card-hover, #f9fafb)" }}
+                                                    onMouseLeave={e => { e.currentTarget.style.background = "transparent" }}
+                                                >
+                                                    <td style={{ padding: "12px 14px" }}>
+                                                        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                                                            <div style={{
+                                                                width: 30, height: 30, borderRadius: 8,
+                                                                backgroundColor: avatarColor,
+                                                                display: "flex", alignItems: "center", justifyContent: "center",
+                                                                color: "#fff", fontSize: 12, fontWeight: 700, flexShrink: 0,
+                                                            }}>
                                                                 {u.username.charAt(0).toUpperCase()}
                                                             </div>
-                                                            <span className="text-sm font-medium text-gray-700 truncate" dir="ltr">{u.username}</span>
+                                                            <span style={{ fontSize: 13, fontWeight: 500, color: "var(--t-text, #374151)" }} dir="ltr">{u.username}</span>
                                                         </div>
                                                     </td>
-                                                    <td className="px-4 py-3.5">
-                                                        <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-600">
+                                                    <td style={{ padding: "12px 14px" }}>
+                                                        <span style={{
+                                                            display: "inline-flex", alignItems: "center", gap: 4,
+                                                            background: "rgba(0,71,134,0.05)", padding: "3px 10px", borderRadius: 6,
+                                                            fontSize: 12, fontWeight: 600, color: "#004786",
+                                                        }}>
                                                             <FileText size={11} />{u.file_count}
                                                         </span>
                                                     </td>
-                                                    <td className="px-4 py-3.5">
-                                                        <span className="inline-flex items-center gap-1.5 rounded-full bg-indigo-50 px-2.5 py-1 text-xs font-semibold text-indigo-600">
+                                                    <td style={{ padding: "12px 14px" }}>
+                                                        <span style={{
+                                                            display: "inline-flex", alignItems: "center", gap: 4,
+                                                            background: "rgba(0,152,214,0.06)", padding: "3px 10px", borderRadius: 6,
+                                                            fontSize: 12, fontWeight: 600, color: "#0072b5",
+                                                        }}>
                                                             <Database size={11} />{u.total_ids.toLocaleString()}
                                                         </span>
                                                     </td>
-                                                    <td className="px-4 py-3.5">
-                                                        <div className="flex items-center gap-2">
-                                                            <div className="h-2 w-20 overflow-hidden rounded-full bg-gray-100">
-                                                                <div className="h-full rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 transition-all" style={{ width: `${Math.min(Number(percentage), 100)}%` }} />
+                                                    <td style={{ padding: "12px 14px" }}>
+                                                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                                            <div style={{ height: 6, width: 64, borderRadius: 3, background: "var(--t-border-light, #e5e7eb)", overflow: "hidden" }}>
+                                                                <div style={{
+                                                                    height: "100%", borderRadius: 3,
+                                                                    background: "linear-gradient(90deg, #004786, #0098d6)",
+                                                                    width: `${Math.min(Number(percentage), 100)}%`,
+                                                                    transition: "width 0.6s ease-out",
+                                                                }} />
                                                             </div>
-                                                            <span className="text-xs font-medium text-gray-500">{percentage}%</span>
+                                                            <span style={{ fontSize: 11, fontWeight: 600, color: "var(--t-text-secondary, #6b7280)" }}>{percentage}%</span>
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -432,52 +577,73 @@ export function DocumentAnalyticsTab() {
                         </ChartSection>
                     )}
 
-                    {/* Files Detail Table */}
+                    {/* ── Files Detail Table ── */}
                     {data.docs_per_file && data.docs_per_file.length > 0 && (
                         <ChartSection title="تفاصيل الملفات" subtitle={`${data.docs_per_file.length} ملف`}>
                             <div className="overflow-x-auto">
-                                <table className="w-full">
+                                <table style={{ width: "100%", borderCollapse: "collapse" }}>
                                     <thead>
-                                        <tr className="border-b border-gray-100 text-right">
-                                            <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-400">اسم الملف</th>
-                                            <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-400">المستخدم</th>
-                                            <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-400">القسم</th>
-                                            <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-400">الفئة</th>
-                                            <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-400">المستندات</th>
+                                        <tr style={{ borderBottom: "1px solid var(--t-border-light, #f0f0f0)" }}>
+                                            <th style={{ padding: "10px 14px", fontSize: 11, fontWeight: 600, color: "var(--t-text-faint, #9ca3af)", textAlign: "right", letterSpacing: "0.3px" }}>اسم الملف</th>
+                                            <th style={{ padding: "10px 14px", fontSize: 11, fontWeight: 600, color: "var(--t-text-faint, #9ca3af)", textAlign: "right", letterSpacing: "0.3px" }}>المستخدم</th>
+                                            <th style={{ padding: "10px 14px", fontSize: 11, fontWeight: 600, color: "var(--t-text-faint, #9ca3af)", textAlign: "right", letterSpacing: "0.3px" }}>القسم</th>
+                                            <th style={{ padding: "10px 14px", fontSize: 11, fontWeight: 600, color: "var(--t-text-faint, #9ca3af)", textAlign: "right", letterSpacing: "0.3px" }}>الفئة</th>
+                                            <th style={{ padding: "10px 14px", fontSize: 11, fontWeight: 600, color: "var(--t-text-faint, #9ca3af)", textAlign: "right", letterSpacing: "0.3px" }}>المستندات</th>
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-gray-50">
+                                    <tbody>
                                         {data.docs_per_file.map((f, idx) => (
-                                            <tr key={`${f.filename}-${idx}`} className="transition-colors hover:bg-gray-50/80" style={{ animation: `daRowFade 0.3s ease-out ${idx * 0.03}s both` }}>
-                                                <td className="px-4 py-3">
-                                                    <div className="flex items-center gap-2">
-                                                        <FileText size={14} className="text-blue-400 shrink-0" />
-                                                        <span className="text-sm font-medium text-gray-700 truncate max-w-[200px]" dir="ltr">{f.filename}</span>
+                                            <tr
+                                                key={`${f.filename}-${idx}`}
+                                                style={{
+                                                    borderBottom: "1px solid var(--t-border-light, #f7f7f7)",
+                                                    transition: "background 0.12s",
+                                                    animation: `daRowFade 0.3s ease-out ${idx * 0.03}s both`,
+                                                }}
+                                                onMouseEnter={e => { e.currentTarget.style.background = "var(--t-card-hover, #f9fafb)" }}
+                                                onMouseLeave={e => { e.currentTarget.style.background = "transparent" }}
+                                            >
+                                                <td style={{ padding: "10px 14px" }}>
+                                                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                                        <FileText size={14} strokeWidth={1.5} style={{ color: "#004786", flexShrink: 0 }} />
+                                                        <span style={{ fontSize: 13, fontWeight: 500, color: "var(--t-text, #374151)", maxWidth: 200, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", display: "block" }} dir="ltr">{f.filename}</span>
                                                     </div>
                                                 </td>
-                                                <td className="px-4 py-3">
-                                                    <span className="text-xs text-gray-500 truncate max-w-[180px] block" dir="ltr">{f.username}</span>
+                                                <td style={{ padding: "10px 14px" }}>
+                                                    <span style={{ fontSize: 12, color: "var(--t-text-secondary, #6b7280)" }} dir="ltr">{f.username}</span>
                                                 </td>
-                                                <td className="px-4 py-3">
+                                                <td style={{ padding: "10px 14px" }}>
                                                     {f.department_id ? (
-                                                        <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 border border-amber-100 px-2 py-0.5 text-[10px] font-medium text-amber-600">
-                                                            <Building2 size={9} />{f.department_id}
+                                                        <span style={{
+                                                            display: "inline-flex", alignItems: "center", gap: 4,
+                                                            background: "rgba(0,71,134,0.05)", padding: "2px 8px", borderRadius: 5,
+                                                            fontSize: 11, fontWeight: 500, color: "#004786",
+                                                        }}>
+                                                            <Building2 size={10} />{f.department_id}
                                                         </span>
                                                     ) : (
-                                                        <span className="text-xs text-gray-300">—</span>
+                                                        <span style={{ fontSize: 12, color: "var(--t-text-faint, #d1d5db)" }}>—</span>
                                                     )}
                                                 </td>
-                                                <td className="px-4 py-3">
+                                                <td style={{ padding: "10px 14px" }}>
                                                     {f.category_id ? (
-                                                        <span className="inline-flex items-center gap-1 rounded-full bg-purple-50 border border-purple-100 px-2 py-0.5 text-[10px] font-medium text-purple-600">
-                                                            <FolderTree size={9} />{f.category_id}
+                                                        <span style={{
+                                                            display: "inline-flex", alignItems: "center", gap: 4,
+                                                            background: "rgba(0,152,214,0.06)", padding: "2px 8px", borderRadius: 5,
+                                                            fontSize: 11, fontWeight: 500, color: "#0072b5",
+                                                        }}>
+                                                            <FolderTree size={10} />{f.category_id}
                                                         </span>
                                                     ) : (
-                                                        <span className="text-xs text-gray-300">—</span>
+                                                        <span style={{ fontSize: 12, color: "var(--t-text-faint, #d1d5db)" }}>—</span>
                                                     )}
                                                 </td>
-                                                <td className="px-4 py-3">
-                                                    <span className="inline-flex items-center gap-1.5 rounded-full bg-indigo-50 px-2.5 py-1 text-xs font-semibold text-indigo-600">
+                                                <td style={{ padding: "10px 14px" }}>
+                                                    <span style={{
+                                                        display: "inline-flex", alignItems: "center", gap: 4,
+                                                        background: "rgba(0,71,134,0.06)", padding: "3px 10px", borderRadius: 6,
+                                                        fontSize: 12, fontWeight: 600, color: "#004786",
+                                                    }}>
                                                         <Database size={10} />{f.id_count.toLocaleString()}
                                                     </span>
                                                 </td>
@@ -491,12 +657,19 @@ export function DocumentAnalyticsTab() {
 
                     {/* Empty state */}
                     {!data.docs_per_file?.length && !data.docs_per_user?.length && (
-                        <div className="flex flex-col items-center justify-center py-16 text-center">
-                            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gray-100">
-                                <BarChart3 size={28} className="text-gray-300" />
+                        <div style={{
+                            display: "flex", flexDirection: "column", alignItems: "center",
+                            justifyContent: "center", padding: "48px 0", textAlign: "center",
+                        }}>
+                            <div style={{
+                                width: 56, height: 56, borderRadius: 14,
+                                background: "rgba(0,71,134,0.05)",
+                                display: "flex", alignItems: "center", justifyContent: "center",
+                            }}>
+                                <BarChart3 size={24} strokeWidth={1.5} style={{ color: "var(--t-text-faint, #d1d5db)" }} />
                             </div>
-                            <p className="mt-4 text-sm font-medium text-gray-500">لا توجد بيانات</p>
-                            <p className="mt-1 text-xs text-gray-400">جرب تغيير الفلاتر أو ارفع ملفات للبدء</p>
+                            <p style={{ fontSize: 14, fontWeight: 500, color: "var(--t-text-secondary, #6b7280)", marginTop: 14 }}>لا توجد بيانات</p>
+                            <p style={{ fontSize: 12, color: "var(--t-text-faint, #9ca3af)", marginTop: 4 }}>جرب تغيير الفلاتر أو ارفع ملفات للبدء</p>
                         </div>
                     )}
                 </>
@@ -504,6 +677,7 @@ export function DocumentAnalyticsTab() {
 
             <style>{`
                 @keyframes daRowFade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+                @keyframes spin{100%{transform:rotate(360deg)}}
             `}</style>
         </div>
     )

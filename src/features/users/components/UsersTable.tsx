@@ -14,6 +14,7 @@ import {
     Monitor,
     Trash2,
     Loader2,
+    Users,
 } from "lucide-react"
 import { updateUserStatus, deleteUser } from "../services/users-service"
 import { useAuthStore } from "@/stores/auth-store"
@@ -27,26 +28,32 @@ interface UsersTableProps {
     onRefresh: () => void
 }
 
-const ROLE_STYLES: Record<string, { bg: string; text: string; label: string }> = {
-    owner: { bg: "bg-purple-50", text: "text-purple-700", label: "مالك" },
-    admin: { bg: "bg-blue-50", text: "text-blue-700", label: "مدير" },
-    manager: { bg: "bg-cyan-50", text: "text-cyan-700", label: "مشرف" },
-    analyst: { bg: "bg-amber-50", text: "text-amber-700", label: "محلل" },
-    user: { bg: "bg-gray-50", text: "text-gray-600", label: "مستخدم" },
+const ROLE_COLORS: Record<string, { bg: string; color: string; label: string }> = {
+    owner: { bg: "rgba(139,92,246,0.08)", color: "#7c3aed", label: "مالك" },
+    admin: { bg: "rgba(0,71,134,0.08)", color: "#004786", label: "مدير" },
+    manager: { bg: "rgba(6,182,212,0.08)", color: "#0891b2", label: "مشرف" },
+    analyst: { bg: "rgba(217,119,6,0.08)", color: "#d97706", label: "محلل" },
+    user: { bg: "var(--t-surface, #f5f5f5)", color: "var(--t-text-secondary, #6b7280)", label: "مستخدم" },
 }
+
+const AVATAR_GRADIENTS = [
+    "linear-gradient(135deg, #004786, #0072b5)",
+    "linear-gradient(135deg, #0891b2, #06b6d4)",
+    "linear-gradient(135deg, #7c3aed, #a855f7)",
+    "linear-gradient(135deg, #0072b5, #0098d6)",
+    "linear-gradient(135deg, #004786, #0098d6)",
+]
 
 function getRoleStyle(role: string) {
-    return ROLE_STYLES[role] || { bg: "bg-gray-50", text: "text-gray-600", label: role }
+    return ROLE_COLORS[role] || { bg: "var(--t-surface, #f5f5f5)", color: "var(--t-text-secondary, #6b7280)", label: role }
 }
 
-/** Extract display name — API returns full_name from list endpoint */
 function getDisplayName(u: AdminUser): string {
     if (u.full_name) return u.full_name
     if (u.first_name || u.last_name) return `${u.first_name || ""} ${u.last_name || ""}`.trim()
     return u.email
 }
 
-/** Get initials for avatar */
 function getInitials(u: AdminUser): string {
     if (u.first_name && u.last_name) return `${u.first_name.charAt(0)}${u.last_name.charAt(0)}`
     if (u.full_name) {
@@ -56,6 +63,36 @@ function getInitials(u: AdminUser): string {
     return u.email.charAt(0).toUpperCase()
 }
 
+function hashCode(s: string): number {
+    let h = 0
+    for (let i = 0; i < s.length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0
+    return Math.abs(h)
+}
+
+/* ── Action button component ── */
+function ActionBtn({ onClick, disabled, title, color, hoverBg, children }: {
+    onClick: () => void; disabled?: boolean; title: string
+    color: string; hoverBg: string; children: React.ReactNode
+}) {
+    return (
+        <button
+            onClick={onClick}
+            disabled={disabled}
+            title={title}
+            style={{
+                width: 30, height: 30, borderRadius: 7, border: "none",
+                background: "transparent", cursor: disabled ? "default" : "pointer",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                color, transition: "all .12s", opacity: disabled ? 0.4 : 1,
+            }}
+            onMouseEnter={e => { if (!disabled) e.currentTarget.style.background = hoverBg }}
+            onMouseLeave={e => { e.currentTarget.style.background = "transparent" }}
+        >
+            {children}
+        </button>
+    )
+}
+
 export function UsersTable({ users, loading, onEdit, onSetPassword, onRefresh }: UsersTableProps) {
     const { user: currentUser } = useAuthStore()
     const tenantId = currentUser?.tenant_id || ""
@@ -63,6 +100,7 @@ export function UsersTable({ users, loading, onEdit, onSetPassword, onRefresh }:
     const [actionLoading, setActionLoading] = useState<Record<string, string | null>>({})
     const [confirmDelete, setConfirmDelete] = useState<string | null>(null)
     const [sessionsUser, setSessionsUser] = useState<AdminUser | null>(null)
+    const [hoveredRow, setHoveredRow] = useState<string | null>(null)
 
     const setUserLoading = (userId: string, action: string | null) => {
         setActionLoading((prev) => ({ ...prev, [userId]: action }))
@@ -88,8 +126,6 @@ export function UsersTable({ users, loading, onEdit, onSetPassword, onRefresh }:
         }
     }
 
-
-
     const handleDelete = async (user: AdminUser) => {
         if (confirmDelete !== user.user_id) {
             setConfirmDelete(user.user_id)
@@ -113,189 +149,202 @@ export function UsersTable({ users, loading, onEdit, onSetPassword, onRefresh }:
         }
     }
 
+    /* ── Loading skeleton ── */
     if (loading) {
         return (
-            <div className="space-y-3 p-6">
+            <div style={{ padding: 20 }}>
                 {[...Array(5)].map((_, i) => (
-                    <div key={i} className="flex items-center gap-4 animate-pulse">
-                        <div className="h-10 w-10 rounded-full bg-gray-200" />
-                        <div className="flex-1 space-y-2">
-                            <div className="h-4 w-1/3 rounded bg-gray-200" />
-                            <div className="h-3 w-1/4 rounded bg-gray-100" />
+                    <div key={i} style={{
+                        display: "flex", alignItems: "center", gap: 14,
+                        padding: "12px 0",
+                        borderBottom: i < 4 ? "1px solid var(--t-border-light, #f0f1f3)" : "none",
+                        animation: `usrsFade .3s ease-out ${i * 0.06}s both`,
+                    }}>
+                        <div style={{
+                            width: 38, height: 38, borderRadius: 10,
+                            background: "linear-gradient(90deg, var(--t-surface,#f0f0f0) 25%, #e8e8e8 50%, var(--t-surface,#f0f0f0) 75%)",
+                            backgroundSize: "200% 100%", animation: "usrsShimmer 1.5s infinite",
+                        }} />
+                        <div style={{ flex: 1 }}>
+                            <div style={{
+                                width: 100 + (i * 20), height: 12, borderRadius: 6,
+                                background: "var(--t-surface, #f0f0f0)", marginBottom: 6,
+                            }} />
+                            <div style={{ width: 140, height: 10, borderRadius: 5, background: "var(--t-surface, #f5f5f5)" }} />
                         </div>
-                        <div className="h-6 w-16 rounded-full bg-gray-200" />
-                        <div className="h-6 w-16 rounded-full bg-gray-200" />
+                        <div style={{ width: 60, height: 22, borderRadius: 12, background: "var(--t-surface, #f0f0f0)" }} />
                     </div>
                 ))}
+                <style>{`@keyframes usrsShimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+                @keyframes usrsFade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}`}</style>
             </div>
         )
     }
 
+    /* ── Empty ── */
     if (users.length === 0) {
         return (
-            <div className="flex flex-col items-center justify-center py-16 text-center">
-                <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gray-100">
-                    <Shield size={32} className="text-gray-300" />
+            <div style={{ textAlign: "center", padding: "48px 20px" }}>
+                <div style={{
+                    width: 56, height: 56, borderRadius: 14,
+                    background: "rgba(0,71,134,0.06)",
+                    display: "inline-flex", alignItems: "center", justifyContent: "center",
+                    marginBottom: 12,
+                }}>
+                    <Users size={24} style={{ color: "#004786" }} />
                 </div>
-                <h3 className="text-lg font-semibold text-gray-600">لا يوجد مستخدمين</h3>
-                <p className="mt-1 text-sm text-gray-400">أضف مستخدمين جدد للبدء</p>
+                <h3 style={{ fontSize: 15, fontWeight: 700, color: "var(--t-text, #111827)", margin: "0 0 4px" }}>لا يوجد مستخدمين</h3>
+                <p style={{ fontSize: 12, color: "var(--t-text-faint, #9ca3af)", margin: 0 }}>أضف مستخدمين جدد للبدء</p>
             </div>
         )
+    }
+
+    /* ── Table ── */
+    const thStyle: React.CSSProperties = {
+        padding: "10px 16px",
+        fontSize: 10.5, fontWeight: 600, letterSpacing: "0.04em",
+        color: "var(--t-text-faint, #9ca3af)",
+        textAlign: "right", whiteSpace: "nowrap",
+        textTransform: "uppercase",
     }
 
     return (
         <>
-            <div className="overflow-x-auto">
-                <table className="w-full">
+            <div style={{ overflowX: "auto" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse" }}>
                     <thead>
-                        <tr className="border-b border-gray-100 text-right">
-                            <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-400">المستخدم</th>
-                            <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-400">البريد</th>
-                            <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-400">الهاتف</th>
-                            <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-400">الدور</th>
-                            <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-400">الحالة</th>
-                            <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-400">الإجراءات</th>
+                        <tr style={{ borderBottom: "1px solid var(--t-border-light, #eaedf0)" }}>
+                            <th style={thStyle}>المستخدم</th>
+                            <th style={thStyle}>البريد</th>
+                            <th style={thStyle}>الهاتف</th>
+                            <th style={thStyle}>الدور</th>
+                            <th style={thStyle}>الحالة</th>
+                            <th style={{ ...thStyle, textAlign: "center" }}>الإجراءات</th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-50">
+                    <tbody>
                         {users.map((u, idx) => {
                             const roleStyle = getRoleStyle(u.role)
                             const userLoading = actionLoading[u.user_id]
                             const displayName = getDisplayName(u)
                             const initials = getInitials(u)
+                            const gradient = AVATAR_GRADIENTS[hashCode(u.user_id) % AVATAR_GRADIENTS.length]
+                            const isHovered = hoveredRow === u.user_id
+
                             return (
                                 <tr
                                     key={u.user_id}
-                                    className="transition-colors hover:bg-gray-50/80"
-                                    style={{ animation: `rowFadeIn 0.3s ease-out ${idx * 0.04}s both` }}
+                                    onMouseEnter={() => setHoveredRow(u.user_id)}
+                                    onMouseLeave={() => setHoveredRow(null)}
+                                    style={{
+                                        borderBottom: "1px solid var(--t-border-light, #f0f1f3)",
+                                        background: isHovered ? "var(--t-surface, #fafbfc)" : "transparent",
+                                        transition: "background .1s",
+                                        animation: `usrsFade .25s ease-out ${idx * 0.03}s both`,
+                                    }}
                                 >
                                     {/* User avatar + name */}
-                                    <td className="px-4 py-3">
-                                        <div className="flex items-center gap-3">
-                                            <div className={`
-                                                flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold text-white
-                                                ${u.is_active
-                                                    ? "bg-gray-900"
-                                                    : "bg-gray-300"
-                                                }
-                                            `}>
-                                                {initials}
+                                    <td style={{ padding: "10px 16px" }}>
+                                        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                                            <div style={{
+                                                width: 38, height: 38, borderRadius: 10,
+                                                background: u.is_active ? gradient : "var(--t-surface, #e5e7eb)",
+                                                display: "flex", alignItems: "center", justifyContent: "center",
+                                                flexShrink: 0,
+                                            }}>
+                                                <span style={{ fontSize: 13, fontWeight: 700, color: u.is_active ? "#fff" : "var(--t-text-faint, #9ca3af)" }}>
+                                                    {initials}
+                                                </span>
                                             </div>
                                             <div>
-                                                <p className="font-medium text-gray-800">{displayName}</p>
-                                                <p className="text-xs text-gray-400">{u.username || u.email}</p>
+                                                <div style={{ fontSize: 13, fontWeight: 600, color: "var(--t-text, #111827)", lineHeight: 1.3 }}>
+                                                    {displayName}
+                                                </div>
+                                                <div style={{ fontSize: 11, color: "var(--t-text-faint, #9ca3af)", marginTop: 1 }}>
+                                                    {u.username || u.email}
+                                                </div>
                                             </div>
                                         </div>
                                     </td>
 
                                     {/* Email */}
-                                    <td className="px-4 py-3">
-                                        <div className="flex items-center gap-1.5 text-sm text-gray-600" dir="ltr">
-                                            <Mail size={13} className="text-gray-300" />
+                                    <td style={{ padding: "10px 16px" }}>
+                                        <div style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 12, color: "var(--t-text-secondary, #6b7280)", fontFamily: "monospace" }} dir="ltr">
+                                            <Mail size={12} style={{ color: "var(--t-text-faint, #c4c9d0)" }} />
                                             {u.email}
                                         </div>
                                     </td>
 
                                     {/* Phone */}
-                                    <td className="px-4 py-3">
+                                    <td style={{ padding: "10px 16px" }}>
                                         {u.phone ? (
-                                            <div className="flex items-center gap-1.5 text-sm text-gray-600" dir="ltr">
-                                                <Phone size={13} className="text-gray-300" />
+                                            <div style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 12, color: "var(--t-text-secondary, #6b7280)", fontFamily: "monospace" }} dir="ltr">
+                                                <Phone size={12} style={{ color: "var(--t-text-faint, #c4c9d0)" }} />
                                                 {u.phone}
                                             </div>
                                         ) : (
-                                            <span className="text-xs text-gray-300">—</span>
+                                            <span style={{ fontSize: 11, color: "var(--t-text-faint, #d1d5db)" }}>—</span>
                                         )}
                                     </td>
 
                                     {/* Role badge */}
-                                    <td className="px-4 py-3">
-                                        <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium ${roleStyle.bg} ${roleStyle.text}`}>
+                                    <td style={{ padding: "10px 16px" }}>
+                                        <span style={{
+                                            display: "inline-flex", alignItems: "center", gap: 4,
+                                            padding: "3px 10px", borderRadius: 6,
+                                            background: roleStyle.bg, color: roleStyle.color,
+                                            fontSize: 11, fontWeight: 600,
+                                        }}>
                                             <Shield size={10} />
                                             {roleStyle.label}
                                         </span>
                                     </td>
 
                                     {/* Status */}
-                                    <td className="px-4 py-3">
-                                        {u.is_active ? (
-                                            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-600">
-                                                <CheckCircle size={10} />
-                                                نشط
-                                            </span>
-                                        ) : (
-                                            <span className="inline-flex items-center gap-1 rounded-full bg-red-50 px-2.5 py-1 text-xs font-medium text-red-500">
-                                                <XCircle size={10} />
-                                                معطل
-                                            </span>
-                                        )}
+                                    <td style={{ padding: "10px 16px" }}>
+                                        <div style={{
+                                            display: "inline-flex", alignItems: "center", gap: 4,
+                                            padding: "3px 10px", borderRadius: 6,
+                                            background: u.is_active ? "rgba(22,163,74,0.06)" : "rgba(239,68,68,0.06)",
+                                            color: u.is_active ? "#16a34a" : "#dc2626",
+                                            fontSize: 11, fontWeight: 600,
+                                        }}>
+                                            {u.is_active ? <CheckCircle size={10} /> : <XCircle size={10} />}
+                                            {u.is_active ? "نشط" : "معطل"}
+                                        </div>
                                     </td>
 
-                                    {/* Inline action buttons */}
-                                    <td className="px-4 py-3">
-                                        <div className="flex items-center gap-1">
-                                            {/* Edit */}
-                                            <button
-                                                onClick={() => onEdit(u)}
-                                                title="تعديل البيانات"
-                                                className="rounded-lg p-2 text-gray-400 transition-all hover:bg-amber-50 hover:text-amber-600"
-                                            >
-                                                <Pencil size={15} />
-                                            </button>
-
-                                            {/* Set Password */}
-                                            <button
-                                                onClick={() => onSetPassword(u)}
-                                                title="تعيين كلمة المرور"
-                                                className="rounded-lg p-2 text-gray-400 transition-all hover:bg-blue-50 hover:text-blue-600"
-                                            >
-                                                <KeyRound size={15} />
-                                            </button>
-
-                                            {/* Toggle Status */}
-                                            <button
-                                                onClick={() => handleToggleStatus(u)}
-                                                disabled={userLoading === "status"}
+                                    {/* Actions */}
+                                    <td style={{ padding: "10px 16px" }}>
+                                        <div style={{
+                                            display: "flex", alignItems: "center", justifyContent: "center", gap: 2,
+                                            opacity: isHovered ? 1 : 0.5, transition: "opacity .15s",
+                                        }}>
+                                            <ActionBtn onClick={() => onEdit(u)} title="تعديل البيانات"
+                                                color="var(--t-text-faint, #9ca3af)" hoverBg="rgba(217,119,6,0.08)">
+                                                <Pencil size={14} />
+                                            </ActionBtn>
+                                            <ActionBtn onClick={() => onSetPassword(u)} title="تعيين كلمة المرور"
+                                                color="var(--t-text-faint, #9ca3af)" hoverBg="rgba(0,71,134,0.06)">
+                                                <KeyRound size={14} />
+                                            </ActionBtn>
+                                            <ActionBtn onClick={() => handleToggleStatus(u)} disabled={userLoading === "status"}
                                                 title={u.is_active ? "تعطيل المستخدم" : "تفعيل المستخدم"}
-                                                className={`rounded-lg p-2 transition-all disabled:opacity-50 ${u.is_active
-                                                    ? "text-gray-400 hover:bg-orange-50 hover:text-orange-500"
-                                                    : "text-gray-400 hover:bg-emerald-50 hover:text-emerald-500"
-                                                    }`}
-                                            >
-                                                {userLoading === "status" ? (
-                                                    <Loader2 size={15} className="animate-spin" />
-                                                ) : u.is_active ? (
-                                                    <ToggleLeft size={15} />
-                                                ) : (
-                                                    <ToggleRight size={15} />
-                                                )}
-                                            </button>
-
-                                            {/* View Sessions */}
-                                            <button
-                                                onClick={() => setSessionsUser(u)}
-                                                title="عرض الجلسات"
-                                                className="rounded-lg p-2 text-gray-400 transition-all hover:bg-purple-50 hover:text-purple-500"
-                                            >
-                                                <Monitor size={15} />
-                                            </button>
-
-                                            {/* Delete */}
-                                            <button
-                                                onClick={() => handleDelete(u)}
-                                                disabled={userLoading === "delete"}
+                                                color={u.is_active ? "var(--t-text-faint, #9ca3af)" : "#16a34a"}
+                                                hoverBg={u.is_active ? "rgba(234,179,8,0.06)" : "rgba(22,163,74,0.06)"}>
+                                                {userLoading === "status" ? <Loader2 size={14} className="animate-spin" /> :
+                                                    u.is_active ? <ToggleLeft size={14} /> : <ToggleRight size={14} />}
+                                            </ActionBtn>
+                                            <ActionBtn onClick={() => setSessionsUser(u)} title="عرض الجلسات"
+                                                color="var(--t-text-faint, #9ca3af)" hoverBg="rgba(139,92,246,0.06)">
+                                                <Monitor size={14} />
+                                            </ActionBtn>
+                                            <ActionBtn onClick={() => handleDelete(u)} disabled={userLoading === "delete"}
                                                 title={confirmDelete === u.user_id ? "اضغط مرة أخرى للتأكيد" : "حذف المستخدم"}
-                                                className={`rounded-lg p-2 transition-all disabled:opacity-50 ${confirmDelete === u.user_id
-                                                    ? "bg-red-100 text-red-600 animate-pulse"
-                                                    : "text-gray-400 hover:bg-red-50 hover:text-red-500"
-                                                    }`}
-                                            >
-                                                {userLoading === "delete" ? (
-                                                    <Loader2 size={15} className="animate-spin" />
-                                                ) : (
-                                                    <Trash2 size={15} />
-                                                )}
-                                            </button>
+                                                color={confirmDelete === u.user_id ? "#dc2626" : "var(--t-text-faint, #9ca3af)"}
+                                                hoverBg="rgba(239,68,68,0.06)">
+                                                {userLoading === "delete" ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
+                                            </ActionBtn>
                                         </div>
                                     </td>
                                 </tr>
@@ -305,14 +354,10 @@ export function UsersTable({ users, loading, onEdit, onSetPassword, onRefresh }:
                 </table>
 
                 <style>{`
-                    @keyframes rowFadeIn {
-                        from { opacity: 0; transform: translateY(8px); }
-                        to { opacity: 1; transform: translateY(0); }
-                    }
+                    @keyframes usrsFade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
                 `}</style>
             </div>
 
-            {/* Sessions Dialog */}
             <UserSessionsDialog
                 open={!!sessionsUser}
                 user={sessionsUser}

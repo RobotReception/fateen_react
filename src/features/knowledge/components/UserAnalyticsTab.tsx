@@ -15,6 +15,8 @@ import { useUserFilesList, useDeleteUserData, useDeleteCollection } from "../hoo
 import { usePrefetchUsers } from "../hooks/use-prefetch"
 import { FetchingBar } from "@/components/ui/FetchingBar"
 import { FileDataModal } from "./FileDataModal"
+import { ActionGuard } from "@/components/guards/ActionGuard"
+import { PAGE_BITS, ACTION_BITS } from "@/lib/permissions"
 import type { UserFileSummary, UserFileItem } from "../types"
 
 /* ══════════ CONSTANTS ══════════ */
@@ -41,19 +43,21 @@ const DeleteConfirmModal = memo(function DeleteConfirmModal({
 }) {
     return (
         <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={onClose}>
-            <div className="mx-4 w-full max-w-md rounded-2xl border border-gray-200 bg-white shadow-2xl" onClick={(e) => e.stopPropagation()} style={{ animation: "uaModalIn .18s ease-out" }}>
-                <div className="p-6 text-center">
-                    <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-red-50"><Trash2 size={24} className="text-red-500" /></div>
-                    <h3 className="text-lg font-bold text-gray-800">{title}</h3>
-                    <p className="mt-2 text-sm text-gray-500">{subtitle}</p>
-                    <div className="mx-auto mt-3 flex items-start gap-2 rounded-xl bg-amber-50 border border-amber-200 p-3 text-right">
-                        <AlertTriangle size={16} className="text-amber-500 mt-0.5 shrink-0" />
-                        <p className="text-xs text-amber-700 leading-relaxed">{warning}</p>
+            <div className="mx-4 w-full max-w-md overflow-hidden bg-white" onClick={(e) => e.stopPropagation()} style={{ animation: "uaModalIn .18s ease-out", borderRadius: 12, border: "1px solid var(--t-border-light, #e5e7eb)" }}>
+                <div style={{ padding: "28px 24px 20px", textAlign: "center" }}>
+                    <div style={{ width: 52, height: 52, borderRadius: 14, background: "rgba(220,38,38,0.06)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 14px" }}>
+                        <Trash2 size={22} style={{ color: "#dc2626" }} />
+                    </div>
+                    <h3 style={{ fontSize: 16, fontWeight: 700, color: "var(--t-text, #1f2937)" }}>{title}</h3>
+                    <p style={{ fontSize: 13, color: "var(--t-text-secondary, #6b7280)", marginTop: 8 }}>{subtitle}</p>
+                    <div style={{ margin: "12px auto 0", display: "flex", alignItems: "flex-start", gap: 8, borderRadius: 8, background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.15)", padding: 10, textAlign: "right" }}>
+                        <AlertTriangle size={14} style={{ color: "#d97706", marginTop: 2, flexShrink: 0 }} />
+                        <p style={{ fontSize: 11, color: "#92400e", lineHeight: 1.6 }}>{warning}</p>
                     </div>
                 </div>
-                <div className="flex items-center justify-center gap-3 border-t border-gray-100 px-6 py-4">
-                    <button onClick={onClose} disabled={deleting} className="rounded-xl border border-gray-200 px-5 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50">إلغاء</button>
-                    <button onClick={onConfirm} disabled={deleting} className="flex items-center gap-2 rounded-xl bg-gray-800 px-5 py-2.5 text-sm font-medium text-white  disabled:opacity-50">
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, borderTop: "1px solid var(--t-border-light, #f0f0f0)", padding: "14px 24px" }}>
+                    <button onClick={onClose} disabled={deleting} style={{ padding: "8px 20px", borderRadius: 7, border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-card, #fff)", fontSize: 13, fontWeight: 500, color: "var(--t-text-secondary, #6b7280)", cursor: "pointer" }}>إلغاء</button>
+                    <button onClick={onConfirm} disabled={deleting} style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 20px", borderRadius: 7, border: "none", background: "#dc2626", color: "#fff", fontSize: 13, fontWeight: 500, cursor: "pointer", opacity: deleting ? 0.5 : 1 }}>
                         {deleting && <Loader2 size={14} className="animate-spin" />}
                         حذف نهائي
                     </button>
@@ -143,56 +147,56 @@ const UserFilesModal = memo(function UserFilesModal({
 
     return (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={onClose}>
-            <div className="mx-4 w-full max-w-3xl max-h-[85vh] flex flex-col rounded-2xl border border-gray-200 bg-white shadow-2xl" onClick={(e) => e.stopPropagation()} style={{ animation: "uaModalIn .18s ease-out" }}>
-                <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4 shrink-0">
-                    <div>
-                        <h3 className="text-sm font-bold text-gray-700">ملفات المستخدم</h3>
-                        <p className="mt-0.5 text-xs text-gray-400 font-mono">{username}</p>
+            <div className="mx-4 w-full max-w-3xl max-h-[85vh] flex flex-col bg-white" onClick={(e) => e.stopPropagation()} style={{ animation: "uaModalIn .18s ease-out", borderRadius: 12, border: "1px solid var(--t-border-light, #e5e7eb)" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 20px", borderBottom: "1px solid var(--t-border-light, #f0f0f0)", flexShrink: 0 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <div style={{ width: 30, height: 30, borderRadius: 8, background: "linear-gradient(135deg, #004786, #0098d6)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                            <Users size={14} style={{ color: "#fff" }} />
+                        </div>
+                        <div>
+                            <h3 style={{ fontSize: 14, fontWeight: 600, color: "var(--t-text, #1f2937)" }}>ملفات المستخدم</h3>
+                            <p style={{ fontSize: 10, color: "var(--t-text-faint, #9ca3af)", fontFamily: "monospace", marginTop: 1 }}>{username}</p>
+                        </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                        <button onClick={() => setConfirmDeleteAll(true)} className="flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-100 transition-colors"><Ban size={12} />حذف جميع بيانات المستخدم</button>
-                        <button onClick={onClose} className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600"><X size={18} /></button>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <button onClick={() => setConfirmDeleteAll(true)} style={{ display: "flex", alignItems: "center", gap: 5, borderRadius: 6, padding: "5px 12px", border: "1px solid rgba(220,38,38,0.2)", background: "rgba(220,38,38,0.04)", fontSize: 11, fontWeight: 500, color: "#dc2626", cursor: "pointer" }}><Ban size={11} />حذف جميع بيانات المستخدم</button>
+                        <button onClick={onClose} style={{ borderRadius: 6, padding: 5, border: "none", background: "transparent", cursor: "pointer", color: "var(--t-text-faint, #9ca3af)" }}><X size={16} /></button>
                     </div>
                 </div>
-                <div className="flex-1 overflow-y-auto p-6">
+                <div style={{ flex: 1, overflowY: "auto", padding: 20 }}>
                     {loading ? (
-                        <div className="flex flex-col items-center justify-center py-12"><div className="ua-loading-spinner" /><p className="mt-3 text-sm text-gray-400 animate-pulse">جاري تحميل الملفات...</p></div>
+                        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "48px 0" }}><div className="ua-loading-spinner" /><p style={{ marginTop: 12, fontSize: 13, color: "var(--t-text-faint, #9ca3af)" }} className="animate-pulse">جاري تحميل الملفات...</p></div>
                     ) : files.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center py-12 text-center"><div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gray-100"><FolderOpen size={24} className="text-gray-300" /></div><p className="mt-3 text-sm font-medium text-gray-500">لا توجد ملفات</p></div>
+                        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "48px 0", textAlign: "center" }}><div style={{ width: 52, height: 52, borderRadius: 14, background: "var(--t-surface, #f3f4f6)", display: "flex", alignItems: "center", justifyContent: "center" }}><FolderOpen size={22} style={{ color: "var(--t-text-faint, #d1d5db)" }} /></div><p style={{ marginTop: 12, fontSize: 13, fontWeight: 500, color: "var(--t-text-secondary, #6b7280)" }}>لا توجد ملفات</p></div>
                     ) : (
-                        <div className="space-y-3">
-                            <p className="text-xs font-semibold text-gray-500 mb-3">{files.length} ملف</p>
+                        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                            <p style={{ fontSize: 11, fontWeight: 600, color: "var(--t-text-faint, #9ca3af)", marginBottom: 4 }}>{files.length} ملف</p>
                             {files.map((file, idx) => (
                                 <div key={`${file.media_id}-${idx}`}
-                                    className={`group rounded-xl border bg-white p-4 shadow-sm transition-all hover:shadow-md ${deletingFile === file.filename ? "border-red-200 bg-red-50/30 opacity-60" : "border-gray-100 hover:border-gray-200"}`}
-                                    style={{ animation: `uaRowFade 0.3s ease-out ${idx * 0.05}s both` }}>
-                                    <div className="flex items-start justify-between gap-3">
-                                        <div className="flex items-start gap-3 min-w-0">
-                                            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gray-100 shrink-0"><FileText size={18} className="text-blue-500" /></div>
-                                            <div className="min-w-0 flex-1">
-                                                <p className="text-sm font-semibold text-gray-700 truncate" dir="ltr">{file.filepath || file.filename}</p>
-                                                <p className="mt-0.5 text-[11px] text-gray-400 font-mono truncate" dir="ltr">{file.filename}</p>
+                                    style={{ borderRadius: 8, border: deletingFile === file.filename ? "1px solid rgba(220,38,38,0.15)" : "1px solid var(--t-border-light, #e5e7eb)", background: deletingFile === file.filename ? "rgba(220,38,38,0.02)" : "var(--t-card, #fff)", padding: 14, transition: "all 0.15s", opacity: deletingFile === file.filename ? 0.5 : 1, animation: `uaRowFade 0.3s ease-out ${idx * 0.05}s both` }}>
+                                    <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12 }}>
+                                        <div style={{ display: "flex", alignItems: "flex-start", gap: 10, minWidth: 0 }}>
+                                            <div style={{ width: 36, height: 36, borderRadius: 8, background: "rgba(0,71,134,0.06)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}><FileText size={16} style={{ color: "#004786" }} /></div>
+                                            <div style={{ minWidth: 0, flex: 1 }}>
+                                                <p style={{ fontSize: 13, fontWeight: 600, color: "var(--t-text, #374151)" }} className="truncate" dir="ltr">{file.filepath || file.filename}</p>
+                                                <p style={{ marginTop: 2, fontSize: 10, color: "var(--t-text-faint, #9ca3af)", fontFamily: "monospace" }} className="truncate" dir="ltr">{file.filename}</p>
                                             </div>
                                         </div>
-                                        <div className="flex items-center gap-2 shrink-0">
-                                            <span className="flex items-center gap-1 rounded-full bg-indigo-50 px-2.5 py-1 text-[10px] font-semibold text-indigo-600"><Database size={10} />{file.id_count} سجل</span>
-                                            <button onClick={() => setViewDataFile(file)} className="rounded-lg p-1.5 text-gray-400 hover:bg-blue-50 hover:text-blue-500 transition-colors" title="عرض البيانات">
-                                                <Eye size={14} />
+                                        <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
+                                            <span style={{ display: "flex", alignItems: "center", gap: 4, borderRadius: 12, background: "rgba(0,71,134,0.05)", padding: "3px 8px", fontSize: 10, fontWeight: 600, color: "#004786" }}><Database size={9} />{file.id_count} سجل</span>
+                                            <button onClick={() => setViewDataFile(file)} style={{ borderRadius: 6, padding: 5, border: "none", background: "transparent", cursor: "pointer", color: "var(--t-text-faint, #9ca3af)", transition: "color 0.12s" }} title="عرض البيانات" onMouseEnter={e => { e.currentTarget.style.color = "#004786" }} onMouseLeave={e => { e.currentTarget.style.color = "var(--t-text-faint, #9ca3af)" }}><Eye size={13} /></button>
+                                            <button onClick={() => handleDownload(file)} disabled={!!downloadingFile} style={{ borderRadius: 6, padding: 5, border: "none", background: "transparent", cursor: "pointer", color: "var(--t-text-faint, #9ca3af)", transition: "color 0.12s", opacity: downloadingFile ? 0.3 : 1 }} title="تنزيل الملف" onMouseEnter={e => { e.currentTarget.style.color = "#059669" }} onMouseLeave={e => { e.currentTarget.style.color = "var(--t-text-faint, #9ca3af)" }}>
+                                                {downloadingFile === file.filename ? <Loader2 size={13} className="animate-spin" style={{ color: "#059669" }} /> : <Download size={13} />}
                                             </button>
-                                            <button onClick={() => handleDownload(file)} disabled={!!downloadingFile}
-                                                className="rounded-lg p-1.5 text-gray-400 hover:bg-emerald-50 hover:text-emerald-500 transition-colors disabled:opacity-30" title="تنزيل الملف">
-                                                {downloadingFile === file.filename ? <Loader2 size={14} className="animate-spin text-emerald-400" /> : <Download size={14} />}
-                                            </button>
-                                            <button onClick={() => setConfirmDeleteFile(file)} disabled={!!deletingFile}
-                                                className="rounded-lg p-1.5 text-gray-300 hover:bg-red-50 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100 disabled:opacity-30" title="حذف هذا الملف">
-                                                {deletingFile === file.filename ? <Loader2 size={14} className="animate-spin text-red-400" /> : <Trash2 size={14} />}
+                                            <button onClick={() => setConfirmDeleteFile(file)} disabled={!!deletingFile} style={{ borderRadius: 6, padding: 5, border: "none", background: "transparent", cursor: "pointer", color: "var(--t-text-faint, #d1d5db)", transition: "color 0.12s", opacity: deletingFile ? 0.3 : 1 }} title="حذف هذا الملف" onMouseEnter={e => { e.currentTarget.style.color = "#dc2626" }} onMouseLeave={e => { e.currentTarget.style.color = "var(--t-text-faint, #d1d5db)" }}>
+                                                {deletingFile === file.filename ? <Loader2 size={13} className="animate-spin" style={{ color: "#dc2626" }} /> : <Trash2 size={13} />}
                                             </button>
                                         </div>
                                     </div>
-                                    <div className="mt-3 flex flex-wrap items-center gap-2 text-[10px]">
-                                        {file.department_id && <span className="flex items-center gap-1 rounded-full bg-amber-50 border border-amber-100 px-2 py-0.5 text-amber-600"><Building2 size={9} />{file.department_id}</span>}
-                                        {file.category_id && <span className="flex items-center gap-1 rounded-full bg-purple-50 border border-purple-100 px-2 py-0.5 text-purple-600"><Tag size={9} />{file.category_id}</span>}
-                                        {file.media_id && <span className="flex items-center gap-1 rounded-full bg-gray-50 border border-gray-100 px-2 py-0.5 text-gray-400 font-mono" dir="ltr"><Hash size={9} />{file.media_id.slice(0, 12)}…</span>}
+                                    <div style={{ marginTop: 10, display: "flex", flexWrap: "wrap", alignItems: "center", gap: 6 }}>
+                                        {file.department_id && <span style={{ display: "flex", alignItems: "center", gap: 4, borderRadius: 12, background: "rgba(0,71,134,0.04)", border: "1px solid rgba(0,71,134,0.08)", padding: "2px 8px", fontSize: 10, color: "#004786" }}><Building2 size={8} />{file.department_id}</span>}
+                                        {file.category_id && <span style={{ display: "flex", alignItems: "center", gap: 4, borderRadius: 12, background: "rgba(0,71,134,0.04)", border: "1px solid rgba(0,71,134,0.08)", padding: "2px 8px", fontSize: 10, color: "#004786" }}><Tag size={8} />{file.category_id}</span>}
+                                        {file.media_id && <span style={{ display: "flex", alignItems: "center", gap: 4, borderRadius: 12, background: "var(--t-surface, #f3f4f6)", border: "1px solid var(--t-border-light, #e5e7eb)", padding: "2px 8px", fontSize: 10, color: "var(--t-text-faint, #9ca3af)", fontFamily: "monospace" }} dir="ltr"><Hash size={8} />{file.media_id.slice(0, 12)}…</span>}
                                     </div>
                                 </div>
                             ))}
@@ -226,19 +230,25 @@ const UserRow = memo(function UserRow({
     const initials = user.username.charAt(0).toUpperCase()
 
     return (
-        <tr className={`group transition-colors hover:bg-gray-50/80 ${deletingUser ? "opacity-50" : ""}`} style={{ animation: `uaRowFade 0.3s ease-out ${idx * 0.04}s both` }}>
-            <td className="px-5 py-4">
-                <div className="flex items-center gap-3">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-full text-white text-sm font-bold shadow-sm shrink-0" style={{ backgroundColor: avatarColor }}>{initials}</div>
-                    <p className="text-sm font-medium text-gray-700 truncate" dir="ltr">{user.username}</p>
+        <tr className="group transition-colors" style={{ animation: `uaRowFade 0.3s ease-out ${idx * 0.04}s both`, background: deletingUser ? "rgba(220,38,38,0.02)" : "transparent", opacity: deletingUser ? 0.5 : 1 }}
+            onMouseEnter={e => { if (!deletingUser) e.currentTarget.style.background = "var(--t-card-hover, #f9fafb)" }}
+            onMouseLeave={e => { if (!deletingUser) e.currentTarget.style.background = "transparent" }}>
+            <td style={{ padding: "12px 16px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <div style={{ width: 34, height: 34, borderRadius: "50%", backgroundColor: avatarColor, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 13, fontWeight: 700, flexShrink: 0 }}>{initials}</div>
+                    <p style={{ fontSize: 13, fontWeight: 500, color: "var(--t-text, #374151)" }} className="truncate" dir="ltr">{user.username}</p>
                 </div>
             </td>
-            <td className="px-5 py-4"><span className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-600"><FileText size={12} />{user.file_count}</span></td>
-            <td className="px-5 py-4"><span className="inline-flex items-center gap-1.5 rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-600"><Database size={12} />{user.total_ids.toLocaleString()}</span></td>
-            <td className="px-5 py-4">
-                <div className="flex items-center gap-1.5">
-                    <button onClick={() => onViewFiles(user.username)} className="flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 shadow-sm transition-all hover:bg-blue-50 hover:border-blue-200 hover:text-blue-600 hover:shadow-md active:scale-[0.97]"><Eye size={13} />عرض الملفات</button>
-                    <button onClick={() => onDeleteUser(user)} className="flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-2.5 py-1.5 text-xs font-medium text-gray-400 shadow-sm transition-all hover:bg-red-50 hover:border-red-200 hover:text-red-500 opacity-0 group-hover:opacity-100 active:scale-[0.97]" title="حذف جميع بيانات المستخدم"><Trash2 size={13} /></button>
+            <td style={{ padding: "12px 16px" }}><span style={{ display: "inline-flex", alignItems: "center", gap: 5, borderRadius: 12, background: "rgba(0,71,134,0.05)", padding: "3px 10px", fontSize: 11, fontWeight: 600, color: "#004786" }}><FileText size={11} />{user.file_count}</span></td>
+            <td style={{ padding: "12px 16px" }}><span style={{ display: "inline-flex", alignItems: "center", gap: 5, borderRadius: 12, background: "rgba(0,71,134,0.05)", padding: "3px 10px", fontSize: 11, fontWeight: 600, color: "#004786" }}><Database size={11} />{user.total_ids.toLocaleString()}</span></td>
+            <td style={{ padding: "12px 16px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                    <ActionGuard pageBit={PAGE_BITS.DOCUMENTS} actionBit={ACTION_BITS.LIST_USER_FILES}>
+                        <button onClick={() => onViewFiles(user.username)} style={{ display: "flex", alignItems: "center", gap: 5, borderRadius: 6, padding: "5px 12px", border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-card, #fff)", fontSize: 11, fontWeight: 500, color: "var(--t-text-secondary, #6b7280)", cursor: "pointer", transition: "all 0.12s" }} onMouseEnter={e => { e.currentTarget.style.borderColor = "#004786"; e.currentTarget.style.color = "#004786" }} onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--t-border-light, #e5e7eb)"; e.currentTarget.style.color = "var(--t-text-secondary, #6b7280)" }}><Eye size={12} />عرض الملفات</button>
+                    </ActionGuard>
+                    <ActionGuard pageBit={PAGE_BITS.DOCUMENTS} actionBit={ACTION_BITS.DELETE_DOCS_BY_USER}>
+                        <button onClick={() => onDeleteUser(user)} style={{ borderRadius: 6, padding: 5, border: "none", background: "transparent", cursor: "pointer", color: "var(--t-text-faint, #d1d5db)", transition: "color 0.12s", opacity: 0 }} className="group-hover:!opacity-100" title="حذف جميع بيانات المستخدم" onMouseEnter={e => { e.currentTarget.style.color = "#dc2626" }} onMouseLeave={e => { e.currentTarget.style.color = "var(--t-text-faint, #d1d5db)" }}><Trash2 size={13} /></button>
+                    </ActionGuard>
                 </div>
             </td>
         </tr>
@@ -373,67 +383,56 @@ export function UserAnalyticsTab() {
 
     /* ═══════════════ RENDER ═══════════════ */
     return (
-        <div className="space-y-5">
-            {/* Header */}
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                    <h2 className="text-xl font-bold text-gray-800">ملفات المستخدمين</h2>
-                    <p className="mt-1 text-sm text-gray-400">عرض المستخدمين وملفاتهم في قاعدة المعرفة</p>
-                </div>
-                <button onClick={() => setShowDeleteCollection(true)} className="flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 text-sm font-medium text-red-600 transition-colors hover:bg-red-100"><Ban size={15} />حذف جميع البيانات</button>
-            </div>
-
-            {/* Department Filter Tabs */}
-            <div className="overflow-x-auto">
-                <div className="flex items-center gap-2 pb-1">
-                    {/* All departments pill */}
-                    <button onClick={() => handleDeptChange("")}
-                        className={`shrink-0 flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-semibold transition-all ${!selectedDept ? "bg-gray-900 text-white " : "bg-white border border-gray-200 text-gray-500 hover:bg-gray-50 hover:border-gray-300"}`}>
-                        <Building2 size={13} />الكل
-                    </button>
-                    {departments.map((dept) => (
-                        <button key={dept.department_id} onClick={() => handleDeptChange(dept.department_id)}
-                            className={`shrink-0 flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-semibold transition-all ${selectedDept === dept.department_id ? "bg-gray-900 text-white " : "bg-white border border-gray-200 text-gray-500 hover:bg-gray-50 hover:border-gray-300"}`}>
-                            {dept.icon && <span className="text-sm">{dept.icon}</span>}
-                            {dept.name}
-                        </button>
-                    ))}
-                </div>
-            </div>
-
-            {/* Stats Cards */}
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                {[
-                    { title: "المستخدمين", value: stats.userCount, icon: Users, gradient: "from-cyan-500 to-blue-600" },
-                    { title: "إجمالي الملفات", value: stats.totalFiles, icon: FileText, gradient: "from-purple-500 to-indigo-600" },
-                    { title: "إجمالي السجلات", value: stats.totalIds.toLocaleString(), icon: Database, gradient: "from-emerald-500 to-teal-600" },
-                ].map((stat) => (
-                    <div key={stat.title} className="group rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-all hover:shadow-md">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-xs font-medium text-gray-400">{stat.title}</p>
-                                <p className="mt-2 text-2xl font-bold text-gray-800">{loading ? "—" : stat.value}</p>
-                            </div>
-                            <div className={`flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br ${stat.gradient} text-white transition-transform group-hover:scale-110`}><stat.icon size={20} /></div>
+        <div className="space-y-4">
+            {/* Header + Department Tabs */}
+            <div style={{ borderRadius: 10, border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-card, #fff)", overflow: "hidden" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 18px", borderBottom: "1px solid var(--t-border-light, #f0f0f0)" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <div style={{ width: 36, height: 36, borderRadius: 9, background: "linear-gradient(135deg, #004786, #0098d6)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                            <Users size={17} style={{ color: "#fff" }} />
+                        </div>
+                        <div>
+                            <h2 style={{ fontSize: 15, fontWeight: 700, color: "var(--t-text, #1f2937)", margin: 0 }}>ملفات المستخدمين</h2>
+                            <p style={{ fontSize: 11, color: "var(--t-text-faint, #9ca3af)", marginTop: 1 }}>عرض المستخدمين وملفاتهم في قاعدة المعرفة</p>
                         </div>
                     </div>
-                ))}
+                    {!loading && users.length > 0 && (
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: 5, borderRadius: 12, background: "rgba(0,71,134,0.05)", border: "1px solid rgba(0,71,134,0.12)", padding: "4px 12px", fontSize: 11, fontWeight: 600, color: "#004786" }}>
+                            <Users size={11} />
+                            {totalCount} مستخدم
+                        </span>
+                    )}
+                </div>
+                {/* Department Tabs inside the header card */}
+                <div className="overflow-x-auto" style={{ padding: "10px 18px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                        <button onClick={() => handleDeptChange("")}
+                            style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 5, borderRadius: 7, padding: "6px 12px", fontSize: 11, fontWeight: !selectedDept ? 600 : 500, border: !selectedDept ? "1px solid #004786" : "1px solid var(--t-border-light, #e5e7eb)", background: !selectedDept ? "rgba(0,71,134,0.06)" : "transparent", color: !selectedDept ? "#004786" : "var(--t-text-secondary, #6b7280)", cursor: "pointer", transition: "all 0.15s" }}>
+                            <Building2 size={11} />الكل
+                        </button>
+                        {departments.map((dept) => (
+                            <button key={dept.department_id} onClick={() => handleDeptChange(dept.department_id)}
+                                style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 5, borderRadius: 7, padding: "6px 12px", fontSize: 11, fontWeight: selectedDept === dept.department_id ? 600 : 500, border: selectedDept === dept.department_id ? "1px solid #004786" : "1px solid var(--t-border-light, #e5e7eb)", background: selectedDept === dept.department_id ? "rgba(0,71,134,0.06)" : "transparent", color: selectedDept === dept.department_id ? "#004786" : "var(--t-text-secondary, #6b7280)", cursor: "pointer", transition: "all 0.15s" }}>
+                                {dept.icon && <span style={{ fontSize: 13 }}>{dept.icon}</span>}
+                                {dept.name}
+                            </button>
+                        ))}
+                    </div>
+                </div>
             </div>
 
-            {/* Search + Category Filter */}
+            {/* Search + Category Filter + Delete */}
             <div className="flex items-center gap-3">
                 <div className="relative flex-1">
-                    <Search size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                    <input type="text" placeholder="بحث بالبريد الإلكتروني..." value={searchInput} onChange={(e) => handleSearchInput(e.target.value)} className="w-full rounded-xl border border-gray-200 bg-white py-2.5 pr-10 pl-4 text-sm text-gray-700 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100" dir="ltr" />
+                    <Search size={15} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <input type="text" placeholder="بحث بالبريد الإلكتروني..." value={searchInput} onChange={(e) => handleSearchInput(e.target.value)} style={{ width: "100%", borderRadius: 8, border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-card, #fff)", padding: "8px 36px 8px 36px", fontSize: 13, color: "var(--t-text, #374151)", outline: "none" }} dir="ltr" />
                     {searchInput && <button onClick={() => { setSearchInput(""); setSearchVal("") }} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500"><X size={14} /></button>}
                     {loading && searchInput && <Loader2 size={14} className="absolute left-10 top-1/2 -translate-y-1/2 text-gray-400 animate-spin" />}
                 </div>
-                {/* Category dropdown */}
                 <div className="relative shrink-0">
-                    <Filter size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                    <Filter size={13} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
                     <select value={selectedCat} onChange={(e) => handleCatChange(e.target.value)}
-                        className={`appearance-none rounded-xl border bg-white py-2.5 pr-9 pl-4 text-sm font-medium outline-none cursor-pointer transition-colors focus:ring-2 focus:ring-blue-100 min-w-[140px] ${selectedCat ? "border-purple-300 text-purple-600 bg-purple-50" : "border-gray-200 text-gray-500 hover:border-gray-300"
-                            }`}>
+                        style={{ appearance: "none", borderRadius: 8, border: selectedCat ? "1px solid rgba(0,71,134,0.3)" : "1px solid var(--t-border-light, #e5e7eb)", background: selectedCat ? "rgba(0,71,134,0.04)" : "var(--t-card, #fff)", padding: "8px 16px 8px 32px", fontSize: 12, fontWeight: 500, color: selectedCat ? "#004786" : "var(--t-text-secondary, #6b7280)", outline: "none", cursor: "pointer", minWidth: 130 }}>
                         <option value="">كل الفئات</option>
                         {categories.map((cat) => (
                             <option key={cat.category_id} value={cat.category_id}>
@@ -445,30 +444,32 @@ export function UserAnalyticsTab() {
                         <button onClick={() => handleCatChange("")} className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full p-0.5 text-purple-400 hover:text-purple-600 hover:bg-purple-100 transition-colors"><X size={12} /></button>
                     )}
                 </div>
+                <ActionGuard pageBit={PAGE_BITS.DOCUMENTS} actionBit={ACTION_BITS.DELETE_COLLECTION_NEW}>
+                    <button onClick={() => setShowDeleteCollection(true)} style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 5, padding: "8px 14px", borderRadius: 8, border: "1px solid rgba(220,38,38,0.15)", background: "rgba(220,38,38,0.03)", color: "#dc2626", fontSize: 12, fontWeight: 500, cursor: "pointer", transition: "all 0.15s" }}><Ban size={13} />حذف الكل</button>
+                </ActionGuard>
             </div>
 
             {/* Info bar */}
             {!loading && users.length > 0 && (
-                <div className="flex items-center justify-between rounded-xl bg-white border border-gray-100 px-4 py-2.5 shadow-sm">
-                    <p className="text-xs text-gray-500">
-                        <span className="font-bold text-gray-700">{totalCount}</span> مستخدم
-                        {selectedDept && <span className="text-gray-400"> — {activeDeptLabel}</span>}
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderRadius: 8, background: "var(--t-card, #fff)", border: "1px solid var(--t-border-light, #e5e7eb)", padding: "7px 14px" }}>
+                    <p style={{ fontSize: 11, color: "var(--t-text-secondary, #6b7280)" }}>
+                        <span style={{ fontWeight: 700, color: "#004786" }}>{totalCount}</span> مستخدم
+                        {selectedDept && <span style={{ color: "var(--t-text-faint, #9ca3af)" }}> — {activeDeptLabel}</span>}
                     </p>
-                    <p className="text-xs text-gray-400">صفحة {page} من {totalPages}</p>
+                    <p style={{ fontSize: 11, color: "var(--t-text-faint, #9ca3af)" }}>صفحة {page} من {totalPages}</p>
                 </div>
             )}
 
             {/* Table */}
-            <div className="relative overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
+            <div style={{ position: "relative", overflow: "hidden", borderRadius: 10, border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-card, #fff)" }}>
                 <FetchingBar visible={backgroundFetching} />
                 <div className="overflow-x-auto" style={{ opacity: backgroundFetching ? 0.6 : 1, transition: 'opacity 0.2s ease' }}>
-                    <table className="w-full">
+                    <table style={{ width: "100%", borderCollapse: "collapse" }}>
                         <thead>
-                            <tr className="border-b border-gray-100 text-right">
-                                <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-gray-400">المستخدم</th>
-                                <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-gray-400">عدد الملفات</th>
-                                <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-gray-400">عدد السجلات</th>
-                                <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-gray-400">الإجراءات</th>
+                            <tr style={{ borderBottom: "1px solid var(--t-border-light, #f0f0f0)", background: "var(--t-surface, #fafafa)", textAlign: "right" }}>
+                                {["المستخدم", "عدد الملفات", "عدد السجلات", "الإجراءات"].map(h => (
+                                    <th key={h} style={{ padding: "10px 16px", fontSize: 11, fontWeight: 600, color: "var(--t-text-faint, #9ca3af)", letterSpacing: "0.3px" }}>{h}</th>
+                                ))}
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-50">
@@ -482,20 +483,20 @@ export function UserAnalyticsTab() {
                     </table>
                 </div>
                 {!loading && users.length === 0 && (
-                    <div className="flex flex-col items-center justify-center py-16 text-center">
-                        <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gray-100"><User size={28} className="text-gray-300" /></div>
-                        <p className="mt-4 text-sm font-medium text-gray-500">{searchVal ? "لا يوجد مستخدمين مطابقين" : selectedDept ? `لا يوجد ملفات في قسم ${activeDeptLabel}` : "لا يوجد مستخدمين"}</p>
-                        <p className="mt-1 text-xs text-gray-400">{searchVal ? "جرب كلمة بحث مختلفة" : "لم يتم رفع أي ملفات بعد"}</p>
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "64px 0", textAlign: "center" }}>
+                        <div style={{ width: 56, height: 56, borderRadius: 14, background: "var(--t-surface, #f3f4f6)", display: "flex", alignItems: "center", justifyContent: "center" }}><User size={24} style={{ color: "var(--t-text-faint, #d1d5db)" }} /></div>
+                        <p style={{ marginTop: 14, fontSize: 13, fontWeight: 500, color: "var(--t-text-secondary, #6b7280)" }}>{searchVal ? "لا يوجد مستخدمين مطابقين" : selectedDept ? `لا يوجد ملفات في قسم ${activeDeptLabel}` : "لا يوجد مستخدمين"}</p>
+                        <p style={{ marginTop: 4, fontSize: 11, color: "var(--t-text-faint, #9ca3af)" }}>{searchVal ? "جرب كلمة بحث مختلفة" : "لم يتم رفع أي ملفات بعد"}</p>
                     </div>
                 )}
             </div>
 
             {/* Pagination */}
             {totalPages > 1 && (
-                <div className="flex items-center justify-center gap-2 pt-2">
-                    <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1} className="flex items-center gap-1 rounded-lg border border-gray-200 px-3 py-2 text-xs font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"><ChevronRight size={14} /> السابق</button>
-                    <span className="flex h-8 items-center rounded-lg bg-gray-900 px-3 text-xs font-bold text-white ">{page}</span>
-                    <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} onMouseEnter={() => page < totalPages && prefetchNextUsers()} disabled={page >= totalPages} className="flex items-center gap-1 rounded-lg border border-gray-200 px-3 py-2 text-xs font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed">التالي <ChevronLeft size={14} /></button>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, paddingTop: 8 }}>
+                    <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1} style={{ display: "flex", alignItems: "center", gap: 4, padding: "6px 12px", borderRadius: 7, border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-card, #fff)", fontSize: 12, fontWeight: 500, color: "var(--t-text-secondary, #6b7280)", cursor: "pointer", opacity: page <= 1 ? 0.4 : 1 }}><ChevronRight size={13} /> السابق</button>
+                    <span style={{ display: "flex", height: 30, alignItems: "center", borderRadius: 7, background: "#004786", padding: "0 12px", fontSize: 12, fontWeight: 700, color: "#fff" }}>{page}</span>
+                    <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} onMouseEnter={() => page < totalPages && prefetchNextUsers()} disabled={page >= totalPages} style={{ display: "flex", alignItems: "center", gap: 4, padding: "6px 12px", borderRadius: 7, border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-card, #fff)", fontSize: 12, fontWeight: 500, color: "var(--t-text-secondary, #6b7280)", cursor: "pointer", opacity: page >= totalPages ? 0.4 : 1 }}>التالي <ChevronLeft size={13} /></button>
                 </div>
             )}
 
@@ -508,20 +509,20 @@ export function UserAnalyticsTab() {
             )}
             {showDeleteCollection && (
                 <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={() => setShowDeleteCollection(false)}>
-                    <div className="mx-4 w-full max-w-md rounded-2xl border border-gray-200 bg-white shadow-2xl" onClick={(e) => e.stopPropagation()} style={{ animation: "uaModalIn .18s ease-out" }}>
-                        <div className="p-6">
-                            <div className="flex items-center gap-3 mb-4">
-                                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-50"><Ban size={20} className="text-red-500" /></div>
-                                <div><h3 className="text-sm font-bold text-gray-700">حذف جميع البيانات</h3><p className="text-xs text-gray-400">سيتم حذف جميع البيانات من قاعدة المعرفة</p></div>
+                    <div className="mx-4 w-full max-w-md overflow-hidden bg-white" onClick={(e) => e.stopPropagation()} style={{ animation: "uaModalIn .18s ease-out", borderRadius: 12, border: "1px solid var(--t-border-light, #e5e7eb)" }}>
+                        <div style={{ padding: 20 }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+                                <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(220,38,38,0.06)", display: "flex", alignItems: "center", justifyContent: "center" }}><Ban size={18} style={{ color: "#dc2626" }} /></div>
+                                <div><h3 style={{ fontSize: 14, fontWeight: 600, color: "var(--t-text, #1f2937)" }}>حذف جميع البيانات</h3><p style={{ fontSize: 11, color: "var(--t-text-faint, #9ca3af)", marginTop: 1 }}>سيتم حذف جميع البيانات من قاعدة المعرفة</p></div>
                             </div>
-                            <div className="flex items-start gap-2 rounded-xl bg-amber-50 border border-amber-200 p-3 text-right">
-                                <AlertTriangle size={16} className="text-amber-500 mt-0.5 shrink-0" />
-                                <p className="text-xs text-amber-700 leading-relaxed">عملية حذف جميع البيانات <strong>لا يمكن التراجع عنها</strong> — سيتم حذف جميع الملفات والسجلات نهائياً</p>
+                            <div style={{ display: "flex", alignItems: "flex-start", gap: 8, borderRadius: 8, background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.15)", padding: 10, textAlign: "right" }}>
+                                <AlertTriangle size={14} style={{ color: "#d97706", marginTop: 2, flexShrink: 0 }} />
+                                <p style={{ fontSize: 11, color: "#92400e", lineHeight: 1.6 }}>عملية حذف جميع البيانات <strong>لا يمكن التراجع عنها</strong> — سيتم حذف جميع الملفات والسجلات نهائياً</p>
                             </div>
                         </div>
-                        <div className="flex items-center justify-end gap-3 border-t border-gray-100 px-6 py-4">
-                            <button onClick={() => setShowDeleteCollection(false)} className="rounded-xl border border-gray-200 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50">إلغاء</button>
-                            <button onClick={handleDeleteCollection} disabled={deletingCollection} className="flex items-center gap-2 rounded-xl bg-gray-800 px-4 py-2 text-sm font-medium text-white  disabled:opacity-50 disabled:cursor-not-allowed">
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 8, borderTop: "1px solid var(--t-border-light, #f0f0f0)", padding: "12px 20px" }}>
+                            <button onClick={() => setShowDeleteCollection(false)} style={{ padding: "7px 16px", borderRadius: 7, border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-card, #fff)", fontSize: 13, fontWeight: 500, color: "var(--t-text-secondary, #6b7280)", cursor: "pointer" }}>إلغاء</button>
+                            <button onClick={handleDeleteCollection} disabled={deletingCollection} style={{ display: "flex", alignItems: "center", gap: 6, padding: "7px 18px", borderRadius: 7, border: "none", background: "#dc2626", color: "#fff", fontSize: 13, fontWeight: 500, cursor: "pointer", opacity: deletingCollection ? 0.5 : 1 }}>
                                 {deletingCollection && <Loader2 size={14} className="animate-spin" />}حذف جميع البيانات
                             </button>
                         </div>

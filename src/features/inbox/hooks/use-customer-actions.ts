@@ -272,12 +272,19 @@ export function useAssignTeams(customerId: string) {
         onMutate: async (teamIds) => {
             await qc.cancelQueries({ queryKey: ["inbox-customers"] })
             const snap = snapshotInbox(qc)
-            patchCustomer(qc, customerId, (c) => ({
-                team_ids: {
-                    teams: [...new Set([...(c.team_ids?.teams ?? []), ...teamIds])],
-                    is_assigned_team: true,
-                },
-            }))
+            patchCustomer(qc, customerId, (c) => {
+                const existingTeams = c.team_ids?.teams ?? []
+                const existingIds = existingTeams.map(t => t.team_id)
+                const newTeams = teamIds
+                    .filter(id => !existingIds.includes(id))
+                    .map(id => ({ team_id: id, name: id }))
+                return {
+                    team_ids: {
+                        teams: [...existingTeams, ...newTeams],
+                        is_assigned_team: true,
+                    },
+                }
+            })
             return snap
         },
         onSuccess: () => toast.success("تم تعيين الفرق"),
@@ -299,7 +306,7 @@ export function useRemoveTeams(customerId: string) {
             await qc.cancelQueries({ queryKey: ["inbox-customers"] })
             const snap = snapshotInbox(qc)
             patchCustomer(qc, customerId, (c) => {
-                const remaining = (c.team_ids?.teams ?? []).filter(t => !teamIds.includes(t))
+                const remaining = (c.team_ids?.teams ?? []).filter(t => !teamIds.includes(t.team_id))
                 return {
                     team_ids: {
                         teams: remaining,

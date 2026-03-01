@@ -7,6 +7,16 @@ import { PAGE_BITS, ACTION_BITS } from "@/lib/permissions"
 
 interface Props { onCreated?: (role: string) => void }
 
+const inputStyle: React.CSSProperties = {
+    width: "100%", borderRadius: 7,
+    border: "1.5px solid var(--t-border-light, #e0e3e7)",
+    background: "var(--t-surface, #fafafa)",
+    padding: "7px 10px", fontSize: 11.5,
+    color: "var(--t-text, #111827)", outline: "none",
+    fontFamily: "inherit",
+    transition: "border-color .15s",
+}
+
 export function CreateRoleForm({ onCreated }: Props) {
     const [open, setOpen] = useState(false)
     const [form, setForm] = useState({ role: "", name_ar: "", name_en: "", description_ar: "", description_en: "" })
@@ -34,56 +44,94 @@ export function CreateRoleForm({ onCreated }: Props) {
     if (!open) {
         return (
             <ActionGuard pageBit={PAGE_BITS.ROLES} actionBit={ACTION_BITS.CREATE_ROLE}>
-                <button onClick={() => setOpen(true)}
-                    className="flex w-full items-center gap-1.5 rounded-lg px-3 py-2.5 text-[13px] font-medium
-                               text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-colors">
-                    <Plus size={14} /> إنشاء دور جديد
-                </button>
+                <div style={{ padding: "8px 10px", borderTop: "1px solid var(--t-border-light, #eaedf0)" }}>
+                    <button onClick={() => setOpen(true)} style={{
+                        display: "flex", width: "100%", alignItems: "center", justifyContent: "center", gap: 5,
+                        padding: "8px 0", borderRadius: 8, border: "1px dashed var(--t-border, #d1d5db)",
+                        background: "transparent", color: "#004786",
+                        fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
+                        transition: "all .12s",
+                    }}
+                        onMouseEnter={e => { e.currentTarget.style.background = "rgba(0,71,134,0.03)"; e.currentTarget.style.borderColor = "#004786" }}
+                        onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.borderColor = "var(--t-border, #d1d5db)" }}
+                    >
+                        <Plus size={13} /> إنشاء دور جديد
+                    </button>
+                </div>
             </ActionGuard>
         )
     }
 
     return (
-        <div className="border-t border-gray-100 p-3 space-y-2.5" style={{ animation: "rSlide .15s ease-out" }}>
-            <div className="flex items-center justify-between">
-                <span className="text-[12px] font-semibold text-gray-600">دور جديد</span>
-                <button onClick={reset} className="rounded p-0.5 text-gray-400 hover:text-gray-600 transition-colors">
+        <div style={{
+            borderTop: "1px solid var(--t-border-light, #eaedf0)",
+            padding: 12, animation: "rSlide .15s ease-out",
+        }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
+                <span style={{ fontSize: 11, fontWeight: 700, color: "#004786" }}>دور جديد</span>
+                <button onClick={reset} style={{
+                    background: "none", border: "none", cursor: "pointer", padding: 2,
+                    color: "var(--t-text-faint, #9ca3af)",
+                }}>
                     <X size={13} />
                 </button>
             </div>
 
-            <input value={form.role} onChange={e => setForm(p => ({ ...p, role: e.target.value }))}
-                placeholder="معرّف الدور (مثال: supervisor)" dir="ltr"
-                className="w-full rounded-md border border-gray-200 bg-white px-2.5 py-1.5 text-[12px] text-gray-700 placeholder:text-gray-300 outline-none focus:border-gray-400" />
-            <input value={form.name_ar} onChange={e => setForm(p => ({ ...p, name_ar: e.target.value }))}
-                placeholder="الاسم بالعربية"
-                className="w-full rounded-md border border-gray-200 bg-white px-2.5 py-1.5 text-[12px] text-gray-700 placeholder:text-gray-300 outline-none focus:border-gray-400" />
-            <input value={form.name_en} onChange={e => setForm(p => ({ ...p, name_en: e.target.value }))}
-                placeholder="Name in English" dir="ltr"
-                className="w-full rounded-md border border-gray-200 bg-white px-2.5 py-1.5 text-[12px] text-gray-700 placeholder:text-gray-300 outline-none focus:border-gray-400" />
-            <input value={form.description_ar} onChange={e => setForm(p => ({ ...p, description_ar: e.target.value }))}
-                placeholder="وصف (اختياري)"
-                className="w-full rounded-md border border-gray-200 bg-white px-2.5 py-1.5 text-[12px] text-gray-700 placeholder:text-gray-300 outline-none focus:border-gray-400" />
-            <input value={form.description_en} onChange={e => setForm(p => ({ ...p, description_en: e.target.value }))}
-                placeholder="Description (optional)" dir="ltr"
-                className="w-full rounded-md border border-gray-200 bg-white px-2.5 py-1.5 text-[12px] text-gray-700 placeholder:text-gray-300 outline-none focus:border-gray-400" />
+            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                <input value={form.role} onChange={e => setForm(p => ({ ...p, role: e.target.value }))}
+                    placeholder="معرّف الدور (مثال: supervisor)" dir="ltr"
+                    style={inputStyle}
+                    onFocus={e => { e.target.style.borderColor = "#004786" }}
+                    onBlur={e => { e.target.style.borderColor = "var(--t-border-light, #e0e3e7)" }}
+                />
+                <input value={form.name_ar} onChange={e => setForm(p => ({ ...p, name_ar: e.target.value }))}
+                    placeholder="الاسم بالعربية"
+                    style={inputStyle}
+                    onFocus={e => { e.target.style.borderColor = "#004786" }}
+                    onBlur={e => { e.target.style.borderColor = "var(--t-border-light, #e0e3e7)" }}
+                />
+                <input value={form.name_en} onChange={e => setForm(p => ({ ...p, name_en: e.target.value }))}
+                    placeholder="Name in English" dir="ltr"
+                    style={inputStyle}
+                    onFocus={e => { e.target.style.borderColor = "#004786" }}
+                    onBlur={e => { e.target.style.borderColor = "var(--t-border-light, #e0e3e7)" }}
+                />
+                <input value={form.description_ar} onChange={e => setForm(p => ({ ...p, description_ar: e.target.value }))}
+                    placeholder="وصف (اختياري)"
+                    style={inputStyle}
+                    onFocus={e => { e.target.style.borderColor = "#004786" }}
+                    onBlur={e => { e.target.style.borderColor = "var(--t-border-light, #e0e3e7)" }}
+                />
+                <input value={form.description_en} onChange={e => setForm(p => ({ ...p, description_en: e.target.value }))}
+                    placeholder="Description (optional)" dir="ltr"
+                    style={inputStyle}
+                    onFocus={e => { e.target.style.borderColor = "#004786" }}
+                    onBlur={e => { e.target.style.borderColor = "var(--t-border-light, #e0e3e7)" }}
+                />
+            </div>
 
             {mut.isError && (
-                <div className="flex items-center gap-1.5 text-[11px] text-gray-500">
-                    <AlertCircle size={11} className="text-gray-400" />
+                <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 6, fontSize: 10.5, color: "#dc2626" }}>
+                    <AlertCircle size={11} />
                     {(mut.error as any)?.message || "فشل الإنشاء"}
                 </div>
             )}
 
             <button onClick={handleSubmit}
                 disabled={mut.isPending || !form.role.trim() || !form.name_ar.trim() || !form.name_en.trim()}
-                className="w-full rounded-md bg-gray-800 py-1.5 text-[12px] font-medium text-white
-                           hover:bg-gray-700 disabled:opacity-40 transition-colors flex items-center justify-center gap-1.5">
+                style={{
+                    width: "100%", marginTop: 8, padding: "8px 0", borderRadius: 8,
+                    border: "none", background: "#004786", color: "#fff",
+                    fontSize: 11.5, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
+                    display: "flex", alignItems: "center", justifyContent: "center", gap: 4,
+                    opacity: (mut.isPending || !form.role.trim() || !form.name_ar.trim() || !form.name_en.trim()) ? 0.4 : 1,
+                    boxShadow: "0 1px 3px rgba(0,71,134,0.15)",
+                }}>
                 {mut.isPending ? <Loader2 size={12} className="animate-spin" /> : <Plus size={12} />}
                 إنشاء
             </button>
 
-            <style>{`@keyframes rSlide{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}`}</style>
+            <style>{`@keyframes rSlide{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}`}</style>
         </div>
     )
 }

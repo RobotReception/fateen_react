@@ -5,22 +5,21 @@ import { RolesList } from "../components/RolesList"
 import { RoleDetail } from "../components/RoleDetail"
 import { FetchingBar } from "@/components/ui/FetchingBar"
 
+const CSS = `@keyframes rpFade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}`
+
 export function RolesPage({ embedded = false }: { embedded?: boolean }) {
     const { data: roles, isLoading, isFetching, isError, refetch } = useRoles()
     const [activeRole, setActiveRole] = useState<string | null>(null)
 
     const bg = isFetching && !isLoading
 
-    /* resolve the active role object */
     const selectedRole = useMemo(
         () => roles?.find(r => r.role === activeRole) || null,
         [roles, activeRole]
     )
 
-    /* auto-select first role when list loads */
     const handleSelect = useCallback((role: string) => setActiveRole(role), [])
 
-    /* when roles load and no selection, select first */
     useEffect(() => {
         if (roles && roles.length > 0 && !activeRole) {
             setActiveRole(roles[0].role)
@@ -28,21 +27,17 @@ export function RolesPage({ embedded = false }: { embedded?: boolean }) {
     }, [roles, activeRole])
 
     return (
-        <div className={embedded ? "max-w-[1200px] mx-auto" : "p-6 sm:p-8 lg:p-10 max-w-[1200px] mx-auto"}>
+        <div className={embedded ? "max-w-[1200px] mx-auto" : "max-w-[1200px] mx-auto"} style={{ animation: "rpFade .25s ease-out" }}>
+            <style>{CSS}</style>
             <FetchingBar visible={bg} />
 
             {/* Header */}
             {!embedded && (
-                <header className="mb-7">
-                    <div className="flex items-center gap-1.5 text-[12px] text-gray-400 mb-1.5">
-                        <span>لوحة التحكم</span>
-                        <span className="text-gray-300">←</span>
-                        <span className="text-gray-600">الأدوار والصلاحيات</span>
-                    </div>
-                    <h1 className="text-[22px] font-bold text-gray-800 tracking-[-0.02em]">
+                <header style={{ marginBottom: 20 }}>
+                    <h1 style={{ fontSize: 20, fontWeight: 700, color: "var(--t-text, #111827)", margin: 0, letterSpacing: "-0.01em" }}>
                         الأدوار والصلاحيات
                     </h1>
-                    <p className="text-[13px] text-gray-400 mt-1">
+                    <p style={{ fontSize: 12, color: "var(--t-text-faint, #9ca3af)", marginTop: 3 }}>
                         إنشاء الأدوار وإدارة الصلاحيات وتعيين المستخدمين
                     </p>
                 </header>
@@ -50,11 +45,26 @@ export function RolesPage({ embedded = false }: { embedded?: boolean }) {
 
             {/* Error state */}
             {isError && !roles && (
-                <div className="rounded-lg border border-gray-100 bg-white flex flex-col items-center justify-center py-20">
-                    <AlertCircle size={18} className="text-gray-300" />
-                    <p className="mt-2 text-[13px] text-gray-400">فشل تحميل الأدوار</p>
-                    <button onClick={() => refetch()}
-                        className="mt-3 rounded-lg border border-gray-200 px-4 py-1.5 text-[13px] text-gray-500 hover:bg-gray-50 transition-colors flex items-center gap-1.5">
+                <div style={{
+                    borderRadius: 12, border: "1px solid var(--t-border-light, #eaedf0)",
+                    background: "var(--t-card, #fff)",
+                    display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+                    padding: "60px 0",
+                }}>
+                    <div style={{
+                        width: 44, height: 44, borderRadius: 10,
+                        background: "rgba(0,71,134,0.06)",
+                        display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 10,
+                    }}>
+                        <AlertCircle size={18} style={{ color: "#004786" }} />
+                    </div>
+                    <p style={{ fontSize: 13, color: "var(--t-text-faint, #9ca3af)", margin: "0 0 10px" }}>فشل تحميل الأدوار</p>
+                    <button onClick={() => refetch()} style={{
+                        display: "flex", alignItems: "center", gap: 5,
+                        padding: "7px 16px", borderRadius: 8,
+                        border: "none", background: "#004786", color: "#fff",
+                        fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
+                    }}>
                         <RefreshCw size={12} /> إعادة المحاولة
                     </button>
                 </div>
@@ -62,8 +72,7 @@ export function RolesPage({ embedded = false }: { embedded?: boolean }) {
 
             {/* Main layout */}
             {(!isError || roles) && (
-                <div className="flex gap-3 items-start">
-                    {/* Left sidebar — roles list */}
+                <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
                     <RolesList
                         roles={roles}
                         isLoading={isLoading}
@@ -73,16 +82,27 @@ export function RolesPage({ embedded = false }: { embedded?: boolean }) {
                         onSelect={handleSelect}
                     />
 
-                    {/* Right panel — role detail */}
                     {selectedRole ? (
                         <RoleDetail
                             key={selectedRole.role}
                             role={selectedRole}
                         />
                     ) : !isLoading && (
-                        <div className="flex-1 rounded-xl border border-gray-200 bg-white flex flex-col items-center justify-center py-20">
-                            <Shield size={28} className="text-gray-300" />
-                            <p className="mt-3 text-[14px] font-medium text-gray-600">اختر دوراً من القائمة</p>
+                        <div style={{
+                            flex: 1, borderRadius: 14,
+                            border: "1px solid var(--t-border-light, #eaedf0)",
+                            background: "var(--t-card, #fff)",
+                            display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+                            padding: "80px 0",
+                        }}>
+                            <div style={{
+                                width: 52, height: 52, borderRadius: 14,
+                                background: "rgba(0,71,134,0.06)",
+                                display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 12,
+                            }}>
+                                <Shield size={24} style={{ color: "#004786" }} />
+                            </div>
+                            <p style={{ fontSize: 14, fontWeight: 600, color: "var(--t-text, #111827)", margin: 0 }}>اختر دوراً من القائمة</p>
                         </div>
                     )}
                 </div>

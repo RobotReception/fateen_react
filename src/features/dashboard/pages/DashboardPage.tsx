@@ -1,106 +1,76 @@
+import { BarChart3, RefreshCw, AlertTriangle, Loader2 } from "lucide-react"
 import { useAnalytics } from "../hooks/useAnalytics"
 import { HeroCards } from "../components/HeroCards"
 import { SessionsChart } from "../components/SessionsChart"
 import { CustomerBreakdown } from "../components/CustomerBreakdown"
 import { PlatformChart } from "../components/PlatformChart"
 import { SecondaryStats } from "../components/SecondaryStats"
-import { BarChart3, RefreshCw, AlertTriangle, ShieldX } from "lucide-react"
 
-/* ── Skeleton Loader ── */
-function SkeletonPulse({ width = "100%", height = 20, radius = 8 }: { width?: string | number; height?: number; radius?: number }) {
+/* ── Skeleton loading state ── */
+function Skeleton({ width, height, radius = 16 }: { width?: string | number; height: number; radius?: number }) {
     return (
-        <div style={{
-            width, height, borderRadius: radius,
-            background: "linear-gradient(90deg, var(--t-surface) 25%, var(--t-surface-deep) 50%, var(--t-surface) 75%)",
-            backgroundSize: "200% 100%",
-            animation: "shimmer 1.5s infinite",
-        }} />
+        <div
+            style={{
+                width: width ?? "100%",
+                height,
+                borderRadius: radius,
+                background: "var(--t-surface, #f1f5f9)",
+                animation: "pulse 1.8s ease-in-out infinite",
+            }}
+        />
     )
 }
 
 function DashboardSkeleton() {
     return (
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-            {/* Hero skeleton */}
+            {/* Hero cards skeleton */}
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 18 }}>
-                {[1, 2, 3, 4].map(i => (
-                    <div key={i} style={{
-                        borderRadius: 16, padding: 24,
-                        background: "var(--t-card)", border: "1px solid var(--t-border)",
-                        height: 130,
-                    }}>
-                        <SkeletonPulse width={100} height={14} />
-                        <div style={{ marginTop: 16 }}>
-                            <SkeletonPulse width={80} height={28} />
-                        </div>
-                    </div>
-                ))}
+                {[1, 2, 3, 4].map(i => <Skeleton key={i} height={130} />)}
             </div>
-            {/* Charts skeleton */}
+            {/* Charts row skeleton */}
             <div style={{ display: "flex", gap: 18, flexWrap: "wrap" }}>
-                {[1, 2].map(i => (
-                    <div key={i} style={{
-                        flex: 1, minWidth: 280, borderRadius: 16, padding: 24,
-                        background: "var(--t-card)", border: "1px solid var(--t-border)",
-                        height: 300,
-                    }}>
-                        <SkeletonPulse width={120} height={16} />
-                        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: 220 }}>
-                            <SkeletonPulse width={160} height={160} radius={80} />
-                        </div>
-                    </div>
-                ))}
+                <div style={{ flex: 1, minWidth: 280 }}><Skeleton height={310} /></div>
+                <div style={{ flex: 1, minWidth: 280 }}><Skeleton height={310} /></div>
             </div>
-            {/* Platform skeleton */}
-            <div style={{
-                borderRadius: 16, padding: 24,
-                background: "var(--t-card)", border: "1px solid var(--t-border)",
-                height: 200,
-            }}>
-                <SkeletonPulse width={120} height={16} />
-                {[1, 2, 3].map(i => (
-                    <div key={i} style={{ marginTop: 16 }}>
-                        <SkeletonPulse width={`${80 - i * 15}%`} height={24} radius={4} />
-                    </div>
-                ))}
+            {/* Platform chart skeleton */}
+            <Skeleton height={220} />
+            {/* Secondary stats skeleton */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(170px, 1fr))", gap: 14 }}>
+                {[1, 2, 3, 4, 5, 6].map(i => <Skeleton key={i} height={80} radius={14} />)}
             </div>
         </div>
     )
 }
 
-/* ── Error State ── */
-function ErrorState({ message, status, onRetry }: { message: string; status?: number; onRetry: () => void }) {
-    const is403 = status === 403
-    const Icon = is403 ? ShieldX : AlertTriangle
-    const title = is403 ? "ليس لديك صلاحية لعرض التحليلات" : "حدث خطأ أثناء تحميل البيانات"
-
+/* ── Error state ── */
+function DashboardError({ onRetry }: { onRetry: () => void }) {
     return (
         <div style={{
             display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
             padding: "80px 20px", textAlign: "center",
+            background: "var(--t-card)", borderRadius: 16,
+            border: "1px solid var(--t-border)",
         }}>
-            <div style={{
-                width: 64, height: 64, borderRadius: 16,
-                background: is403 ? "var(--t-warning-soft)" : "var(--t-danger-soft)",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                marginBottom: 16,
-            }}>
-                <Icon size={28} color={is403 ? "var(--t-warning)" : "var(--t-danger)"} />
-            </div>
-            <h3 style={{ fontSize: 17, fontWeight: 700, color: "var(--t-text)", marginBottom: 6 }}>{title}</h3>
-            <p style={{ fontSize: 13, color: "var(--t-text-faint)", marginBottom: 20, maxWidth: 360 }}>{message}</p>
+            <AlertTriangle size={48} style={{ color: "#F59E0B", marginBottom: 16, opacity: 0.7 }} />
+            <h3 style={{ fontSize: 17, fontWeight: 700, color: "var(--t-text)", marginBottom: 6 }}>
+                حدث خطأ في تحميل البيانات
+            </h3>
+            <p style={{ fontSize: 13, color: "var(--t-text-faint)", maxWidth: 360, marginBottom: 20 }}>
+                لم نتمكن من جلب بيانات التحليلات. يرجى المحاولة مرة أخرى.
+            </p>
             <button
                 onClick={onRetry}
                 style={{
                     display: "flex", alignItems: "center", gap: 8,
-                    padding: "10px 22px", borderRadius: 10,
-                    border: "1px solid var(--t-border)",
-                    background: "var(--t-card)", color: "var(--t-text)",
-                    fontSize: 13, fontWeight: 600, cursor: "pointer",
-                    transition: "background 0.15s",
+                    padding: "10px 24px", borderRadius: 10,
+                    border: "none", cursor: "pointer",
+                    background: "var(--t-accent, #3B82F6)", color: "#fff",
+                    fontSize: 14, fontWeight: 600,
+                    transition: "opacity 0.15s",
                 }}
-                onMouseEnter={e => { e.currentTarget.style.background = "var(--t-card-hover)" }}
-                onMouseLeave={e => { e.currentTarget.style.background = "var(--t-card)" }}
+                onMouseEnter={e => { e.currentTarget.style.opacity = "0.85" }}
+                onMouseLeave={e => { e.currentTarget.style.opacity = "1" }}
             >
                 <RefreshCw size={15} />
                 إعادة المحاولة
@@ -109,11 +79,9 @@ function ErrorState({ message, status, onRetry }: { message: string; status?: nu
     )
 }
 
-/* ── Dashboard Page ── */
+/* ── Main Dashboard Page ── */
 export function DashboardPage() {
-    const { data: analytics, isLoading, isError, error, refetch } = useAnalytics()
-
-    const errStatus = (error as any)?.response?.status as number | undefined
+    const { data: analytics, isLoading, isError, refetch } = useAnalytics()
 
     return (
         <div className="h-full overflow-y-auto p-4 lg:p-6" dir="rtl">
@@ -129,27 +97,25 @@ export function DashboardPage() {
                     </div>
                     <div>
                         <h1 style={{ fontSize: 22, fontWeight: 800, color: "var(--t-text)", lineHeight: 1.2 }}>
-                            التحليلات العامة
+                            لوحة التحكم
                         </h1>
                         <p style={{ fontSize: 13, color: "var(--t-text-faint)", marginTop: 2 }}>
-                            نظرة شاملة على إحصائيات النظام والمنصات
+                            نظرة عامة على إحصائيات النظام
                         </p>
                     </div>
                 </div>
             </div>
 
-            {/* Body */}
-            {isLoading ? (
-                <DashboardSkeleton />
-            ) : isError ? (
-                <ErrorState
-                    message={(error as any)?.message || "تعذّر الاتصال بالخادم"}
-                    status={errStatus}
-                    onRetry={() => refetch()}
-                />
-            ) : analytics ? (
+            {/* ── Loading ── */}
+            {isLoading && <DashboardSkeleton />}
+
+            {/* ── Error ── */}
+            {isError && <DashboardError onRetry={() => refetch()} />}
+
+            {/* ── Data ── */}
+            {analytics && (
                 <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-                    {/* 1 — Hero Cards */}
+                    {/* Hero Cards */}
                     <HeroCards
                         totalCustomers={analytics.total_customers}
                         totalMessages={analytics.total_messages}
@@ -157,7 +123,7 @@ export function DashboardPage() {
                         totalChannels={analytics.total_channels}
                     />
 
-                    {/* 2 — Charts Row */}
+                    {/* Charts Row */}
                     <div style={{ display: "flex", gap: 18, flexWrap: "wrap" }}>
                         <SessionsChart
                             open={analytics.open_sessions}
@@ -170,18 +136,20 @@ export function DashboardPage() {
                         />
                     </div>
 
-                    {/* 3 — Platform Distribution */}
+                    {/* Platform Chart */}
                     <PlatformChart platforms={analytics.platforms} />
 
-                    {/* 4 — Secondary Stats */}
-                    <div style={{ marginTop: 4 }}>
-                        <h3 style={{ fontSize: 15, fontWeight: 700, color: "var(--t-text)", marginBottom: 14 }}>
-                            إحصائيات إضافية
-                        </h3>
-                        <SecondaryStats data={analytics} />
-                    </div>
+                    {/* Secondary Stats Grid */}
+                    <SecondaryStats data={analytics} />
                 </div>
-            ) : null}
+            )}
+
+            <style>{`
+                @keyframes pulse {
+                    0%, 100% { opacity: 1; }
+                    50% { opacity: 0.4; }
+                }
+            `}</style>
         </div>
     )
 }

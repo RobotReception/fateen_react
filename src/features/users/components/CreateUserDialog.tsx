@@ -22,6 +22,12 @@ interface CreateUserDialogProps {
     onSuccess: () => void
 }
 
+const CSS = `@keyframes dlgSlide{from{opacity:0;transform:translateY(16px) scale(0.97)}to{opacity:1;transform:none}}`
+
+const inputCls = `w-full rounded-lg border border-gray-200 bg-[var(--t-surface,#fafafa)] px-3.5 py-2.5 text-sm text-[var(--t-text,#111827)]
+    outline-none transition-all placeholder:text-gray-400
+    focus:border-[#004786] focus:bg-white focus:ring-2 focus:ring-[#004786]/10`
+
 export function CreateUserDialog({ open, onClose, onSuccess }: CreateUserDialogProps) {
     const [loading, setLoading] = useState(false)
     const [showPassword, setShowPassword] = useState(false)
@@ -45,7 +51,6 @@ export function CreateUserDialog({ open, onClose, onSuccess }: CreateUserDialogP
         },
     })
 
-    // Set default role when roles load
     useEffect(() => {
         if (roles.length > 0) {
             reset((prev) => ({
@@ -99,168 +104,183 @@ export function CreateUserDialog({ open, onClose, onSuccess }: CreateUserDialogP
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center">
-            <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
+            <style>{CSS}</style>
+            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
             <div
-                className="relative z-10 w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl"
+                className="relative z-10 w-full max-w-lg bg-white shadow-2xl"
                 dir="rtl"
-                style={{ animation: "fadeSlideUp 0.3s ease-out" }}
+                style={{ animation: "dlgSlide .25s ease-out", borderRadius: 16, overflow: "hidden" }}
             >
-                {/* Header */}
-                <div className="mb-6 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gray-900">
-                            <UserPlus size={20} className="text-white" />
+                {/* ── Gradient header ── */}
+                <div style={{
+                    background: "linear-gradient(135deg, #004786, #0072b5)",
+                    padding: "16px 20px",
+                    display: "flex", alignItems: "center", justifyContent: "space-between",
+                }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <div style={{
+                            width: 36, height: 36, borderRadius: 10,
+                            background: "rgba(255,255,255,0.15)",
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                        }}>
+                            <UserPlus size={18} style={{ color: "#fff" }} />
                         </div>
-                        <h2 className="text-lg font-bold text-gray-800">إضافة مستخدم جديد</h2>
+                        <h2 style={{ fontSize: 15, fontWeight: 700, color: "#fff", margin: 0 }}>إضافة مستخدم جديد</h2>
                     </div>
-                    <button onClick={onClose} className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600">
-                        <X size={20} />
+                    <button onClick={onClose} style={{
+                        background: "rgba(255,255,255,0.12)", border: "none", borderRadius: 8,
+                        padding: 5, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+                        transition: "background .12s",
+                    }}
+                        onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.25)" }}
+                        onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.12)" }}>
+                        <X size={16} style={{ color: "#fff" }} />
                     </button>
                 </div>
 
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                    {/* Name row */}
-                    <div className="grid grid-cols-2 gap-3">
-                        <div>
-                            <label className="mb-1 block text-sm font-medium text-gray-700">الاسم الأول *</label>
-                            <input
-                                {...register("first_name", {
-                                    required: "مطلوب",
-                                    minLength: { value: 2, message: "على الأقل حرفين" },
-                                })}
-                                className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm outline-none transition-all focus:border-cyan-500 focus:bg-white focus:ring-2 focus:ring-cyan-500/20"
-                                placeholder="أحمد"
-                            />
-                            {errors.first_name && <p className="mt-1 text-xs text-red-500">{errors.first_name.message}</p>}
+                {/* ── Form ── */}
+                <form onSubmit={handleSubmit(onSubmit)} style={{ padding: "20px 20px 16px" }}>
+                    <div className="space-y-4">
+                        {/* Name row */}
+                        <div className="grid grid-cols-2 gap-3">
+                            <div>
+                                <label className="mb-1.5 block text-xs font-semibold text-gray-600">الاسم الأول *</label>
+                                <input
+                                    {...register("first_name", {
+                                        required: "مطلوب",
+                                        minLength: { value: 2, message: "على الأقل حرفين" },
+                                    })}
+                                    className={inputCls}
+                                    placeholder="أحمد"
+                                />
+                                {errors.first_name && <p className="mt-1 text-xs text-red-500">{errors.first_name.message}</p>}
+                            </div>
+                            <div>
+                                <label className="mb-1.5 block text-xs font-semibold text-gray-600">اسم العائلة *</label>
+                                <input
+                                    {...register("last_name", {
+                                        required: "مطلوب",
+                                        minLength: { value: 2, message: "على الأقل حرفين" },
+                                    })}
+                                    className={inputCls}
+                                    placeholder="محمد"
+                                />
+                                {errors.last_name && <p className="mt-1 text-xs text-red-500">{errors.last_name.message}</p>}
+                            </div>
                         </div>
+
+                        {/* Email */}
                         <div>
-                            <label className="mb-1 block text-sm font-medium text-gray-700">اسم العائلة *</label>
+                            <label className="mb-1.5 block text-xs font-semibold text-gray-600">البريد الإلكتروني *</label>
                             <input
-                                {...register("last_name", {
+                                {...register("email", {
                                     required: "مطلوب",
-                                    minLength: { value: 2, message: "على الأقل حرفين" },
+                                    pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: "بريد غير صالح" },
                                 })}
-                                className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm outline-none transition-all focus:border-cyan-500 focus:bg-white focus:ring-2 focus:ring-cyan-500/20"
-                                placeholder="محمد"
-                            />
-                            {errors.last_name && <p className="mt-1 text-xs text-red-500">{errors.last_name.message}</p>}
-                        </div>
-                    </div>
-
-                    {/* Email */}
-                    <div>
-                        <label className="mb-1 block text-sm font-medium text-gray-700">البريد الإلكتروني *</label>
-                        <input
-                            {...register("email", {
-                                required: "مطلوب",
-                                pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: "بريد غير صالح" },
-                            })}
-                            type="email"
-                            dir="ltr"
-                            className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm outline-none transition-all focus:border-cyan-500 focus:bg-white focus:ring-2 focus:ring-cyan-500/20"
-                            placeholder="user@example.com"
-                        />
-                        {errors.email && <p className="mt-1 text-xs text-red-500">{errors.email.message}</p>}
-                    </div>
-
-                    {/* Phone & Role row */}
-                    <div className="grid grid-cols-2 gap-3">
-                        <div>
-                            <label className="mb-1 block text-sm font-medium text-gray-700">رقم الهاتف</label>
-                            <input
-                                {...register("phone")}
+                                type="email"
                                 dir="ltr"
-                                className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm outline-none transition-all focus:border-cyan-500 focus:bg-white focus:ring-2 focus:ring-cyan-500/20"
-                                placeholder="+967..."
+                                className={inputCls}
+                                placeholder="user@example.com"
                             />
+                            {errors.email && <p className="mt-1 text-xs text-red-500">{errors.email.message}</p>}
                         </div>
+
+                        {/* Phone & Role row */}
+                        <div className="grid grid-cols-2 gap-3">
+                            <div>
+                                <label className="mb-1.5 block text-xs font-semibold text-gray-600">رقم الهاتف</label>
+                                <input
+                                    {...register("phone")}
+                                    dir="ltr"
+                                    className={inputCls}
+                                    placeholder="+967..."
+                                />
+                            </div>
+                            <div>
+                                <label className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold text-gray-600">
+                                    <Shield size={12} style={{ color: "#004786" }} />
+                                    الدور *
+                                </label>
+                                {rolesLoading ? (
+                                    <div className="flex items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2.5">
+                                        <Loader2 size={14} className="animate-spin text-gray-400" />
+                                        <span className="text-sm text-gray-400">تحميل...</span>
+                                    </div>
+                                ) : (
+                                    <select
+                                        {...register("role", { required: "مطلوب" })}
+                                        className={inputCls}
+                                    >
+                                        <option value="" disabled>اختر الدور</option>
+                                        {roles.map((r) => (
+                                            <option key={r.id} value={r.id}>{r.name}</option>
+                                        ))}
+                                    </select>
+                                )}
+                                {errors.role && <p className="mt-1 text-xs text-red-500">{errors.role.message}</p>}
+                            </div>
+                        </div>
+
+                        {/* Password */}
                         <div>
-                            <label className="mb-1 flex items-center gap-2 text-sm font-medium text-gray-700">
-                                <Shield size={14} className="text-cyan-500" />
-                                الدور *
+                            <label className="mb-1.5 block text-xs font-semibold text-gray-600">
+                                كلمة المرور <span className="text-gray-400 font-normal">(اختياري — يتم توليدها تلقائياً)</span>
                             </label>
-                            {rolesLoading ? (
-                                <div className="flex items-center gap-2 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5">
-                                    <Loader2 size={14} className="animate-spin text-gray-400" />
-                                    <span className="text-sm text-gray-400">تحميل...</span>
-                                </div>
-                            ) : (
-                                <select
-                                    {...register("role", { required: "مطلوب" })}
-                                    className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm outline-none transition-all focus:border-cyan-500 focus:bg-white focus:ring-2 focus:ring-cyan-500/20"
+                            <div className="relative">
+                                <input
+                                    {...register("password")}
+                                    type={showPassword ? "text" : "password"}
+                                    dir="ltr"
+                                    className={`${inputCls} pl-10`}
+                                    placeholder="اتركه فارغاً للتوليد التلقائي"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                                 >
-                                    <option value="" disabled>
-                                        اختر الدور
-                                    </option>
-                                    {roles.map((r) => (
-                                        <option key={r.id} value={r.id}>
-                                            {r.name}
-                                        </option>
-                                    ))}
-                                </select>
-                            )}
-                            {errors.role && <p className="mt-1 text-xs text-red-500">{errors.role.message}</p>}
+                                    {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                                </button>
+                            </div>
                         </div>
-                    </div>
 
-                    {/* Password */}
-                    <div>
-                        <label className="mb-1 block text-sm font-medium text-gray-700">كلمة المرور <span className="text-xs text-gray-400">(اختياري — يتم توليدها تلقائياً)</span></label>
-                        <div className="relative">
+                        {/* Send invitation */}
+                        <label className="flex items-center gap-2.5 cursor-pointer">
                             <input
-                                {...register("password")}
-                                type={showPassword ? "text" : "password"}
-                                dir="ltr"
-                                className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 pl-10 text-sm outline-none transition-all focus:border-cyan-500 focus:bg-white focus:ring-2 focus:ring-cyan-500/20"
-                                placeholder="اتركه فارغاً للتوليد التلقائي"
+                                type="checkbox"
+                                {...register("send_invitation")}
+                                style={{ accentColor: "#004786" }}
+                                className="h-4 w-4 rounded"
                             />
-                            <button
-                                type="button"
-                                onClick={() => setShowPassword(!showPassword)}
-                                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                            >
-                                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                            </button>
-                        </div>
+                            <span className="text-xs text-gray-600 font-medium">إرسال دعوة بالبريد الإلكتروني</span>
+                        </label>
                     </div>
 
-                    {/* Send invitation */}
-                    <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                            type="checkbox"
-                            {...register("send_invitation")}
-                            className="h-4 w-4 rounded border-gray-300 text-cyan-500 focus:ring-cyan-500/20"
-                        />
-                        <span className="text-sm text-gray-600">إرسال دعوة بالبريد الإلكتروني</span>
-                    </label>
-
-                    {/* Actions */}
-                    <div className="flex items-center justify-end gap-3 pt-2">
-                        <button
-                            type="button"
-                            onClick={onClose}
-                            className="rounded-xl px-5 py-2.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100"
-                        >
-                            إلغاء
-                        </button>
-                        <button
-                            type="submit"
-                            disabled={loading || rolesLoading}
-                            className="flex items-center gap-2 rounded-xl bg-gray-900 px-5 py-2.5 text-sm font-medium text-white transition-all hover:bg-gray-800 disabled:opacity-50"
-                        >
-                            {loading ? <Loader2 size={16} className="animate-spin" /> : <UserPlus size={16} />}
+                    {/* ── Actions ── */}
+                    <div style={{
+                        display: "flex", alignItems: "center", justifyContent: "flex-end",
+                        gap: 8, marginTop: 18, paddingTop: 14,
+                        borderTop: "1px solid var(--t-border-light, #eaedf0)",
+                    }}>
+                        <button type="button" onClick={onClose} style={{
+                            padding: "8px 18px", borderRadius: 9, border: "1px solid var(--t-border, #dcdfe3)",
+                            background: "var(--t-card, #fff)", color: "var(--t-text-secondary, #6b7280)",
+                            fontSize: 12, fontWeight: 500, cursor: "pointer", fontFamily: "inherit",
+                        }}>إلغاء</button>
+                        <button type="submit" disabled={loading || rolesLoading} style={{
+                            padding: "8px 20px", borderRadius: 9, border: "none",
+                            background: "#004786", color: "#fff",
+                            fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
+                            display: "flex", alignItems: "center", gap: 5,
+                            opacity: (loading || rolesLoading) ? 0.5 : 1,
+                            boxShadow: "0 1px 3px rgba(0,71,134,0.15)",
+                        }}>
+                            {loading ? <Loader2 size={14} className="animate-spin" /> : <UserPlus size={14} />}
                             إنشاء المستخدم
                         </button>
                     </div>
                 </form>
             </div>
-
-            <style>{`
-                @keyframes fadeSlideUp {
-                    from { opacity: 0; transform: translateY(20px) scale(0.96); }
-                    to { opacity: 1; transform: translateY(0) scale(1); }
-                }
-            `}</style>
         </div>
     )
 }

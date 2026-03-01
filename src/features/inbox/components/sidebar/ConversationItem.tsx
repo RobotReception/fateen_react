@@ -22,8 +22,8 @@ function timeAgo(dateStr?: string | null): string {
 
 function sessionDot(status?: string): string {
     switch (status) {
-        case "open": return "var(--t-success)"
-        case "pending": return "var(--t-warning)"
+        case "open": return "#10b981"
+        case "pending": return "#f59e0b"
         case "closed": return "var(--t-text-faint)"
         default: return "var(--t-text-faint)"
     }
@@ -77,7 +77,7 @@ export function ConversationItem({ customer: c, isSelected }: ConversationItemPr
                     <img src={c.profile_photo} alt={displayName} className="ci-avatar"
                         onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none" }} />
                 ) : (
-                    <Avatar name={displayName} size={40} />
+                    <Avatar name={displayName} size={42} />
                 )}
                 <span className="ci-status-dot" style={{ background: sessionDot(c.session_status) }} />
                 {c.platform_icon && (
@@ -124,7 +124,7 @@ export function ConversationItem({ customer: c, isSelected }: ConversationItemPr
                         {c.last_direction === "outbound" && (
                             <span className="ci-tick">
                                 {c.last_message_status === "read"
-                                    ? <CheckCheck size={13} style={{ color: "var(--t-info)" }} />
+                                    ? <CheckCheck size={13} style={{ color: "#0072b5" }} />
                                     : c.last_message_status === "delivered"
                                         ? <CheckCheck size={13} />
                                         : <Check size={13} />
@@ -139,7 +139,7 @@ export function ConversationItem({ customer: c, isSelected }: ConversationItemPr
                         </p>
                     </div>
                     <div className="ci-badges">
-                        {c.favorite && <Star size={12} style={{ color: "var(--t-warning)", fill: "var(--t-warning)" }} />}
+                        {c.favorite && <Star size={12} style={{ color: "#f59e0b", fill: "#f59e0b" }} />}
                         {c.muted && <BellOff size={12} className="ci-muted-icon" />}
                         {hasUnread && (
                             <span className="ci-unread-badge">
@@ -174,36 +174,48 @@ export function ConversationItem({ customer: c, isSelected }: ConversationItemPr
             <style>{`
                 .ci-row {
                     display:flex; align-items:flex-start; gap:10px;
-                    padding:10px 14px 10px 12px; cursor:pointer;
+                    padding:11px 14px 11px 12px; cursor:pointer;
                     border-bottom:1px solid var(--t-border-light);
                     border-right:3px solid transparent;
-                    transition:all .15s ease; position:relative;
+                    transition:all .18s ease; position:relative;
                 }
-                .ci-row:hover, .ci-hover { background:var(--t-surface); }
+                .ci-row:hover, .ci-hover {
+                    background:var(--t-surface);
+                }
                 .ci-selected {
-                    background:var(--t-accent-muted) !important;
-                    border-right-color:var(--t-accent) !important;
+                    background:rgba(0,71,134,0.06) !important;
+                    border-right-color:#0072b5 !important;
+                }
+                .ci-selected::before {
+                    content:'';
+                    position:absolute; top:0; right:0; bottom:0;
+                    width:100%;
+                    background:linear-gradient(90deg, transparent, rgba(0,114,181,0.03));
+                    pointer-events:none;
                 }
 
                 /* Avatar */
                 .ci-avatar-wrap {
                     position:relative; flex-shrink:0;
-                    width:40px; height:40px;
+                    width:42px; height:42px;
                 }
                 .ci-avatar {
-                    width:40px; height:40px; border-radius:50%;
+                    width:42px; height:42px; border-radius:50%;
                     object-fit:cover;
+                    border:2px solid var(--t-border-light);
                 }
                 .ci-status-dot {
                     position:absolute; bottom:0; right:0;
-                    width:10px; height:10px; border-radius:50%;
-                    border:2px solid var(--t-card);
+                    width:11px; height:11px; border-radius:50%;
+                    border:2.5px solid var(--t-card);
+                    box-shadow:0 0 0 1px rgba(0,0,0,0.05);
                 }
                 .ci-platform-badge {
                     position:absolute; top:-2px; left:-2px;
-                    width:15px; height:15px; object-fit:contain;
+                    width:16px; height:16px; object-fit:contain;
                     background:var(--t-card); border-radius:50%;
                     padding:1px;
+                    box-shadow:0 1px 3px rgba(0,0,0,0.1);
                 }
 
                 /* Body */
@@ -230,17 +242,19 @@ export function ConversationItem({ customer: c, isSelected }: ConversationItemPr
                     color:var(--t-text-faint);
                 }
                 .ci-time-accent {
-                    color:var(--t-accent); font-weight:600;
+                    color:#0072b5; font-weight:700;
                 }
                 .ci-menu-btn {
-                    width:20px; height:20px; border-radius:5px;
-                    border:none; background:transparent; cursor:pointer;
+                    width:22px; height:22px; border-radius:6px;
+                    border:1px solid transparent; background:transparent;
+                    cursor:pointer;
                     display:flex; align-items:center; justify-content:center;
                     color:var(--t-text-muted);
-                    transition:background .1s; padding:0;
+                    transition:all .12s; padding:0;
                 }
                 .ci-menu-btn:hover, .ci-menu-active {
-                    background:var(--t-border-light);
+                    background:var(--t-surface-deep, var(--t-surface));
+                    border-color:var(--t-border-light);
                 }
 
                 /* Row 2: message preview */
@@ -263,7 +277,7 @@ export function ConversationItem({ customer: c, isSelected }: ConversationItemPr
                     overflow:hidden; text-overflow:ellipsis;
                     white-space:nowrap; flex:1;
                 }
-                .ci-preview-bold { color:var(--t-text); font-weight:500; }
+                .ci-preview-bold { color:var(--t-text); font-weight:600; }
                 .ci-badges {
                     display:flex; align-items:center; gap:4px; flex-shrink:0;
                 }
@@ -271,34 +285,39 @@ export function ConversationItem({ customer: c, isSelected }: ConversationItemPr
                 .ci-unread-badge {
                     font-size:10px; font-weight:700;
                     padding:1px 6px; border-radius:10px;
-                    background:var(--t-accent);
-                    color:var(--t-text-on-accent); min-width:18px; text-align:center;
+                    background:linear-gradient(135deg, #004786, #0072b5);
+                    color:#fff; min-width:18px; text-align:center;
                     line-height:16px;
+                    box-shadow:0 1px 4px rgba(0,71,134,0.25);
                 }
 
                 /* Row 3: chips */
                 .ci-chips {
                     display:flex; align-items:center; gap:4px;
-                    margin-top:4px; flex-wrap:wrap;
+                    margin-top:5px; flex-wrap:wrap;
                 }
                 .ci-chip {
                     font-size:10px; font-weight:500;
                     display:inline-flex; align-items:center; gap:2px;
-                    padding:1px 7px; border-radius:10px;
+                    padding:1px 8px; border-radius:10px;
                     line-height:16px;
+                    border:1px solid transparent;
                 }
                 .ci-chip-icon { font-size:10px; }
                 .ci-chip-lc {
-                    background:var(--t-surface);
-                    color:var(--t-text-muted);
+                    background:rgba(0,71,134,0.06);
+                    color:#004786;
+                    border-color:rgba(0,71,134,0.1);
                 }
                 .ci-chip-agent {
-                    background:var(--t-accent-muted);
-                    color:var(--t-accent);
+                    background:rgba(0,114,181,0.08);
+                    color:#0072b5;
+                    border-color:rgba(0,114,181,0.12);
                 }
                 .ci-chip-closed {
-                    background:var(--t-danger-soft);
-                    color:var(--t-danger);
+                    background:var(--t-danger-soft, rgba(239,68,68,0.08));
+                    color:var(--t-danger, #ef4444);
+                    border-color:rgba(239,68,68,0.12);
                 }
             `}</style>
         </div>

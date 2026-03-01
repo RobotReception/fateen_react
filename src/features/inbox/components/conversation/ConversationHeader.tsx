@@ -16,7 +16,7 @@ export function ConversationHeader({ customer: c }: Props) {
                         <img src={c.profile_photo} alt="" className="ch-avatar"
                             onError={e => { e.currentTarget.style.display = "none" }} />
                     ) : (
-                        <Avatar name={displayName} size={28} />
+                        <Avatar name={displayName} size={30} />
                     )}
                     <span className="ch-name">{displayName}</span>
                 </div>
@@ -43,15 +43,24 @@ export function ConversationHeader({ customer: c }: Props) {
                 <AssignPanel customer={c} />
             </div>
 
+            {/* Gradient bottom border */}
+            <div className="ch-bottom-border" />
+
             <style>{`
                 .ch-row {
                     display:flex; align-items:center; justify-content:space-between;
-                    padding:0 12px; height:42px;
+                    padding:0 14px; height:46px;
                     background:var(--t-card);
-                    border-bottom:1px solid var(--t-border-light);
                     flex-shrink:0; gap:10px;
                     direction:rtl;
+                    position:relative;
                 }
+                .ch-bottom-border {
+                    position:absolute; bottom:0; left:0; right:0;
+                    height:2px;
+                    background:linear-gradient(90deg, transparent, rgba(0,114,181,0.15), rgba(0,71,134,0.2), rgba(0,114,181,0.15), transparent);
+                }
+
                 .ch-identity {
                     display:flex; align-items:center; gap:8px;
                     min-width:0; flex-shrink:1; overflow:hidden;
@@ -59,25 +68,37 @@ export function ConversationHeader({ customer: c }: Props) {
                 .ch-avatar-click {
                     display:flex; align-items:center; gap:8px;
                     cursor:pointer; border-radius:8px;
-                    padding:2px 6px 2px 2px;
-                    transition:background .12s;
+                    padding:3px 8px 3px 3px;
+                    transition:all .15s;
+                    border:1px solid transparent;
                 }
-                .ch-avatar-click:hover { background:var(--t-accent-muted); }
+                .ch-avatar-click:hover {
+                    background:rgba(0,114,181,0.06);
+                    border-color:rgba(0,114,181,0.1);
+                }
                 .ch-avatar {
-                    width:28px; height:28px; border-radius:50%;
+                    width:30px; height:30px; border-radius:50%;
                     object-fit:cover; flex-shrink:0;
+                    border:2px solid var(--t-border-light);
                 }
                 .ch-name {
-                    font-size:13px; font-weight:700;
+                    font-size:13.5px; font-weight:700;
                     color:var(--t-text);
                     white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+                    letter-spacing:-0.01em;
                 }
-                .ch-sep { color:var(--t-text-faint); font-size:13px; flex-shrink:0; }
+                .ch-sep {
+                    color:var(--t-text-faint); font-size:13px; flex-shrink:0;
+                    opacity:0.5;
+                }
                 .ch-lifecycle-badge {
                     display:inline-flex; align-items:center; gap:4px;
-                    padding:2px 8px; border-radius:6px;
+                    padding:2px 9px; border-radius:6px;
                     font-size:11px; font-weight:600;
                     white-space:nowrap; flex-shrink:0;
+                    background:rgba(0,71,134,0.06);
+                    color:#004786;
+                    border:1px solid rgba(0,71,134,0.1);
                 }
                 .ch-platform {
                     display:inline-flex; align-items:center; gap:3px;
@@ -89,15 +110,23 @@ export function ConversationHeader({ customer: c }: Props) {
                     flex-shrink:0;
                 }
                 .ch-icon-btn {
-                    width:28px; height:28px; border-radius:6px;
+                    width:30px; height:30px; border-radius:7px;
                     border:1px solid var(--t-border-light);
                     background:transparent; cursor:pointer;
                     display:flex; align-items:center; justify-content:center;
                     color:var(--t-text-muted);
-                    transition:all .12s; flex-shrink:0;
+                    transition:all .15s; flex-shrink:0;
                 }
-                .ch-icon-btn:hover { background:var(--t-surface); border-color:var(--t-border); }
-                .ch-icon-active { background:var(--t-surface) !important; border-color:var(--t-accent) !important; color:var(--t-accent) !important; }
+                .ch-icon-btn:hover {
+                    background:var(--t-surface);
+                    border-color:var(--t-border);
+                    color:var(--t-text);
+                }
+                .ch-icon-active {
+                    background:rgba(0,114,181,0.06) !important;
+                    border-color:#0072b5 !important;
+                    color:#0072b5 !important;
+                }
             `}</style>
         </div>
     )
