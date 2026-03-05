@@ -201,7 +201,6 @@ export function AddChannelDialog({ defaultPlatform, onClose }: { defaultPlatform
         )
         if (platform === "appchat") return (
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                {textField("App ID *", "app_id", "my_app_v1")}
                 <div>
                     <FieldLabel>النطاقات المسموحة (Allowed Origins) *</FieldLabel>
                     <OriginsEditor value={form.allowed_origins} onChange={v => set("allowed_origins", v)} />
