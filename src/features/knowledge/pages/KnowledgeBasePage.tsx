@@ -25,7 +25,7 @@ const OperationHistoryTab = lazy(() => import("../components/OperationHistoryTab
 type TabKey = "data" | "analytics" | "departments" | "categories" | "doc-analytics" | "pending-requests" | "operation-history"
 
 const TABS: { key: TabKey; title: string; icon: typeof Database; description: string; pageBit: number }[] = [
-    { key: "doc-analytics", title: "تحليلات المستندات", icon: PieChart, description: "إحصائيات وتقارير", pageBit: PAGE_BITS.DOCUMENT_ANALYTICS },
+    { key: "doc-analytics", title: "تحليلات المستندات", icon: PieChart, description: "إحصائيات وتقارير", pageBit: PAGE_BITS.DOCUMENTS },
     { key: "data", title: "إدارة البيانات", icon: Database, description: "إدارة الملفات والمستندات", pageBit: PAGE_BITS.DOCUMENTS },
     { key: "analytics", title: "ملفات المستخدمين", icon: BarChart3, description: "عرض ملفات المستخدمين", pageBit: PAGE_BITS.DOCUMENTS },
     { key: "departments", title: "الأقسام", icon: Building2, description: "إدارة أقسام المؤسسة", pageBit: PAGE_BITS.DEPARTMENTS },

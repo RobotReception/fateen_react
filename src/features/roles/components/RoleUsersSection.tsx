@@ -4,6 +4,8 @@ import { UserPlus, X, Loader2, Users, Search, Mail, Phone, UserX, ChevronDown } 
 import { useAssignUserRole, useRemoveUserRole } from "../hooks/use-roles"
 import { getAllUsers, type AdminUser } from "../services/admin-service"
 import { useAuthStore } from "@/stores/auth-store"
+import { ActionGuard } from "@/components/guards/ActionGuard"
+import { PAGE_BITS, ACTION_BITS } from "@/lib/permissions"
 
 interface Props { role: string }
 
@@ -127,22 +129,24 @@ export function RoleUsersSection({ role }: Props) {
                     </div>
                 </div>
 
-                <button
-                    onClick={() => { setShowAdd(!showAdd); setPickerSearch(""); setSelectedUser(null); setPickerOpen(false) }}
-                    style={{
-                        display: "flex", alignItems: "center", gap: 5,
-                        padding: "7px 14px", borderRadius: 8, border: "none",
-                        background: showAdd ? "var(--t-surface, #f3f4f6)" : "#004786",
-                        color: showAdd ? "var(--t-text-faint, #6b7280)" : "#fff",
-                        fontSize: 12, fontWeight: 600,
-                        cursor: "pointer", fontFamily: "inherit",
-                        transition: "all 0.15s",
-                        boxShadow: showAdd ? "none" : "0 1px 3px rgba(0,71,134,0.15)",
-                    }}
-                >
-                    {showAdd ? <X size={13} /> : <UserPlus size={13} />}
-                    {showAdd ? "إلغاء" : "تعيين مستخدم"}
-                </button>
+                <ActionGuard pageBit={PAGE_BITS.ROLES} actionBit={ACTION_BITS.ASSIGN_ROLE}>
+                    <button
+                        onClick={() => { setShowAdd(!showAdd); setPickerSearch(""); setSelectedUser(null); setPickerOpen(false) }}
+                        style={{
+                            display: "flex", alignItems: "center", gap: 5,
+                            padding: "7px 14px", borderRadius: 8, border: "none",
+                            background: showAdd ? "var(--t-surface, #f3f4f6)" : "#004786",
+                            color: showAdd ? "var(--t-text-faint, #6b7280)" : "#fff",
+                            fontSize: 12, fontWeight: 600,
+                            cursor: "pointer", fontFamily: "inherit",
+                            transition: "all 0.15s",
+                            boxShadow: showAdd ? "none" : "0 1px 3px rgba(0,71,134,0.15)",
+                        }}
+                    >
+                        {showAdd ? <X size={13} /> : <UserPlus size={13} />}
+                        {showAdd ? "إلغاء" : "تعيين مستخدم"}
+                    </button>
+                </ActionGuard>
             </div>
 
             {/* ── User Picker ── */}
@@ -428,35 +432,37 @@ export function RoleUsersSection({ role }: Props) {
                                 </div>
 
                                 {/* Remove */}
-                                <button
-                                    onClick={() => handleRemove(user.user_id, user.full_name)}
-                                    disabled={isRemoving}
-                                    style={{
-                                        display: "flex", alignItems: "center", gap: 4,
-                                        padding: "5px 10px", borderRadius: 7,
-                                        border: "1px solid var(--t-border-light, #eaedf0)",
-                                        background: "var(--t-card, #fff)",
-                                        color: "var(--t-text-faint, #9ca3af)", fontSize: 11, fontWeight: 600,
-                                        cursor: isRemoving ? "not-allowed" : "pointer",
-                                        opacity: isRemoving ? 0.4 : 1,
-                                        transition: "all 0.12s", flexShrink: 0,
-                                        fontFamily: "inherit",
-                                    }}
-                                    onMouseEnter={e => {
-                                        if (!isRemoving) {
-                                            e.currentTarget.style.background = "rgba(239,68,68,0.04)"
-                                            e.currentTarget.style.color = "#dc2626"
-                                            e.currentTarget.style.borderColor = "rgba(239,68,68,0.2)"
-                                        }
-                                    }}
-                                    onMouseLeave={e => {
-                                        e.currentTarget.style.background = "var(--t-card, #fff)"
-                                        e.currentTarget.style.color = "var(--t-text-faint, #9ca3af)"
-                                        e.currentTarget.style.borderColor = "var(--t-border-light, #eaedf0)"
-                                    }}
-                                >
-                                    <UserX size={11} /> إزالة
-                                </button>
+                                <ActionGuard pageBit={PAGE_BITS.ROLES} actionBit={ACTION_BITS.REMOVE_ROLE}>
+                                    <button
+                                        onClick={() => handleRemove(user.user_id, user.full_name)}
+                                        disabled={isRemoving}
+                                        style={{
+                                            display: "flex", alignItems: "center", gap: 4,
+                                            padding: "5px 10px", borderRadius: 7,
+                                            border: "1px solid var(--t-border-light, #eaedf0)",
+                                            background: "var(--t-card, #fff)",
+                                            color: "var(--t-text-faint, #9ca3af)", fontSize: 11, fontWeight: 600,
+                                            cursor: isRemoving ? "not-allowed" : "pointer",
+                                            opacity: isRemoving ? 0.4 : 1,
+                                            transition: "all 0.12s", flexShrink: 0,
+                                            fontFamily: "inherit",
+                                        }}
+                                        onMouseEnter={e => {
+                                            if (!isRemoving) {
+                                                e.currentTarget.style.background = "rgba(239,68,68,0.04)"
+                                                e.currentTarget.style.color = "#dc2626"
+                                                e.currentTarget.style.borderColor = "rgba(239,68,68,0.2)"
+                                            }
+                                        }}
+                                        onMouseLeave={e => {
+                                            e.currentTarget.style.background = "var(--t-card, #fff)"
+                                            e.currentTarget.style.color = "var(--t-text-faint, #9ca3af)"
+                                            e.currentTarget.style.borderColor = "var(--t-border-light, #eaedf0)"
+                                        }}
+                                    >
+                                        <UserX size={11} /> إزالة
+                                    </button>
+                                </ActionGuard>
                             </div>
                         )
                     })}

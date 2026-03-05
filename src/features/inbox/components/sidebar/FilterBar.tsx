@@ -1,9 +1,9 @@
 import { useRef, useMemo } from "react"
-import { SlidersHorizontal, Search, X, ChevronDown, Star, BellOff, Mail, Bot } from "lucide-react"
+import { SlidersHorizontal, Search, X, ChevronDown, Star, BellOff, Mail } from "lucide-react"
 import { useQuery } from "@tanstack/react-query"
 import { useInboxStore, type StatusFilter, type AdvancedFilters } from "../../store/inbox.store"
 import { useInboxSummary } from "../../hooks/use-inbox-summary"
-import { getBriefUsers } from "../../services/inbox-service"
+import { getBriefUsers, getAccounts } from "../../services/inbox-service"
 import { useAuthStore } from "@/stores/auth-store"
 import type { AvailableFilters } from "../../types/inbox.types"
 
@@ -14,7 +14,6 @@ interface Props {
 const STATUS_PILLS: { key: StatusFilter; label: string }[] = [
     { key: "all", label: "All" },
     { key: "open", label: "Open" },
-    { key: "pending", label: "Pending" },
     { key: "closed", label: "Closed" },
 ]
 
@@ -31,6 +30,11 @@ export function FilterBar({ availableFilters }: Props) {
     const { data: briefData } = useQuery({
         queryKey: ["brief-users"],
         queryFn: () => getBriefUsers(1, 100),
+        staleTime: 5 * 60 * 1000,
+    })
+    const { data: accountsData } = useQuery({
+        queryKey: ["customer-accounts"],
+        queryFn: () => getAccounts(),
         staleTime: 5 * 60 * 1000,
     })
 
@@ -59,9 +63,15 @@ export function FilterBar({ availableFilters }: Props) {
         return m
     }, [summary])
 
-    // Helper: convert string[] to {value, label}[] using a lookup map
-    const resolveOpts = (ids: string[], nameMap: Map<string, string>) =>
-        ids.map(id => ({ value: id, label: nameMap.get(id) || id }))
+    // Helper: convert string[] (or object[]) to {value, label}[] using a lookup map
+    const resolveOpts = (ids: any[], nameMap: Map<string, string>) =>
+        ids.map((id: any) => {
+            // API sometimes returns objects like {value, count} instead of plain strings
+            const strId = typeof id === "object" && id !== null
+                ? String(id.value ?? id.code ?? id.name ?? JSON.stringify(id))
+                : String(id ?? "")
+            return { value: strId, label: nameMap.get(strId) || strId }
+        })
 
     // Resolve a single ID
     const resolveName = (id: string | undefined, nameMap: Map<string, string>) =>
@@ -135,6 +145,19 @@ export function FilterBar({ availableFilters }: Props) {
                         />
                     </div>
 
+                    {/* Row 3: Account ID */}
+                    <div className="fb-filter-row">
+                        <FilterDropdown
+                            label="الحساب"
+                            value={advancedFilters.account_id}
+                            options={(accountsData?.accounts ?? []).map(a => ({
+                                value: a.account_id,
+                                label: `${a.platform === "whatsapp" ? "📱" : a.platform === "facebook" ? "📘" : "📸"} ${a.account_id} (${a.customer_count})`,
+                            }))}
+                            onChange={(v) => setFilter("account_id", v)}
+                        />
+                    </div>
+
                     {/* Row 3: Date Range */}
                     <div className="fb-filter-row">
                         <DateInput
@@ -149,7 +172,18 @@ export function FilterBar({ availableFilters }: Props) {
                         />
                     </div>
 
-                    {/* Row 4: Toggle chips */}
+                    {/* Row 4: Toggle chips + AI dropdown */}
+                    <div className="fb-filter-row">
+                        <FilterDropdown
+                            label="AI"
+                            value={advancedFilters.enable_ai_q}
+                            options={[
+                                { value: "true", label: "✅ مفعّل" },
+                                { value: "false", label: "❌ معطّل" },
+                            ]}
+                            onChange={(v) => setFilter("enable_ai_q", v)}
+                        />
+                    </div>
                     <div className="fb-toggles">
                         <ToggleChip
                             icon={<Mail size={11} />}
@@ -169,12 +203,6 @@ export function FilterBar({ availableFilters }: Props) {
                             isActive={!!advancedFilters.muted}
                             onClick={() => setFilter("muted", advancedFilters.muted ? undefined : true)}
                         />
-                        <ToggleChip
-                            icon={<Bot size={11} />}
-                            label="AI"
-                            isActive={advancedFilters.enable_ai_q === "true"}
-                            onClick={() => setFilter("enable_ai_q", advancedFilters.enable_ai_q === "true" ? undefined : "true")}
-                        />
                     </div>
 
                     {/* Clear all */}
@@ -193,12 +221,13 @@ export function FilterBar({ availableFilters }: Props) {
                     {advancedFilters.lifecycle && <ActiveChip label={`الحياة: ${resolveName(advancedFilters.lifecycle, lifecycleMap)}`} onClear={() => setFilter("lifecycle", undefined)} />}
                     {advancedFilters.assigned_to && <ActiveChip label={`الموظف: ${resolveName(advancedFilters.assigned_to, userMap)}`} onClear={() => setFilter("assigned_to", undefined)} />}
                     {advancedFilters.team_id && <ActiveChip label={`الفريق: ${resolveName(advancedFilters.team_id, teamMap)}`} onClear={() => setFilter("team_id", undefined)} />}
+                    {advancedFilters.account_id && <ActiveChip label={`الحساب: ${advancedFilters.account_id}`} onClear={() => setFilter("account_id", undefined)} />}
                     {advancedFilters.start_date && <ActiveChip label={`From: ${advancedFilters.start_date.split("T")[0]}`} onClear={() => setFilter("start_date", undefined)} />}
                     {advancedFilters.end_date && <ActiveChip label={`To: ${advancedFilters.end_date.split("T")[0]}`} onClear={() => setFilter("end_date", undefined)} />}
                     {advancedFilters.unread_only && <ActiveChip label="Unread" onClear={() => setFilter("unread_only", undefined)} />}
                     {advancedFilters.favorite && <ActiveChip label="Favorites" onClear={() => setFilter("favorite", undefined)} />}
                     {advancedFilters.muted && <ActiveChip label="Muted" onClear={() => setFilter("muted", undefined)} />}
-                    {advancedFilters.enable_ai_q === "true" && <ActiveChip label="AI" onClear={() => setFilter("enable_ai_q", undefined)} />}
+                    {advancedFilters.enable_ai_q && <ActiveChip label={`AI: ${advancedFilters.enable_ai_q === "true" ? "مفعّل" : "معطّل"}`} onClear={() => setFilter("enable_ai_q", undefined)} />}
                 </div>
             )}
 
@@ -470,9 +499,14 @@ function FilterDropdown({ label, value, options, onChange }: {
                     className={`fb-select ${value ? "fb-select-active" : ""}`}
                 >
                     <option value="">الكل</option>
-                    {options.map((opt) => (
-                        <option key={opt.value} value={opt.value}>{opt.label}</option>
-                    ))}
+                    {options.map((opt, i) => {
+                        const k = opt.value ? String(opt.value) : `opt-${i}`
+                        return (
+                            <option key={k} value={String(opt.value ?? "")}>
+                                {String(opt.label ?? opt.value ?? "")}
+                            </option>
+                        )
+                    })}
                 </select>
                 <ChevronDown size={10} style={{
                     position: "absolute", left: 6, top: "50%",
@@ -530,6 +564,7 @@ function countActiveFilters(f: AdvancedFilters): number {
     if (f.lifecycle) n++
     if (f.assigned_to) n++
     if (f.team_id) n++
+    if (f.account_id) n++
     if (f.start_date) n++
     if (f.end_date) n++
     if (f.unread_only) n++

@@ -50,6 +50,7 @@ export function ConversationListPanel() {
         ...(advancedFilters.lifecycle && !activeSection.startsWith("lc_") ? { lifecycle: advancedFilters.lifecycle } : {}),
         ...(advancedFilters.assigned_to && activeSection !== "mine" ? { assigned_to: advancedFilters.assigned_to } : {}),
         ...(advancedFilters.team_id && !activeSection.startsWith("team_") ? { team_id: advancedFilters.team_id } : {}),
+        ...(advancedFilters.account_id ? { account_id: advancedFilters.account_id } : {}),
         ...(advancedFilters.start_date ? { start_date: advancedFilters.start_date } : {}),
         ...(advancedFilters.end_date ? { end_date: advancedFilters.end_date } : {}),
         ...(advancedFilters.unread_only ? { unread_only: true } : {}),

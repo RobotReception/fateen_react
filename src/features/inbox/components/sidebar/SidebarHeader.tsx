@@ -1,4 +1,6 @@
 import { Search, Plus } from "lucide-react"
+import { usePermissions } from "@/lib/usePermissions"
+import { PAGE_BITS, ACTION_BITS } from "@/lib/permissions"
 
 interface SidebarHeaderProps {
     searchQuery: string
@@ -6,11 +8,14 @@ interface SidebarHeaderProps {
 }
 
 export function SidebarHeader({ searchQuery, onSearch }: SidebarHeaderProps) {
+    const { canPerformAction } = usePermissions()
+    const canCreate = canPerformAction(PAGE_BITS.INBOX, ACTION_BITS.CREATE_INBOX_ITEM)
+
     return (
         <div style={{ padding: "14px 12px 8px" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
                 <h2 style={{ fontSize: 16, fontWeight: 700, color: "var(--t-text)" }}>المحادثات</h2>
-                <button
+                {canCreate && <button
                     title="محادثة جديدة"
                     style={{
                         width: 32, height: 32, borderRadius: 8,
@@ -25,7 +30,7 @@ export function SidebarHeader({ searchQuery, onSearch }: SidebarHeaderProps) {
                     onMouseLeave={(e) => { e.currentTarget.style.background = "var(--t-surface)" }}
                 >
                     <Plus size={15} />
-                </button>
+                </button>}
             </div>
 
             {/* Search */}

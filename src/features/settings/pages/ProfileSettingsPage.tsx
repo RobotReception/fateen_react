@@ -1,9 +1,11 @@
 import { useState } from "react"
 import {
-    User, ChevronLeft, KeyRound, Bell, Shield, Zap, Settings,
+    User, ChevronLeft, KeyRound, Bell, Settings,
 } from "lucide-react"
 import { Link } from "react-router-dom"
 import { ProfileTab } from "../components/ProfileTab"
+import { SecurityTab } from "../components/SecurityTab"
+import { NotificationsTab } from "../components/NotificationsTab"
 
 /* ── sidebar items ── */
 const SIDEBAR_ITEMS = [
@@ -14,35 +16,6 @@ const SIDEBAR_ITEMS = [
 
 type SidebarKey = (typeof SIDEBAR_ITEMS)[number]["key"]
 
-/* ── placeholder ── */
-function ComingSoon({ title, desc }: { title: string; desc: string }) {
-    return (
-        <div style={{
-            background: "var(--t-card, #fff)", borderRadius: 14, border: "1px solid var(--t-border-light, #e8eaed)",
-            padding: "56px 24px", textAlign: "center",
-        }}>
-            <div style={{
-                width: 52, height: 52, borderRadius: 14,
-                background: "linear-gradient(135deg, rgba(0,71,134,0.06), rgba(0,152,214,0.06))",
-                display: "inline-flex", alignItems: "center", justifyContent: "center",
-                marginBottom: 14,
-            }}>
-                <Shield size={22} style={{ color: "#004786" }} />
-            </div>
-            <h3 style={{ fontSize: 16, fontWeight: 700, color: "var(--t-text, #1f2937)", margin: "0 0 4px" }}>{title}</h3>
-            <p style={{ fontSize: 13, color: "var(--t-text-faint, #9ca3af)", margin: 0, maxWidth: 320, marginInline: "auto" }}>{desc}</p>
-            <div style={{
-                marginTop: 16, display: "inline-flex", alignItems: "center", gap: 5,
-                padding: "6px 20px", borderRadius: 8,
-                background: "rgba(0,71,134,0.04)", border: "1px solid rgba(0,71,134,0.1)",
-                fontSize: 12, fontWeight: 600, color: "#004786",
-            }}>
-                <Zap size={10} style={{ color: "#0098d6" }} />
-                قريباً
-            </div>
-        </div>
-    )
-}
 
 export function ProfileSettingsPage() {
     const [active, setActive] = useState<SidebarKey>("profile")
@@ -192,18 +165,8 @@ export function ProfileSettingsPage() {
                 <div className="p-6">
                     <div key={active} style={{ animation: "profileFade .18s ease-out" }}>
                         {active === "profile" && <ProfileTab />}
-                        {active === "security" && (
-                            <ComingSoon
-                                title="الأمان وكلمة المرور"
-                                desc="تغيير كلمة المرور، تفعيل المصادقة الثنائية، وإدارة جلسات تسجيل الدخول."
-                            />
-                        )}
-                        {active === "notifications" && (
-                            <ComingSoon
-                                title="تفضيلات الإشعارات"
-                                desc="التحكم في أنواع الإشعارات التي تصلك عبر البريد والتطبيق."
-                            />
-                        )}
+                        {active === "security" && <SecurityTab />}
+                        {active === "notifications" && <NotificationsTab />}
                     </div>
                 </div>
             </div>

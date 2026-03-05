@@ -1,8 +1,9 @@
-import { Search, SlidersHorizontal, ChevronLeft, ChevronRight, RefreshCw, Users } from "lucide-react"
+import { Search, SlidersHorizontal, ChevronLeft, ChevronRight, RefreshCw, Users, X } from "lucide-react"
 import { useContactsStore } from "../store/contacts.store"
-import { useContacts } from "../hooks/use-contacts"
+import { useContacts, useContactsFilters } from "../hooks/use-contacts"
 import { useContactLookups } from "../hooks/use-contact-lookups"
 import { ContactItem } from "./ContactItem"
+import { useAuthStore } from "@/stores/auth-store"
 
 interface TableColumn {
     key: string
@@ -38,26 +39,33 @@ export function ContactsListPanel() {
         setCurrentPage, setPageSize,
         sortBy, sortOrder,
         activeSection,
-        filters,
+        filters, setFilter, clearFilters,
         filterPanelOpen, toggleFilterPanel,
     } = useContactsStore()
+    const userId = useAuthStore((s) => s.user?.id)
 
     const skip = (currentPage - 1) * pageSize
     const lifecycleFilter = activeSection.startsWith("lc_") ? activeSection.slice(3) : filters.lifecycle
+    const teamFilter = activeSection.startsWith("team_") ? activeSection.slice(5) : undefined
+    const assignedFilter = activeSection === "mine" ? userId : filters.assigned_to
+    const isAssignedTeamFilter = activeSection === "unassigned" ? "false" : undefined
     const queryParams = {
         skip, limit: pageSize,
         search: searchQuery || undefined,
         platform: filters.platform,
         session_status: filters.session_status,
-        assigned_to: filters.assigned_to,
+        assigned_to: assignedFilter,
         lifecycle: lifecycleFilter,
         tags: filters.tags,
+        team_id: teamFilter,
+        is_assigned_team: isAssignedTeamFilter,
         enable_ai: filters.enable_ai,
         conversation_status: filters.conversation_status,
         sort_by: sortBy, sort_order: sortOrder,
     }
 
     const { data, isLoading, isFetching, refetch } = useContacts(queryParams)
+    const { data: filtersData } = useContactsFilters()
     const { tagMap, lifecycleMap } = useContactLookups()
     const contacts = data?.contacts ?? []
     const pagination = data?.pagination
@@ -77,6 +85,12 @@ export function ContactsListPanel() {
     const startItem = totalCount === 0 ? 0 : skip + 1
     const endItem = Math.min(skip + pageSize, totalCount)
 
+    // Count active filters
+    const activeFilterCount = Object.values(filters).filter(v => v !== undefined && v !== "").length
+
+    // Extract filter facets from API
+    const facets = filtersData?.filters ?? {} as Record<string, { value: any; count: number }[]>
+
     return (
         <div className="cl-root">
             {/* ── Top Bar ── */}
@@ -92,8 +106,19 @@ export function ContactsListPanel() {
                         <Users size={11} /> {totalCount} جهة اتصال
                     </span>
                     <button className="cl-icon-btn" onClick={toggleFilterPanel} title="فلترة"
-                        style={{ background: filterPanelOpen ? "rgba(0,71,134,.06)" : undefined, color: filterPanelOpen ? "#004786" : undefined }}>
+                        style={{
+                            background: filterPanelOpen ? "rgba(0,71,134,.06)" : undefined,
+                            color: filterPanelOpen ? "#004786" : undefined,
+                            position: "relative",
+                        }}>
                         <SlidersHorizontal size={13} />
+                        {activeFilterCount > 0 && (
+                            <span style={{
+                                position: "absolute", top: -3, right: -3, width: 14, height: 14,
+                                borderRadius: "50%", background: "#004786", color: "#fff",
+                                fontSize: 8, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center",
+                            }}>{activeFilterCount}</span>
+                        )}
                     </button>
                     <button className="cl-icon-btn" onClick={() => refetch()} title="تحديث"
                         style={{ background: isFetching ? "rgba(0,71,134,.06)" : undefined, color: isFetching ? "#004786" : undefined }}>
@@ -101,6 +126,82 @@ export function ContactsListPanel() {
                     </button>
                 </div>
             </div>
+
+            {/* ── Filter Panel ── */}
+            {filterPanelOpen && (
+                <div className="cl-filter-panel">
+                    <div className="cl-filter-row">
+                        {/* Platform */}
+                        <FilterSelect label="المنصة" value={filters.platform ?? ""}
+                            onChange={v => setFilter("platform", v || undefined)}
+                            options={(facets.platform ?? []).map((f: any) => ({
+                                value: typeof f.value === "string" ? f.value : String(f.value),
+                                label: typeof f.value === "string" ? f.value : String(f.value),
+                                count: f.count,
+                            }))} />
+
+                        {/* Session Status */}
+                        <FilterSelect label="حالة الجلسة" value={filters.session_status ?? ""}
+                            onChange={v => setFilter("session_status", v || undefined)}
+                            options={(facets.session_status ?? []).map((f: any) => ({
+                                value: typeof f.value === "string" ? f.value : String(f.value),
+                                label: f.value === "pending" ? "قيد الانتظار" : f.value === "closed" ? "مغلقة" : String(f.value),
+                                count: f.count,
+                            }))} />
+
+                        {/* Conversation Status */}
+                        <FilterSelect label="حالة المحادثة" value={filters.conversation_status ?? ""}
+                            onChange={v => setFilter("conversation_status", v || undefined)}
+                            options={(facets.conversation_status ?? []).map((f: any) => ({
+                                value: typeof f.value === "string" ? f.value : String(f.value),
+                                label: f.value === "open" ? "مفتوحة" : f.value === "closed" ? "مغلقة" : String(f.value),
+                                count: f.count,
+                            }))} />
+
+                        {/* Lifecycle */}
+                        <FilterSelect label="مرحلة الحياة" value={filters.lifecycle ?? ""}
+                            onChange={v => setFilter("lifecycle", v || undefined)}
+                            options={(facets.lifecycle ?? []).map((f: any) => ({
+                                value: typeof f.value === "string" ? f.value : String(f.value),
+                                label: lifecycleMap.get(f.value)?.name ?? f.value,
+                                count: f.count,
+                            }))} />
+
+                        {/* AI */}
+                        <FilterSelect label="AI" value={filters.enable_ai === undefined ? "" : String(filters.enable_ai)}
+                            onChange={v => setFilter("enable_ai", v === "" ? undefined : v === "true")}
+                            options={(facets.enable_ai ?? []).map((f: any) => ({
+                                value: String(f.value),
+                                label: f.value === "true" || f.value === true ? "مفعّل" : "معطّل",
+                                count: f.count,
+                            }))} />
+
+                        {/* Tags */}
+                        <FilterSelect label="الوسوم" value={filters.tags ?? ""}
+                            onChange={v => setFilter("tags", v || undefined)}
+                            options={(facets.tags ?? []).map((f: any) => ({
+                                value: typeof f.value === "object" ? f.value.id : String(f.value),
+                                label: typeof f.value === "object" ? `${f.value.emoji ?? ""} ${f.value.name}`.trim() : String(f.value),
+                                count: f.count,
+                            }))} />
+
+                        {/* Assigned */}
+                        <FilterSelect label="معيّن إلى" value={filters.assigned_to ?? ""}
+                            onChange={v => setFilter("assigned_to", v || undefined)}
+                            options={(facets.assigned_to ?? []).map((f: any) => ({
+                                value: typeof f.value === "string" ? f.value : String(f.value),
+                                label: typeof f.value === "string" ? f.value : String(f.value),
+                                count: f.count,
+                            }))} />
+                    </div>
+
+                    {activeFilterCount > 0 && (
+                        <button className="cl-filter-clear" onClick={clearFilters}>
+                            <X size={10} /> مسح الفلاتر
+                        </button>
+                    )}
+                </div>
+            )}
 
             {/* ── Loading bar ── */}
             {isFetching && (
@@ -213,10 +314,42 @@ export function ContactsListPanel() {
                 .cl-page-btn{width:26px;height:26px;border-radius:6px;border:1px solid #ebeef2;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#9ca3af;transition:all .12s}
                 .cl-page-btn:hover:not(:disabled){background:#f5f6f8;color:#111827}
                 .cl-page-btn:disabled{opacity:.35;cursor:not-allowed}
+                .cl-filter-panel{padding:10px 14px;background:#fafbfc;border-bottom:1px solid #ebeef2;animation:clFilterFade .15s ease-out}
+                .cl-filter-row{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end}
+                .cl-filter-clear{display:flex;align-items:center;gap:4px;background:none;border:none;font-size:10.5px;color:#ef4444;cursor:pointer;padding:4px 0 0;font-family:inherit;font-weight:600;transition:opacity .12s}
+                .cl-filter-clear:hover{opacity:.7}
+                .cl-filter-group{display:flex;flex-direction:column;gap:3px;min-width:120px;flex:1;max-width:180px}
+                .cl-filter-label{font-size:9.5px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.04em}
+                .cl-filter-select{padding:5px 8px;border:1px solid #e5e7eb;border-radius:7px;font-size:11.5px;background:#fff;color:#111827;outline:none;cursor:pointer;font-family:inherit;transition:border-color .15s;appearance:auto}
+                .cl-filter-select:focus{border-color:#004786}
                 @keyframes spin{to{transform:rotate(360deg)}}
                 @keyframes clSweep{0%{transform:translateX(-100%)}100%{transform:translateX(200%)}}
+                @keyframes clFilterFade{from{opacity:0;max-height:0}to{opacity:1;max-height:200px}}
                 .cl-spin{animation:spin .8s linear infinite}
             `}</style>
+        </div>
+    )
+}
+
+/* ── Filter Select ── */
+function FilterSelect({ label, value, onChange, options }: {
+    label: string
+    value: string
+    onChange: (v: string) => void
+    options: { value: string; label: string; count: number }[]
+}) {
+    return (
+        <div className="cl-filter-group">
+            <span className="cl-filter-label">{label}</span>
+            <select className="cl-filter-select" value={value}
+                onChange={e => onChange(e.target.value)}>
+                <option value="">الكل</option>
+                {options.map(opt => (
+                    <option key={opt.value} value={opt.value}>
+                        {opt.label} ({opt.count})
+                    </option>
+                ))}
+            </select>
         </div>
     )
 }

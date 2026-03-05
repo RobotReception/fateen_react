@@ -3,16 +3,19 @@ import { createPortal } from "react-dom"
 import { useQuery } from "@tanstack/react-query"
 import {
     CheckCircle, MessageSquareText, UserPlus, Tag,
-    ChevronRight, Bot, BotOff, Users, UserX, X,
+    ChevronRight, Bot, BotOff, Users, UserX, X, Star, BellOff,
 } from "lucide-react"
 import type { Customer, SidebarLifecycle, SidebarTeam } from "../../types/inbox.types"
 import { useAuthStore } from "@/stores/auth-store"
 import {
     useCloseConversation, useReopenConversation, useAssignAgent,
     useUpdateLifecycle, useToggleAI, useAssignTeams, useRemoveTeams,
+    useToggleFavorite, useToggleMuted,
 } from "../../hooks/use-customer-actions"
 import { useInboxSummary } from "../../hooks/use-inbox-summary"
 import { getBriefUsers } from "../../services/inbox-service"
+import { usePermissions } from "@/lib/usePermissions"
+import { PAGE_BITS, ACTION_BITS } from "@/lib/permissions"
 
 /* ═══════════ Types ═══════════ */
 interface Props {
@@ -39,6 +42,7 @@ export function CustomerActionsMenu({ customer: c, open, onClose, anchorRef }: P
     const [subPos, setSubPos] = useState({ top: 0, left: 0 })
     const menuRef = useRef<HTMLDivElement>(null)
     const { user } = useAuthStore()
+    const { canPerformAction } = usePermissions()
     const { data: summary } = useInboxSummary(user?.id)
     const { data: briefData } = useQuery({
         queryKey: ["brief-users"],
@@ -54,8 +58,19 @@ export function CustomerActionsMenu({ customer: c, open, onClose, anchorRef }: P
     const aiMut = useToggleAI(c.customer_id)
     const assignTeamsMut = useAssignTeams(c.customer_id)
     const removeTeamsMut = useRemoveTeams(c.customer_id)
+    const favMut = useToggleFavorite(c.customer_id)
+    const muteMut = useToggleMuted(c.customer_id)
 
     const isClosed = c.conversation_status?.is_closed ?? false
+
+    /* ── فحص الصلاحيات ── */
+    const canSession = canPerformAction(PAGE_BITS.INBOX, ACTION_BITS.UPDATE_SESSION_STATUS)
+    const canAssign = canPerformAction(PAGE_BITS.INBOX, ACTION_BITS.ASSIGN_CUSTOMER_AGENT)
+    const canLifecycle = canPerformAction(PAGE_BITS.INBOX, ACTION_BITS.UPDATE_CUSTOMER_LIFECYCLE)
+    const canTeams = canPerformAction(PAGE_BITS.INBOX, ACTION_BITS.MANAGE_CUSTOMER_TEAMS)
+    const canAI = canPerformAction(PAGE_BITS.INBOX, ACTION_BITS.TOGGLE_AI)
+    const canFav = canPerformAction(PAGE_BITS.INBOX, ACTION_BITS.TOGGLE_FAVORITE)
+    const canMute = canPerformAction(PAGE_BITS.INBOX, ACTION_BITS.TOGGLE_MUTE)
 
     // Position — open towards the LEFT (messages area)
     useEffect(() => {
@@ -120,39 +135,56 @@ export function CustomerActionsMenu({ customer: c, open, onClose, anchorRef }: P
             }} onClick={e => e.stopPropagation()}>
 
                 {isClosed ? (
-                    <MItem icon={<span className="cam-emoji">🔄</span>} label="إعادة فتح"
+                    <>{canSession && <MItem icon={<span className="cam-emoji">🔄</span>} label="إعادة فتح"
                         onClick={() => reopenMut.mutate(user?.id ?? c.assigned?.assigned_to ?? "", { onSuccess: done })}
-                        loading={reopenMut.isPending} />
+                        loading={reopenMut.isPending} />}</>
                 ) : (<>
-                    <MItem icon={<CheckCircle size={14} />} label="إغلاق"
+                    {canSession && <MItem icon={<CheckCircle size={14} />} label="إغلاق"
                         onClick={() => closeMut.mutate({ reason: "resolved", category: "resolved", lang: "ar" }, { onSuccess: done })}
-                        loading={closeMut.isPending} iconColor="#059669" />
-                    <MItem icon={<MessageSquareText size={14} />} label="إغلاق مع ملاحظات" arrow
+                        loading={closeMut.isPending} iconColor="#059669" />}
+                    {canSession && <MItem icon={<MessageSquareText size={14} />} label="إغلاق مع ملاحظات" arrow
                         onClick={(e) => openSub("close-notes", e)}
-                        active={subPanel === "close-notes"} />
+                        active={subPanel === "close-notes"} />}
                 </>)}
 
                 <div className="cam-sep" />
 
-                <MItem icon={<UserPlus size={14} />} label="تعيين" arrow
+                {canAssign && <MItem icon={<UserPlus size={14} />} label="تعيين" arrow
                     onClick={(e) => openSub("assign", e)}
-                    active={subPanel === "assign"} />
-                <MItem icon={<Tag size={14} />} label="دورة الحياة" arrow
+                    active={subPanel === "assign"} />}
+                {canLifecycle && <MItem icon={<Tag size={14} />} label="دورة الحياة" arrow
                     onClick={(e) => openSub("lifecycle", e)}
-                    active={subPanel === "lifecycle"} />
+                    active={subPanel === "lifecycle"} />}
 
                 <div className="cam-sep" />
 
-                <MItem icon={<Users size={14} />} label="الفرق" arrow
+                {canTeams && <MItem icon={<Users size={14} />} label="الفرق" arrow
                     onClick={(e) => openSub("teams", e)}
-                    active={subPanel === "teams"} />
-                <MItem
+                    active={subPanel === "teams"} />}
+                {canAI && <MItem
                     icon={c.enable_ai ? <BotOff size={14} /> : <Bot size={14} />}
                     label={c.enable_ai ? "تعطيل AI" : "تفعيل AI"}
                     onClick={() => aiMut.mutate(!c.enable_ai, { onSuccess: done })}
                     loading={aiMut.isPending}
                     iconColor={c.enable_ai ? "#ef4444" : "#8b5cf6"}
-                />
+                />}
+
+                <div className="cam-sep" />
+
+                {canFav && <MItem
+                    icon={<Star size={14} fill={c.favorite ? "currentColor" : "none"} />}
+                    label={c.favorite ? "إزالة من المفضلة" : "إضافة للمفضلة"}
+                    onClick={() => favMut.mutate(!c.favorite, { onSuccess: done })}
+                    loading={favMut.isPending}
+                    iconColor={c.favorite ? "#f59e0b" : undefined}
+                />}
+                {canMute && <MItem
+                    icon={<BellOff size={14} />}
+                    label={c.muted ? "إلغاء الكتم" : "كتم المحادثة"}
+                    onClick={() => muteMut.mutate(!c.muted, { onSuccess: done })}
+                    loading={muteMut.isPending}
+                    iconColor={c.muted ? "#6b7280" : undefined}
+                />}
             </div>
 
             {/* ── Sub-panels ── */}

@@ -22,6 +22,7 @@ import type {
     UpdateGroupPayload,
     AccountMainMenu,
     AccountMenuItemDetail,
+    CompiledMenuData,
 } from "../types"
 
 const BASE = "/menu-manager"
@@ -81,7 +82,7 @@ export async function deleteTemplate(
 
 export async function getTemplateTree(
     templateId: string,
-    params?: { format?: string; include_assets?: boolean; start_key?: string }
+    params?: { format?: string; include_assets?: boolean; include_inactive?: boolean; start_key?: string }
 ): Promise<ApiResponse<MenuTreeNode>> {
     const { data } = await apiClient.get(
         `${BASE}/templates/${templateId}/tree`,
@@ -320,6 +321,47 @@ export async function getAccountMenuSiblings(
 ): Promise<ApiResponse<{ header: string; footer: string; button: string; items: AccountMainMenu["items"] }>> {
     const { data } = await apiClient.get(
         `${BASE}/accounts/${accountId}/menu/items/${itemIdOrKey}/siblings`
+    )
+    return data
+}
+
+export async function getCompiledMenu(
+    accountId: string,
+    menuKey: string = "root"
+): Promise<ApiResponse<CompiledMenuData>> {
+    const { data } = await apiClient.get(
+        `${BASE}/accounts/${accountId}/menus/${menuKey}/compiled`
+    )
+    return data
+}
+
+export async function getCompiledMenuLegacy(
+    menuId: string,
+    accountId?: string
+): Promise<ApiResponse<CompiledMenuData>> {
+    const { data } = await apiClient.get(
+        `${BASE}/menus/${menuId}/compiled`,
+        { params: accountId ? { account_id: accountId } : undefined }
+    )
+    return data
+}
+
+export async function clearAccountCache(
+    accountId: string,
+    menuKey: string = "root"
+): Promise<ApiResponse<{ message: string; account_id: string; menu_key: string }>> {
+    const { data } = await apiClient.delete(
+        `${BASE}/cache/accounts/${accountId}/menus`,
+        { params: { menu_key: menuKey } }
+    )
+    return data
+}
+
+export async function clearTemplateCache(
+    templateId: string
+): Promise<ApiResponse<{ message: string; template_id: string; invalidated_count: number }>> {
+    const { data } = await apiClient.delete(
+        `${BASE}/cache/templates/${templateId}`
     )
     return data
 }

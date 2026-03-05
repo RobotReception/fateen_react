@@ -13,6 +13,8 @@ import {
 } from "../../hooks/use-customer-actions"
 import { useInboxSummary } from "../../hooks/use-inbox-summary"
 import { getBriefUsers } from "../../services/inbox-service"
+import { usePermissions } from "@/lib/usePermissions"
+import { PAGE_BITS, ACTION_BITS } from "@/lib/permissions"
 
 interface Props { customer: Customer }
 
@@ -21,7 +23,15 @@ type DropKey = "assign" | "lifecycle" | "team" | "close"
 export function AssignPanel({ customer: c }: Props) {
     const { user } = useAuthStore()
     const { data: summary } = useInboxSummary(user?.id)
+    const { canPerformAction } = usePermissions()
     const isClosed = c.conversation_status?.is_closed ?? false
+
+    /* ── فحص الصلاحيات ── */
+    const canAssign = canPerformAction(PAGE_BITS.INBOX, ACTION_BITS.ASSIGN_CUSTOMER_AGENT)
+    const canLifecycle = canPerformAction(PAGE_BITS.INBOX, ACTION_BITS.UPDATE_CUSTOMER_LIFECYCLE)
+    const canTeams = canPerformAction(PAGE_BITS.INBOX, ACTION_BITS.MANAGE_CUSTOMER_TEAMS)
+    const canAI = canPerformAction(PAGE_BITS.INBOX, ACTION_BITS.TOGGLE_AI)
+    const canSession = canPerformAction(PAGE_BITS.INBOX, ACTION_BITS.UPDATE_SESSION_STATUS)
 
     const closeMut = useCloseConversation(c.customer_id)
     const reopenMut = useReopenConversation(c.customer_id)
@@ -65,147 +75,165 @@ export function AssignPanel({ customer: c }: Props) {
     return (
         <>
             {/* ── Assign ── */}
-            <CompactBtn ref={assignRef}
-                icon={<UserCircle size={13} />}
-                label={agentName || "Unassigned"}
-                onClick={() => toggle("assign")}
-                active={openDrop === "assign"}
-            />
-            {openDrop === "assign" && (
-                <DropPanel anchorRef={assignRef} onClose={closeDrop} width={230}>
-                    <div className="ap-search-wrap">
-                        <Search size={13} className="ap-search-icon" />
-                        <input className="ap-search-input" placeholder="بحث..."
-                            value={assignSearch} onChange={e => setAssignSearch(e.target.value)} autoFocus />
-                    </div>
-                    <div className="ap-sep" />
-                    {user && (
-                        <DropItem icon={<span style={{ fontSize: 11 }}>👤</span>} label="تعيين لي"
-                            active={c.assigned?.assigned_to === user.id}
-                            onClick={() => { assignMut.mutate({ assigned_to: user.id, is_assigned: true, performed_by_name: user.first_name }); closeDrop() }} />
+            {canAssign && (
+                <>
+                    <CompactBtn ref={assignRef}
+                        icon={<UserCircle size={13} />}
+                        label={agentName || "Unassigned"}
+                        onClick={() => toggle("assign")}
+                        active={openDrop === "assign"}
+                    />
+                    {openDrop === "assign" && (
+                        <DropPanel anchorRef={assignRef} onClose={closeDrop} width={230}>
+                            <div className="ap-search-wrap">
+                                <Search size={13} className="ap-search-icon" />
+                                <input className="ap-search-input" placeholder="بحث..."
+                                    value={assignSearch} onChange={e => setAssignSearch(e.target.value)} autoFocus />
+                            </div>
+                            <div className="ap-sep" />
+                            {user && (
+                                <DropItem icon={<span style={{ fontSize: 11 }}>👤</span>} label="تعيين لي"
+                                    active={c.assigned?.assigned_to === user.id}
+                                    onClick={() => { assignMut.mutate({ assigned_to: user.id, is_assigned: true, performed_by_name: user.first_name }); closeDrop() }} />
+                            )}
+                            {c.assigned?.is_assigned && (
+                                <DropItem icon={<UserCircle size={12} />} label="إلغاء التعيين" danger
+                                    onClick={() => { assignMut.mutate({ assigned_to: null, is_assigned: false }); closeDrop() }} />
+                            )}
+                            <div className="ap-sep" />
+                            {filteredUsers.length === 0 && (
+                                <p style={{ fontSize: 11, color: "#9ca3af", padding: "8px 12px", margin: 0, textAlign: "center" }}>لا توجد نتائج</p>
+                            )}
+                            {filteredUsers.map(u => (
+                                <DropItem key={u.user_id}
+                                    icon={u.profile_picture
+                                        ? <img src={u.profile_picture} alt="" style={{ width: 18, height: 18, borderRadius: "50%", objectFit: "cover" }}
+                                            onError={e => { (e.target as HTMLImageElement).style.display = "none" }} />
+                                        : <div style={{ width: 18, height: 18, borderRadius: "50%", background: "#e0e7ff", color: "#4f46e5", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9, fontWeight: 700 }}>{u.name.charAt(0).toUpperCase()}</div>
+                                    }
+                                    label={u.name}
+                                    active={c.assigned?.assigned_to === u.user_id}
+                                    onClick={() => { assignMut.mutate({ assigned_to: u.user_id, is_assigned: true, performed_by_name: u.name }); closeDrop() }}
+                                />
+                            ))}
+                        </DropPanel>
                     )}
-                    {c.assigned?.is_assigned && (
-                        <DropItem icon={<UserCircle size={12} />} label="إلغاء التعيين" danger
-                            onClick={() => { assignMut.mutate({ assigned_to: null, is_assigned: false }); closeDrop() }} />
-                    )}
-                    <div className="ap-sep" />
-                    {filteredUsers.length === 0 && (
-                        <p style={{ fontSize: 11, color: "#9ca3af", padding: "8px 12px", margin: 0, textAlign: "center" }}>لا توجد نتائج</p>
-                    )}
-                    {filteredUsers.map(u => (
-                        <DropItem key={u.user_id}
-                            icon={u.profile_picture
-                                ? <img src={u.profile_picture} alt="" style={{ width: 18, height: 18, borderRadius: "50%", objectFit: "cover" }}
-                                    onError={e => { (e.target as HTMLImageElement).style.display = "none" }} />
-                                : <div style={{ width: 18, height: 18, borderRadius: "50%", background: "#e0e7ff", color: "#4f46e5", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9, fontWeight: 700 }}>{u.name.charAt(0).toUpperCase()}</div>
-                            }
-                            label={u.name}
-                            active={c.assigned?.assigned_to === u.user_id}
-                            onClick={() => { assignMut.mutate({ assigned_to: u.user_id, is_assigned: true, performed_by_name: u.name }); closeDrop() }}
-                        />
-                    ))}
-                </DropPanel>
+                </>
             )}
 
             {/* ── Lifecycle ── */}
-            <CompactBtn ref={lifecycleRef}
-                icon={<span style={{ fontSize: 11 }}>{c.lifecycle?.icon || "📌"}</span>}
-                label={c.lifecycle?.name || "Lifecycle"}
-                onClick={() => toggle("lifecycle")}
-                active={openDrop === "lifecycle"}
-            />
-            {openDrop === "lifecycle" && (
-                <DropPanel anchorRef={lifecycleRef} onClose={closeDrop} width={200}>
-                    <p className="ap-drop-title">دورة الحياة</p>
-                    {lifecycles.map(lc => (
-                        <DropItem key={lc.code}
-                            icon={<span style={{ fontSize: 11 }}>{lc.icon || "📌"}</span>}
-                            label={lc.name}
-                            active={c.lifecycle?.code === lc.code}
-                            onClick={() => { lifecycleMut.mutate(lc.code); closeDrop() }}
-                        />
-                    ))}
-                    {c.lifecycle && (
-                        <>
-                            <div className="ap-sep" />
-                            <DropItem icon={<X size={12} />} label="إزالة" danger
-                                onClick={() => { lifecycleMut.mutate(""); closeDrop() }} />
-                        </>
+            {canLifecycle && (
+                <>
+                    <CompactBtn ref={lifecycleRef}
+                        icon={<span style={{ fontSize: 11 }}>{c.lifecycle?.icon || "📌"}</span>}
+                        label={c.lifecycle?.name || "Lifecycle"}
+                        onClick={() => toggle("lifecycle")}
+                        active={openDrop === "lifecycle"}
+                    />
+                    {openDrop === "lifecycle" && (
+                        <DropPanel anchorRef={lifecycleRef} onClose={closeDrop} width={200}>
+                            <p className="ap-drop-title">دورة الحياة</p>
+                            {lifecycles.map(lc => (
+                                <DropItem key={lc.code}
+                                    icon={<span style={{ fontSize: 11 }}>{lc.icon || "📌"}</span>}
+                                    label={lc.name}
+                                    active={c.lifecycle?.code === lc.code}
+                                    onClick={() => { lifecycleMut.mutate(lc.code); closeDrop() }}
+                                />
+                            ))}
+                            {c.lifecycle && (
+                                <>
+                                    <div className="ap-sep" />
+                                    <DropItem icon={<X size={12} />} label="إزالة" danger
+                                        onClick={() => { lifecycleMut.mutate(""); closeDrop() }} />
+                                </>
+                            )}
+                        </DropPanel>
                     )}
-                </DropPanel>
+                </>
             )}
 
             {/* ── Team Transfer ── */}
-            <CompactBtn ref={teamRef}
-                icon={<Users size={13} />}
-                label="Team"
-                onClick={() => toggle("team")}
-                active={openDrop === "team"}
-            />
-            {openDrop === "team" && (
-                <DropPanel anchorRef={teamRef} onClose={closeDrop} width={220}>
-                    <p className="ap-drop-title">تحويل لفريق</p>
-                    {teams.length === 0 && (
-                        <p style={{ fontSize: 11, color: "#9ca3af", padding: "8px 12px", margin: 0, textAlign: "center" }}>لا توجد فرق</p>
+            {canTeams && (
+                <>
+                    <CompactBtn ref={teamRef}
+                        icon={<Users size={13} />}
+                        label="Team"
+                        onClick={() => toggle("team")}
+                        active={openDrop === "team"}
+                    />
+                    {openDrop === "team" && (
+                        <DropPanel anchorRef={teamRef} onClose={closeDrop} width={220}>
+                            <p className="ap-drop-title">تحويل لفريق</p>
+                            {teams.length === 0 && (
+                                <p style={{ fontSize: 11, color: "#9ca3af", padding: "8px 12px", margin: 0, textAlign: "center" }}>لا توجد فرق</p>
+                            )}
+                            {teams.map(t => {
+                                const isActive = c.team_ids?.teams?.some(tm => tm.team_id === t.team_id) ?? false
+                                const isLoading = teamMut.isPending || unassignTeamMut.isPending
+                                return (
+                                    <button key={t.team_id} className="ap-drop-item" onClick={() => {
+                                        if (isActive) unassignTeamMut.mutate([t.team_id])
+                                        else teamMut.mutate([t.team_id])
+                                    }} disabled={isLoading} style={{ opacity: isLoading ? 0.6 : 1 }}>
+                                        <span style={{
+                                            width: 16, height: 16, borderRadius: 4, flexShrink: 0,
+                                            border: isActive ? "none" : "1.5px solid #cbd5e1",
+                                            background: isActive ? "linear-gradient(135deg, #0072b5, #004786)" : "#fff",
+                                            display: "flex", alignItems: "center", justifyContent: "center",
+                                            transition: "all .15s ease",
+                                            boxShadow: isActive ? "0 1px 4px rgba(0,71,134,0.25)" : "none",
+                                        }}>
+                                            {isActive && (
+                                                <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                                                    <path d="M2 5.5L4 7.5L8 3" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                                </svg>
+                                            )}
+                                        </span>
+                                        <span style={{ fontSize: 11, lineHeight: 1 }}>{t.icon || "👥"}</span>
+                                        <span style={{ flex: 1, fontSize: 12, fontWeight: isActive ? 600 : 500, color: isActive ? "#004786" : "#374151" }}>{t.name}</span>
+                                    </button>
+                                )
+                            })}
+                        </DropPanel>
                     )}
-                    {teams.map(t => {
-                        const isActive = c.team_ids?.teams?.some(tm => tm.team_id === t.team_id) ?? false
-                        const isLoading = teamMut.isPending || unassignTeamMut.isPending
-                        return (
-                            <button key={t.team_id} className="ap-drop-item" onClick={() => {
-                                if (isActive) unassignTeamMut.mutate([t.team_id])
-                                else teamMut.mutate([t.team_id])
-                            }} disabled={isLoading} style={{ opacity: isLoading ? 0.6 : 1 }}>
-                                <span style={{
-                                    width: 16, height: 16, borderRadius: 4, flexShrink: 0,
-                                    border: isActive ? "none" : "1.5px solid #cbd5e1",
-                                    background: isActive ? "linear-gradient(135deg, #0072b5, #004786)" : "#fff",
-                                    display: "flex", alignItems: "center", justifyContent: "center",
-                                    transition: "all .15s ease",
-                                    boxShadow: isActive ? "0 1px 4px rgba(0,71,134,0.25)" : "none",
-                                }}>
-                                    {isActive && (
-                                        <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                                            <path d="M2 5.5L4 7.5L8 3" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                                        </svg>
-                                    )}
-                                </span>
-                                <span style={{ fontSize: 11, lineHeight: 1 }}>{t.icon || "👥"}</span>
-                                <span style={{ flex: 1, fontSize: 12, fontWeight: isActive ? 600 : 500, color: isActive ? "#004786" : "#374151" }}>{t.name}</span>
-                            </button>
-                        )
-                    })}
-                </DropPanel>
+                </>
             )}
 
             {/* ── AI Toggle ── */}
-            <button className={`ap-icon-btn ${c.enable_ai ? "ap-icon-active" : ""}`}
-                onClick={() => aiMut.mutate(!c.enable_ai)} disabled={aiMut.isPending}
-                title={c.enable_ai ? "تعطيل AI" : "تفعيل AI"}>
-                {c.enable_ai ? <Bot size={14} /> : <BotOff size={14} />}
-                <span className="ap-ai-dot-i" data-on={c.enable_ai} />
-            </button>
+            {canAI && (
+                <button className={`ap-icon-btn ${c.enable_ai ? "ap-icon-active" : ""}`}
+                    onClick={() => aiMut.mutate(!c.enable_ai)} disabled={aiMut.isPending}
+                    title={c.enable_ai ? "تعطيل AI" : "تفعيل AI"}>
+                    {c.enable_ai ? <Bot size={14} /> : <BotOff size={14} />}
+                    <span className="ap-ai-dot-i" data-on={c.enable_ai} />
+                </button>
+            )}
 
             {/* ── Close / Reopen ── */}
-            {isClosed ? (
-                <button className="ap-close-btn ap-reopen-btn"
-                    onClick={() => reopenMut.mutate(user?.id ?? c.assigned?.assigned_to ?? "")}
-                    disabled={reopenMut.isPending}>
-                    🔄 Reopen
-                </button>
-            ) : (
-                <CompactBtn ref={closeRef}
-                    icon={<CheckCircle size={13} />}
-                    label="Close"
-                    accent
-                    onClick={() => toggle("close")}
-                    active={openDrop === "close"}
-                />
-            )}
-            {openDrop === "close" && (
-                <ClosePanel anchorRef={closeRef} onClose={closeDrop}
-                    onSubmit={(cat, sum) => { closeMut.mutate({ reason: sum || cat, category: cat, lang: "ar" }); closeDrop() }}
-                    isPending={closeMut.isPending} />
+            {canSession && (
+                <>
+                    {isClosed ? (
+                        <button className="ap-close-btn ap-reopen-btn"
+                            onClick={() => reopenMut.mutate(user?.id ?? c.assigned?.assigned_to ?? "")}
+                            disabled={reopenMut.isPending}>
+                            🔄 Reopen
+                        </button>
+                    ) : (
+                        <CompactBtn ref={closeRef}
+                            icon={<CheckCircle size={13} />}
+                            label="Close"
+                            accent
+                            onClick={() => toggle("close")}
+                            active={openDrop === "close"}
+                        />
+                    )}
+                    {openDrop === "close" && (
+                        <ClosePanel anchorRef={closeRef} onClose={closeDrop}
+                            onSubmit={(cat, sum) => { closeMut.mutate({ reason: sum || cat, category: cat, lang: "ar" }); closeDrop() }}
+                            isPending={closeMut.isPending} />
+                    )}
+                </>
             )}
 
             {/* ── Styles ── */}

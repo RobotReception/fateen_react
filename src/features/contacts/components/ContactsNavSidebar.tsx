@@ -84,6 +84,16 @@ export function ContactsNavSidebar() {
                             }}>{totalCount > 9 ? "9+" : totalCount}</span>
                         )}
                     </NavItem>
+                    <NavItem active={isActive("mine")} collapsed={collapsed} onClick={() => setActiveSection("mine")} title={collapsed ? "محادثاتي" : undefined}>
+                        <Users size={13} style={{ flexShrink: 0, opacity: .8 }} />
+                        {!collapsed && <span style={{ flex: 1, fontWeight: isActive("mine") ? 700 : 500 }}>محادثاتي</span>}
+                        {!collapsed && (summary?.mine ?? 0) > 0 && <CountBadge count={summary?.mine ?? 0} active={isActive("mine")} />}
+                    </NavItem>
+                    <NavItem active={isActive("unassigned")} collapsed={collapsed} onClick={() => setActiveSection("unassigned")} title={collapsed ? "غير معينة" : undefined}>
+                        <Users size={13} style={{ flexShrink: 0, opacity: .8 }} />
+                        {!collapsed && <span style={{ flex: 1, fontWeight: isActive("unassigned") ? 700 : 500 }}>غير معينة</span>}
+                        {!collapsed && (summary?.unassigned ?? 0) > 0 && <CountBadge count={summary?.unassigned ?? 0} active={isActive("unassigned")} />}
+                    </NavItem>
                 </div>
 
                 {/* ── Lifecycle ── */}

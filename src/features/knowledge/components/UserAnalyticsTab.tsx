@@ -444,7 +444,7 @@ export function UserAnalyticsTab() {
                         <button onClick={() => handleCatChange("")} className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full p-0.5 text-purple-400 hover:text-purple-600 hover:bg-purple-100 transition-colors"><X size={12} /></button>
                     )}
                 </div>
-                <ActionGuard pageBit={PAGE_BITS.DOCUMENTS} actionBit={ACTION_BITS.DELETE_COLLECTION_NEW}>
+                <ActionGuard pageBit={PAGE_BITS.DOCUMENTS} actionBit={ACTION_BITS.DELETE_COLLECTION}>
                     <button onClick={() => setShowDeleteCollection(true)} style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 5, padding: "8px 14px", borderRadius: 8, border: "1px solid rgba(220,38,38,0.15)", background: "rgba(220,38,38,0.03)", color: "#dc2626", fontSize: 12, fontWeight: 500, cursor: "pointer", transition: "all 0.15s" }}><Ban size={13} />حذف الكل</button>
                 </ActionGuard>
             </div>

@@ -25,10 +25,25 @@ import { ConversationPage } from "@/features/inbox/pages/ConversationPage"
 import { ContactsPage } from "@/features/contacts/pages/ContactsPage"
 import { MenuManagerPage } from "@/features/menu-manager/pages/MenuManagerPage"
 
-/** يتحقق من تسجيل الدخول — يحوّل لصفحة Login إذا لم يكن مسجلاً */
+/** يتحقق من تسجيل الدخول + وجود توكن فعلي — يحوّل لصفحة Login إذا لم يكن مسجلاً */
 function AuthGuard({ children }: { children: React.ReactNode }) {
-    const isAuthenticated = useAuthStore((s) => s.isAuthenticated)
+    const { isAuthenticated, token, logout } = useAuthStore()
+
+    // إذا عنده isAuthenticated=true لكن ما عنده توكن فعلي → تسجيل خروج فوري
+    if (isAuthenticated && !token) {
+        logout()
+        return <Navigate to="/login" replace />
+    }
+
     if (!isAuthenticated) return <Navigate to="/login" replace />
+    return <>{children}</>
+}
+
+/** يمنع المستخدم المسجّل من الدخول لصفحات تسجيل الدخول/التسجيل */
+function GuestGuard({ children }: { children: React.ReactNode }) {
+    const isAuthenticated = useAuthStore((s) => s.isAuthenticated)
+    const token = useAuthStore((s) => s.token)
+    if (isAuthenticated && token) return <Navigate to="/dashboard" replace />
     return <>{children}</>
 }
 
@@ -38,12 +53,12 @@ export function AppRouter() {
             {/* Redirect root to login */}
             <Route path="/" element={<Navigate to="/login" replace />} />
 
-            {/* Auth Routes */}
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
+            {/* Auth Routes — محمية بـ GuestGuard (لا يدخلها المسجّل) */}
+            <Route path="/login" element={<GuestGuard><LoginPage /></GuestGuard>} />
+            <Route path="/register" element={<GuestGuard><RegisterPage /></GuestGuard>} />
             <Route path="/verify-email" element={<VerifyEmailPage />} />
             <Route path="/onboarding" element={<OnboardingPage />} />
-            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/forgot-password" element={<GuestGuard><ForgotPasswordPage /></GuestGuard>} />
 
             {/* Admin Routes — محمية بـ AuthGuard + PermissionGuard */}
             <Route path="/dashboard" element={<AuthGuard><AdminLayout /></AuthGuard>}>
@@ -54,12 +69,12 @@ export function AppRouter() {
                     </PermissionGuard>
                 } />
                 <Route path="knowledge" element={
-                    <PermissionGuard pageBit={PAGE_BITS.DOCUMENT_MANAGEMENT}>
+                    <PermissionGuard pageBit={PAGE_BITS.DOCUMENTS}>
                         <KnowledgeBasePage />
                     </PermissionGuard>
                 } />
                 <Route path="menu-manager" element={
-                    <PermissionGuard pageBit={PAGE_BITS.MENUS}>
+                    <PermissionGuard pageBit={PAGE_BITS.MENU_MANAGER}>
                         <MenuManagerPage />
                     </PermissionGuard>
                 } />
@@ -92,7 +107,11 @@ export function AppRouter() {
                 <Route path="settings/organization" element={<OrganizationSettingsPage />} />
                 <Route path="settings/profile" element={<ProfileSettingsPage />} />
                 <Route path="settings/ai" element={<Navigate to="/dashboard/settings/organization?tab=ai" replace />} />
-                <Route path="settings/ai/:agentId" element={<AgentDetailPage />} />
+                <Route path="settings/ai/:agentId" element={
+                    <PermissionGuard pageBit={PAGE_BITS.AGENTS}>
+                        <AgentDetailPage />
+                    </PermissionGuard>
+                } />
             </Route>
 
             {/* Catch-all — redirect to login */}

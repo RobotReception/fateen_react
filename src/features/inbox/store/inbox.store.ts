@@ -10,6 +10,7 @@ export interface AdvancedFilters {
     lifecycle?: string
     assigned_to?: string
     team_id?: string
+    account_id?: string
     start_date?: string
     end_date?: string
     unread_only?: boolean

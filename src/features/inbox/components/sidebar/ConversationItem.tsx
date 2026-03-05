@@ -5,20 +5,8 @@ import { Avatar } from "../ui/Avatar"
 import { Star, BellOff, Check, CheckCheck, MoreHorizontal } from "lucide-react"
 import type { Customer } from "../../types/inbox.types"
 import { CustomerActionsMenu } from "../conversation/CustomerActionsMenu"
+import { getTimeOrDate } from "../../../../utils/time"
 
-function timeAgo(dateStr?: string | null): string {
-    if (!dateStr) return ""
-    const diff = Date.now() - new Date(dateStr).getTime()
-    const mins = Math.floor(diff / 60000)
-    if (mins < 1) return "now"
-    if (mins < 60) return `${mins}m`
-    const hrs = Math.floor(mins / 60)
-    if (hrs < 24) return `${hrs}h`
-    const days = Math.floor(hrs / 24)
-    if (days === 1) return "yesterday"
-    if (days < 7) return new Date(dateStr).toLocaleDateString("en", { weekday: "short", timeZone: "Asia/Aden" })
-    return new Date(dateStr).toLocaleDateString("en", { month: "short", day: "numeric", timeZone: "Asia/Aden" })
-}
 
 function sessionDot(status?: string): string {
     switch (status) {
@@ -113,7 +101,7 @@ export function ConversationItem({ customer: c, isSelected }: ConversationItemPr
                             </div>
                         )}
                         <span className={`ci-time ${hasUnread ? "ci-time-accent" : ""}`}>
-                            {timeAgo(c.last_timestamp)}
+                            {getTimeOrDate(c.last_timestamp)}
                         </span>
                     </div>
                 </div>
@@ -132,9 +120,11 @@ export function ConversationItem({ customer: c, isSelected }: ConversationItemPr
                             </span>
                         )}
                         <p className={`ci-preview ${hasUnread ? "ci-preview-bold" : ""}`}>
-                            {c.last_message_type !== "text" && c.last_message_type
-                                ? `📎 ${c.last_message_type}`
-                                : c.last_message || "—"
+                            {c.last_message_type === "template"
+                                ? `📋 ${c.last_message || "template"}`
+                                : c.last_message_type !== "text" && c.last_message_type
+                                    ? `📎 ${c.last_message_type}`
+                                    : c.last_message || "—"
                             }
                         </p>
                     </div>

@@ -216,7 +216,7 @@ export function DocumentAnalyticsTab() {
                         </p>
                     </div>
                 </div>
-                <ActionGuard pageBit={PAGE_BITS.DOCUMENTS} actionBit={ACTION_BITS.GET_ALL_ANALYTICS_NEW}>
+                <ActionGuard pageBit={PAGE_BITS.DOCUMENTS} actionBit={ACTION_BITS.GET_ALL_ANALYTICS}>
                     <button
                         onClick={handleRefresh}
                         disabled={isFetching}

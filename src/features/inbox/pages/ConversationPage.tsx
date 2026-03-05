@@ -50,14 +50,22 @@ function useCachedCustomer(customerId: string): Customer | null {
     return customer
 }
 
-export function ConversationPage() {
-    const { id } = useParams<{ id: string }>()
-    if (!id) return <Navigate to="/dashboard/inbox" replace />
-
+// Inner component that uses hooks, only rendered if `id` is present
+function ConversationPageInner({ id }: { id: string }) {
+    const queryClient = useQueryClient()
     const customer = useCachedCustomer(id)
-    const { data, isLoading: loadingMsgs, fetchNextPage, hasNextPage, isFetchingNextPage } = useCustomerMessages(id)
+
+    // Pass accountId so the query key is stable and API receives correct account context
+    const accountId = customer?.account_id ?? undefined
+
+    const { data, isLoading: loadingMsgs, fetchNextPage, hasNextPage, isFetchingNextPage } = useCustomerMessages(id, accountId)
     const messages = flattenMessages(data)
     const { pendingMessages } = useConversationStore()
+
+    // Force-invalidate messages every time we navigate to a new conversation
+    useEffect(() => {
+        queryClient.invalidateQueries({ queryKey: ["customer-messages", id] })
+    }, [id, queryClient])
 
     return (
         <div style={{ display: "flex", height: "100%", overflow: "hidden" }}>
@@ -91,6 +99,13 @@ export function ConversationPage() {
             {customer && <ConversationDetails customer={customer} />}
         </div>
     )
+}
+
+export function ConversationPage() {
+    const { id } = useParams<{ id: string }>()
+    if (!id) return <Navigate to="/dashboard/inbox" replace />
+
+    return <ConversationPageInner id={id} />
 }
 
 function HeaderSkeleton() {

@@ -740,7 +740,7 @@ export function DataManagementTab({ onNavigateToTab }: { onNavigateToTab?: (tab:
                         <ActionGuard pageBit={PAGE_BITS.DOCUMENTS} actionBit={ACTION_BITS.UPLOAD_DOCUMENT}>
                             <button onClick={() => setShowUpload(true)} style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 16px", borderRadius: 8, border: "none", background: "#004786", color: "#fff", fontSize: 13, fontWeight: 500, cursor: "pointer", transition: "all 0.15s" }} onMouseEnter={e => { e.currentTarget.style.background = "#003b6f" }} onMouseLeave={e => { e.currentTarget.style.background = "#004786" }}><Upload size={14} />رفع ملف</button>
                         </ActionGuard>
-                        <ActionGuard pageBit={PAGE_BITS.DOCUMENTS} actionBit={ACTION_BITS.UPLOAD_DOCUMENT_JSON}>
+                        <ActionGuard pageBit={PAGE_BITS.DOCUMENTS} actionBit={ACTION_BITS.UPLOAD_DOCUMENT}>
                             <button onClick={() => setShowAddText(true)} style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 16px", borderRadius: 8, border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-card, #fff)", color: "var(--t-text-secondary, #6b7280)", fontSize: 13, fontWeight: 500, cursor: "pointer", transition: "all 0.15s" }} onMouseEnter={e => { e.currentTarget.style.borderColor = "#004786"; e.currentTarget.style.color = "#004786" }} onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--t-border-light, #e5e7eb)"; e.currentTarget.style.color = "var(--t-text-secondary, #6b7280)" }}><Plus size={14} />إضافة نص</button>
                         </ActionGuard>
                     </div>

@@ -9,6 +9,8 @@ import { useOrganization, useUpdateOrganization } from "../hooks/use-settings"
 import { useAuthStore } from "@/stores/auth-store"
 import { FetchingBar } from "@/components/ui/FetchingBar"
 import type { UpdateOrganizationPayload } from "../types"
+import { ActionGuard } from "@/components/guards/ActionGuard"
+import { PAGE_BITS, ACTION_BITS } from "@/lib/permissions"
 
 const CSS = `
 @keyframes orgFade{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
@@ -293,17 +295,19 @@ export function OrganizationTab() {
 
                         {/* Edit button */}
                         {!editing && (
-                            <button onClick={startEdit} style={{
-                                padding: "8px 18px", borderRadius: 9, border: "none", cursor: "pointer",
-                                background: "#004786", color: "#fff", fontSize: 12, fontWeight: 600,
-                                display: "flex", alignItems: "center", gap: 6, flexShrink: 0,
-                                boxShadow: "0 1px 3px rgba(0,71,134,0.15)",
-                                transition: "background .15s",
-                            }}
-                                onMouseEnter={e => { e.currentTarget.style.background = "#003a6e" }}
-                                onMouseLeave={e => { e.currentTarget.style.background = "#004786" }}>
-                                <Edit3 size={13} /> تعديل البيانات
-                            </button>
+                            <ActionGuard pageBit={PAGE_BITS.ORGANIZATION} actionBit={ACTION_BITS.UPDATE_ORGANIZATION}>
+                                <button onClick={startEdit} style={{
+                                    padding: "8px 18px", borderRadius: 9, border: "none", cursor: "pointer",
+                                    background: "#004786", color: "#fff", fontSize: 12, fontWeight: 600,
+                                    display: "flex", alignItems: "center", gap: 6, flexShrink: 0,
+                                    boxShadow: "0 1px 3px rgba(0,71,134,0.15)",
+                                    transition: "background .15s",
+                                }}
+                                    onMouseEnter={e => { e.currentTarget.style.background = "#003a6e" }}
+                                    onMouseLeave={e => { e.currentTarget.style.background = "#004786" }}>
+                                    <Edit3 size={13} /> تعديل البيانات
+                                </button>
+                            </ActionGuard>
                         )}
                     </div>
 

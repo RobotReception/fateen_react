@@ -111,6 +111,13 @@
       "meta": {}
     },
     {
+      "id": "organization",
+      "base_bit": 2097152,
+      "name_ar": "المؤسسة",
+      "name_en": "Organization",
+      "meta": {}
+    },
+    {
       "id": "pending_requests",
       "base_bit": 256,
       "name_ar": "الطلبات المعلقة",
@@ -164,6 +171,13 @@
       "base_bit": 16384,
       "name_ar": "طلبات التدريب",
       "name_en": "TrainRequests",
+      "meta": {}
+    },
+    {
+      "id": "user_profile",
+      "base_bit": 4194304,
+      "name_ar": "الملف الشخصي",
+      "name_en": "User Profile",
       "meta": {}
     }
   ],
@@ -1016,6 +1030,20 @@
       "weight": 1024
     },
     {
+      "id": "restore_lifecycle",
+      "ar": "استعادة مرحلة حياة",
+      "en": "Restore Lifecycle",
+      "uid": 9602,
+      "weight": 2048
+    },
+    {
+      "id": "restore_tag",
+      "ar": "استعادة وسم",
+      "en": "Restore Tag",
+      "uid": 9610,
+      "weight": 32
+    },
+    {
       "id": "revoke_all_sessions",
       "ar": "إلغاء كل الجلسات",
       "en": "Revoke All Sessions",
@@ -1338,6 +1366,13 @@
       "weight": 128
     },
     {
+      "id": "unassign_customer_to_teams",
+      "ar": "إلغاء تعيين عميل من فرق",
+      "en": "Unassign Customer from Teams",
+      "uid": 9630,
+      "weight": 2048
+    },
+    {
       "id": "upload_document",
       "ar": "رفع مستند",
       "en": "Upload Document",
@@ -1352,6 +1387,27 @@
       "weight": 2
     },
     {
+      "id": "update_customer_lifecycle_action",
+      "ar": "تغيير مرحلة عميل",
+      "en": "Update Customer Lifecycle",
+      "uid": 9603,
+      "weight": 32
+    },
+    {
+      "id": "update_organization",
+      "ar": "تحديث بيانات المؤسسة",
+      "en": "Update Organization",
+      "uid": 9621,
+      "weight": 2
+    },
+    {
+      "id": "update_profile",
+      "ar": "تحديث الملف الشخصي",
+      "en": "Update Profile",
+      "uid": 9623,
+      "weight": 2
+    },
+    {
       "id": "view",
       "ar": "عرض",
       "en": "View",
@@ -1359,10 +1415,24 @@
       "weight": 2
     },
     {
+      "id": "view_organization",
+      "ar": "عرض بيانات المؤسسة",
+      "en": "View Organization",
+      "uid": 9620,
+      "weight": 1
+    },
+    {
       "id": "view_page",
       "ar": "عرض الصفحة",
       "en": "View Page",
       "uid": 1000,
+      "weight": 1
+    },
+    {
+      "id": "view_profile",
+      "ar": "عرض الملف الشخصي",
+      "en": "View Profile",
+      "uid": 9622,
       "weight": 1
     }
   ],
@@ -2568,6 +2638,26 @@
       "section_code": 32
     },
     {
+      "id": "lifecycles:restore_lifecycle",
+      "action": "restore_lifecycle",
+      "action_code": 2048,
+      "code": 2048,
+      "name_ar": "استعادة مرحلة حياة",
+      "name_en": "Restore Lifecycle",
+      "section": "lifecycles",
+      "section_code": 32
+    },
+    {
+      "id": "lifecycles:update_customer_lifecycle",
+      "action": "update_customer_lifecycle",
+      "action_code": 32,
+      "code": 32,
+      "name_ar": "تغيير مرحلة عميل",
+      "name_en": "Update Customer Lifecycle",
+      "section": "lifecycles",
+      "section_code": 32
+    },
+    {
       "id": "menus:create_menu",
       "action": "create_menu",
       "action_code": 8,
@@ -3138,12 +3228,32 @@
       "section_code": 4096
     },
     {
+      "id": "tags:restore_tag",
+      "action": "restore_tag",
+      "action_code": 32,
+      "code": 32,
+      "name_ar": "استعادة وسم",
+      "name_en": "Restore Tag",
+      "section": "tags",
+      "section_code": 4096
+    },
+    {
       "id": "teams:assign_customer_to_teams",
       "action": "assign_customer_to_teams",
       "action_code": 4,
       "code": 4,
       "name_ar": "تعيين عميل لفرق",
       "name_en": "Assign Customer to Teams",
+      "section": "teams",
+      "section_code": 8192
+    },
+    {
+      "id": "teams:unassign_customer_to_teams",
+      "action": "unassign_customer_to_teams",
+      "action_code": 2048,
+      "code": 2048,
+      "name_ar": "إلغاء تعيين عميل من فرق",
+      "name_en": "Unassign Customer from Teams",
       "section": "teams",
       "section_code": 8192
     },
@@ -3436,6 +3546,8 @@
         "lifecycles:delete_lifecycle",
         "lifecycles:list_lifecycles",
         "lifecycles:reorder_lifecycles",
+        "lifecycles:restore_lifecycle",
+        "lifecycles:update_customer_lifecycle",
         "lifecycles:update_lifecycle",
         "menus:create_menu",
         "menus:delete_menu",
@@ -3493,8 +3605,10 @@
         "tags:delete_tag",
         "tags:get_tag",
         "tags:list_tags",
+        "tags:restore_tag",
         "tags:update_tag",
         "teams:assign_customer_to_teams",
+        "teams:unassign_customer_to_teams",
         "teams:assign_customers_bulk",
         "teams:create_team",
         "teams:delete_team",

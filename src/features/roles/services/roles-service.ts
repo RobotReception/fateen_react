@@ -40,7 +40,7 @@ async function apiFetch<T>(path: string, options: RequestInit = {}): Promise<T> 
         ...(options.headers as Record<string, string> || {}),
     }
 
-    const res = await fetch(`${BASE_URL}${path}`, { ...options, headers: merged })
+    const res = await fetch(`${BASE_URL}${path}`, { ...options, headers: merged, credentials: "include" })
     const text = await res.text()
 
     let data: any
@@ -153,6 +153,21 @@ export function getUsersWithRole(role: string, tenantId: string): Promise<UsersW
 /** GET /permissions/get-permission-admin-permissions — all system permissions */
 export function getAllPermissions(tenantId: string): Promise<AllPermissionsResponse> {
     return apiFetch("/permissions/get-permission-admin-permissions", {
+        headers: authHeaders(tenantId),
+    })
+}
+
+/** GET /roles/get-my-permissions — صلاحيات المستخدم الحالي */
+export function getMyPermissions(tenantId: string): Promise<{
+    success: boolean
+    data: {
+        pageWithPermission: {
+            totalPages: number
+            permissions: { pageValue: number; totalValue: number }[]
+        }
+    }
+}> {
+    return apiFetch("/roles/get-my-permissions", {
         headers: authHeaders(tenantId),
     })
 }

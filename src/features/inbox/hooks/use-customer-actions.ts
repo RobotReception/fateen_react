@@ -1,11 +1,14 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
+import { invalidateCustomerCaches } from "@/lib/query-keys"
 import {
     closeConversation,
     reopenConversation,
     assignCustomerAgent,
     updateCustomerLifecycle,
     toggleCustomerAI,
+    toggleFavorite,
+    toggleMuted,
     updateSessionStatus,
     assignCustomerTeams,
     removeCustomerTeams,
@@ -68,10 +71,9 @@ function patchCustomer(
     }
 }
 
-/** Invalidate + background refetch to sync with server truth. */
-function settleInbox(qc: ReturnType<typeof useQueryClient>) {
-    qc.invalidateQueries({ queryKey: ["inbox-customers"] })
-    qc.invalidateQueries({ queryKey: ["inbox-summary"] })
+/** Invalidate + background refetch to sync with server truth across ALL features. */
+function settleInbox(qc: ReturnType<typeof useQueryClient>, customerId?: string) {
+    invalidateCustomerCaches(qc, customerId)
 }
 
 
@@ -79,11 +81,11 @@ function settleInbox(qc: ReturnType<typeof useQueryClient>) {
 /*               Close / Reopen                    */
 /* ═══════════════════════════════════════════════ */
 
-export function useCloseConversation(customerId: string) {
+export function useCloseConversation(customerId: string, accountId?: string) {
     const qc = useQueryClient()
     return useMutation({
         mutationFn: (p: { reason: string; category: string; lang?: string }) =>
-            closeConversation(customerId, p),
+            closeConversation(customerId, p, accountId),
 
         onMutate: async (p) => {
             await qc.cancelQueries({ queryKey: ["inbox-customers"] })
@@ -103,15 +105,15 @@ export function useCloseConversation(customerId: string) {
             if (snap) rollback(qc, snap)
             toast.error(e?.response?.status === 423 ? "المحادثة مغلقة مسبقاً" : "فشل إغلاق المحادثة")
         },
-        onSettled: () => settleInbox(qc),
+        onSettled: () => settleInbox(qc, customerId),
     })
 }
 
-export function useReopenConversation(customerId: string) {
+export function useReopenConversation(customerId: string, accountId?: string) {
     const qc = useQueryClient()
     return useMutation({
         mutationFn: (userId: string) =>
-            reopenConversation(customerId, { user_id: userId }),
+            reopenConversation(customerId, { user_id: userId }, accountId),
 
         onMutate: async () => {
             await qc.cancelQueries({ queryKey: ["inbox-customers"] })
@@ -126,7 +128,7 @@ export function useReopenConversation(customerId: string) {
             if (snap) rollback(qc, snap)
             toast.error("فشل إعادة فتح المحادثة")
         },
-        onSettled: () => settleInbox(qc),
+        onSettled: () => settleInbox(qc, customerId),
     })
 }
 
@@ -135,11 +137,11 @@ export function useReopenConversation(customerId: string) {
 /*                Assign Agent                     */
 /* ═══════════════════════════════════════════════ */
 
-export function useAssignAgent(customerId: string) {
+export function useAssignAgent(customerId: string, accountId?: string) {
     const qc = useQueryClient()
     return useMutation({
         mutationFn: (p: { assigned_to: string | null; is_assigned: boolean; performed_by_name?: string }) =>
-            assignCustomerAgent(customerId, p),
+            assignCustomerAgent(customerId, p, accountId),
 
         onMutate: async (p) => {
             await qc.cancelQueries({ queryKey: ["inbox-customers"] })
@@ -160,7 +162,7 @@ export function useAssignAgent(customerId: string) {
             if (snap) rollback(qc, snap)
             toast.error("فشل تعيين الموظف")
         },
-        onSettled: () => settleInbox(qc),
+        onSettled: () => settleInbox(qc, customerId),
     })
 }
 
@@ -169,11 +171,11 @@ export function useAssignAgent(customerId: string) {
 /*                  Lifecycle                      */
 /* ═══════════════════════════════════════════════ */
 
-export function useUpdateLifecycle(customerId: string) {
+export function useUpdateLifecycle(customerId: string, accountId?: string) {
     const qc = useQueryClient()
     return useMutation({
         mutationFn: (lifecycleCode: string) =>
-            updateCustomerLifecycle(customerId, lifecycleCode),
+            updateCustomerLifecycle(customerId, lifecycleCode, accountId),
 
         onMutate: async (code) => {
             await qc.cancelQueries({ queryKey: ["inbox-customers"] })
@@ -202,7 +204,7 @@ export function useUpdateLifecycle(customerId: string) {
             if (snap) rollback(qc, snap)
             toast.error("فشل تحديث دورة الحياة")
         },
-        onSettled: () => settleInbox(qc),
+        onSettled: () => settleInbox(qc, customerId),
     })
 }
 
@@ -211,11 +213,11 @@ export function useUpdateLifecycle(customerId: string) {
 /*                  AI Toggle                      */
 /* ═══════════════════════════════════════════════ */
 
-export function useToggleAI(customerId: string) {
+export function useToggleAI(customerId: string, accountId?: string) {
     const qc = useQueryClient()
     return useMutation({
         mutationFn: (enableAi: boolean) =>
-            toggleCustomerAI(customerId, enableAi),
+            toggleCustomerAI(customerId, enableAi, accountId),
 
         onMutate: async (enableAi) => {
             await qc.cancelQueries({ queryKey: ["inbox-customers"] })
@@ -228,20 +230,64 @@ export function useToggleAI(customerId: string) {
             if (snap) rollback(qc, snap)
             toast.error("فشل تغيير حالة AI")
         },
-        onSettled: () => settleInbox(qc),
+        onSettled: () => settleInbox(qc, customerId),
     })
 }
 
 
 /* ═══════════════════════════════════════════════ */
-/*              Session Status                     */
+/*              Favorite / Muted                   */
 /* ═══════════════════════════════════════════════ */
 
-export function useUpdateSessionStatus(customerId: string) {
+export function useToggleFavorite(customerId: string, accountId?: string) {
+    const qc = useQueryClient()
+    return useMutation({
+        mutationFn: (favorite: boolean) =>
+            toggleFavorite(customerId, favorite, accountId),
+
+        onMutate: async (favorite) => {
+            await qc.cancelQueries({ queryKey: ["inbox-customers"] })
+            const snap = snapshotInbox(qc)
+            patchCustomer(qc, customerId, () => ({ favorite }))
+            return snap
+        },
+        onSuccess: (_d, v) => toast.success(v ? "أُضيف إلى المفضلة" : "أُزيل من المفضلة"),
+        onError: (_e, _v, snap) => {
+            if (snap) rollback(qc, snap)
+            toast.error("فشل تحديث المفضلة")
+        },
+        onSettled: () => settleInbox(qc, customerId),
+    })
+}
+
+export function useToggleMuted(customerId: string, accountId?: string) {
+    const qc = useQueryClient()
+    return useMutation({
+        mutationFn: (muted: boolean) =>
+            toggleMuted(customerId, muted, accountId),
+
+        onMutate: async (muted) => {
+            await qc.cancelQueries({ queryKey: ["inbox-customers"] })
+            const snap = snapshotInbox(qc)
+            patchCustomer(qc, customerId, () => ({ muted }))
+            return snap
+        },
+        onSuccess: (_d, v) => toast.success(v ? "تم كتم المحادثة" : "تم إلغاء الكتم"),
+        onError: (_e, _v, snap) => {
+            if (snap) rollback(qc, snap)
+            toast.error("فشل تحديث الكتم")
+        },
+        onSettled: () => settleInbox(qc, customerId),
+    })
+}
+
+
+
+export function useUpdateSessionStatus(customerId: string, accountId?: string) {
     const qc = useQueryClient()
     return useMutation({
         mutationFn: (status: SessionStatus) =>
-            updateSessionStatus(customerId, status),
+            updateSessionStatus(customerId, status, accountId),
 
         onMutate: async (status) => {
             await qc.cancelQueries({ queryKey: ["inbox-customers"] })
@@ -254,7 +300,7 @@ export function useUpdateSessionStatus(customerId: string) {
             if (snap) rollback(qc, snap)
             toast.error("فشل تحديث حالة الجلسة")
         },
-        onSettled: () => settleInbox(qc),
+        onSettled: () => settleInbox(qc, customerId),
     })
 }
 
@@ -263,11 +309,11 @@ export function useUpdateSessionStatus(customerId: string) {
 /*                    Teams                        */
 /* ═══════════════════════════════════════════════ */
 
-export function useAssignTeams(customerId: string) {
+export function useAssignTeams(customerId: string, accountId?: string) {
     const qc = useQueryClient()
     return useMutation({
         mutationFn: (teamIds: string[]) =>
-            assignCustomerTeams(customerId, teamIds),
+            assignCustomerTeams(customerId, teamIds, accountId),
 
         onMutate: async (teamIds) => {
             await qc.cancelQueries({ queryKey: ["inbox-customers"] })
@@ -292,15 +338,15 @@ export function useAssignTeams(customerId: string) {
             if (snap) rollback(qc, snap)
             toast.error("فشل تعيين الفرق")
         },
-        onSettled: () => settleInbox(qc),
+        onSettled: () => settleInbox(qc, customerId),
     })
 }
 
-export function useRemoveTeams(customerId: string) {
+export function useRemoveTeams(customerId: string, accountId?: string) {
     const qc = useQueryClient()
     return useMutation({
         mutationFn: (teamIds: string[]) =>
-            removeCustomerTeams(customerId, teamIds),
+            removeCustomerTeams(customerId, teamIds, accountId),
 
         onMutate: async (teamIds) => {
             await qc.cancelQueries({ queryKey: ["inbox-customers"] })
@@ -321,6 +367,6 @@ export function useRemoveTeams(customerId: string) {
             if (snap) rollback(qc, snap)
             toast.error("فشل إزالة الفرق")
         },
-        onSettled: () => settleInbox(qc),
+        onSettled: () => settleInbox(qc, customerId),
     })
 }

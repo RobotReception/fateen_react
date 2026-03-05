@@ -13,10 +13,10 @@ import type {
 
 /* ── Agents API lives at /api/v1/agents ── */
 const AGENTS_BASE =
-    (import.meta.env.VITE_API_BASE_URL || "http://161.97.117.77:4488/api/backend/v2")
+    (import.meta.env.VITE_API_BASE_URL || "/api/backend/v2")
         .replace(/\/api\/backend\/v2\/?$/, "/api/backend/v2/agents")
 
-const client = axios.create({ baseURL: AGENTS_BASE, timeout: 30000 })
+const client = axios.create({ baseURL: AGENTS_BASE, withCredentials: true, timeout: 30000 })
 
 // Inject JWT + tenant-id automatically
 client.interceptors.request.use((cfg) => {

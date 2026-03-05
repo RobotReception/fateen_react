@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback, useEffect, useMemo, type KeyboardEvent, type ChangeEvent } from "react"
 import {
     Send, Paperclip, Smile, Image, FileText,
-    MessageSquare, Sparkles, ChevronDown, X, Loader2, AtSign, Hash, Mic, Square
+    MessageSquare, Sparkles, ChevronDown, X, Loader2, AtSign, Hash, Mic, Square, StickyNote
 } from "lucide-react"
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query"
 import { useSendMessage } from "../../hooks/use-send-message"
@@ -12,6 +12,8 @@ import { getAllSnippets } from "@/features/settings/services/snippets-service"
 import { toast } from "sonner"
 import type { Customer } from "../../types/inbox.types"
 import type { Snippet } from "@/features/settings/types/teams-tags"
+import { usePermissions } from "@/lib/usePermissions"
+import { PAGE_BITS, ACTION_BITS } from "@/lib/permissions"
 
 interface Props {
     customerId: string
@@ -84,6 +86,12 @@ export function MessageComposer({ customerId, customer }: Props) {
     const { mutate: send, isPending } = useSendMessage(customerId)
     const { setIsSending, replyTo, setReplyTo } = useConversationStore()
     const { user } = useAuthStore()
+    const { canPerformAction } = usePermissions()
+
+    /* ── فحص الصلاحيات ── */
+    const canSendMsg = canPerformAction(PAGE_BITS.INBOX, ACTION_BITS.CREATE_INBOX_ITEM)
+    const canUpload = canPerformAction(PAGE_BITS.INBOX, ACTION_BITS.UPLOAD_MEDIA_INBOX)
+    const canComment = canPerformAction(PAGE_BITS.INBOX, ACTION_BITS.ADD_COMMENT)
 
     // ── Brief users for @mentions ──
     const { data: briefUsersData } = useQuery({
@@ -96,18 +104,70 @@ export function MessageComposer({ customerId, customer }: Props) {
         !mentionSearch || u.name.toLowerCase().includes(mentionSearch.toLowerCase())
     )
 
-    // ── Comment mutation ──
+    // ── Comment mutation (optimistic — appears instantly) ──
     const commentMutation = useMutation({
         mutationFn: addComment,
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["customer-messages", customerId] })
+        onMutate: async (payload) => {
+            const tempId = `_comment_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
+
+            const optimisticComment = {
+                id: tempId,
+                _key: tempId,
+                customer_id: payload.customer_id,
+                platform: payload.platform,
+                sender_id: payload.sender_id,
+                sender_type: "agent" as const,
+                sender_info: payload.sender_info,
+                direction: "outbound" as const,
+                message_type: "comment" as const,
+                content: payload.content,
+                timestamp: new Date().toISOString(),
+                status: "sent" as const,
+                is_internal: true,
+            }
+
+            // Show instantly via pending store
+            const { addPendingMessage } = useConversationStore.getState()
+            addPendingMessage(optimisticComment as any)
+
+            return { tempId, optimisticComment }
+        },
+        onSuccess: (_data, _payload, context) => {
+            if (!context) return
+            const { tempId, optimisticComment } = context
+            const queryKey = ["customer-messages", customerId]
+
+            // 1. Inject into React Query cache so it survives the pending removal
+            queryClient.setQueryData<{ pages: any[]; pageParams: unknown[] }>(
+                queryKey,
+                (old) => {
+                    if (!old || !old.pages.length) return old
+                    const newPages = [...old.pages]
+                    const firstPage = { ...newPages[0] }
+                    firstPage.messages = [...(firstPage.messages ?? []), optimisticComment]
+                    newPages[0] = firstPage
+                    return { ...old, pages: newPages }
+                }
+            )
+
+            // 2. Remove from pending (it's now safe in the cache)
+            const { removePendingMessage } = useConversationStore.getState()
+            removePendingMessage(tempId)
+
+            // 3. Background sync with server
+            queryClient.invalidateQueries({ queryKey })
+
             setCommentText("")
             setMentionIds([])
             setMode("reply")
             setIsSendingComment(false)
             toast.success("تم إضافة التعليق")
         },
-        onError: () => {
+        onError: (_err, _payload, context) => {
+            if (context?.tempId) {
+                const { removePendingMessage } = useConversationStore.getState()
+                removePendingMessage(context.tempId)
+            }
             setIsSendingComment(false)
             toast.error("فشل إضافة التعليق")
         },
@@ -265,7 +325,6 @@ export function MessageComposer({ customerId, customer }: Props) {
             ? `${user.first_name ?? ""} ${user.last_name ?? ""}`.trim() || "Support"
             : "Support"
         const accountId = customer.account_id || customer.id || customer.tenant_id || ""
-        console.log("[SendMsg] account_id:", accountId, "| customer.account_id:", customer.account_id, "| customer.id:", customer.id)
 
         const basePayload = {
             platform: customer.platform,
@@ -378,7 +437,6 @@ export function MessageComposer({ customerId, customer }: Props) {
 
         uploadMedia(file, { platform: customer?.platform ?? "whatsapp" })
             .then((res) => {
-                console.log("[MediaUpload] response:", res)
                 // Defensive: try multiple field names for media_id
                 const mId = res.media_id || (res as any).id || (res as any).mediaId || ""
                 const mUrl = res.public_url || res.proxy_url || ""
@@ -398,6 +456,45 @@ export function MessageComposer({ customerId, customer }: Props) {
     }
 
     const canSend = (!!text.trim() || !!attachment) && !isPending && !isUploading && !!customer
+    const sessionClosed = customer?.session_status === "closed"
+
+    // ── Session closed — show locked notice ──
+    if (sessionClosed) {
+        return (
+            <div style={{
+                borderTop: "1px solid var(--t-border-light)",
+                background: "var(--t-card)",
+                flexShrink: 0,
+                padding: "16px 20px",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 8,
+            }}>
+                <div style={{
+                    display: "flex", alignItems: "center", gap: 8,
+                    padding: "10px 20px", borderRadius: 10,
+                    background: "rgba(239,68,68,0.04)",
+                    border: "1px solid rgba(239,68,68,0.12)",
+                    width: "100%", justifyContent: "center",
+                }}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                    </svg>
+                    <span style={{
+                        fontSize: 13, fontWeight: 700, color: "#ef4444",
+                    }}>الجلسة مغلقة</span>
+                </div>
+                <p style={{
+                    margin: 0, fontSize: 11.5, color: "var(--t-text-muted)",
+                    textAlign: "center", lineHeight: 1.6,
+                }}>
+                    لا يمكن إرسال رسائل أو تعليقات — الجلسة مغلقة. يجب إعادة فتح الجلسة أولاً.
+                </p>
+            </div>
+        )
+    }
 
     return (
         <div style={{ borderTop: "1px solid var(--t-border-light)", background: "var(--t-card)", flexShrink: 0 }}>
@@ -557,12 +654,12 @@ export function MessageComposer({ customerId, customer }: Props) {
                     {/* Toolbar */}
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "4px 10px 6px" }}>
                         <div style={{ display: "flex", alignItems: "center", gap: 1 }}>
-                            <ToolBtn icon={<Image size={15} />} title="صورة" onClick={() => {
+                            {canUpload && <ToolBtn icon={<Image size={15} />} title="صورة" onClick={() => {
                                 if (fileInputRef.current) { fileInputRef.current.accept = "image/*"; fileInputRef.current.click() }
-                            }} />
-                            <ToolBtn icon={<Paperclip size={15} />} title="مرفق" onClick={() => {
+                            }} />}
+                            {canUpload && <ToolBtn icon={<Paperclip size={15} />} title="مرفق" onClick={() => {
                                 if (fileInputRef.current) { fileInputRef.current.accept = "*/*"; fileInputRef.current.click() }
-                            }} />
+                            }} />}
                             <ToolBtn icon={<Smile size={15} />} title="إيموجي" isActive={showEmoji}
                                 onClick={() => { setShowEmoji(!showEmoji); setShowSnippets(false); setShowVariables(false) }} />
                             <ToolBtn icon={isRecording ? <Square size={15} /> : <Mic size={15} />}
@@ -582,65 +679,43 @@ export function MessageComposer({ customerId, customer }: Props) {
                                             return
                                         }
                                         navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
-                                            const mr = new MediaRecorder(stream)
+                                            // Pick the best MIME type the server accepts & browser supports
+                                            const preferredTypes = [
+                                                { mime: "audio/ogg;codecs=opus", ext: "ogg" },
+                                                { mime: "audio/ogg", ext: "ogg" },
+                                                { mime: "audio/webm;codecs=opus", ext: "ogg" }, // webm/opus → rename to .ogg (same codec)
+                                                { mime: "audio/webm", ext: "ogg" },
+                                            ]
+                                            const chosen = preferredTypes.find((t) => MediaRecorder.isTypeSupported(t.mime))
+                                                ?? { mime: "", ext: "ogg" }
+
+                                            const mr = chosen.mime
+                                                ? new MediaRecorder(stream, { mimeType: chosen.mime })
+                                                : new MediaRecorder(stream)
                                             mediaRecorderRef.current = mr
                                             const chunks: BlobPart[] = []
                                             mr.ondataavailable = (e) => chunks.push(e.data)
-                                            mr.onstop = async () => {
+                                            mr.onstop = () => {
                                                 stream.getTracks().forEach((t) => t.stop())
-                                                const webmBlob = new Blob(chunks, { type: "audio/webm" })
+                                                const actualMime = mr.mimeType || chosen.mime || "audio/ogg"
+                                                // Always upload with .ogg extension (server accepts ogg/mp3, not wav/webm)
+                                                const blob = new Blob(chunks, { type: actualMime })
+                                                const file = new File([blob], `voice_${Date.now()}.ogg`, { type: "audio/ogg" })
 
-                                                // Convert webm → MP3 via AudioContext + lamejs
-                                                try {
-                                                    const arrayBuf = await webmBlob.arrayBuffer()
-                                                    const audioCtx = new AudioContext()
-                                                    const decoded = await audioCtx.decodeAudioData(arrayBuf)
-                                                    audioCtx.close()
-
-                                                    const sampleRate = decoded.sampleRate
-                                                    const samples = decoded.getChannelData(0) // mono
-
-                                                    // @ts-ignore — lamejs has no TS types
-                                                    const lamejs = await import("lamejs")
-                                                    const mp3enc = new lamejs.Mp3Encoder(1, sampleRate, 128)
-
-                                                    // Convert Float32 → Int16
-                                                    const int16 = new Int16Array(samples.length)
-                                                    for (let i = 0; i < samples.length; i++) {
-                                                        const s = Math.max(-1, Math.min(1, samples[i]))
-                                                        int16[i] = s < 0 ? s * 0x8000 : s * 0x7FFF
-                                                    }
-
-                                                    const mp3Parts: Uint8Array[] = []
-                                                    const blockSize = 1152
-                                                    for (let i = 0; i < int16.length; i += blockSize) {
-                                                        const chunk = int16.subarray(i, i + blockSize)
-                                                        const buf = mp3enc.encodeBuffer(chunk)
-                                                        if (buf.length > 0) mp3Parts.push(new Uint8Array(buf))
-                                                    }
-                                                    const end = mp3enc.flush()
-                                                    if (end.length > 0) mp3Parts.push(new Uint8Array(end))
-
-                                                    const mp3Blob = new Blob(mp3Parts as BlobPart[], { type: "audio/mpeg" })
-                                                    const file = new File([mp3Blob], `voice_${Date.now()}.mp3`, { type: "audio/mpeg" })
-
-                                                    setAttachment({ file, type: "audio" })
-                                                    setIsUploading(true)
-                                                    uploadMedia(file, { platform: customer?.platform ?? "whatsapp" })
-                                                        .then((res) => {
-                                                            const mId = res.media_id || (res as any).id || ""
-                                                            const mUrl = res.public_url || res.proxy_url || ""
-                                                            setAttachment((prev) => prev ? { ...prev, mediaId: mId, mediaUrl: mUrl } : null)
-                                                            setIsUploading(false)
-                                                        })
-                                                        .catch(() => {
-                                                            toast.error("فشل رفع التسجيل الصوتي")
-                                                            setAttachment(null)
-                                                            setIsUploading(false)
-                                                        })
-                                                } catch {
-                                                    toast.error("فشل تحويل التسجيل إلى MP3")
-                                                }
+                                                setAttachment({ file, type: "audio" })
+                                                setIsUploading(true)
+                                                uploadMedia(file, { platform: customer?.platform ?? "whatsapp" })
+                                                    .then((res) => {
+                                                        const mId = res.media_id || (res as any).id || ""
+                                                        const mUrl = res.public_url || res.proxy_url || ""
+                                                        setAttachment((prev) => prev ? { ...prev, mediaId: mId, mediaUrl: mUrl } : null)
+                                                        setIsUploading(false)
+                                                    })
+                                                    .catch(() => {
+                                                        toast.error("فشل رفع التسجيل الصوتي")
+                                                        setAttachment(null)
+                                                        setIsUploading(false)
+                                                    })
                                             }
                                             mr.start()
                                             setIsRecording(true)
@@ -673,7 +748,7 @@ export function MessageComposer({ customerId, customer }: Props) {
                             </div>
                         )}
 
-                        <button onClick={handleSend} disabled={!canSend} style={{
+                        {canSendMsg && <button onClick={handleSend} disabled={!canSend} style={{
                             width: 32, height: 32, borderRadius: "50%", border: "none",
                             background: canSend ? "var(--t-accent)" : "var(--t-surface)",
                             color: canSend ? "var(--t-text-on-accent)" : "var(--t-text-faint)",
@@ -684,7 +759,7 @@ export function MessageComposer({ customerId, customer }: Props) {
                             {isPending || isUploading
                                 ? <Loader2 size={15} style={{ animation: "spin 0.7s linear infinite" }} />
                                 : <Send size={14} />}
-                        </button>
+                        </button>}
                     </div>
 
                     {/* Full emoji picker */}
@@ -741,11 +816,40 @@ export function MessageComposer({ customerId, customer }: Props) {
             {/* ═══ COMMENT MODE ═══ */}
             {mode === "comment" && (
                 <div style={{
-                    background: "rgba(0,114,181,0.04)",
-                    border: "2px solid rgba(0,71,134,0.15)",
+                    background: "#fff",
                     borderRadius: 0,
                     position: "relative",
                 }}>
+                    {/* Accent header bar */}
+                    <div style={{
+                        display: "flex", alignItems: "center", gap: 8,
+                        padding: "7px 14px",
+                        background: "linear-gradient(90deg, rgba(245,158,11,0.06) 0%, rgba(217,119,6,0.03) 100%)",
+                        borderBottom: "1px solid rgba(245,158,11,0.12)",
+                    }}>
+                        <div style={{
+                            width: 4, height: 16, borderRadius: 2,
+                            background: "linear-gradient(180deg, #f59e0b, #d97706)",
+                            flexShrink: 0,
+                        }} />
+                        <StickyNote size={13} style={{ color: "#d97706", flexShrink: 0 }} />
+                        <span style={{ fontSize: 11, fontWeight: 700, color: "#92400e" }}>ملاحظة داخلية</span>
+                        <span style={{ fontSize: 9, color: "#9ca3af", fontWeight: 500 }}>— مرئية فقط لفريقك</span>
+                        <span style={{ flex: 1 }} />
+                        <button onClick={() => { setMode("reply"); setCommentText(""); setMentionIds([]) }}
+                            style={{
+                                width: 20, height: 20, borderRadius: "50%", border: "none",
+                                background: "rgba(0,0,0,0.05)", cursor: "pointer", flexShrink: 0,
+                                display: "flex", alignItems: "center", justifyContent: "center",
+                                color: "#9ca3af", transition: "all .12s",
+                            }}
+                            onMouseEnter={e => { e.currentTarget.style.background = "rgba(0,0,0,0.1)"; e.currentTarget.style.color = "#374151" }}
+                            onMouseLeave={e => { e.currentTarget.style.background = "rgba(0,0,0,0.05)"; e.currentTarget.style.color = "#9ca3af" }}
+                        >
+                            <X size={11} />
+                        </button>
+                    </div>
+
                     {/* @Mentions dropdown */}
                     {showMentions && (
                         <div ref={mentionRef} style={{
@@ -755,12 +859,15 @@ export function MessageComposer({ customerId, customer }: Props) {
                             border: "1px solid var(--t-border-light)",
                             maxHeight: 200, overflowY: "auto", zIndex: 50,
                         }}>
+                            <div style={{ padding: "6px 12px 4px", display: "flex", alignItems: "center", gap: 5, borderBottom: "1px solid var(--t-border-light)" }}>
+                                <AtSign size={11} style={{ color: "#004786" }} />
+                                <span style={{ fontSize: 10, fontWeight: 700, color: "#004786" }}>أذكر شخصاً</span>
+                            </div>
                             {filteredMentionUsers.length === 0 ? (
                                 <div style={{ padding: "10px 14px", fontSize: 12, color: "var(--t-text-faint)" }}>لا يوجد نتائج</div>
                             ) : filteredMentionUsers.map((u) => (
                                 <button key={u.user_id}
                                     onClick={() => {
-                                        // Insert @name and store the user_id
                                         const before = commentText.slice(0, commentText.lastIndexOf("@"))
                                         setCommentText(before + `@${u.name} `)
                                         if (!mentionIds.includes(u.user_id)) setMentionIds((p) => [...p, u.user_id])
@@ -778,9 +885,9 @@ export function MessageComposer({ customerId, customer }: Props) {
                                     onMouseLeave={(e) => { e.currentTarget.style.background = "none" }}
                                 >
                                     {u.profile_picture ? (
-                                        <img src={u.profile_picture} alt="" style={{ width: 28, height: 28, borderRadius: "50%", objectFit: "cover" }} />
+                                        <img src={u.profile_picture} alt="" style={{ width: 26, height: 26, borderRadius: "50%", objectFit: "cover" }} />
                                     ) : (
-                                        <div style={{ width: 28, height: 28, borderRadius: "50%", background: "var(--t-accent)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700 }}>
+                                        <div style={{ width: 26, height: 26, borderRadius: "50%", background: "linear-gradient(135deg, #f59e0b, #d97706)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700 }}>
                                             {u.name?.charAt(0) || "?"}
                                         </div>
                                     )}
@@ -790,71 +897,86 @@ export function MessageComposer({ customerId, customer }: Props) {
                         </div>
                     )}
 
-                    {/* Textarea */}
-                    <div style={{ padding: "10px 14px 4px", display: "flex", alignItems: "flex-start", gap: 8 }}>
-                        <span style={{ fontSize: 18, flexShrink: 0, marginTop: 2 }}>💬</span>
-                        <textarea
-                            ref={commentRef as any}
-                            autoFocus
-                            value={commentText}
-                            onChange={(e) => {
-                                const val = e.target.value
-                                setCommentText(val)
-                                // Auto-resize
-                                e.target.style.height = "auto"
-                                e.target.style.height = Math.min(e.target.scrollHeight, 120) + "px"
-                                // Detect @ for mentions
-                                const atIdx = val.lastIndexOf("@")
-                                if (atIdx >= 0) {
-                                    const afterAt = val.slice(atIdx + 1)
-                                    if (!afterAt.includes(" ")) {
-                                        setShowMentions(true)
-                                        setMentionSearch(afterAt)
+                    {/* Textarea area */}
+                    <div style={{ padding: "8px 14px 6px" }}>
+                        <div style={{
+                            background: "rgba(245,158,11,0.03)",
+                            border: "1.5px solid rgba(245,158,11,0.18)",
+                            borderRadius: 10,
+                            padding: "8px 12px",
+                            transition: "border-color .15s",
+                        }}>
+                            <textarea
+                                ref={commentRef as any}
+                                autoFocus
+                                value={commentText}
+                                onChange={(e) => {
+                                    const val = e.target.value
+                                    setCommentText(val)
+                                    e.target.style.height = "auto"
+                                    e.target.style.height = Math.min(e.target.scrollHeight, 120) + "px"
+                                    const atIdx = val.lastIndexOf("@")
+                                    if (atIdx >= 0) {
+                                        const afterAt = val.slice(atIdx + 1)
+                                        if (!afterAt.includes(" ")) {
+                                            setShowMentions(true)
+                                            setMentionSearch(afterAt)
+                                        } else {
+                                            setShowMentions(false)
+                                        }
                                     } else {
                                         setShowMentions(false)
                                     }
-                                } else {
-                                    setShowMentions(false)
-                                }
-                            }}
-                            onKeyDown={(e) => {
-                                if (e.key === "Escape") { setShowMentions(false); if (!showMentions) { setMode("reply"); setCommentText(""); setMentionIds([]) } }
-                                if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSendComment() }
-                            }}
-                            placeholder="Use @ to mention a teammate. Comments are only visible to your team."
-                            rows={1}
-                            style={{
-                                flex: 1, border: "none", outline: "none", resize: "none",
-                                background: "transparent", fontSize: 13,
-                                color: "#1a3a5c", fontFamily: "inherit",
-                                lineHeight: 1.6, minHeight: 24, maxHeight: 120,
-                            }}
-                        />
-                        <button onClick={() => { setMode("reply"); setCommentText(""); setMentionIds([]) }}
-                            style={{
-                                width: 24, height: 24, borderRadius: "50%", border: "none",
-                                background: "rgba(0,71,134,0.08)", cursor: "pointer", flexShrink: 0,
-                                display: "flex", alignItems: "center", justifyContent: "center",
-                                color: "#004786", marginTop: 2,
-                            }}>
-                            <X size={14} />
-                        </button>
+                                }}
+                                onKeyDown={(e) => {
+                                    if (e.key === "Escape") { setShowMentions(false); if (!showMentions) { setMode("reply"); setCommentText(""); setMentionIds([]) } }
+                                    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSendComment() }
+                                }}
+                                onFocus={(e) => {
+                                    const wrapper = e.currentTarget.parentElement as HTMLElement
+                                    if (wrapper) wrapper.style.borderColor = "rgba(245,158,11,0.4)"
+                                }}
+                                onBlur={(e) => {
+                                    const wrapper = e.currentTarget.parentElement as HTMLElement
+                                    if (wrapper) wrapper.style.borderColor = "rgba(245,158,11,0.18)"
+                                }}
+                                placeholder="اكتب ملاحظتك هنا... استخدم @ لذكر أحد أعضاء الفريق"
+                                rows={2}
+                                style={{
+                                    width: "100%", border: "none", outline: "none", resize: "none",
+                                    background: "transparent", fontSize: 13,
+                                    color: "#1f2937", fontFamily: "inherit",
+                                    lineHeight: 1.6, minHeight: 44, maxHeight: 120,
+                                    padding: 0,
+                                }}
+                            />
+                        </div>
                     </div>
 
                     {/* Mention tags */}
                     {mentionIds.length > 0 && (
-                        <div style={{ padding: "0 14px 4px 44px", display: "flex", gap: 4, flexWrap: "wrap" }}>
+                        <div style={{ padding: "0 14px 6px", display: "flex", gap: 4, flexWrap: "wrap" }}>
                             {mentionIds.map((uid) => {
                                 const u = allUsers.find((x) => x.user_id === uid)
                                 return (
                                     <span key={uid} style={{
-                                        fontSize: 10, padding: "2px 8px", borderRadius: 10,
-                                        background: "rgba(0,114,181,0.1)", color: "#004786", fontWeight: 600,
-                                        display: "inline-flex", alignItems: "center", gap: 3,
+                                        display: "inline-flex", alignItems: "center", gap: 4,
+                                        padding: "3px 8px 3px 10px", borderRadius: 12,
+                                        background: "rgba(0,71,134,0.06)",
+                                        color: "#004786", fontSize: 10, fontWeight: 700,
+                                        border: "1px solid rgba(0,71,134,0.1)",
                                     }}>
-                                        @{u?.name || uid}
+                                        <AtSign size={9} />
+                                        {u?.name || uid}
                                         <button onClick={() => setMentionIds((p) => p.filter((x) => x !== uid))}
-                                            style={{ background: "none", border: "none", cursor: "pointer", padding: 0, color: "#004786", fontSize: 10, lineHeight: 1 }}>✕</button>
+                                            style={{
+                                                background: "rgba(0,71,134,0.08)", border: "none",
+                                                cursor: "pointer", padding: "1px 2px",
+                                                color: "#004786", fontSize: 9, lineHeight: 1,
+                                                borderRadius: "50%", display: "flex",
+                                                alignItems: "center", justifyContent: "center",
+                                                width: 14, height: 14,
+                                            }}>✕</button>
                                     </span>
                                 )
                             })}
@@ -865,16 +987,21 @@ export function MessageComposer({ customerId, customer }: Props) {
                     <div style={{
                         display: "flex", alignItems: "center", justifyContent: "space-between",
                         padding: "4px 14px 6px",
+                        borderTop: "1px solid #f3f4f6",
                     }}>
-                        <div style={{ display: "flex", gap: 4 }}>
+                        <div style={{ display: "flex", gap: 2 }}>
                             <button onClick={() => { setShowMentions(true); setMentionSearch(""); setCommentText((p) => p + "@"); commentRef.current?.focus() }}
                                 title="Mention @"
                                 style={{
                                     width: 30, height: 30, border: "none",
                                     background: "transparent", cursor: "pointer",
                                     display: "flex", alignItems: "center", justifyContent: "center",
-                                    color: "#004786", borderRadius: 6,
-                                }}>
+                                    color: "#d97706", borderRadius: 6,
+                                    transition: "all .12s",
+                                }}
+                                onMouseEnter={e => { e.currentTarget.style.background = "rgba(245,158,11,0.06)" }}
+                                onMouseLeave={e => { e.currentTarget.style.background = "transparent" }}
+                            >
                                 <AtSign size={15} />
                             </button>
                         </div>
@@ -883,10 +1010,11 @@ export function MessageComposer({ customerId, customer }: Props) {
                             disabled={!commentText.trim() || isSendingComment}
                             style={{
                                 width: 30, height: 30, borderRadius: "50%", border: "none",
-                                background: commentText.trim() && !isSendingComment ? "linear-gradient(135deg, #0072b5, #004786)" : "#e5e7eb",
+                                background: commentText.trim() && !isSendingComment ? "linear-gradient(135deg, #f59e0b, #d97706)" : "#e5e7eb",
                                 cursor: commentText.trim() && !isSendingComment ? "pointer" : "not-allowed",
                                 display: "flex", alignItems: "center", justifyContent: "center",
                                 color: "#fff", transition: "all .15s",
+                                boxShadow: commentText.trim() && !isSendingComment ? "0 2px 6px rgba(245,158,11,0.3)" : "none",
                             }}>
                             {isSendingComment ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
                         </button>
@@ -901,17 +1029,29 @@ export function MessageComposer({ customerId, customer }: Props) {
                 borderTop: "1px solid var(--t-border-light)",
                 background: "var(--t-bg, var(--t-surface))",
             }}>
-                <button
+                {canComment && <button
                     onClick={() => { setMode(mode === "comment" ? "reply" : "comment"); if (mode !== "comment") setTimeout(() => commentRef.current?.focus(), 50) }}
                     style={{
-                        ...linkBtnDark,
-                        fontWeight: mode === "comment" ? 700 : 500,
-                        color: mode === "comment" ? "#004786" : "var(--t-text-secondary)",
-                    }}>
-                    <MessageSquare size={13} />
-                    {mode === "comment" ? "Back to reply" : "Add comment"}
-                </button>
-                <button style={linkBtn}><Sparkles size={13} />Summarize</button>
+                        display: "flex", alignItems: "center", gap: 5,
+                        background: mode === "comment"
+                            ? "rgba(0,71,134,0.08)"
+                            : "linear-gradient(135deg, rgba(245,158,11,0.08), rgba(217,119,6,0.05))",
+                        padding: "5px 12px",
+                        borderRadius: 8,
+                        fontSize: 11,
+                        fontWeight: 700,
+                        color: mode === "comment" ? "#004786" : "#92400e",
+                        cursor: "pointer",
+                        transition: "all .15s",
+                        border: mode === "comment" ? "1px solid rgba(0,71,134,0.15)" : "1px solid rgba(245,158,11,0.15)",
+                    }}
+                    onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 2px 6px rgba(0,0,0,0.06)" }}
+                    onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none" }}
+                >
+                    {mode === "comment" ? <MessageSquare size={12} /> : <StickyNote size={12} />}
+                    {mode === "comment" ? "العودة للرد" : "إضافة ملاحظة"}
+                </button>}
+                <button style={linkBtn}><Sparkles size={13} />تلخيص</button>
             </div>
 
             <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
@@ -984,13 +1124,6 @@ const linkBtn: React.CSSProperties = {
     border: "none", background: "transparent",
     fontSize: 12, fontWeight: 600,
     color: "var(--t-accent)", cursor: "pointer",
-}
-
-const linkBtnDark: React.CSSProperties = {
-    display: "flex", alignItems: "center", gap: 4,
-    border: "none", background: "transparent",
-    fontSize: 12, fontWeight: 500,
-    color: "var(--t-text-secondary)", cursor: "pointer",
 }
 
 

@@ -226,6 +226,11 @@
   background-color: #1e293b !important;
 }
 
+/* Dark mode glassmorphism header */
+.dark header {
+  background: rgba(30, 41, 59, 0.82) !important;
+}
+
 .dark .text-gray-900 {
   color: #f1f5f9 !important;
 }

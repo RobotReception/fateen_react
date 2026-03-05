@@ -1,5 +1,5 @@
 // ══════════════════════════════════════════════════════════════
-//  Menu Manager — TypeScript Types
+//  Menu Manager — TypeScript Types (matches actual API)
 // ══════════════════════════════════════════════════════════════
 
 // ── Shared API response wrapper ──
@@ -74,7 +74,7 @@ export type MenuItemType =
     | "quick_reply"
 
 export interface MenuItemContent {
-    // submenu
+    // submenu presentation
     presentation?: { header?: string; footer?: string; button?: string }
     // text
     reply?: string
@@ -84,12 +84,21 @@ export interface MenuItemContent {
     // media
     reply_after_media?: string | null
     asset_ids?: string[]
-    // generic
+    // images (new format)
+    caption?: string
+    images?: { url: string; alt?: string }[]
+    // files (new format)
+    files?: { url: string; filename: string; mime_type?: string }[]
+    // buttons (new format)
+    buttons?: { type: "url" | "reply"; title: string; value: string }[]
+    // generic fallback
     [key: string]: unknown
 }
 
 export interface MenuItem {
     id: string
+    item_id?: string
+    tenant_id?: string
     template_id: string
     root_id?: string
     parent_id: string | null
@@ -105,7 +114,7 @@ export interface MenuItem {
     deleted_at?: string | null
 }
 
-/** Tree node returned by GET /templates/{id}/tree */
+/** Tree node returned by GET /templates/{id}/tree — { item, children } wrapper */
 export interface MenuTreeNode {
     item: MenuItem
     children: MenuTreeNode[]
@@ -125,6 +134,10 @@ export interface CreateMenuItemPayload {
     content?: MenuItemContent
     is_active?: boolean
     order?: number
+    // submenu-specific (API also accepts top-level)
+    header?: string
+    footer?: string
+    button?: string
 }
 
 export interface UpdateMenuItemPayload {
@@ -136,11 +149,14 @@ export interface UpdateMenuItemPayload {
     is_active?: boolean
     order?: number
     parent_id?: string
+    header?: string
+    footer?: string
+    button?: string
 }
 
 export interface MoveItemPayload {
     new_parent_id?: string | null
-    new_order: number
+    new_order?: number
 }
 
 export interface ReorderItem {
@@ -192,9 +208,13 @@ export interface CreateAssignmentPayload {
 }
 
 export interface UpdateAssignmentPayload {
+    template_id?: string
+    menu_key?: string
     priority?: number
     is_active?: boolean
     customizations?: AssignmentCustomizations
+    effective_from?: string | null
+    effective_until?: string | null
 }
 
 // ── Account Groups ──
@@ -226,6 +246,7 @@ export interface CreateGroupPayload {
 export interface UpdateGroupPayload {
     name?: string
     description?: string
+    is_active?: boolean
 }
 
 // ── Account Menus (Runtime) ──
@@ -259,6 +280,26 @@ export interface AccountMenuItemDetail {
     button?: string
     items?: AccountMainMenu["items"]
     content?: MenuItemContent
+}
+
+// ── Compiled Menu ──
+
+export interface CompiledMenuData {
+    v: number
+    tenant: string
+    account_id: string
+    menu_key: string
+    template_id: string
+    assignment_id: string
+    title: string
+    type: string
+    content: Record<string, unknown>
+    items: unknown[]
+    footer?: string
+    button?: string
+    header?: string
+    compiled_at: string
+    cache_ttl: number
 }
 
 // ── Menu Item Type Config (UI) ──

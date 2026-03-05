@@ -1,19 +1,12 @@
 import { useState, useRef, useEffect } from "react"
 import { createPortal } from "react-dom"
-import { FileText, Headphones, Film, MessageSquare, UserCheck, Users, Tag, XCircle, RefreshCw, ArrowRightLeft, MoreVertical, Copy, Reply, Download, X } from "lucide-react"
+import { FileText, Headphones, Film, MessageSquare, UserCheck, Users, Tag, XCircle, RefreshCw, ArrowRightLeft, MoreVertical, Copy, Reply, Download, X, StickyNote, AtSign } from "lucide-react"
 import type { Message, ActivityEventType } from "../../types/inbox.types"
 import { useConversationStore } from "../../store/conversation.store"
 import { toast } from "sonner"
+import { formatTime, formatDate } from "../../../../utils/time"
 
-function formatTime(dateStr?: string) {
-    if (!dateStr) return ""
-    return new Date(dateStr).toLocaleTimeString("ar", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Aden" })
-}
 
-function formatDate(dateStr?: string) {
-    if (!dateStr) return ""
-    return new Date(dateStr).toLocaleDateString("ar", { year: "numeric", month: "short", day: "numeric", timeZone: "Asia/Aden" })
-}
 
 interface Props {
     message: Message
@@ -21,14 +14,7 @@ interface Props {
 }
 
 export function MessageBubble({ message: m, isPending }: Props) {
-    // ─── Activity events → centered system row ───
-    if (m.message_type === "activity") return <ActivityBubble message={m} />
-
-    // ─── Comment → internal note ───
-    if (m.message_type === "comment") return <CommentBubble message={m} />
-
-    // ─── Regular messages ───
-    const isOwn = m.direction === "outbound"
+    // ─── All hooks must be called unconditionally (Rules of Hooks) ───
     const [hovered, setHovered] = useState(false)
     const [menuOpen, setMenuOpen] = useState(false)
     const menuRef = useRef<HTMLDivElement>(null)
@@ -43,6 +29,15 @@ export function MessageBubble({ message: m, isPending }: Props) {
         document.addEventListener("mousedown", handler)
         return () => document.removeEventListener("mousedown", handler)
     }, [menuOpen])
+
+    // ─── Activity events → centered system row ───
+    if (m.message_type === "activity") return <ActivityBubble message={m} />
+
+    // ─── Comment → internal note ───
+    if (m.message_type === "comment") return <CommentBubble message={m} />
+
+    // ─── Regular messages ───
+    const isOwn = m.direction === "outbound"
 
     const handleCopy = () => {
         const text = m.content?.text || m.content?.caption || ""
@@ -83,11 +78,15 @@ export function MessageBubble({ message: m, isPending }: Props) {
             )}
 
             <div style={{
-                maxWidth: "68%", padding: "8px 12px",
-                borderRadius: isOwn ? "14px 14px 4px 14px" : "14px 14px 14px 4px",
-                background: isOwn ? "var(--t-accent)" : "var(--t-card)",
+                maxWidth: "68%", padding: "9px 13px",
+                borderRadius: isOwn ? "16px 16px 4px 16px" : "16px 16px 16px 4px",
+                background: isOwn
+                    ? "linear-gradient(135deg, #004786, #0072b5)"
+                    : "var(--t-card)",
                 border: isOwn ? "none" : "1px solid var(--t-border-light)",
-                boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+                boxShadow: isOwn
+                    ? "0 2px 10px rgba(0,71,134,0.28)"
+                    : "0 1px 4px rgba(0,0,0,0.05)",
                 position: "relative",
             }}>
                 {/* Three-dot menu */}
@@ -206,28 +205,32 @@ function InteractiveContent({ content: c, isOwn }: { content: any; isOwn: boolea
     const [listOpen, setListOpen] = useState(false)
     const [hoveredRow, setHoveredRow] = useState<number | null>(null)
     const textColor = isOwn ? "rgba(255,255,255,0.95)" : "var(--t-text)"
-    const mutedColor = isOwn ? "rgba(255,255,255,0.5)" : "var(--t-text-faint)"
-    const btnColor = isOwn ? "#fff" : "var(--t-accent)"
-    const borderColor = isOwn ? "rgba(255,255,255,0.15)" : "var(--t-border-light)"
+    const mutedColor = isOwn ? "rgba(255,255,255,0.55)" : "var(--t-text-faint)"
+    // Fateen brand accent colours
+    const brandMain = isOwn ? "#fff" : "#004786"
+    const brandLight = isOwn ? "rgba(255,255,255,0.14)" : "rgba(0,71,134,0.07)"
+    const borderColor = isOwn ? "rgba(255,255,255,0.16)" : "rgba(0,71,134,0.14)"
 
-    // ── Inbound interactive (customer selected from list/button) ──
+    // ── Inbound interactive: customer selected an option ──
     if (c.type === "interactive" && c.title) {
         return (
             <div style={{
-                display: "inline-flex", alignItems: "center", gap: 6,
-                padding: "5px 10px", borderRadius: 8,
-                background: isOwn ? "rgba(255,255,255,0.08)" : "rgba(99,102,241,0.06)",
-                border: `1px solid ${isOwn ? "rgba(255,255,255,0.12)" : "rgba(99,102,241,0.15)"}`,
+                display: "inline-flex", alignItems: "center", gap: 7,
+                padding: "5px 12px 5px 6px", borderRadius: 20,
+                background: isOwn
+                    ? "rgba(255,255,255,0.12)"
+                    : "linear-gradient(135deg, rgba(0,71,134,0.07), rgba(0,114,181,0.07))",
+                border: `1.5px solid ${isOwn ? "rgba(255,255,255,0.18)" : "rgba(0,71,134,0.18)"}`,
             }}>
                 <span style={{
-                    width: 16, height: 16, borderRadius: "50%",
-                    background: isOwn ? "rgba(255,255,255,0.2)" : "var(--t-accent)",
+                    width: 18, height: 18, borderRadius: "50%", flexShrink: 0,
+                    background: isOwn
+                        ? "rgba(255,255,255,0.25)"
+                        : "linear-gradient(135deg, #004786, #0072b5)",
                     display: "flex", alignItems: "center", justifyContent: "center",
-                    fontSize: 8, color: "#fff", flexShrink: 0, fontWeight: 700,
+                    fontSize: 9, color: "#fff", fontWeight: 700,
                 }}>✓</span>
-                <span style={{
-                    fontSize: 12, fontWeight: 600, color: textColor,
-                }}>{c.title}</span>
+                <span style={{ fontSize: 12, fontWeight: 600, color: textColor }}>{c.title}</span>
             </div>
         )
     }
@@ -248,57 +251,69 @@ function InteractiveContent({ content: c, isOwn }: { content: any; isOwn: boolea
     const sections: any[] = c.sections || c.interactive?.action?.sections || []
 
     return (
-        <div style={{ minWidth: isList ? 200 : 160, maxWidth: 280 }}>
-            {/* Header */}
+        <div style={{ minWidth: isList ? 210 : 170, maxWidth: 290 }}>
+            {/* ── Header ── */}
             {header && (
                 typeof header === "object" && header.type === "image" && header.image?.link ? (
                     <img src={header.image.link} alt=""
-                        style={{ width: "100%", maxHeight: 140, objectFit: "cover", borderRadius: 6, marginBottom: 4 }} />
+                        style={{ width: "100%", maxHeight: 140, objectFit: "cover", borderRadius: 8, marginBottom: 6 }} />
                 ) : (
                     <p style={{
                         fontSize: 12, fontWeight: 700, color: textColor,
-                        margin: "0 0 3px", lineHeight: 1.3,
-                        paddingBottom: 4,
-                        borderBottom: `1.5px solid ${isOwn ? "rgba(255,255,255,0.15)" : "rgba(99,102,241,0.2)"}`,
+                        margin: "0 0 4px", lineHeight: 1.3, paddingBottom: 5,
+                        borderBottom: `1.5px solid ${borderColor}`,
                     }}>
                         {typeof header === "string" ? header : header.text || header}
                     </p>
                 )
             )}
 
-            {/* Body text */}
+            {/* ── Body ── */}
             {body && (
-                <p style={{ fontSize: 12, color: textColor, lineHeight: 1.5, margin: "2px 0 0", whiteSpace: "pre-wrap" }}>
+                <p style={{ fontSize: 12, color: textColor, lineHeight: 1.55, margin: "2px 0 0", whiteSpace: "pre-wrap" }}>
                     {typeof body === "string" ? body : body.text || ""}
                 </p>
             )}
 
-            {/* Footer */}
+            {/* ── Footer ── */}
             {footer && (
-                <p style={{ fontSize: 10, color: mutedColor, margin: "3px 0 0" }}>
+                <p style={{ fontSize: 10, color: mutedColor, margin: "4px 0 0", fontStyle: "italic" }}>
                     {typeof footer === "string" ? footer : footer.text || ""}
                 </p>
             )}
 
-            {/* Reply Buttons */}
+            {/* ── Reply Buttons ── */}
             {buttons.length > 0 && (
-                <div style={{ marginTop: 6, display: "flex", flexDirection: "column", gap: 3 }}>
+                <div style={{ marginTop: 8, display: "flex", flexDirection: "column", gap: 4 }}>
                     {buttons.map((btn: any, i: number) => {
-                        const label = btn.reply?.title || btn.title || btn.text || btn.label || `Button ${i + 1}`
+                        const label = btn.reply?.title || btn.title || btn.text || btn.label || `زر ${i + 1}`
                         const url = btn.url || btn.reply?.url
                         const id = btn.reply?.id || btn.id || i
                         return (
-                            <div key={id} style={{
-                                padding: "5px 10px", borderRadius: 6,
-                                background: isOwn ? "rgba(255,255,255,0.1)" : "var(--t-surface)",
-                                border: `1px solid ${borderColor}`,
-                                textAlign: "center", fontSize: 11, fontWeight: 600,
-                                color: btnColor, cursor: url ? "pointer" : "default",
-                                display: "flex", alignItems: "center", justifyContent: "center", gap: 4,
-                            }}
+                            <div key={id}
                                 onClick={() => { if (url) window.open(url, "_blank") }}
+                                style={{
+                                    padding: "6px 12px", borderRadius: 8,
+                                    background: brandLight,
+                                    border: `1.5px solid ${isOwn ? "rgba(255,255,255,0.22)" : "rgba(0,71,134,0.2)"}`,
+                                    textAlign: "center", fontSize: 12, fontWeight: 600,
+                                    color: brandMain, cursor: url ? "pointer" : "default",
+                                    display: "flex", alignItems: "center", justifyContent: "center", gap: 5,
+                                    transition: "all .15s ease",
+                                    userSelect: "none",
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.background = isOwn ? "rgba(255,255,255,0.22)" : "linear-gradient(135deg, #004786, #0072b5)"
+                                    e.currentTarget.style.color = "#fff"
+                                    e.currentTarget.style.borderColor = "transparent"
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.background = brandLight
+                                    e.currentTarget.style.color = brandMain
+                                    e.currentTarget.style.borderColor = isOwn ? "rgba(255,255,255,0.22)" : "rgba(0,71,134,0.2)"
+                                }}
                             >
-                                {url && <span style={{ fontSize: 9 }}>🔗</span>}
+                                {url && <span style={{ fontSize: 10 }}>🔗</span>}
                                 {label}
                             </div>
                         )
@@ -309,28 +324,28 @@ function InteractiveContent({ content: c, isOwn }: { content: any; isOwn: boolea
             {/* ── WhatsApp-style List ── */}
             {isList && listRows.length > 0 && (
                 <div style={{ marginTop: 8 }}>
-                    {/* List toggle button — pill style */}
                     <button
                         onClick={() => setListOpen(!listOpen)}
                         style={{
-                            width: "100%", padding: "7px 12px", borderRadius: 20,
-                            background: isOwn ? "rgba(255,255,255,0.1)" : "transparent",
-                            border: `1.5px solid ${isOwn ? "rgba(255,255,255,0.25)" : "var(--t-accent)"}`,
+                            width: "100%", padding: "7px 14px", borderRadius: 20,
+                            background: listOpen
+                                ? (isOwn ? "rgba(255,255,255,0.22)" : "linear-gradient(135deg, #004786, #0072b5)")
+                                : brandLight,
+                            border: `1.5px solid ${isOwn ? "rgba(255,255,255,0.25)" : "rgba(0,71,134,0.25)"}`,
                             cursor: "pointer", fontSize: 11, fontWeight: 700,
-                            color: isOwn ? "#fff" : "var(--t-accent)",
+                            color: listOpen ? "#fff" : brandMain,
                             display: "flex", alignItems: "center",
                             justifyContent: "center", gap: 6, fontFamily: "inherit",
                             transition: "all .2s ease",
-                            letterSpacing: 0.3,
                         }}
                         onMouseEnter={(e) => {
-                            e.currentTarget.style.background = isOwn ? "rgba(255,255,255,0.18)" : "var(--t-accent)"
+                            e.currentTarget.style.background = isOwn ? "rgba(255,255,255,0.22)" : "linear-gradient(135deg, #004786, #0072b5)"
                             e.currentTarget.style.color = "#fff"
-                            e.currentTarget.style.transform = "scale(1.02)"
+                            e.currentTarget.style.transform = "scale(1.01)"
                         }}
                         onMouseLeave={(e) => {
-                            e.currentTarget.style.background = isOwn ? "rgba(255,255,255,0.1)" : "transparent"
-                            e.currentTarget.style.color = isOwn ? "#fff" : "var(--t-accent)"
+                            e.currentTarget.style.background = listOpen ? (isOwn ? "rgba(255,255,255,0.22)" : "linear-gradient(135deg, #004786, #0072b5)") : brandLight
+                            e.currentTarget.style.color = listOpen ? "#fff" : brandMain
                             e.currentTarget.style.transform = "scale(1)"
                         }}
                     >
@@ -338,17 +353,16 @@ function InteractiveContent({ content: c, isOwn }: { content: any; isOwn: boolea
                         {listBtnLabel}
                         <span style={{
                             fontSize: 8, transition: "transform .25s ease",
-                            transform: listOpen ? "rotate(180deg)" : "rotate(0)",
-                            opacity: 0.6,
+                            transform: listOpen ? "rotate(180deg)" : "rotate(0)", opacity: 0.7,
                         }}>▼</span>
                     </button>
 
-                    {/* Expandable list rows */}
                     {listOpen && (
                         <div style={{
-                            marginTop: 5, borderRadius: 8, overflow: "hidden",
+                            marginTop: 4, borderRadius: 10, overflow: "hidden",
                             border: `1px solid ${borderColor}`,
-                            background: isOwn ? "rgba(255,255,255,0.04)" : "var(--t-card)",
+                            background: isOwn ? "rgba(0,0,0,0.08)" : "var(--t-card)",
+                            boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
                         }}>
                             {listRows.map((row: any, ri: number) => (
                                 <div
@@ -356,37 +370,39 @@ function InteractiveContent({ content: c, isOwn }: { content: any; isOwn: boolea
                                     onMouseEnter={() => setHoveredRow(ri)}
                                     onMouseLeave={() => setHoveredRow(null)}
                                     style={{
-                                        padding: "7px 10px",
+                                        padding: "8px 12px",
                                         borderBottom: ri < listRows.length - 1
-                                            ? `1px solid ${isOwn ? "rgba(255,255,255,0.06)" : "var(--t-border-light)"}`
+                                            ? `1px solid ${isOwn ? "rgba(255,255,255,0.07)" : "var(--t-border-light)"}`
                                             : "none",
                                         cursor: "default",
-                                        display: "flex", alignItems: "center", gap: 8,
-                                        transition: "all .15s ease",
+                                        display: "flex", alignItems: "center", gap: 10,
+                                        transition: "background .15s",
                                         background: hoveredRow === ri
-                                            ? (isOwn ? "rgba(255,255,255,0.08)" : "var(--t-surface)")
+                                            ? (isOwn ? "rgba(255,255,255,0.07)" : "rgba(0,71,134,0.05)")
                                             : "transparent",
-                                        borderRight: hoveredRow === ri
-                                            ? `2px solid ${isOwn ? "rgba(255,255,255,0.5)" : "var(--t-accent)"}`
-                                            : "2px solid transparent",
+                                        borderRight: `3px solid ${hoveredRow === ri
+                                            ? (isOwn ? "rgba(255,255,255,0.5)" : "#0072b5")
+                                            : "transparent"}`,
                                     }}
                                 >
-                                    {/* Dot indicator */}
                                     <span style={{
-                                        width: 5, height: 5, borderRadius: "50%",
+                                        width: 6, height: 6, borderRadius: "50%", flexShrink: 0,
                                         background: hoveredRow === ri
-                                            ? (isOwn ? "#fff" : "var(--t-accent)")
-                                            : (isOwn ? "rgba(255,255,255,0.3)" : "var(--t-text-faint)"),
-                                        flexShrink: 0,
-                                        transition: "all .15s ease",
+                                            ? (isOwn ? "#fff" : "#0072b5")
+                                            : (isOwn ? "rgba(255,255,255,0.25)" : "rgba(0,71,134,0.2)"),
+                                        transition: "background .15s",
                                     }} />
-                                    <p style={{
-                                        fontSize: 12, fontWeight: 500,
-                                        color: hoveredRow === ri ? (isOwn ? "#fff" : "var(--t-accent)") : textColor,
-                                        margin: 0, flex: 1,
-                                        overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-                                        transition: "color .15s ease",
-                                    }}>{row.title}</p>
+                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                        <p style={{
+                                            fontSize: 12, fontWeight: 600, margin: 0,
+                                            color: hoveredRow === ri ? (isOwn ? "#fff" : "#004786") : textColor,
+                                            overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                                            transition: "color .15s",
+                                        }}>{row.title}</p>
+                                        {row.description && (
+                                            <p style={{ fontSize: 10, margin: "1px 0 0", color: mutedColor }}>{row.description}</p>
+                                        )}
+                                    </div>
                                 </div>
                             ))}
                         </div>
@@ -394,50 +410,48 @@ function InteractiveContent({ content: c, isOwn }: { content: any; isOwn: boolea
                 </div>
             )}
 
-            {/* Sections-based list fallback */}
+            {/* ── Sections-based list fallback ── */}
             {!isList && sections.length > 0 && (
                 <div style={{ marginTop: 8 }}>
                     <button
                         onClick={() => setListOpen(!listOpen)}
                         style={{
-                            width: "100%", padding: "9px 12px", borderRadius: 8,
-                            background: isOwn ? "rgba(255,255,255,0.1)" : "var(--t-surface)", border: `1px solid ${borderColor}`,
-                            cursor: "pointer", fontSize: 13, fontWeight: 600,
-                            color: btnColor, display: "flex", alignItems: "center",
+                            width: "100%", padding: "7px 12px", borderRadius: 8,
+                            background: brandLight, border: `1.5px solid ${borderColor}`,
+                            cursor: "pointer", fontSize: 12, fontWeight: 600,
+                            color: brandMain, display: "flex", alignItems: "center",
                             justifyContent: "center", gap: 6, fontFamily: "inherit",
                             transition: "all .15s",
                         }}
                     >
-                        <span style={{ fontSize: 14 }}>📋</span>
+                        <span style={{ fontSize: 13 }}>📋</span>
                         {listBtnLabel}
                         <span style={{ fontSize: 10, transition: "transform .2s", transform: listOpen ? "rotate(180deg)" : "rotate(0)" }}>▼</span>
                     </button>
 
                     {listOpen && (
                         <div style={{
-                            marginTop: 6, borderRadius: 8, overflow: "hidden",
-                            border: `1px solid ${borderColor}`, background: isOwn ? "rgba(255,255,255,0.1)" : "var(--t-surface)",
+                            marginTop: 5, borderRadius: 10, overflow: "hidden",
+                            border: `1px solid ${borderColor}`,
+                            background: isOwn ? "rgba(0,0,0,0.08)" : "var(--t-surface)",
                         }}>
                             {sections.map((section: any, si: number) => (
                                 <div key={si}>
                                     {section.title && (
                                         <p style={{
-                                            fontSize: 11, fontWeight: 700, color: btnColor,
-                                            padding: "8px 12px 4px", margin: 0,
-                                            textTransform: "uppercase", letterSpacing: 0.5,
-                                        }}>
-                                            {section.title}
-                                        </p>
+                                            fontSize: 10, fontWeight: 800, color: isOwn ? "rgba(255,255,255,0.6)" : "#0072b5",
+                                            padding: "8px 12px 3px", margin: 0,
+                                            textTransform: "uppercase", letterSpacing: "0.07em",
+                                        }}>{section.title}</p>
                                     )}
                                     {(section.rows || []).map((row: any, ri: number) => (
                                         <div key={row.id || ri} style={{
                                             padding: "8px 12px",
                                             borderBottom: `1px solid ${borderColor}`,
-                                            cursor: "default",
                                         }}>
-                                            <p style={{ fontSize: 13, fontWeight: 600, color: textColor, margin: 0 }}>{row.title}</p>
+                                            <p style={{ fontSize: 12, fontWeight: 600, color: textColor, margin: 0 }}>{row.title}</p>
                                             {row.description && (
-                                                <p style={{ fontSize: 11, color: mutedColor, margin: "2px 0 0" }}>{row.description}</p>
+                                                <p style={{ fontSize: 10, color: mutedColor, margin: "2px 0 0" }}>{row.description}</p>
                                             )}
                                         </div>
                                     ))}
@@ -448,7 +462,7 @@ function InteractiveContent({ content: c, isOwn }: { content: any; isOwn: boolea
                 </div>
             )}
 
-            {/* Fallback: if no interactive content parsed, show raw text */}
+            {/* Fallback: raw text */}
             {!body && !buttons.length && !isList && !sections.length && c.text && (
                 <p style={{ fontSize: 13, color: textColor, lineHeight: 1.6, margin: 0, whiteSpace: "pre-wrap" }}>{c.text}</p>
             )}
@@ -629,6 +643,65 @@ function ContentRenderer({ message: m, isOwn }: { message: Message; isOwn: boole
                         {c.caption && <p style={{ fontSize: 11, opacity: 0.8 }}>{c.caption}</p>}
                     </div>
                 </a>
+            )
+
+        case "template":
+            return (
+                <div style={{
+                    minWidth: 200, maxWidth: 300,
+                    borderRadius: 12, overflow: "hidden",
+                    border: `1px solid ${isOwn ? "rgba(255,255,255,0.2)" : "rgba(0,71,134,0.15)"}`,
+                    background: isOwn ? "rgba(255,255,255,0.08)" : "rgba(0,71,134,0.04)",
+                }}>
+                    {/* Header bar */}
+                    <div style={{
+                        padding: "8px 12px",
+                        background: isOwn
+                            ? "rgba(255,255,255,0.12)"
+                            : "linear-gradient(135deg, rgba(0,71,134,0.08), rgba(0,114,181,0.08))",
+                        borderBottom: `1px solid ${isOwn ? "rgba(255,255,255,0.12)" : "rgba(0,71,134,0.1)"}`,
+                        display: "flex", alignItems: "center", gap: 8,
+                    }}>
+                        <span style={{
+                            width: 26, height: 26, borderRadius: 6, flexShrink: 0,
+                            background: isOwn
+                                ? "rgba(255,255,255,0.2)"
+                                : "linear-gradient(135deg, #004786, #0072b5)",
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                            fontSize: 12, color: "#fff", fontWeight: 700,
+                        }}>T</span>
+                        <div>
+                            <p style={{
+                                fontSize: 11, fontWeight: 700, margin: 0,
+                                color: isOwn ? "rgba(255,255,255,0.95)" : "#004786",
+                                letterSpacing: "-0.01em",
+                            }}>
+                                {c.template_name || c.name || "template"}
+                            </p>
+                            <p style={{
+                                fontSize: 9, margin: "1px 0 0",
+                                color: isOwn ? "rgba(255,255,255,0.5)" : "var(--t-text-faint)",
+                                textTransform: "uppercase", letterSpacing: "0.06em",
+                            }}>WhatsApp Template</p>
+                        </div>
+                    </div>
+                    {/* Footer: language */}
+                    {(c.language_code || c.language?.code) && (
+                        <div style={{
+                            padding: "5px 12px",
+                            display: "flex", alignItems: "center", gap: 5,
+                        }}>
+                            <span style={{ fontSize: 11 }}>🌐</span>
+                            <span style={{
+                                fontSize: 10, fontWeight: 600,
+                                color: isOwn ? "rgba(255,255,255,0.6)" : "var(--t-text-faint)",
+                                fontFamily: "monospace",
+                            }}>
+                                {c.language_code || c.language?.code}
+                            </span>
+                        </div>
+                    )}
+                </div>
             )
 
         default:
@@ -818,29 +891,121 @@ function activityText(evType?: ActivityEventType, meta?: Record<string, any>): {
 
 // ── Comment bubble (internal notes) ───────
 function CommentBubble({ message: m }: { message: Message }) {
+    const [expanded, setExpanded] = useState(false)
+    const senderName = m.sender_info?.name || "تعليق داخلي"
+    const initials = senderName.charAt(0).toUpperCase()
+    const rawText = m.content?.text || ""
+    const mentions = (m.content as any)?.mentions as string[] | undefined
+
+    // Strip @mentions from display text when collapsed
+    const displayText = expanded ? rawText : rawText.replace(/@[\w\u0600-\u06FF.]+/g, "").replace(/\s{2,}/g, " ").trim()
+
+    // Extract @mention names from raw text
+    const mentionNames = rawText.match(/@[\w\u0600-\u06FF.]+/g) || []
+    const hasMentions = mentionNames.length > 0 || (mentions && mentions.length > 0)
+
     return (
         <div style={{
-            display: "flex", justifyContent: "center", margin: "8px 16px",
+            display: "flex", justifyContent: "center", margin: "6px 20px",
+            animation: "noteIn .2s ease-out",
         }}>
-            <div style={{
-                maxWidth: "80%", padding: "8px 14px", borderRadius: 12,
-                background: "#fffbeb",
-                border: "1px solid #fde68a",
-                position: "relative",
-            }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 4, marginBottom: 4 }}>
-                    <MessageSquare size={12} style={{ color: "#b45309" }} />
-                    <span style={{ fontSize: 10, fontWeight: 700, color: "#b45309" }}>
-                        {m.sender_info?.name || "تعليق داخلي"}
-                    </span>
+            <div
+                onClick={() => hasMentions && setExpanded(!expanded)}
+                style={{
+                    maxWidth: "75%", minWidth: 200,
+                    borderRadius: 10,
+                    background: "#fff",
+                    border: "1px solid #e8eaed",
+                    boxShadow: expanded ? "0 2px 8px rgba(0,0,0,0.07)" : "0 1px 4px rgba(0,0,0,0.04)",
+                    overflow: "hidden",
+                    display: "flex",
+                    cursor: hasMentions ? "pointer" : "default",
+                    transition: "box-shadow .15s",
+                }}
+            >
+                {/* Accent bar */}
+                <div style={{
+                    width: 3, flexShrink: 0,
+                    background: "linear-gradient(180deg, #f59e0b, #d97706)",
+                    borderRadius: "3px 0 0 3px",
+                }} />
+
+                <div style={{ flex: 1, padding: "8px 12px" }}>
+                    {/* Header: avatar + name + badge */}
+                    <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 5 }}>
+                        <div style={{
+                            width: 22, height: 22, borderRadius: "50%", flexShrink: 0,
+                            background: "linear-gradient(135deg, #f59e0b, #d97706)",
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                            fontSize: 10, fontWeight: 800, color: "#fff",
+                            boxShadow: "0 1px 3px rgba(245,158,11,0.3)",
+                        }}>
+                            {initials}
+                        </div>
+                        <span style={{ fontSize: 11, fontWeight: 700, color: "#1f2937" }}>{senderName}</span>
+                        <span style={{
+                            fontSize: 8, fontWeight: 700, color: "#d97706",
+                            background: "rgba(245,158,11,0.08)",
+                            padding: "2px 6px", borderRadius: 4,
+                            letterSpacing: ".03em", textTransform: "uppercase",
+                        }}>ملاحظة</span>
+                        <span style={{ flex: 1 }} />
+                        {hasMentions && (
+                            <span style={{
+                                fontSize: 9, color: "#004786", fontWeight: 600,
+                                display: "flex", alignItems: "center", gap: 3,
+                                opacity: 0.6,
+                            }}>
+                                <AtSign size={10} />
+                                {mentionNames.length}
+                            </span>
+                        )}
+                        <StickyNote size={11} style={{ color: "#d4a017", opacity: 0.5 }} />
+                    </div>
+
+                    {/* Body */}
+                    <p style={{
+                        fontSize: 12.5, color: "#374151", lineHeight: 1.65,
+                        margin: 0, whiteSpace: "pre-wrap", wordBreak: "break-word",
+                    }}>
+                        {displayText || rawText}
+                    </p>
+
+                    {/* Expanded mentions */}
+                    {expanded && hasMentions && (
+                        <div style={{
+                            marginTop: 8, paddingTop: 7,
+                            borderTop: "1px solid #f3f4f6",
+                            display: "flex", flexWrap: "wrap", gap: 4,
+                            animation: "noteIn .15s ease-out",
+                        }}>
+                            <span style={{ fontSize: 9, color: "#9ca3af", fontWeight: 600, width: "100%", marginBottom: 2 }}>المذكورون:</span>
+                            {mentionNames.map((name, i) => (
+                                <span key={i} style={{
+                                    display: "inline-flex", alignItems: "center", gap: 3,
+                                    padding: "3px 8px", borderRadius: 12,
+                                    background: "rgba(0,71,134,0.06)",
+                                    color: "#004786", fontSize: 10, fontWeight: 700,
+                                }}>
+                                    <AtSign size={9} />
+                                    {name.replace("@", "")}
+                                </span>
+                            ))}
+                        </div>
+                    )}
+
+                    {/* Footer: timestamp + expand hint */}
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 4 }}>
+                        {hasMentions && !expanded && (
+                            <span style={{ fontSize: 9, color: "#d97706", opacity: 0.7 }}>اضغط لعرض المذكورين</span>
+                        )}
+                        <span style={{ flex: 1 }} />
+                        <span style={{ fontSize: 9, color: "#9ca3af" }}>{formatTime(m.timestamp)}</span>
+                    </div>
                 </div>
-                <p style={{ fontSize: 12, color: "#78350f", lineHeight: 1.5, margin: 0, whiteSpace: "pre-wrap" }}>
-                    {m.content?.text || ""}
-                </p>
-                <p style={{ fontSize: 9, color: "#92400e", marginTop: 3, textAlign: "left", opacity: 0.6 }}>
-                    {formatTime(m.timestamp)}
-                </p>
             </div>
+
+            <style>{`@keyframes noteIn { from { opacity:0; transform:translateY(4px) } to { opacity:1; transform:translateY(0) } }`}</style>
         </div>
     )
 }

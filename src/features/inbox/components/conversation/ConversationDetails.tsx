@@ -2,21 +2,26 @@ import { useState, useEffect, useRef, useMemo } from "react"
 import {
     Phone, Tag, Users, Calendar, Hash, Bot, Mail,
     Contact, MessageSquare, Clock, Globe, Plus, X, Search,
-    FileSliders, Loader2,
+    FileSliders, Loader2, Activity, RefreshCw,
 } from "lucide-react"
 import { useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
+import { invalidateCustomerCaches } from "@/lib/query-keys"
 import type { Customer } from "../../types/inbox.types"
 import { Avatar } from "../ui/Avatar"
 import { addCustomerTags, removeCustomerTags, updateContactCustomFields } from "../../services/inbox-service"
+import type { ActivityEvent } from "../../services/inbox-service"
 import { useTags } from "../../../settings/hooks/use-tags"
 import { useDynamicFields } from "../../../settings/hooks/use-contact-fields"
 import { useAuthStore } from "@/stores/auth-store"
 import type { Tag as TagType, DynamicField } from "../../../settings/types/teams-tags"
+import { useSessionActivity } from "../../hooks/use-session-activity"
+import { usePermissions } from "@/lib/usePermissions"
+import { PAGE_BITS, ACTION_BITS } from "@/lib/permissions"
 
 interface Props { customer: Customer }
 
-type Tab = "contact" | "conversation"
+type Tab = "contact" | "conversation" | "activity"
 
 export function ConversationDetails({ customer: c }: Props) {
     const [tab, setTab] = useState<Tab | null>(null)
@@ -38,6 +43,8 @@ export function ConversationDetails({ customer: c }: Props) {
                     onClick={() => toggleTab("contact")} title="تفاصيل الاتصال" />
                 <TabIcon icon={<MessageSquare size={16} />} active={tab === "conversation"}
                     onClick={() => toggleTab("conversation")} title="تفاصيل المحادثة" />
+                <TabIcon icon={<Activity size={16} />} active={tab === "activity"}
+                    onClick={() => toggleTab("activity")} title="سجل الأحداث" />
             </div>
 
             {/* ── Content area (only when a tab is active) ── */}
@@ -45,8 +52,10 @@ export function ConversationDetails({ customer: c }: Props) {
                 <div className="cd-content">
                     {tab === "contact" ? (
                         <ContactTab customer={c} />
-                    ) : (
+                    ) : tab === "conversation" ? (
                         <ConversationTab customer={c} />
+                    ) : (
+                        <ActivityTab customer={c} />
                     )}
                 </div>
             )}
@@ -179,6 +188,230 @@ export function ConversationDetails({ customer: c }: Props) {
                     padding:2px 8px; border-radius:5px;
                     font-size:11px; font-weight:600;
                 }
+
+                /* ── Activity Timeline ── */
+                .act-wrap { display:flex; flex-direction:column; height:100%; }
+
+                .act-header {
+                    display:flex; align-items:center; justify-content:space-between;
+                    padding:11px 14px 10px;
+                    border-bottom:1px solid var(--t-border-light);
+                    position:sticky; top:0; z-index:2;
+                    background:var(--t-card);
+                    backdrop-filter:blur(8px);
+                }
+                .act-header-left {
+                    display:flex; align-items:center; gap:7px;
+                }
+                .act-header-icon {
+                    width:28px; height:28px; border-radius:8px;
+                    background:linear-gradient(135deg,#0072b5,#004786);
+                    display:flex; align-items:center; justify-content:center;
+                    color:#fff; flex-shrink:0;
+                    box-shadow:0 2px 6px rgba(0,100,200,.25);
+                }
+                .act-header-title {
+                    font-size:12.5px; font-weight:700; color:var(--t-text); margin:0;
+                }
+                .act-header-sub {
+                    font-size:10px; color:var(--t-text-faint); margin:0;
+                }
+                .act-refresh-btn {
+                    width:28px; height:28px; border-radius:8px;
+                    border:1px solid var(--t-border-light);
+                    background:transparent; cursor:pointer;
+                    display:flex; align-items:center; justify-content:center;
+                    color:var(--t-text-muted); transition:all .15s;
+                }
+                .act-refresh-btn:hover { background:var(--t-accent-muted); color:var(--t-accent); border-color:var(--t-accent); }
+                .act-refresh-btn.spinning svg { animation:actSpin .6s linear infinite; }
+                @keyframes actSpin { to { transform:rotate(360deg); } }
+
+                /* Timeline list */
+                .act-list {
+                    padding:10px 12px 24px;
+                    display:flex; flex-direction:column; gap:0;
+                }
+
+                /* Connector line (draws from top of card to bottom, excluding last) */
+                .act-connector {
+                    display:flex; flex-shrink:0;
+                    flex-direction:column; align-items:center;
+                    width:30px;
+                }
+                .act-connector-dot {
+                    width:10px; height:10px; border-radius:50%;
+                    border:2px solid; flex-shrink:0; margin-top:13px;
+                    position:relative; z-index:1;
+                    box-shadow:0 0 0 3px var(--t-card);
+                    transition:transform .15s;
+                }
+                .act-row:hover .act-connector-dot { transform:scale(1.35); }
+                .act-connector-line {
+                    flex:1; width:2px;
+                    background:linear-gradient(to bottom, var(--act-dot-color,#94a3b8) 0%, transparent 100%);
+                    opacity:.25; min-height:12px;
+                    margin-top:2px;
+                }
+                .act-no-line .act-connector-line { display:none; }
+
+                /* Card */
+                .act-row {
+                    display:flex; gap:0; align-items:stretch;
+                    cursor:pointer;
+                }
+                .act-card {
+                    flex:1; margin-bottom:6px; margin-right:4px;
+                    border-radius:10px;
+                    border:1px solid var(--t-border-light);
+                    background:var(--t-card);
+                    overflow:hidden;
+                    transition:border-color .15s, box-shadow .15s;
+                }
+                .act-card:hover {
+                    border-color:var(--act-dot-color, #94a3b8);
+                    box-shadow:0 2px 12px rgba(0,0,0,.06);
+                }
+                .act-card[data-open="true"] {
+                    border-color:var(--act-dot-color, #94a3b8);
+                    box-shadow:0 3px 16px rgba(0,0,0,.09);
+                }
+
+                /* Top accent bar */
+                .act-card-accent {
+                    height:3px;
+                    background:linear-gradient(90deg, var(--act-dot-color,#94a3b8), transparent);
+                    opacity:.6;
+                    display:none;
+                }
+                .act-card[data-open="true"] .act-card-accent { display:block; }
+
+                /* Card summary row */
+                .act-card-summary {
+                    display:flex; align-items:center; gap:8px;
+                    padding:8px 10px 7px;
+                }
+                .act-type-badge {
+                    width:30px; height:30px; border-radius:8px;
+                    display:flex; align-items:center; justify-content:center;
+                    font-size:14px; flex-shrink:0;
+                    border:1px solid;
+                }
+                .act-card-info { flex:1; min-width:0; }
+                .act-card-title {
+                    font-size:11.5px; font-weight:700;
+                    color:var(--t-text); margin:0;
+                    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+                }
+                .act-card-meta {
+                    display:flex; align-items:center; gap:5px; margin:1px 0 0;
+                    font-size:10px; color:var(--t-text-faint);
+                }
+                .act-card-meta-dot {
+                    width:2px; height:2px; border-radius:50%;
+                    background:var(--t-border);
+                }
+                .act-chevron {
+                    color:var(--t-text-faint); flex-shrink:0;
+                    transition:transform .2s ease;
+                }
+                .act-chevron[data-open="true"] { transform:rotate(90deg); }
+
+                /* Preview pill (visible when collapsed) */
+                .act-preview {
+                    display:flex; align-items:center; gap:4px;
+                    padding:0 10px 8px;
+                }
+                .act-preview-pill {
+                    display:inline-flex; align-items:center; gap:4px;
+                    padding:2px 8px; border-radius:20px;
+                    font-size:10px; font-weight:600;
+                    background:var(--t-surface);
+                    border:1px solid var(--t-border-light);
+                    color:var(--t-text-secondary);
+                    max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+                }
+                .act-pill-old { color:var(--t-danger,#dc2626); text-decoration:line-through; }
+                .act-pill-new { color:#16a34a; font-weight:700; }
+
+                /* Expanded details panel */
+                .act-expanded {
+                    border-top:1px solid var(--t-border-light);
+                    padding:10px 10px 12px;
+                    display:flex; flex-direction:column; gap:6px;
+                    animation:actSlideIn .18s ease-out;
+                    background:var(--t-surface);
+                }
+                @keyframes actSlideIn {
+                    from { opacity:0; transform:translateY(-4px); }
+                    to   { opacity:1; transform:translateY(0); }
+                }
+                .act-detail-row {
+                    display:flex; align-items:baseline; gap:4px;
+                    font-size:10.5px;
+                }
+                .act-detail-key {
+                    color:var(--t-text-faint); flex-shrink:0; min-width:60px;
+                    font-weight:500;
+                }
+                .act-detail-val {
+                    color:var(--t-text); font-weight:600;
+                    word-break:break-all;
+                }
+                .act-detail-change {
+                    display:flex; align-items:center; gap:5px; flex-wrap:wrap;
+                }
+                .act-old-val {
+                    color:var(--t-danger,#dc2626); text-decoration:line-through;
+                    font-weight:600;
+                }
+                .act-new-val { color:#16a34a; font-weight:700; }
+                .act-arrow { color:var(--t-text-faint); font-size:11px; }
+
+                /* event ID chip */
+                .act-id-chip {
+                    font-size:9px; color:var(--t-text-faint); font-family:monospace;
+                    background:var(--t-border-light); border-radius:4px;
+                    padding:1px 5px; margin-top:2px;
+                    user-select:all; word-break:break-all;
+                }
+
+                /* Skeleton */
+                .act-skeleton-card {
+                    border-radius:10px; border:1px solid var(--t-border-light);
+                    padding:10px; margin-bottom:6px; margin-right:4px;
+                    display:flex; gap:8px; align-items:center;
+                }
+                .act-skeleton-circle {
+                    width:30px; height:30px; border-radius:8px; flex-shrink:0;
+                    background:var(--t-border-light);
+                    animation:actPulse 1.4s ease-in-out infinite;
+                }
+                .act-skeleton-line {
+                    height:9px; border-radius:5px;
+                    background:var(--t-border-light);
+                    animation:actPulse 1.4s ease-in-out infinite;
+                }
+                @keyframes actPulse { 0%,100%{opacity:.5} 50%{opacity:.9} }
+
+                /* Empty */
+                .act-empty {
+                    display:flex; flex-direction:column; align-items:center;
+                    justify-content:center; padding:50px 20px;
+                    color:var(--t-text-faint); text-align:center;
+                    gap:10px;
+                }
+                .act-empty-icon { font-size:40px; opacity:.4; }
+                .act-empty-text { font-size:12px; font-weight:500; margin:0; }
+                .act-empty-sub { font-size:10.5px; color:var(--t-text-faint); margin:0; }
+
+                /* Counter badge */
+                .act-count-badge {
+                    display:inline-flex; align-items:center;
+                    padding:1px 7px; border-radius:20px;
+                    background:var(--t-accent-muted); color:var(--t-accent);
+                    font-size:10px; font-weight:700;
+                }
             `}</style>
         </div>
     )
@@ -201,6 +434,8 @@ function ContactTab({ customer: c }: { customer: Customer }) {
     const tid = user?.tenant_id ?? ""
     const { data: dynamicFields = [] } = useDynamicFields(tid)
     const queryClient = useQueryClient()
+    const { canPerformAction } = usePermissions()
+    const canEditFields = canPerformAction(PAGE_BITS.INBOX, ACTION_BITS.UPDATE_CUSTOM_FIELDS_INBOX)
 
     const [saving, setSaving] = useState(false)
 
@@ -240,8 +475,7 @@ function ContactTab({ customer: c }: { customer: Customer }) {
 
         try {
             await updateContactCustomFields(c.customer_id, changedFields)
-            queryClient.invalidateQueries({ queryKey: ["inbox-customers"] })
-            queryClient.invalidateQueries({ queryKey: ["inbox-summary"] })
+            invalidateCustomerCaches(queryClient, c.customer_id)
             setLocalFields({})
             toast.success("تم تحديث الحقول بنجاح")
         } catch {
@@ -379,8 +613,8 @@ function ContactTab({ customer: c }: { customer: Customer }) {
                         )
                     })}
 
-                    {/* Bulk Update Button — only shown if there are changes */}
-                    {hasChanges && (
+                    {/* Bulk Update Button — only shown if there are changes AND permission exists */}
+                    {hasChanges && canEditFields && (
                         <button
                             onClick={saveAllFields}
                             disabled={saving}
@@ -451,6 +685,8 @@ function TagsSection({ customer }: { customer: Customer }) {
     const tid = user?.tenant_id ?? ""
     const { data: allTags = [] } = useTags(tid)
     const queryClient = useQueryClient()
+    const { canPerformAction } = usePermissions()
+    const canManageTags = canPerformAction(PAGE_BITS.INBOX, ACTION_BITS.MANAGE_CUSTOMER_TAGS)
 
     const [popoverOpen, setPopoverOpen] = useState(false)
     const [search, setSearch] = useState("")
@@ -494,8 +730,7 @@ function TagsSection({ customer }: { customer: Customer }) {
         // Fire API in background
         addCustomerTags(customer.customer_id, [tagId])
             .then(() => {
-                queryClient.invalidateQueries({ queryKey: ["inbox-customers"] })
-                queryClient.invalidateQueries({ queryKey: ["inbox-summary"] })
+                invalidateCustomerCaches(queryClient, customer.customer_id)
             })
             .catch(() => {
                 // Rollback on error
@@ -511,8 +746,7 @@ function TagsSection({ customer }: { customer: Customer }) {
         // Fire API in background
         removeCustomerTags(customer.customer_id, [tagId])
             .then(() => {
-                queryClient.invalidateQueries({ queryKey: ["inbox-customers"] })
-                queryClient.invalidateQueries({ queryKey: ["inbox-summary"] })
+                invalidateCustomerCaches(queryClient, customer.customer_id)
             })
             .catch(() => {
                 // Rollback on error
@@ -548,21 +782,23 @@ function TagsSection({ customer }: { customer: Customer }) {
         <>
             <div className="cd-section-header">
                 <h3 className="cd-section-title">Tags</h3>
-                <button
-                    ref={btnRef}
-                    onClick={() => popoverOpen ? setPopoverOpen(false) : openPopover()}
-                    style={{
-                        width: 22, height: 22, borderRadius: 6,
-                        border: "1px solid var(--t-border-light)",
-                        background: popoverOpen ? "var(--t-accent)" : "transparent",
-                        color: popoverOpen ? "var(--t-text-on-accent)" : "var(--t-text-faint)",
-                        cursor: "pointer", display: "flex",
-                        alignItems: "center", justifyContent: "center",
-                        transition: "all .12s",
-                    }}
-                >
-                    <Plus size={12} />
-                </button>
+                {canManageTags && (
+                    <button
+                        ref={btnRef}
+                        onClick={() => popoverOpen ? setPopoverOpen(false) : openPopover()}
+                        style={{
+                            width: 22, height: 22, borderRadius: 6,
+                            border: "1px solid var(--t-border-light)",
+                            background: popoverOpen ? "var(--t-accent)" : "transparent",
+                            color: popoverOpen ? "var(--t-text-on-accent)" : "var(--t-text-faint)",
+                            cursor: "pointer", display: "flex",
+                            alignItems: "center", justifyContent: "center",
+                            transition: "all .12s",
+                        }}
+                    >
+                        <Plus size={12} />
+                    </button>
+                )}
             </div>
 
             {/* Fixed-position tag picker popover */}
@@ -703,19 +939,20 @@ function TagsSection({ customer }: { customer: Customer }) {
                             }}>
                                 {tag.emoji && <span style={{ fontSize: 11 }}>{tag.emoji}</span>}
                                 {tag.name}
-                                <button
-                                    onClick={() => handleRemove(tagId)}
-
-                                    style={{
-                                        border: "none", background: "transparent",
-                                        cursor: "pointer", padding: 0, display: "flex",
-                                        color: "var(--t-text-faint)", marginRight: 1,
-                                    }}
-                                    onMouseEnter={e => { e.currentTarget.style.color = "var(--t-danger)" }}
-                                    onMouseLeave={e => { e.currentTarget.style.color = "var(--t-text-faint)" }}
-                                >
-                                    <X size={10} />
-                                </button>
+                                {canManageTags && (
+                                    <button
+                                        onClick={() => handleRemove(tagId)}
+                                        style={{
+                                            border: "none", background: "transparent",
+                                            cursor: "pointer", padding: 0, display: "flex",
+                                            color: "var(--t-text-faint)", marginRight: 1,
+                                        }}
+                                        onMouseEnter={e => { e.currentTarget.style.color = "var(--t-danger)" }}
+                                        onMouseLeave={e => { e.currentTarget.style.color = "var(--t-text-faint)" }}
+                                    >
+                                        <X size={10} />
+                                    </button>
+                                )}
                             </span>
                         )
                     })
@@ -818,6 +1055,288 @@ function InfoCard({ icon, label, value }: {
                 <p className="cd-info-label">{label}</p>
                 <p className="cd-info-value">{value}</p>
             </div>
+        </div>
+    )
+}
+
+/* ═════════ Activity Tab ═════════ */
+
+type EventMeta = { label: string; emoji: string; color: string; bg: string; borderColor: string }
+
+const EVENT_META: Record<string, EventMeta> = {
+    // Real API event types
+    lifecycle_changed: { label: "تغيير المرحلة", emoji: "🔄", color: "#2563eb", bg: "#eff6ff", borderColor: "#bfdbfe" },
+    ai_status_changed: { label: "تغيير حالة AI", emoji: "🤖", color: "#059669", bg: "#ecfdf5", borderColor: "#a7f3d0" },
+    customer_assigned: { label: "تعيين وكيل", emoji: "👤", color: "#0891b2", bg: "#ecfeff", borderColor: "#a5f3fc" },
+    teams_assigned: { label: "تعيين فريق", emoji: "👥", color: "#0d9488", bg: "#f0fdfa", borderColor: "#99f6e4" },
+    session_auto_closed: { label: "إغلاق تلقائي", emoji: "🔒", color: "#dc2626", bg: "#fef2f2", borderColor: "#fecaca" },
+    session_closed: { label: "إغلاق الجلسة", emoji: "🔒", color: "#dc2626", bg: "#fef2f2", borderColor: "#fecaca" },
+    session_reopened: { label: "فتح الجلسة", emoji: "🔓", color: "#16a34a", bg: "#f0fdf4", borderColor: "#bbf7d0" },
+    tag_added: { label: "إضافة تاج", emoji: "🏷️", color: "#7c3aed", bg: "#f5f3ff", borderColor: "#ddd6fe" },
+    tag_removed: { label: "إزالة تاج", emoji: "🗑️", color: "#b91c1c", bg: "#fef2f2", borderColor: "#fecaca" },
+}
+
+const DEFAULT_META: EventMeta = { label: "حدث", emoji: "📋", color: "#6b7280", bg: "#f9fafb", borderColor: "#e5e7eb" }
+
+function relativeTime(iso: string): string {
+    const diff = Date.now() - new Date(iso).getTime()
+    const mins = Math.floor(diff / 60000)
+    const hours = Math.floor(diff / 3600000)
+    const days = Math.floor(diff / 86400000)
+    if (mins < 1) return "الآن"
+    if (mins < 60) return `منذ ${mins} دقيقة`
+    if (hours < 24) return `منذ ${hours} ساعة`
+    if (days < 7) return `منذ ${days} يوم`
+    return new Date(iso).toLocaleDateString("ar-SA", { year: "numeric", month: "short", day: "numeric" })
+}
+
+function fullDateTime(iso: string): string {
+    return new Date(iso).toLocaleString("ar-SA", {
+        year: "numeric", month: "short", day: "numeric",
+        hour: "2-digit", minute: "2-digit", second: "2-digit",
+        timeZone: "Asia/Aden",
+    })
+}
+
+// Keys NOT shown in the generic metadata rows (rendered specially or irrelevant)
+const HIDDEN_KEYS = new Set(["customer_id", "performed_by", "all_teams"])
+
+const META_LABELS: Record<string, string> = {
+    performed_by_name: "نفّذه",
+    action: "الإجراء",
+    close_reason: "سبب الإغلاق",
+    hours_idle: "ساعات الخمول",
+    assigned_to_username: "وكيل مُعيَّن",
+    is_assigned: "معين",
+    enable_ai: "AI",
+    old_lifecycle: "المرحلة السابقة",
+    new_lifecycle: "المرحلة الجديدة",
+    added_teams: "الفرق المضافة",
+    team_names: "أسماء الفرق",
+    is_assigned_team: "تعيين فريق",
+    assigned_to: "معرّف الوكيل",
+}
+
+// Collapsed summary chip content per event type
+function buildSummary(eventType: string, md: Record<string, unknown>): string | null {
+    const s = (k: string) => md[k] as string | undefined
+    switch (eventType) {
+        case "ai_status_changed":
+            return md.enable_ai ? "✅ تم تفعيل AI" : "❌ تم تعطيل AI"
+        case "customer_assigned":
+            return s("assigned_to_username") ? `→ ${s("assigned_to_username")}` : null
+        case "teams_assigned": {
+            const names = md.team_names as Record<string, string> | undefined
+            return names ? Object.values(names).join("، ") : null
+        }
+        case "session_auto_closed":
+            return s("close_reason") ?? null
+        case "lifecycle_changed":
+            return (s("new_lifecycle") && s("old_lifecycle"))
+                ? `${s("new_lifecycle")} ← ${s("old_lifecycle")}` : null
+        default: return null
+    }
+}
+
+function MetaRow({ label, children }: { label: string; children: React.ReactNode }) {
+    return (
+        <div className="act-detail-row">
+            <span className="act-detail-key">{label}</span>
+            <span className="act-detail-val">{children}</span>
+        </div>
+    )
+}
+
+function renderMetaVal(key: string, val: unknown): React.ReactNode {
+    if (key === "team_names" && typeof val === "object" && val !== null) {
+        return (
+            <span style={{ display: "flex", flexWrap: "wrap", gap: 3 }}>
+                {Object.values(val as Record<string, string>).map((n, i) => (
+                    <span key={i} style={{
+                        background: "#f0fdfa", border: "1px solid #99f6e4",
+                        borderRadius: 5, padding: "1px 7px",
+                        fontSize: 10.5, color: "#0d9488", fontWeight: 600,
+                    }}>{n}</span>
+                ))}
+            </span>
+        )
+    }
+    if (key === "added_teams" && Array.isArray(val)) return (val as string[]).join("، ")
+    if (key === "enable_ai") return val
+        ? <span style={{ color: "#059669", fontWeight: 700 }}>مفعّل ✓</span>
+        : <span style={{ color: "#dc2626", fontWeight: 700 }}>معطّل</span>
+    if (key === "is_assigned" || key === "is_assigned_team") return val ? "نعم" : "لا"
+    if (key === "hours_idle") return `${val} ساعة`
+    return String(val)
+}
+
+function ActivityEventCard({ event, isLast }: { event: ActivityEvent; isLast: boolean }) {
+    const [open, setOpen] = useState(false)
+    const md = event.metadata ?? {}
+    const actor = (md.performed_by_name as string) || "النظام"
+    const summary = buildSummary(event.event_type, md)
+
+    // Resolve effective meta (ai_status_changed color depends on enable_ai)
+    const baseMeta = EVENT_META[event.event_type] ?? DEFAULT_META
+    const effectiveMeta: EventMeta = event.event_type === "ai_status_changed"
+        ? {
+            ...baseMeta,
+            label: md.enable_ai ? "تفعيل AI" : "تعطيل AI",
+            color: md.enable_ai ? "#059669" : "#6b7280",
+            bg: md.enable_ai ? "#ecfdf5" : "#f9fafb",
+            borderColor: md.enable_ai ? "#a7f3d0" : "#e5e7eb",
+        }
+        : baseMeta
+
+    const visibleEntries = Object.entries(md).filter(([k]) => !HIDDEN_KEYS.has(k))
+
+    return (
+        <div
+            className={`act-row${isLast ? " act-no-line" : ""}`}
+            style={{ "--act-dot-color": effectiveMeta.color } as React.CSSProperties}
+        >
+            <div className="act-connector">
+                <div className="act-connector-dot"
+                    style={{ borderColor: effectiveMeta.color, background: open ? effectiveMeta.color : effectiveMeta.bg }}
+                />
+                {!isLast && <div className="act-connector-line" />}
+            </div>
+
+            <div className="act-card" data-open={open}
+                style={{ "--act-dot-color": effectiveMeta.color } as React.CSSProperties}
+                onClick={() => setOpen(o => !o)}
+            >
+                <div className="act-card-accent" />
+
+                <div className="act-card-summary">
+                    <div className="act-type-badge" style={{
+                        background: effectiveMeta.bg,
+                        borderColor: effectiveMeta.borderColor,
+                        color: effectiveMeta.color,
+                    }}>
+                        {effectiveMeta.emoji}
+                    </div>
+                    <div className="act-card-info">
+                        <p className="act-card-title">{effectiveMeta.label}</p>
+                        <div className="act-card-meta">
+                            <span>{actor}</span>
+                            <span className="act-card-meta-dot" />
+                            <span>{relativeTime(event.timestamp)}</span>
+                        </div>
+                    </div>
+                    <svg className="act-chevron" data-open={open}
+                        width="12" height="12" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" strokeWidth="2.5"
+                        strokeLinecap="round" strokeLinejoin="round"
+                    >
+                        <polyline points="9 18 15 12 9 6" />
+                    </svg>
+                </div>
+
+                {/* Collapsed chip summary */}
+                {!open && summary && (
+                    <div className="act-preview">
+                        <div className="act-preview-pill">{summary}</div>
+                    </div>
+                )}
+
+                {/* Expanded details */}
+                {open && (
+                    <div className="act-expanded">
+                        <MetaRow label="التاريخ">{fullDateTime(event.timestamp)}</MetaRow>
+
+                        {visibleEntries
+                            .filter(([k]) => k !== "performed_by_name")
+                            .map(([k, v]) => (
+                                <MetaRow key={k} label={META_LABELS[k] ?? k}>
+                                    {renderMetaVal(k, v)}
+                                </MetaRow>
+                            ))
+                        }
+
+                        {/* Performer ID (short) */}
+                        {typeof md.performed_by === "string" && md.performed_by && (
+                            <div className="act-id-chip">منفّذ: {md.performed_by}</div>
+                        )}
+                        {event.event_id && (
+                            <div className="act-id-chip">{event.event_id}</div>
+                        )}
+                    </div>
+                )}
+            </div>
+        </div>
+    )
+}
+
+function ActivitySkeleton() {
+    return (
+        <div className="act-list">
+            {[0.0, 0.1, 0.2].map((delay, i) => (
+                <div key={i} style={{ display: "flex", gap: 0, marginBottom: 6 }}>
+                    <div style={{ width: 30, display: "flex", flexDirection: "column", alignItems: "center", paddingTop: 10 }}>
+                        <div className="act-skeleton-circle" style={{ width: 10, height: 10, borderRadius: "50%", animationDelay: `${delay}s` }} />
+                    </div>
+                    <div className="act-skeleton-card" style={{ flex: 1, animationDelay: `${delay}s` }}>
+                        <div className="act-skeleton-circle" style={{ animationDelay: `${delay + 0.05}s` }} />
+                        <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 6 }}>
+                            <div className="act-skeleton-line" style={{ width: "55%", animationDelay: `${delay}s` }} />
+                            <div className="act-skeleton-line" style={{ width: "35%", height: 7, animationDelay: `${delay + 0.1}s` }} />
+                        </div>
+                    </div>
+                </div>
+            ))}
+        </div>
+    )
+}
+
+function ActivityTab({ customer: c }: { customer: Customer }) {
+    const { data, isLoading, isFetching, refetch } = useSessionActivity(c.session_id ?? undefined)
+    const events = data?.events ?? []
+
+    return (
+        <div className="act-wrap">
+            {/* Sticky header */}
+            <div className="act-header">
+                <div className="act-header-left">
+                    <div className="act-header-icon">
+                        <Activity size={14} />
+                    </div>
+                    <div>
+                        <p className="act-header-title">سجل الأحداث</p>
+                        {data && (
+                            <p className="act-header-sub">{data.total_events} حدث مسجّل</p>
+                        )}
+                    </div>
+                </div>
+                <button
+                    className={`act-refresh-btn${isFetching ? " spinning" : ""}`}
+                    onClick={e => { e.stopPropagation(); refetch() }}
+                    title="تحديث"
+                >
+                    <RefreshCw size={13} />
+                </button>
+            </div>
+
+            {/* Content */}
+            {isLoading ? (
+                <ActivitySkeleton />
+            ) : events.length === 0 ? (
+                <div className="act-empty">
+                    <div className="act-empty-icon">🗓️</div>
+                    <p className="act-empty-text">لا توجد أحداث مسجّلة</p>
+                    <p className="act-empty-sub">سيظهر هنا سجل كل تغيير يحدث على هذه الجلسة</p>
+                </div>
+            ) : (
+                <div className="act-list">
+                    {events.map((evt, idx) => (
+                        <ActivityEventCard
+                            key={evt.event_id}
+                            event={evt}
+                            isLast={idx === events.length - 1}
+                        />
+                    ))}
+                </div>
+            )}
         </div>
     )
 }

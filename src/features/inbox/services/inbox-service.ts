@@ -17,6 +17,29 @@ export async function getSidebarSummary(userId?: string): Promise<SidebarSummary
     return data.data
 }
 
+// ─── Accounts List ──────────────────────────────────────
+// GET /customers/accounts
+export interface AccountInfo {
+    account_id: string
+    platform: string
+    customer_count: number
+    last_activity: string
+}
+
+export interface AccountsResponse {
+    total_accounts: number
+    total_customers: number
+    platforms_summary: Record<string, { accounts: number; customers: number }>
+    accounts: AccountInfo[]
+}
+
+export async function getAccounts(platform?: string): Promise<AccountsResponse> {
+    const { data } = await apiClient.get("/customers/accounts", {
+        params: platform ? { platform } : undefined,
+    })
+    return data.data
+}
+
 // ─── Customers (unified list) ───────────────────────────
 // GET /inbox/customers
 export async function getCustomers(params?: {
@@ -49,6 +72,7 @@ export async function getCustomers(params?: {
 export async function getCustomerMessages(customerId: string, params?: {
     page?: number
     page_size?: number
+    account_id?: string
 }): Promise<MessagesResponse> {
     const { data } = await apiClient.get(`/inbox/customers/${customerId}/messages`, { params })
     return data.data
@@ -101,84 +125,141 @@ export async function uploadMedia(file: File, options?: {
 // PATCH /customers/{id}/close-conversation
 export async function closeConversation(customerId: string, payload: {
     reason: string; category: string; lang?: string
-}) {
-    const { data } = await apiClient.patch(`/customers/${customerId}/close-conversation`, payload)
+}, accountId?: string) {
+    const { data } = await apiClient.patch(`/customers/${customerId}/close-conversation`, payload, {
+        params: accountId ? { account_id: accountId } : undefined,
+    })
     return data.data
 }
 
 // PATCH /customers/{id}/reopen-conversation
 export async function reopenConversation(customerId: string, payload: {
     user_id: string
-}) {
-    const { data } = await apiClient.patch(`/customers/${customerId}/reopen-conversation`, payload)
+}, accountId?: string) {
+    const { data } = await apiClient.patch(`/customers/${customerId}/reopen-conversation`, payload, {
+        params: accountId ? { account_id: accountId } : undefined,
+    })
     return data.data
 }
 
 // PATCH /customers/{id}/assign
 export async function assignCustomerAgent(customerId: string, payload: {
     assigned_to: string | null; is_assigned: boolean; performed_by_name?: string
-}) {
-    const { data } = await apiClient.patch(`/customers/${customerId}/assign`, payload)
+}, accountId?: string) {
+    const { data } = await apiClient.patch(`/customers/${customerId}/assign`, payload, {
+        params: accountId ? { account_id: accountId } : undefined,
+    })
     return data.data
 }
 
 // PATCH /customers/{id}/lifecycle
-export async function updateCustomerLifecycle(customerId: string, lifecycleCode: string) {
+export async function updateCustomerLifecycle(customerId: string, lifecycleCode: string, accountId?: string) {
     const { data } = await apiClient.patch(`/customers/${customerId}/lifecycle`, {
         lifecycle_code: lifecycleCode,
+    }, {
+        params: accountId ? { account_id: accountId } : undefined,
     })
     return data.data
 }
 
-// PATCH /customers/{id}/enable-ai
-export async function toggleCustomerAI(customerId: string, enableAi: boolean) {
+// PATCH /customers/{id}/enable-ai  (account_id في الـ Body — الاستثناء الوحيد)
+export async function toggleCustomerAI(customerId: string, enableAi: boolean, accountId?: string) {
     const { data } = await apiClient.patch(`/customers/${customerId}/enable-ai`, {
         enable_ai: enableAi,
+        ...(accountId && { account_id: accountId }),
     })
+    return data.data
+}
+
+// PATCH /customers/{id}/favorite
+export async function toggleFavorite(customerId: string, favorite: boolean, accountId?: string) {
+    const { data } = await apiClient.patch(
+        `/customers/${customerId}/favorite`,
+        { favorite },
+        { params: accountId ? { account_id: accountId } : undefined },
+    )
+    return data.data
+}
+
+// PATCH /customers/{id}/mute
+export async function toggleMuted(customerId: string, muted: boolean, accountId?: string) {
+    const { data } = await apiClient.patch(
+        `/customers/${customerId}/mute`,
+        { muted },
+        { params: accountId ? { account_id: accountId } : undefined },
+    )
     return data.data
 }
 
 // PATCH /customers/{id}/session-status
-export async function updateSessionStatus(customerId: string, sessionStatus: SessionStatus) {
+export async function updateSessionStatus(customerId: string, sessionStatus: SessionStatus, accountId?: string) {
     const { data } = await apiClient.patch(`/customers/${customerId}/session-status`, {
         session_status: sessionStatus,
+    }, {
+        params: accountId ? { account_id: accountId } : undefined,
     })
     return data.data
 }
 
 // PUT /customers/{id}/teams — assign teams
-export async function assignCustomerTeams(customerId: string, teamIds: string[]) {
+export async function assignCustomerTeams(customerId: string, teamIds: string[], accountId?: string) {
     const { data } = await apiClient.put(`/customers/${customerId}/teams`, {
         teams: teamIds,
         is_assigned_team: true,
+    }, {
+        params: accountId ? { account_id: accountId } : undefined,
     })
     return data.data
 }
 
 // DELETE /customers/{id}/teams — remove teams
-export async function removeCustomerTeams(customerId: string, teamIds: string[]) {
+export async function removeCustomerTeams(customerId: string, teamIds: string[], accountId?: string) {
     const { data } = await apiClient.delete(`/customers/${customerId}/teams`, {
         data: { teams: teamIds },
+        params: accountId ? { account_id: accountId } : undefined,
     })
     return data.data
 }
 
 // GET /customers/{id}/teams — fetch customer teams
-export async function getCustomerTeams(customerId: string) {
-    const { data } = await apiClient.get(`/customers/${customerId}/teams`)
+export async function getCustomerTeams(customerId: string, accountId?: string) {
+    const { data } = await apiClient.get(`/customers/${customerId}/teams`, {
+        params: accountId ? { account_id: accountId } : undefined,
+    })
     return data.data
 }
 
 // POST /customers/{id}/tags
-export async function addCustomerTags(customerId: string, tags: string[]) {
-    const { data } = await apiClient.post(`/customers/${customerId}/tags`, { tags })
+export async function addCustomerTags(customerId: string, tags: string[], accountId?: string) {
+    const { data } = await apiClient.post(`/customers/${customerId}/tags`, { tags }, {
+        params: accountId ? { account_id: accountId } : undefined,
+    })
     return data.data
 }
 
 // DELETE /customers/{id}/tags
-export async function removeCustomerTags(customerId: string, tags: string[]) {
+export async function removeCustomerTags(customerId: string, tags: string[], accountId?: string) {
     const { data } = await apiClient.delete(`/customers/${customerId}/tags`, {
         data: { tags },
+        params: accountId ? { account_id: accountId } : undefined,
+    })
+    return data.data
+}
+
+// ─── New Endpoints ──────────────────────────────────────
+
+// GET /customers/{id}/basic-info
+export async function getCustomerBasicInfo(customerId: string, accountId?: string) {
+    const { data } = await apiClient.get(`/customers/${customerId}/basic-info`, {
+        params: accountId ? { account_id: accountId } : undefined,
+    })
+    return data.data
+}
+
+// GET /customers/{id}/ai-check
+export async function getCustomerAICheck(customerId: string, accountId?: string) {
+    const { data } = await apiClient.get(`/customers/${customerId}/ai-check`, {
+        params: accountId ? { account_id: accountId } : undefined,
     })
     return data.data
 }
@@ -207,4 +288,32 @@ export async function getBriefUsers(page = 1, pageSize = 50): Promise<{
         params: { page, page_size: pageSize },
     })
     return data.data
+}
+
+// ─── Session Activity ────────────────────────────────────
+
+export interface ActivityEvent {
+    event_id?: string
+    event_type: string
+    timestamp: string
+    // Real API uses a flat `metadata` object with all details
+    metadata: Record<string, unknown>
+}
+
+export interface SessionActivityResponse {
+    success: boolean
+    lookup_by: string
+    session_id?: string
+    customer_id?: string
+    total_events: number
+    source: string
+    events: ActivityEvent[]
+}
+
+// GET /activity?session_id={sessionId}
+export async function getSessionActivity(sessionId: string): Promise<SessionActivityResponse> {
+    const { data } = await apiClient.get("/activity", {
+        params: { session_id: sessionId },
+    })
+    return data
 }

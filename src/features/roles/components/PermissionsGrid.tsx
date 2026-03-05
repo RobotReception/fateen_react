@@ -2,6 +2,8 @@
 import { ChevronDown, ChevronLeft, Loader2, Check, Minus, Lock, Shield, Search } from "lucide-react"
 import { useAllPermissions, useRoleActivePermissionIds, useAddRolePermissions, useRemoveRolePermissions } from "../hooks/use-roles"
 import type { PermissionSection } from "../types"
+import { usePermissions } from "@/lib/usePermissions"
+import { PAGE_BITS, ACTION_BITS } from "@/lib/permissions"
 
 /* ─── Section display names (Arabic) ─── */
 const SECTION_LABELS: Record<string, string> = {
@@ -32,6 +34,7 @@ const SECTION_LABELS: Record<string, string> = {
     agents: "الوكلاء",
     inbox: "صندوق الوارد",
     media: "الوسائط",
+    document_search: "بحث الوثائق",
 }
 
 /* ─── Toggle Switch ─── */
@@ -106,12 +109,18 @@ export function PermissionsGrid({ role }: Props) {
     const isLoading = allLoading || activeLoading
     const activeSet = activeIds || new Set<string>()
 
+    /* ── فحص صلاحية التعديل ── */
+    const { canPerformAction } = usePermissions()
+    const canModify = canPerformAction(PAGE_BITS.ROLES, ACTION_BITS.ADD_ROLE_PERMISSIONS)
+        || canPerformAction(PAGE_BITS.ROLES, ACTION_BITS.REMOVE_ROLE_PERMISSIONS)
+    const isDisabled = busy || !canModify
+
     const toggleExpand = useCallback((section: string) => {
         setExpanded(p => ({ ...p, [section]: !p[section] }))
     }, [])
 
     const togglePerm = useCallback((permId: string) => {
-        if (busy) return
+        if (busy || !canModify) return
         const on = activeSet.has(permId)
         setMutatingIds(prev => new Set(prev).add(permId))
         const cleanup = () => {
@@ -119,15 +128,15 @@ export function PermissionsGrid({ role }: Props) {
         }
         if (on) { removeMut.mutate([permId], { onSettled: cleanup }) }
         else { addMut.mutate([permId], { onSettled: cleanup }) }
-    }, [busy, activeSet, addMut, removeMut])
+    }, [busy, canModify, activeSet, addMut, removeMut])
 
     const toggleSection = useCallback((section: PermissionSection) => {
-        if (busy) return
+        if (busy || !canModify) return
         const allIds = section.actions.map(a => a.id)
         const allActive = section.actions.every(a => activeSet.has(a.id))
         if (allActive) { removeMut.mutate(allIds) }
         else { addMut.mutate(allIds.filter(id => !activeSet.has(id))) }
-    }, [busy, activeSet, addMut, removeMut])
+    }, [busy, canModify, activeSet, addMut, removeMut])
 
     const filteredSections = useMemo((): PermissionSection[] => {
         if (!allSections) return []
@@ -239,6 +248,19 @@ export function PermissionsGrid({ role }: Props) {
                 <span style={{ fontSize: 11, color: "var(--t-text-faint, #9ca3af)", fontWeight: 500 }}>{filteredSections.length} قسم</span>
             </div>
 
+            {/* ── تنبيه عدم وجود صلاحية التعديل ── */}
+            {!canModify && (
+                <div style={{
+                    display: "flex", alignItems: "center", gap: 8,
+                    padding: "8px 14px", borderRadius: 8,
+                    background: "rgba(245,158,11,0.06)",
+                    border: "1px solid rgba(245,158,11,0.15)",
+                }}>
+                    <Lock size={13} style={{ color: "#f59e0b", flexShrink: 0 }} />
+                    <span style={{ fontSize: 11.5, color: "#92400e", fontWeight: 500 }}>عرض فقط — ليس لديك صلاحية تعديل الصلاحيات</span>
+                </div>
+            )}
+
             {/* ── Sections ── */}
             {filteredSections.map(section => {
                 const isOpen = !!expanded[section.section]
@@ -280,7 +302,7 @@ export function PermissionsGrid({ role }: Props) {
 
                             <SectionCheckbox
                                 state={sectionState}
-                                disabled={busy}
+                                disabled={isDisabled}
                                 onClick={() => toggleSection(section)}
                             />
 
@@ -344,7 +366,7 @@ export function PermissionsGrid({ role }: Props) {
                                                         <Loader2 size={14} className="animate-spin" style={{ color: "#004786" }} />
                                                     </div>
                                                 ) : (
-                                                    <ToggleSwitch checked={on} disabled={busy} onChange={() => togglePerm(perm.id)} />
+                                                    <ToggleSwitch checked={on} disabled={isDisabled} onChange={() => togglePerm(perm.id)} />
                                                 )}
                                             </div>
 

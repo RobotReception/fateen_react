@@ -5,7 +5,7 @@
 // ─── Enums ────────────────────────────────
 export type SessionStatus = "open" | "closed" | "pending"
 export type MessageDirection = "inbound" | "outbound" | "system" | "internal"
-export type MessageType = "text" | "image" | "audio" | "video" | "document" | "interactive" | "comment" | "activity"
+export type MessageType = "text" | "image" | "audio" | "video" | "document" | "interactive" | "comment" | "activity" | "template"
 export type InboxFilter = "all" | "open" | "closed" | "pending"
 export type MediaType = "image" | "document" | "audio" | "video"
 export type MessageStatus = "received" | "sent" | "delivered" | "read" | "failed" | "notified"
@@ -156,6 +156,12 @@ export interface MessageContent {
     // activity
     event_type?: ActivityEventType
     metadata?: Record<string, any>
+
+    // template
+    template_name?: string
+    language_code?: string
+    name?: string                             // alternate template name field
+    language?: { code: string }              // alternate language field (send-message shape)
 
     // send-message payload fields (different from received)
     image_url?: string

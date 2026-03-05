@@ -10,6 +10,8 @@ import { useUserProfile, useUpdateUserProfile } from "../hooks/use-settings"
 import { uploadMedia } from "@/features/inbox/services/inbox-service"
 import { FetchingBar } from "@/components/ui/FetchingBar"
 import type { UpdateUserProfilePayload } from "../types"
+import { ActionGuard } from "@/components/guards/ActionGuard"
+import { PAGE_BITS, ACTION_BITS } from "@/lib/permissions"
 
 const CSS = `
 @keyframes profFade{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
@@ -256,18 +258,20 @@ export function ProfileTab() {
 
                     {/* Action button */}
                     {!editing && (
-                        <button onClick={startEdit} style={{
-                            padding: "8px 16px", borderRadius: 8, cursor: "pointer",
-                            border: "1px solid var(--t-border, #dcdfe3)", background: "var(--t-card, #fff)",
-                            color: "var(--t-text-secondary, #4b5563)", fontSize: 12, fontWeight: 600,
-                            display: "flex", alignItems: "center", gap: 5, flexShrink: 0,
-                            transition: "all .12s",
-                        }}
-                            onMouseEnter={e => { e.currentTarget.style.borderColor = "#004786"; e.currentTarget.style.color = "#004786" }}
-                            onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--t-border, #dcdfe3)"; e.currentTarget.style.color = "var(--t-text-secondary, #4b5563)" }}
-                        >
-                            <Edit3 size={13} /> تعديل
-                        </button>
+                        <ActionGuard pageBit={PAGE_BITS.USER_PROFILE} actionBit={ACTION_BITS.UPDATE_PROFILE}>
+                            <button onClick={startEdit} style={{
+                                padding: "8px 16px", borderRadius: 8, cursor: "pointer",
+                                border: "1px solid var(--t-border, #dcdfe3)", background: "var(--t-card, #fff)",
+                                color: "var(--t-text-secondary, #4b5563)", fontSize: 12, fontWeight: 600,
+                                display: "flex", alignItems: "center", gap: 5, flexShrink: 0,
+                                transition: "all .12s",
+                            }}
+                                onMouseEnter={e => { e.currentTarget.style.borderColor = "#004786"; e.currentTarget.style.color = "#004786" }}
+                                onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--t-border, #dcdfe3)"; e.currentTarget.style.color = "var(--t-text-secondary, #4b5563)" }}
+                            >
+                                <Edit3 size={13} /> تعديل
+                            </button>
+                        </ActionGuard>
                     )}
                 </div>
             </div>

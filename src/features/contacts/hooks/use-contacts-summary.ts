@@ -1,10 +1,10 @@
 import { useQuery } from "@tanstack/react-query"
 import { getContactsSidebarSummary } from "../services/contacts-service"
 
-export function useContactsSidebarSummary() {
+export function useContactsSidebarSummary(accountId?: string) {
     return useQuery({
-        queryKey: ["contacts-sidebar-summary"],
-        queryFn: getContactsSidebarSummary,
+        queryKey: ["contacts-sidebar-summary", accountId],
+        queryFn: () => getContactsSidebarSummary(accountId),
         refetchInterval: 30_000,
     })
 }

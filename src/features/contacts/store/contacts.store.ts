@@ -1,6 +1,6 @@
 import { create } from "zustand"
 
-export type ContactsSection = "all" | `lc_${string}` | `team_${string}` | `seg_${string}`
+export type ContactsSection = "all" | "mine" | "unassigned" | `lc_${string}` | `team_${string}` | `seg_${string}`
 
 export interface ContactsFilters {
     platform?: string

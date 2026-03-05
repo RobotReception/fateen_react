@@ -24,7 +24,7 @@ async function apiFetch<T>(path: string, options: RequestInit = {}): Promise<T> 
         ...(options.headers as Record<string, string> || {}),
     }
 
-    const res = await fetch(`${BASE_URL}${path}`, { ...options, headers: merged })
+    const res = await fetch(`${BASE_URL}${path}`, { ...options, headers: merged, credentials: "include" })
     const text = await res.text()
 
     let data: any

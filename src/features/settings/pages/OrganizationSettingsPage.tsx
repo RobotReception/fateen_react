@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import {
     Building2, Users, MessageSquare, CreditCard,
-    Settings, ChevronLeft, Shield, Brain, Palette,
+    Settings, ChevronLeft, Shield, Brain,
     UsersRound, Tag, FileText, RefreshCw, FileSliders,
 } from "lucide-react"
 import { Link, useSearchParams } from "react-router-dom"
@@ -10,16 +10,34 @@ import { BillingTab } from "../components/BillingTab"
 import { UsersPage } from "@/features/users/pages/UsersPage"
 import { RolesPage } from "@/features/roles/pages/RolesPage"
 import { AISettingsTab } from "@/features/ai-settings/components/AISettingsTab"
-import { ThemeTab } from "../components/ThemeTab"
+
 import { ChannelsPage } from "@/features/channels/pages/ChannelsPage"
 import { TeamsTab } from "../components/TeamsTab"
 import { TagsTab } from "../components/TagsTab"
 import { SnippetsTab } from "../components/SnippetsTab"
 import { LifecyclesTab } from "../components/LifecyclesTab"
 import { ContactFieldsTab } from "../components/ContactFieldsTab"
+import { usePermissions } from "@/lib/usePermissions"
+import { PAGE_BITS } from "@/lib/permissions"
+import { usePermissionsRefresh } from "@/lib/usePermissionsSync"
 
 /* ── sidebar sections ── */
-type SidebarKey = "general" | "users" | "roles" | "channels" | "teams" | "tags" | "snippets" | "lifecycles" | "contact-fields" | "ai" | "theme" | "billing"
+type SidebarKey = "general" | "users" | "roles" | "channels" | "teams" | "tags" | "snippets" | "lifecycles" | "contact-fields" | "ai" | "billing"
+
+/* ── map each tab to its PAGE_BIT (undefined = always visible) ── */
+const TAB_PAGE_BITS: Partial<Record<SidebarKey, number>> = {
+    general: PAGE_BITS.ORGANIZATION,
+    users: PAGE_BITS.ADMIN_USERS,
+    roles: PAGE_BITS.ROLES,
+    channels: PAGE_BITS.CHANNELS,
+    teams: PAGE_BITS.TEAMS,
+    tags: PAGE_BITS.TAGS,
+    snippets: PAGE_BITS.SNIPPETS,
+    lifecycles: PAGE_BITS.LIFECYCLES,
+    "contact-fields": PAGE_BITS.CONTACT_FIELDS,
+    ai: PAGE_BITS.AGENTS,
+    // theme & billing: no dedicated PAGE_BIT → always visible
+}
 
 interface SidebarItem { key: SidebarKey; label: string; icon: typeof Settings; desc: string }
 interface SidebarSection { title: string; items: SidebarItem[] }
@@ -58,26 +76,55 @@ const SIDEBAR_SECTIONS: SidebarSection[] = [
     {
         title: "النظام والفوترة",
         items: [
-            { key: "theme", label: "تخصيص المظهر", icon: Palette, desc: "ألوان وهوية المؤسسة" },
             { key: "billing", label: "الاشتراك والدفع", icon: CreditCard, desc: "إدارة الخطة والفواتير" },
         ],
     },
 ]
 
-const SIDEBAR_ITEMS = SIDEBAR_SECTIONS.flatMap(s => s.items)
+
 
 
 export function OrganizationSettingsPage() {
     const [searchParams] = useSearchParams()
     const tabParam = searchParams.get("tab") as SidebarKey | null
-    const [active, setActive] = useState<SidebarKey>(tabParam && SIDEBAR_ITEMS.some(i => i.key === tabParam) ? tabParam : "general")
+    const { canAccessPage, hasPermissionData } = usePermissions()
+    usePermissionsRefresh()  // تحديث فوري عند فتح الإعدادات
+
+    /* ── فحص الصلاحية لتاب واحد ── */
+    const canRenderTab = (key: SidebarKey): boolean => {
+        if (!hasPermissionData) return true   // owner → كل شيء مسموح
+        const bit = TAB_PAGE_BITS[key]
+        return bit === undefined || canAccessPage(bit)
+    }
+
+    /* ── filter sections & items by permission ── */
+    const filteredSections = useMemo(() => {
+        if (!hasPermissionData) return SIDEBAR_SECTIONS          // owner: show all
+        return SIDEBAR_SECTIONS
+            .map(s => ({
+                ...s,
+                items: s.items.filter(i => canRenderTab(i.key)),
+            }))
+            .filter(s => s.items.length > 0)                       // hide empty sections
+    }, [hasPermissionData, canAccessPage])
+
+    const SIDEBAR_ITEMS = filteredSections.flatMap(s => s.items)
+
+    const defaultTab = tabParam && SIDEBAR_ITEMS.some(i => i.key === tabParam) ? tabParam
+        : SIDEBAR_ITEMS.length > 0 ? SIDEBAR_ITEMS[0].key : "general"
+
+    const [active, setActive] = useState<SidebarKey>(defaultTab)
     const [collapsed, setCollapsed] = useState(false)
 
+    /* ── إذا التاب النشط غير مسموح (تغيّرت الصلاحيات أو URL param) → ارجع لأول تاب متاح ── */
     useEffect(() => {
         if (tabParam && SIDEBAR_ITEMS.some(i => i.key === tabParam)) {
             setActive(tabParam)
+        } else if (!SIDEBAR_ITEMS.some(i => i.key === active)) {
+            // التاب الحالي لم يعد متاحاً → انتقل لأول تاب مسموح
+            if (SIDEBAR_ITEMS.length > 0) setActive(SIDEBAR_ITEMS[0].key)
         }
-    }, [tabParam])
+    }, [tabParam, SIDEBAR_ITEMS, active])
 
     const activeItem = SIDEBAR_ITEMS.find(i => i.key === active)
 
@@ -141,7 +188,7 @@ export function OrganizationSettingsPage() {
 
                 {/* ── Sidebar Navigation ── */}
                 <nav style={{ padding: "4px 6px", flex: 1, overflowY: "auto" }}>
-                    {SIDEBAR_SECTIONS.map((section, si) => (
+                    {filteredSections.map((section, si) => (
                         <div key={si}>
                             {/* Section header */}
                             {!collapsed && (
@@ -261,20 +308,31 @@ export function OrganizationSettingsPage() {
                 </p>
 
                 {/* content */}
-                <div key={active} style={{ animation: "orgFade .18s ease-out" }}>
-                    {active === "general" && <OrganizationTab />}
-                    {active === "users" && <UsersPage embedded />}
-                    {active === "roles" && <RolesPage embedded />}
-                    {active === "channels" && <ChannelsPage />}
-                    {active === "teams" && <TeamsTab />}
-                    {active === "tags" && <TagsTab />}
-                    {active === "snippets" && <SnippetsTab />}
-                    {active === "lifecycles" && <LifecyclesTab />}
-                    {active === "contact-fields" && <ContactFieldsTab />}
-                    {active === "ai" && <AISettingsTab />}
-                    {active === "theme" && <ThemeTab />}
-                    {active === "billing" && <BillingTab />}
-                </div>
+                {SIDEBAR_ITEMS.length === 0 ? (
+                    /* ── لا توجد صلاحيات لأي تاب ── */
+                    <div style={{
+                        display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+                        minHeight: 300, gap: 12, color: "var(--t-text-faint, #9ca3af)",
+                    }}>
+                        <Shield size={40} strokeWidth={1.2} style={{ color: "var(--t-text-faint, #d1d5db)" }} />
+                        <p style={{ fontSize: 14, fontWeight: 600, color: "var(--t-text-secondary, #6b7280)" }}>لا توجد صلاحيات كافية</p>
+                        <p style={{ fontSize: 12 }}>ليس لديك صلاحية الوصول لأي من إعدادات المؤسسة</p>
+                    </div>
+                ) : (
+                    <div key={active} style={{ animation: "orgFade .18s ease-out" }}>
+                        {active === "general" && canRenderTab("general") && <OrganizationTab />}
+                        {active === "users" && canRenderTab("users") && <UsersPage embedded />}
+                        {active === "roles" && canRenderTab("roles") && <RolesPage embedded />}
+                        {active === "channels" && canRenderTab("channels") && <ChannelsPage />}
+                        {active === "teams" && canRenderTab("teams") && <TeamsTab />}
+                        {active === "tags" && canRenderTab("tags") && <TagsTab />}
+                        {active === "snippets" && canRenderTab("snippets") && <SnippetsTab />}
+                        {active === "lifecycles" && canRenderTab("lifecycles") && <LifecyclesTab />}
+                        {active === "contact-fields" && canRenderTab("contact-fields") && <ContactFieldsTab />}
+                        {active === "ai" && canRenderTab("ai") && <AISettingsTab />}
+                        {active === "billing" && <BillingTab />}
+                    </div>
+                )}
             </main>
 
             <style>{`@keyframes orgFade{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}`}</style>

@@ -10,11 +10,12 @@ import type { Team } from "../types/teams-tags"
 import { getBriefUsers } from "@/features/inbox/services/inbox-service"
 import {
     Plus, Trash2, Pencil, Users, X, Loader2, Search, AlertTriangle, Check,
-    MoreVertical, UserPlus, Mail, Shield, ChevronDown,
+    MoreVertical, UserPlus, Mail, Shield, ChevronDown, Lock,
     ArrowUpDown, RotateCcw, ChevronLeft, ChevronRight,
 } from "lucide-react"
 import { ActionGuard } from "@/components/guards/ActionGuard"
 import { PAGE_BITS, ACTION_BITS } from "@/lib/permissions"
+import { usePermissions } from "@/lib/usePermissions"
 
 /* ═══════════════════════════════════════
    CSS — Fateen branded
@@ -398,6 +399,9 @@ function ActionsDropdown({ onEdit, onMembers, onDelete, memberCount }: {
 
 /* ─── Members Modal ─── */
 function MembersModal({ team, onClose, tenantId }: { team: Team; onClose: () => void; tenantId: string }) {
+    const { canPerformAction } = usePermissions()
+    const canViewMembers = canPerformAction(PAGE_BITS.TEAMS, ACTION_BITS.GET_TEAM_MEMBERS)
+
     const { data: membersData, isLoading } = useTeamMembers(tenantId, team.team_id)
     const addMut = useAddTeamMember(tenantId)
     const removeMut = useRemoveTeamMember(tenantId)
@@ -420,151 +424,173 @@ function MembersModal({ team, onClose, tenantId }: { team: Team; onClose: () => 
 
     return (
         <Modal title={`أعضاء — ${team.name}`} width={480} onClose={onClose}>
-            {/* Add button */}
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
-                <span style={{ fontSize: 11, fontWeight: 700, color: "#9ca3af" }}>
-                    {members.length} عضو
-                </span>
-                <button className="tt-btn-primary" style={{ padding: "5px 12px", fontSize: 11 }}
-                    onClick={() => setShowAdd(!showAdd)}>
-                    {showAdd ? <X size={12} /> : <UserPlus size={12} />}
-                    {showAdd ? "إلغاء" : "إضافة"}
-                </button>
-            </div>
-
-            {/* Add dropdown */}
-            {showAdd && (
-                <div style={{
-                    marginBottom: 10, padding: 10, borderRadius: 10,
-                    border: "1px solid #eaedf0", background: "#fafbfc",
-                    animation: "ttMenuIn .15s ease-out",
-                }}>
-                    <input className="tt-field" value={addSearch} onChange={e => setAddSearch(e.target.value)}
-                        placeholder="ابحث عن موظف..." style={{ fontSize: 11, padding: "7px 10px", marginBottom: 6 }} autoFocus />
-                    <div style={{ maxHeight: 140, overflowY: "auto", display: "flex", flexDirection: "column", gap: 2 }}>
-                        {available.length === 0 ? (
-                            <div style={{ textAlign: "center", padding: "10px 0", fontSize: 10, color: "#9ca3af" }}>لا يوجد</div>
-                        ) : available.map(u => (
-                            <button key={u.user_id}
-                                onClick={() => addMut.mutate({ teamId: team.team_id, userId: u.user_id })}
-                                disabled={addMut.isPending}
-                                style={{
-                                    display: "flex", alignItems: "center", gap: 7,
-                                    padding: "6px 8px", borderRadius: 7, border: "none",
-                                    background: "transparent", cursor: "pointer",
-                                    fontSize: 11, color: "var(--t-text, #374151)", fontFamily: "inherit",
-                                    textAlign: "right", width: "100%", transition: "background .08s",
-                                }}
-                                onMouseEnter={e => { e.currentTarget.style.background = "#f0f1f3" }}
-                                onMouseLeave={e => { e.currentTarget.style.background = "transparent" }}
-                            >
-                                <div style={{
-                                    width: 22, height: 22, borderRadius: "50%", flexShrink: 0,
-                                    background: AVATAR_GRADIENTS[hashCode(u.user_id) % AVATAR_GRADIENTS.length],
-                                    display: "flex", alignItems: "center", justifyContent: "center",
-                                    fontSize: 9, fontWeight: 700, color: "#fff",
-                                }}>
-                                    {u.name.charAt(0).toUpperCase()}
-                                </div>
-                                <span style={{ flex: 1 }}>{u.name}</span>
-                                <UserPlus size={10} style={{ color: "#004786" }} />
-                            </button>
-                        ))}
-                    </div>
-                </div>
-            )}
-
-            {/* Members list */}
-            {isLoading ? (
-                <div style={{ textAlign: "center", padding: "28px 0", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, color: "#004786", fontSize: 11 }}>
-                    <Loader2 size={14} className="animate-spin" /> جاري التحميل...
-                </div>
-            ) : members.length === 0 ? (
-                <div style={{ textAlign: "center", padding: "28px 0" }}>
+            {/* ── فحص صلاحية عرض الأعضاء ── */}
+            {!canViewMembers ? (
+                <div style={{ textAlign: "center", padding: "36px 0" }}>
                     <div style={{
-                        width: 44, height: 44, borderRadius: 12,
-                        background: "rgba(0,71,134,.06)",
+                        width: 44, height: 44, borderRadius: 10,
+                        background: "rgba(245,158,11,0.08)",
                         display: "flex", alignItems: "center", justifyContent: "center",
-                        margin: "0 auto 8px",
+                        margin: "0 auto 10px",
                     }}>
-                        <Users size={20} style={{ color: "#004786" }} />
+                        <Lock size={18} style={{ color: "#f59e0b" }} />
                     </div>
-                    <div style={{ fontSize: 12, color: "#9ca3af" }}>لا يوجد أعضاء</div>
+                    <p style={{ fontSize: 13, fontWeight: 600, color: "var(--t-text, #111827)", margin: "0 0 4px" }}>لا توجد صلاحية</p>
+                    <p style={{ fontSize: 11, color: "#9ca3af", margin: 0 }}>ليس لديك صلاحية عرض أعضاء الفريق</p>
                 </div>
             ) : (
-                <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-                    {members.map(member => {
-                        const initials = member.full_name.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2)
-                        const gradient = AVATAR_GRADIENTS[hashCode(member.user_id) % AVATAR_GRADIENTS.length]
-                        return (
-                            <div key={member.user_id} style={{
-                                display: "flex", alignItems: "center", justifyContent: "space-between",
-                                padding: "9px 12px", borderRadius: 10,
-                                border: "1px solid #eaedf0", background: "#fff",
-                                transition: "all .12s",
-                            }}
-                                onMouseEnter={e => { e.currentTarget.style.borderColor = "#d1d5db"; e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,.03)" }}
-                                onMouseLeave={e => { e.currentTarget.style.borderColor = "#eaedf0"; e.currentTarget.style.boxShadow = "none" }}
-                            >
-                                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                                    {member.profile_picture ? (
-                                        <img src={member.profile_picture} alt="" style={{ width: 30, height: 30, borderRadius: 8, objectFit: "cover" }}
-                                            onError={e => { (e.target as HTMLImageElement).style.display = "none" }} />
-                                    ) : (
+                <>
+                    {/* Add button */}
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+                        <span style={{ fontSize: 11, fontWeight: 700, color: "#9ca3af" }}>
+                            {members.length} عضو
+                        </span>
+                        <ActionGuard pageBit={PAGE_BITS.TEAMS} actionBit={ACTION_BITS.UPDATE_TEAM_MEMBERS}>
+                            <button className="tt-btn-primary" style={{ padding: "5px 12px", fontSize: 11 }}
+                                onClick={() => setShowAdd(!showAdd)}>
+                                {showAdd ? <X size={12} /> : <UserPlus size={12} />}
+                                {showAdd ? "إلغاء" : "إضافة"}
+                            </button>
+                        </ActionGuard>
+                    </div>
+
+                    {/* Add dropdown */}
+                    {showAdd && (
+                        <div style={{
+                            marginBottom: 10, padding: 10, borderRadius: 10,
+                            border: "1px solid #eaedf0", background: "#fafbfc",
+                            animation: "ttMenuIn .15s ease-out",
+                        }}>
+                            <input className="tt-field" value={addSearch} onChange={e => setAddSearch(e.target.value)}
+                                placeholder="ابحث عن موظف..." style={{ fontSize: 11, padding: "7px 10px", marginBottom: 6 }} autoFocus />
+                            <div style={{ maxHeight: 140, overflowY: "auto", display: "flex", flexDirection: "column", gap: 2 }}>
+                                {available.length === 0 ? (
+                                    <div style={{ textAlign: "center", padding: "10px 0", fontSize: 10, color: "#9ca3af" }}>لا يوجد</div>
+                                ) : available.map(u => (
+                                    <button key={u.user_id}
+                                        onClick={() => addMut.mutate({ teamId: team.team_id, userId: u.user_id })}
+                                        disabled={addMut.isPending}
+                                        style={{
+                                            display: "flex", alignItems: "center", gap: 7,
+                                            padding: "6px 8px", borderRadius: 7, border: "none",
+                                            background: "transparent", cursor: "pointer",
+                                            fontSize: 11, color: "var(--t-text, #374151)", fontFamily: "inherit",
+                                            textAlign: "right", width: "100%", transition: "background .08s",
+                                        }}
+                                        onMouseEnter={e => { e.currentTarget.style.background = "#f0f1f3" }}
+                                        onMouseLeave={e => { e.currentTarget.style.background = "transparent" }}
+                                    >
                                         <div style={{
-                                            width: 30, height: 30, borderRadius: 8,
-                                            background: gradient,
+                                            width: 22, height: 22, borderRadius: "50%", flexShrink: 0,
+                                            background: AVATAR_GRADIENTS[hashCode(u.user_id) % AVATAR_GRADIENTS.length],
                                             display: "flex", alignItems: "center", justifyContent: "center",
-                                            fontSize: 10, fontWeight: 700, color: "#fff",
+                                            fontSize: 9, fontWeight: 700, color: "#fff",
                                         }}>
-                                            {initials}
+                                            {u.name.charAt(0).toUpperCase()}
                                         </div>
-                                    )}
-                                    <div>
-                                        <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-                                            <span style={{ fontSize: 12, fontWeight: 600, color: "var(--t-text, #111827)" }}>{member.full_name}</span>
-                                            {!member.is_active && (
-                                                <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 4, background: "rgba(239,68,68,.06)", color: "#dc2626", fontWeight: 700 }}>غير نشط</span>
-                                            )}
-                                        </div>
-                                        <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 1 }}>
-                                            {member.email && (
-                                                <span style={{ display: "flex", alignItems: "center", gap: 2, fontSize: 10, color: "#9ca3af" }}>
-                                                    <Mail size={9} /> {member.email}
-                                                </span>
-                                            )}
-                                            {member.role && (
-                                                <span style={{
-                                                    display: "flex", alignItems: "center", gap: 2,
-                                                    fontSize: 9, fontWeight: 700,
-                                                    padding: "1px 6px", borderRadius: 4,
-                                                    background: "rgba(0,71,134,.04)", color: "#004786",
-                                                }}>
-                                                    <Shield size={8} /> {member.role}
-                                                </span>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
-                                <button
-                                    onClick={() => removeMut.mutate({ teamId: team.team_id, userId: member.user_id })}
-                                    disabled={removeMut.isPending}
-                                    style={{
-                                        width: 26, height: 26, borderRadius: 7, border: "none",
-                                        background: "rgba(239,68,68,.06)", color: "#dc2626",
-                                        cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+                                        <span style={{ flex: 1 }}>{u.name}</span>
+                                        <UserPlus size={10} style={{ color: "#004786" }} />
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Members list */}
+                    {isLoading ? (
+                        <div style={{ textAlign: "center", padding: "28px 0", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, color: "#004786", fontSize: 11 }}>
+                            <Loader2 size={14} className="animate-spin" /> جاري التحميل...
+                        </div>
+                    ) : members.length === 0 ? (
+                        <div style={{ textAlign: "center", padding: "28px 0" }}>
+                            <div style={{
+                                width: 44, height: 44, borderRadius: 12,
+                                background: "rgba(0,71,134,.06)",
+                                display: "flex", alignItems: "center", justifyContent: "center",
+                                margin: "0 auto 8px",
+                            }}>
+                                <Users size={20} style={{ color: "#004786" }} />
+                            </div>
+                            <div style={{ fontSize: 12, color: "#9ca3af" }}>لا يوجد أعضاء</div>
+                        </div>
+                    ) : (
+                        <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+                            {members.map(member => {
+                                const initials = member.full_name.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2)
+                                const gradient = AVATAR_GRADIENTS[hashCode(member.user_id) % AVATAR_GRADIENTS.length]
+                                return (
+                                    <div key={member.user_id} style={{
+                                        display: "flex", alignItems: "center", justifyContent: "space-between",
+                                        padding: "9px 12px", borderRadius: 10,
+                                        border: "1px solid #eaedf0", background: "#fff",
                                         transition: "all .12s",
                                     }}
-                                    onMouseEnter={e => { e.currentTarget.style.background = "rgba(239,68,68,.12)" }}
-                                    onMouseLeave={e => { e.currentTarget.style.background = "rgba(239,68,68,.06)" }}
-                                    title="إزالة"
-                                >
-                                    {removeMut.isPending ? <Loader2 size={10} className="animate-spin" /> : <Trash2 size={11} />}
-                                </button>
-                            </div>
-                        )
-                    })}
-                </div>
+                                        onMouseEnter={e => { e.currentTarget.style.borderColor = "#d1d5db"; e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,.03)" }}
+                                        onMouseLeave={e => { e.currentTarget.style.borderColor = "#eaedf0"; e.currentTarget.style.boxShadow = "none" }}
+                                    >
+                                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                            {member.profile_picture ? (
+                                                <img src={member.profile_picture} alt="" style={{ width: 30, height: 30, borderRadius: 8, objectFit: "cover" }}
+                                                    onError={e => { (e.target as HTMLImageElement).style.display = "none" }} />
+                                            ) : (
+                                                <div style={{
+                                                    width: 30, height: 30, borderRadius: 8,
+                                                    background: gradient,
+                                                    display: "flex", alignItems: "center", justifyContent: "center",
+                                                    fontSize: 10, fontWeight: 700, color: "#fff",
+                                                }}>
+                                                    {initials}
+                                                </div>
+                                            )}
+                                            <div>
+                                                <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                                                    <span style={{ fontSize: 12, fontWeight: 600, color: "var(--t-text, #111827)" }}>{member.full_name}</span>
+                                                    {!member.is_active && (
+                                                        <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 4, background: "rgba(239,68,68,.06)", color: "#dc2626", fontWeight: 700 }}>غير نشط</span>
+                                                    )}
+                                                </div>
+                                                <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 1 }}>
+                                                    {member.email && (
+                                                        <span style={{ display: "flex", alignItems: "center", gap: 2, fontSize: 10, color: "#9ca3af" }}>
+                                                            <Mail size={9} /> {member.email}
+                                                        </span>
+                                                    )}
+                                                    {member.role && (
+                                                        <span style={{
+                                                            display: "flex", alignItems: "center", gap: 2,
+                                                            fontSize: 9, fontWeight: 700,
+                                                            padding: "1px 6px", borderRadius: 4,
+                                                            background: "rgba(0,71,134,.04)", color: "#004786",
+                                                        }}>
+                                                            <Shield size={8} /> {member.role}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <ActionGuard pageBit={PAGE_BITS.TEAMS} actionBit={ACTION_BITS.UPDATE_TEAM_MEMBERS}>
+                                            <button
+                                                onClick={() => removeMut.mutate({ teamId: team.team_id, userId: member.user_id })}
+                                                disabled={removeMut.isPending}
+                                                style={{
+                                                    width: 26, height: 26, borderRadius: 7, border: "none",
+                                                    background: "rgba(239,68,68,.06)", color: "#dc2626",
+                                                    cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+                                                    transition: "all .12s",
+                                                }}
+                                                onMouseEnter={e => { e.currentTarget.style.background = "rgba(239,68,68,.12)" }}
+                                                onMouseLeave={e => { e.currentTarget.style.background = "rgba(239,68,68,.06)" }}
+                                                title="إزالة"
+                                            >
+                                                {removeMut.isPending ? <Loader2 size={10} className="animate-spin" /> : <Trash2 size={11} />}
+                                            </button>
+                                        </ActionGuard>
+                                    </div>
+                                )
+                            })}
+                        </div>
+                    )}
+                </>
             )}
         </Modal>
     )

@@ -1,8 +1,8 @@
-import type { Conversation } from "../../types/inbox.types"
+import type { Customer } from "../../types/inbox.types"
 import { ConversationItem } from "./ConversationItem"
 
 interface ConversationListProps {
-    conversations: Conversation[]
+    conversations: Customer[]
     selectedId: string | null
     isLoading: boolean
 }
@@ -58,11 +58,11 @@ export function ConversationList({ conversations, selectedId, isLoading }: Conve
 
     return (
         <div style={{ padding: "0 6px", overflowY: "auto", flex: 1 }}>
-            {conversations.map((convo) => (
+            {conversations.map((convo, i) => (
                 <ConversationItem
-                    key={convo.id}
-                    conversation={convo}
-                    isSelected={convo.id === selectedId}
+                    key={convo.customer_id ?? convo.id ?? `convo-${i}`}
+                    customer={convo}
+                    isSelected={convo.customer_id === selectedId}
                 />
             ))}
         </div>

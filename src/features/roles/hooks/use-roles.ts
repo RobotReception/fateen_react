@@ -12,6 +12,7 @@ import {
     assignUserRole,
     removeUserRole,
     getAllPermissions,
+    getMyPermissions,
 } from "../services/roles-service"
 import type {
     Role,
@@ -164,6 +165,25 @@ export function useUsersWithRole(role: string) {
     })
 }
 
+/**
+ * صلاحيات المستخدم الحالي — React Query بدل setInterval
+ * - staleTime: 5 دقائق
+ * - refetchOnWindowFocus: تلقائي
+ */
+export function useMyPermissions() {
+    const tenantId = useTenantId()
+    const isAuth = useAuthStore(s => s.isAuthenticated)
+
+    return useQuery({
+        queryKey: rolesKeys.myPermissions(),
+        queryFn: () => getMyPermissions(tenantId),
+        enabled: !!tenantId && isAuth,
+        staleTime: 5 * 60 * 1000,
+        refetchOnWindowFocus: true,
+        select: (res) => res?.data?.pageWithPermission ?? null,
+    })
+}
+
 /* ============================================================
    MUTATIONS
    ============================================================ */
@@ -177,6 +197,7 @@ export function useCreateRole() {
         mutationFn: (payload: CreateRolePayload) => createRole(payload, tenantId),
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: rolesKeys.list() })
+            qc.invalidateQueries({ queryKey: rolesKeys.myPermissions() })
             toast.success("تم إنشاء الدور بنجاح")
         },
         onError: () => toast.error("فشل إنشاء الدور"),
@@ -192,6 +213,7 @@ export function useDeleteRole() {
         mutationFn: (role: string) => deleteRole(role, tenantId),
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: rolesKeys.all })
+            qc.invalidateQueries({ queryKey: rolesKeys.myPermissions() })
             toast.success("تم حذف الدور بنجاح")
         },
         onError: () => toast.error("فشل حذف الدور"),
@@ -208,6 +230,7 @@ export function useAddRolePermissions(role: string) {
             addRolePermissions(role, permissionIds, tenantId),
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: rolesKeys.permissions(role) })
+            qc.invalidateQueries({ queryKey: rolesKeys.myPermissions() })
             toast.success("تم إضافة الصلاحية")
         },
         onError: () => toast.error("فشل إضافة الصلاحية"),
@@ -224,6 +247,7 @@ export function useRemoveRolePermissions(role: string) {
             removeRolePermissions(role, permissionIds, tenantId),
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: rolesKeys.permissions(role) })
+            qc.invalidateQueries({ queryKey: rolesKeys.myPermissions() })
             toast.success("تم إزالة الصلاحية")
         },
         onError: () => toast.error("فشل إزالة الصلاحية"),
@@ -239,6 +263,7 @@ export function useAssignUserRole() {
         mutationFn: (payload: AssignRolePayload) => assignUserRole(payload, tenantId),
         onSuccess: (_data, vars) => {
             qc.invalidateQueries({ queryKey: rolesKeys.usersWithRole(vars.role) })
+            qc.invalidateQueries({ queryKey: rolesKeys.myPermissions() })
             toast.success("تم تعيين الدور للمستخدم")
         },
         onError: () => toast.error("فشل تعيين الدور"),
@@ -254,6 +279,7 @@ export function useRemoveUserRole() {
         mutationFn: (payload: AssignRolePayload) => removeUserRole(payload, tenantId),
         onSuccess: (_data, vars) => {
             qc.invalidateQueries({ queryKey: rolesKeys.usersWithRole(vars.role) })
+            qc.invalidateQueries({ queryKey: rolesKeys.myPermissions() })
             toast.success("تم إزالة الدور من المستخدم")
         },
         onError: () => toast.error("فشل إزالة الدور"),

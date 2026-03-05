@@ -148,9 +148,11 @@ function PlatformCard({ platform, on, count, selected, toggling, onToggle, onSel
                     {toggling ? (
                         <Loader2 size={14} style={{ color: "#004786", animation: "chPulse .8s infinite" }} />
                     ) : (
-                        <button className={`ch-sw-sm ${on ? "on" : "off"}`}
-                            onClick={onToggle}
-                            title={on ? `إيقاف ${m.labelAr}` : `تفعيل ${m.labelAr}`} />
+                        <ActionGuard pageBit={PAGE_BITS.CHANNELS} actionBit={ACTION_BITS.TOGGLE_PLATFORM}>
+                            <button className={`ch-sw-sm ${on ? "on" : "off"}`}
+                                onClick={onToggle}
+                                title={on ? `إيقاف ${m.labelAr}` : `تفعيل ${m.labelAr}`} />
+                        </ActionGuard>
                     )}
                 </div>
             </div>
@@ -218,22 +220,26 @@ function RowActions({ onView, onDelete }: { onView: () => void; onDelete: () => 
                         boxShadow: "0 8px 28px rgba(0,0,0,.12)", minWidth: 150, padding: 4,
                         animation: "chIn .1s ease-out",
                     }}>
-                        <button onClick={() => { onView(); setOpen(false) }} style={{
-                            width: "100%", padding: "8px 12px", border: "none", background: "transparent", cursor: "pointer",
-                            display: "flex", alignItems: "center", gap: 8, borderRadius: 7,
-                            fontSize: 12, fontWeight: 600, color: "#374151", transition: "background .08s", fontFamily: "inherit", textAlign: "right",
-                        }}
-                            onMouseEnter={e => { e.currentTarget.style.background = "#f5f6f8" }}
-                            onMouseLeave={e => { e.currentTarget.style.background = "transparent" }}
-                        ><Settings2 size={13} /> الإعدادات</button>
-                        <button onClick={() => { onDelete(); setOpen(false) }} style={{
-                            width: "100%", padding: "8px 12px", border: "none", background: "transparent", cursor: "pointer",
-                            display: "flex", alignItems: "center", gap: 8, borderRadius: 7,
-                            fontSize: 12, fontWeight: 600, color: "#dc2626", transition: "background .08s", fontFamily: "inherit", textAlign: "right",
-                        }}
-                            onMouseEnter={e => { e.currentTarget.style.background = "rgba(239,68,68,.04)" }}
-                            onMouseLeave={e => { e.currentTarget.style.background = "transparent" }}
-                        ><Trash2 size={13} /> حذف</button>
+                        <ActionGuard pageBit={PAGE_BITS.CHANNELS} actionBit={ACTION_BITS.GET_CHANNEL}>
+                            <button onClick={() => { onView(); setOpen(false) }} style={{
+                                width: "100%", padding: "8px 12px", border: "none", background: "transparent", cursor: "pointer",
+                                display: "flex", alignItems: "center", gap: 8, borderRadius: 7,
+                                fontSize: 12, fontWeight: 600, color: "#374151", transition: "background .08s", fontFamily: "inherit", textAlign: "right",
+                            }}
+                                onMouseEnter={e => { e.currentTarget.style.background = "#f5f6f8" }}
+                                onMouseLeave={e => { e.currentTarget.style.background = "transparent" }}
+                            ><Settings2 size={13} /> الإعدادات</button>
+                        </ActionGuard>
+                        <ActionGuard pageBit={PAGE_BITS.CHANNELS} actionBit={ACTION_BITS.DELETE_CHANNEL}>
+                            <button onClick={() => { onDelete(); setOpen(false) }} style={{
+                                width: "100%", padding: "8px 12px", border: "none", background: "transparent", cursor: "pointer",
+                                display: "flex", alignItems: "center", gap: 8, borderRadius: 7,
+                                fontSize: 12, fontWeight: 600, color: "#dc2626", transition: "background .08s", fontFamily: "inherit", textAlign: "right",
+                            }}
+                                onMouseEnter={e => { e.currentTarget.style.background = "rgba(239,68,68,.04)" }}
+                                onMouseLeave={e => { e.currentTarget.style.background = "transparent" }}
+                            ><Trash2 size={13} /> حذف</button>
+                        </ActionGuard>
                     </div>
                 </>,
                 document.body
@@ -436,7 +442,7 @@ export function ChannelsPage() {
                                     </button>
                                 )}
                             </div>
-                            <ActionGuard pageBit={PAGE_BITS.CHANNELS} actionBit={ACTION_BITS.LIST_CHANNELS}>
+                            <ActionGuard pageBit={PAGE_BITS.CHANNELS} actionBit={ACTION_BITS.CREATE_CHANNEL}>
                                 <button onClick={() => setShowAdd(true)} style={{
                                     display: "inline-flex", alignItems: "center", gap: 5, padding: "6px 12px", borderRadius: 7,
                                     background: "#004786", color: "#fff", border: "none",
@@ -475,13 +481,15 @@ export function ChannelsPage() {
                                 {search ? "جرّب كلمة بحث أخرى" : `أضف قناة ${am.labelAr} للبدء`}
                             </div>
                             {!search && (
-                                <button onClick={() => setShowAdd(true)} style={{
-                                    display: "inline-flex", alignItems: "center", gap: 5, padding: "7px 14px",
-                                    borderRadius: 7, background: "#004786", color: "#fff", border: "none",
-                                    fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
-                                }}>
-                                    <Plus size={12} /> إضافة قناة
-                                </button>
+                                <ActionGuard pageBit={PAGE_BITS.CHANNELS} actionBit={ACTION_BITS.CREATE_CHANNEL}>
+                                    <button onClick={() => setShowAdd(true)} style={{
+                                        display: "inline-flex", alignItems: "center", gap: 5, padding: "7px 14px",
+                                        borderRadius: 7, background: "#004786", color: "#fff", border: "none",
+                                        fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
+                                    }}>
+                                        <Plus size={12} /> إضافة قناة
+                                    </button>
+                                </ActionGuard>
                             )}
                         </div>
                     ) : (
@@ -550,8 +558,10 @@ export function ChannelsPage() {
                                                 {isToggling ? (
                                                     <Loader2 size={13} style={{ color: "#004786", animation: "chPulse .8s infinite" }} />
                                                 ) : (
-                                                    <button className={`ch-sw ${ch.enabled ? "on" : "off"}`}
-                                                        onClick={() => toggleCh.mutate({ platform: ch.platform, identifier: ch.identifier, payload: { enabled: !(ch.enabled ?? false) } })} />
+                                                    <ActionGuard pageBit={PAGE_BITS.CHANNELS} actionBit={ACTION_BITS.TOGGLE_CHANNEL}>
+                                                        <button className={`ch-sw ${ch.enabled ? "on" : "off"}`}
+                                                            onClick={() => toggleCh.mutate({ platform: ch.platform, identifier: ch.identifier, payload: { enabled: !(ch.enabled ?? false) } })} />
+                                                    </ActionGuard>
                                                 )}
                                             </td>
                                             {/* Agents */}

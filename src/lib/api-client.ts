@@ -1,12 +1,13 @@
 import axios from "axios"
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://161.97.117.77:4488/api/backend/v2"
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "/api/backend/v2"
 
 export const apiClient = axios.create({
     baseURL: API_BASE_URL,
     headers: {
         "Content-Type": "application/json",
     },
+    withCredentials: true,
     timeout: 30000,
 })
 
@@ -102,6 +103,7 @@ apiClient.interceptors.response.use(
             const refreshToken = localStorage.getItem("refresh_token")
             if (!refreshToken) {
                 // No refresh token — clear and redirect
+                isRefreshing = false
                 localStorage.removeItem("access_token")
                 localStorage.removeItem("refresh_token")
                 localStorage.removeItem("fateen-auth-storage")
@@ -113,7 +115,7 @@ apiClient.interceptors.response.use(
                 const { data } = await axios.post(
                     `${API_BASE_URL}/auth/refresh-token`,
                     { refresh_token: refreshToken },
-                    { headers: { "Content-Type": "application/json" } }
+                    { headers: { "Content-Type": "application/json" }, withCredentials: true }
                 )
 
                 const newToken = data.data.token
@@ -133,30 +135,21 @@ apiClient.interceptors.response.use(
                     }
                 } catch { /* silent */ }
 
+                // Resolve queued requests with the new token, THEN reset flag
                 processQueue(null, newToken)
+                isRefreshing = false
 
                 originalRequest.headers.Authorization = `Bearer ${newToken}`
                 return apiClient(originalRequest)
             } catch (refreshError) {
                 processQueue(refreshError, null)
+                isRefreshing = false
                 localStorage.removeItem("access_token")
                 localStorage.removeItem("refresh_token")
                 localStorage.removeItem("fateen-auth-storage")
                 window.location.href = "/login"
                 return Promise.reject(refreshError)
-            } finally {
-                isRefreshing = false
             }
-        }
-
-        // ── 403: Log warning ──
-        if (status === 403) {
-            console.warn("Access forbidden:", error.response?.data?.message)
-        }
-
-        // ── 500: Log error ──
-        if (status === 500) {
-            console.error("Server error:", error.response?.data)
         }
 
         return Promise.reject(error)

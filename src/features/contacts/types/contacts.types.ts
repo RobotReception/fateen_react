@@ -9,7 +9,7 @@ export interface ContactAssignment {
 }
 
 export interface ContactTeamIds {
-    teams: string[]
+    teams: { team_id: string; name: string }[]
     is_assigned_team: boolean
 }
 
@@ -20,12 +20,19 @@ export interface ContactConversationStatus {
     closed_at: string
 }
 
+export interface ContactTag {
+    id: string
+    name: string
+    emoji?: string
+}
+
 export interface Contact {
     id: string
     customer_id: string
     session_id?: string | null
     is_contacts: boolean
     sender_name: string
+    profile_photo?: string | null
     platform: string
     platform_icon?: string | null
     contact_fields: Record<string, string>
@@ -35,7 +42,7 @@ export interface Contact {
     team_ids: ContactTeamIds | null
     session_status: string
     lifecycle: string
-    tags: string[]
+    tags: ContactTag[]
     enable_ai: boolean
     platform_metadata?: Record<string, any>
     conversation_summary?: string
@@ -71,6 +78,9 @@ export interface ContactsQueryParams {
     assigned_to?: string
     lifecycle?: string
     tags?: string
+    team_id?: string
+    is_assigned_team?: string
+    account_id?: string
     enable_ai?: boolean
     conversation_status?: string
     sort_by?: string

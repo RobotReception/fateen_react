@@ -20,6 +20,7 @@ export default defineConfig({
         target: 'http://161.97.117.77:4488',
         changeOrigin: true,
         secure: false,
+        ws: true,
       },
     },
   },
