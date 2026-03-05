@@ -25,17 +25,32 @@ import { ConversationPage } from "@/features/inbox/pages/ConversationPage"
 import { ContactsPage } from "@/features/contacts/pages/ContactsPage"
 import { MenuManagerPage } from "@/features/menu-manager/pages/MenuManagerPage"
 
-/** يتحقق من تسجيل الدخول + وجود توكن فعلي — يحوّل لصفحة Login إذا لم يكن مسجلاً */
+/**
+ * فحص صلاحية JWT — يتحقق من تاريخ الانتهاء (exp)
+ * يعود true فقط إذا التوكن صالح وغير منتهي
+ */
+function isTokenValid(token: string | null): boolean {
+    if (!token) return false
+    try {
+        const payload = JSON.parse(atob(token.split(".")[1]))
+        // exp بالثواني — نقارن مع الوقت الحالي مع هامش 30 ثانية
+        return payload.exp * 1000 > Date.now() - 30000
+    } catch {
+        return false
+    }
+}
+
+/** يتحقق من تسجيل الدخول + صلاحية التوكن — يحوّل لصفحة Login إذا انتهى */
 function AuthGuard({ children }: { children: React.ReactNode }) {
     const { isAuthenticated, token, logout } = useAuthStore()
 
-    // إذا عنده isAuthenticated=true لكن ما عنده توكن فعلي → تسجيل خروج فوري
-    if (isAuthenticated && !token) {
-        logout()
+    // تحقق فعلي من صلاحية التوكن (ليس مجرد وجوده)
+    if (!isAuthenticated || !isTokenValid(token)) {
+        // إذا عنده بيانات قديمة → نظّف كل شيء
+        if (isAuthenticated) logout()
         return <Navigate to="/login" replace />
     }
 
-    if (!isAuthenticated) return <Navigate to="/login" replace />
     return <>{children}</>
 }
 
