@@ -85,7 +85,7 @@ const SIDEBAR_SECTIONS: SidebarSection[] = [
 
 
 export function OrganizationSettingsPage() {
-    const [searchParams] = useSearchParams()
+    const [searchParams, setSearchParams] = useSearchParams()
     const tabParam = searchParams.get("tab") as SidebarKey | null
     const { canAccessPage, hasPermissionData } = usePermissions()
     usePermissionsRefresh()  // تحديث فوري عند فتح الإعدادات
@@ -120,11 +120,13 @@ export function OrganizationSettingsPage() {
     useEffect(() => {
         if (tabParam && SIDEBAR_ITEMS.some(i => i.key === tabParam)) {
             setActive(tabParam)
+            // مسح ?tab= من URL بعد تطبيقه لمنع تعارضه مع التنقل اليدوي
+            setSearchParams({}, { replace: true })
         } else if (!SIDEBAR_ITEMS.some(i => i.key === active)) {
             // التاب الحالي لم يعد متاحاً → انتقل لأول تاب مسموح
             if (SIDEBAR_ITEMS.length > 0) setActive(SIDEBAR_ITEMS[0].key)
         }
-    }, [tabParam, SIDEBAR_ITEMS, active])
+    }, [tabParam, SIDEBAR_ITEMS])
 
     const activeItem = SIDEBAR_ITEMS.find(i => i.key === active)
 
