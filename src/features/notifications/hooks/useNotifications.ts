@@ -74,6 +74,8 @@ export function useNotifications() {
         wsRef.current = ws
 
         ws.onopen = () => {
+            // إرسال التوكن كأول رسالة للمصادقة (خلال 10 ثوان)
+            ws.send(`auth:${token}`)
             // Fetch list now if not already fetched
             initialLoad()
         }
