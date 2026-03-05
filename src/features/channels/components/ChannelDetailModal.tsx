@@ -1,8 +1,8 @@
-import { useState } from "react"
+import { useState, useRef, useCallback } from "react"
 import {
     X, Eye, EyeOff, Loader2, Save, Globe, Bot, Copy,
     ToggleLeft, ToggleRight, Settings2, Wifi, WifiOff,
-    Flag,
+    Flag, ImageIcon, Trash2,
 } from "lucide-react"
 import { useUpdateChannel, useToggleChannel, useChannelFlags, useUpdateChannelFlags } from "../hooks/use-channels"
 import { useAuthStore } from "@/stores/auth-store"
@@ -10,6 +10,7 @@ import { PLATFORM_META } from "../types"
 import type { Channel, ChannelFlagsData } from "../types"
 import { toast } from "sonner"
 import { AgentMultiSelect } from "./AgentMultiSelect"
+import { uploadMedia } from "@/features/inbox/services/inbox-service"
 
 const CSS = `
 @keyframes mdlIn{from{opacity:0;transform:scale(.96) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
@@ -51,6 +52,93 @@ function SecretField({ label, value, onChange }: { label: string; value: string;
                     {show ? <EyeOff size={14} /> : <Eye size={14} />}
                 </button>
             </div>
+        </div>
+    )
+}
+
+/* ─── Icon Upload (edit mode) ─── */
+function IconUploadEdit({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+    const fileRef = useRef<HTMLInputElement>(null)
+    const [uploading, setUploading] = useState(false)
+    const [preview, setPreview] = useState<string>(value || "")
+
+    const handleFile = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+        if (!file) return
+        if (!file.type.startsWith("image/")) { toast.error("يرجى اختيار ملف صورة"); return }
+        if (file.size > 5 * 1024 * 1024) { toast.error("الحد الأقصى 5MB"); return }
+        const localUrl = URL.createObjectURL(file)
+        setPreview(localUrl)
+        setUploading(true)
+        try {
+            const res = await uploadMedia(file, { platform: "webchat", source: "channel_icon" })
+            const url = res.public_url || res.proxy_url
+            onChange(url)
+            setPreview(url)
+            toast.success("تم رفع الأيقونة")
+        } catch {
+            toast.error("فشل رفع الأيقونة")
+            setPreview(value || "")
+        } finally {
+            setUploading(false)
+            if (fileRef.current) fileRef.current.value = ""
+        }
+    }, [onChange, value])
+
+    const remove = useCallback(() => {
+        onChange("")
+        setPreview("")
+    }, [onChange])
+
+    return (
+        <div>
+            <label className="mdl-label">أيقونة الويدجت</label>
+            <input ref={fileRef} type="file" accept="image/*" onChange={handleFile} style={{ display: "none" }} />
+            {preview ? (
+                <div style={{
+                    display: "flex", alignItems: "center", gap: 10,
+                    padding: "6px 10px", borderRadius: 9, border: "1.5px solid #e0e3e7", background: "#fafafa",
+                }}>
+                    <img src={preview} alt="icon" style={{ width: 32, height: 32, borderRadius: 7, objectFit: "cover", border: "1px solid #e0e3e7" }} />
+                    <span style={{ flex: 1, fontSize: 11, color: "#6b7280", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", direction: "ltr" }}>
+                        {uploading ? "جاري الرفع..." : "✓"}
+                    </span>
+                    {uploading ? (
+                        <Loader2 size={14} style={{ color: "#004786", animation: "spin 1s linear infinite", flexShrink: 0 }} />
+                    ) : (
+                        <>
+                            <button type="button" onClick={() => fileRef.current?.click()} style={{
+                                display: "flex", alignItems: "center", justifyContent: "center",
+                                width: 26, height: 26, borderRadius: 6, border: "none",
+                                background: "rgba(0,71,134,0.06)", cursor: "pointer", color: "#004786", flexShrink: 0,
+                            }}>
+                                <ImageIcon size={12} />
+                            </button>
+                            <button type="button" onClick={remove} style={{
+                                display: "flex", alignItems: "center", justifyContent: "center",
+                                width: 26, height: 26, borderRadius: 6, border: "none",
+                                background: "rgba(220,38,38,0.06)", cursor: "pointer", color: "#dc2626", flexShrink: 0,
+                            }}>
+                                <Trash2 size={12} />
+                            </button>
+                        </>
+                    )}
+                </div>
+            ) : (
+                <button type="button" onClick={() => fileRef.current?.click()} style={{
+                    display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                    width: "100%", padding: "10px 12px", borderRadius: 9,
+                    border: "1.5px dashed #d1d5db", background: "#fafafa",
+                    cursor: "pointer", color: "#9ca3af", fontSize: 12, fontWeight: 600, fontFamily: "inherit",
+                    transition: "all .15s",
+                }}
+                    onMouseEnter={e => { e.currentTarget.style.borderColor = "#004786"; e.currentTarget.style.color = "#004786" }}
+                    onMouseLeave={e => { e.currentTarget.style.borderColor = "#d1d5db"; e.currentTarget.style.color = "#9ca3af" }}
+                >
+                    <ImageIcon size={16} />
+                    اختر صورة الأيقونة
+                </button>
+            )}
         </div>
     )
 }
@@ -99,36 +187,12 @@ function SettingsTab({ channel, tenantId }: { channel: Channel; tenantId: string
                 <input className="mdl-field" dir="rtl" value={name} onChange={e => setName(e.target.value)} placeholder="اسم القناة" />
             </div>
 
-            <div>
-                <label className="mdl-label">المعرّف (identifier)</label>
-                <div style={{ display: "flex", gap: 6 }}>
-                    <input className="mdl-field" dir="ltr" value={channel.identifier} readOnly style={{ fontFamily: "monospace", opacity: 0.7, cursor: "default" }} />
-                    <button type="button" onClick={() => { navigator.clipboard.writeText(channel.identifier); toast.success("تم النسخ") }} style={{
-                        width: 38, height: 38, borderRadius: 9, border: "1.5px solid #e0e3e7", flexShrink: 0,
-                        background: "#fafafa", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
-                        color: "#9ca3af", transition: "all .12s",
-                    }}
-                        onMouseEnter={e => { e.currentTarget.style.borderColor = "#004786"; e.currentTarget.style.color = "#004786" }}
-                        onMouseLeave={e => { e.currentTarget.style.borderColor = "#e0e3e7"; e.currentTarget.style.color = "#9ca3af" }}
-                    >
-                        <Copy size={14} />
-                    </button>
-                </div>
-            </div>
-
-            {hasToken && (
-                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                    <SecretField label="Access Token" value={token} onChange={setToken} />
-                    <SecretField label="META App Secret" value={secret} onChange={setSecret} />
-                </div>
-            )}
-
-            {channel.platform === "webchat" && channel.script_url && (
+            {channel.platform !== "webchat" && (
                 <div>
-                    <label className="mdl-label" style={{ display: "flex", alignItems: "center", gap: 5 }}><Globe size={10} /> رابط التضمين (Script URL)</label>
+                    <label className="mdl-label">المعرّف (identifier)</label>
                     <div style={{ display: "flex", gap: 6 }}>
-                        <input className="mdl-field" dir="ltr" value={channel.script_url} readOnly style={{ fontFamily: "monospace", fontSize: 11, opacity: 0.7 }} />
-                        <button type="button" onClick={() => { navigator.clipboard.writeText(channel.script_url!); toast.success("تم نسخ الرابط") }} style={{
+                        <input className="mdl-field" dir="ltr" value={channel.identifier} readOnly style={{ fontFamily: "monospace", opacity: 0.7, cursor: "default" }} />
+                        <button type="button" onClick={() => { navigator.clipboard.writeText(channel.identifier); toast.success("تم النسخ") }} style={{
                             width: 38, height: 38, borderRadius: 9, border: "1.5px solid #e0e3e7", flexShrink: 0,
                             background: "#fafafa", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
                             color: "#9ca3af", transition: "all .12s",
@@ -142,12 +206,64 @@ function SettingsTab({ channel, tenantId }: { channel: Channel; tenantId: string
                 </div>
             )}
 
-            {channel.platform === "webchat" && (
-                <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 10 }}>
+            {hasToken && (
+                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                    <SecretField label="Access Token" value={token} onChange={setToken} />
+                    <SecretField label="META App Secret" value={secret} onChange={setSecret} />
+                </div>
+            )}
+
+            {channel.platform === "webchat" && channel.script_url && (() => {
+                const embedCode = `<script src="${channel.script_url}" async><\/script>`
+                return (
                     <div>
-                        <label className="mdl-label">أيقونة الويدجت</label>
-                        <input className="mdl-field" dir="ltr" value={icon} onChange={e => setIcon(e.target.value)} placeholder="https://..." />
+                        <label className="mdl-label" style={{ display: "flex", alignItems: "center", gap: 5 }}><Globe size={10} /> كود التضمين (Embed Code)</label>
+                        <div style={{
+                            position: "relative", borderRadius: 10, overflow: "hidden",
+                            border: "1.5px solid #e0e3e7", background: "#1e293b",
+                        }}>
+                            <div style={{
+                                display: "flex", alignItems: "center", justifyContent: "space-between",
+                                padding: "6px 12px", background: "#334155", borderBottom: "1px solid #475569",
+                            }}>
+                                <span style={{ fontSize: 10, fontWeight: 700, color: "#94a3b8", letterSpacing: ".03em" }}>HTML</span>
+                                <button type="button" onClick={() => { navigator.clipboard.writeText(embedCode); toast.success("تم نسخ كود التضمين") }} style={{
+                                    display: "flex", alignItems: "center", gap: 5,
+                                    padding: "3px 10px", borderRadius: 6, border: "1px solid #475569",
+                                    background: "transparent", cursor: "pointer",
+                                    fontSize: 10, fontWeight: 700, color: "#94a3b8", transition: "all .12s",
+                                    fontFamily: "inherit",
+                                }}
+                                    onMouseEnter={e => { e.currentTarget.style.background = "#475569"; e.currentTarget.style.color = "#e2e8f0" }}
+                                    onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#94a3b8" }}
+                                >
+                                    <Copy size={10} /> نسخ
+                                </button>
+                            </div>
+                            <pre dir="ltr" style={{
+                                margin: 0, padding: "12px 14px", fontSize: 11.5, lineHeight: 1.6,
+                                fontFamily: "'Fira Code', 'Cascadia Code', 'JetBrains Mono', monospace",
+                                color: "#e2e8f0", overflowX: "auto", whiteSpace: "pre-wrap", wordBreak: "break-all",
+                            }}>
+                                <span style={{ color: "#94a3b8" }}>&lt;</span>
+                                <span style={{ color: "#f472b6" }}>script</span>
+                                {" "}<span style={{ color: "#7dd3fc" }}>src</span>
+                                <span style={{ color: "#94a3b8" }}>=</span>
+                                <span style={{ color: "#a5f3fc" }}>"{channel.script_url}"</span>
+                                {" "}<span style={{ color: "#7dd3fc" }}>async</span>
+                                <span style={{ color: "#94a3b8" }}>&gt;&lt;/</span>
+                                <span style={{ color: "#f472b6" }}>script</span>
+                                <span style={{ color: "#94a3b8" }}>&gt;</span>
+                            </pre>
+                        </div>
+                        <p style={{ marginTop: 6, fontSize: 10, color: "#9ca3af" }}>الصق هذا الكود في صفحة HTML الخاصة بك قبل إغلاق &lt;/body&gt;</p>
                     </div>
+                )
+            })()}
+
+            {channel.platform === "webchat" && (
+                <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 10, alignItems: "end" }}>
+                    <IconUploadEdit value={icon} onChange={setIcon} />
                     <div>
                         <label className="mdl-label">اللون</label>
                         <input type="color" value={color} onChange={e => setColor(e.target.value)} style={{ width: 38, height: 38, borderRadius: 9, border: "1.5px solid #e0e3e7", padding: 2, cursor: "pointer" }} />

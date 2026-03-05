@@ -1,10 +1,12 @@
-import { useState } from "react"
-import { X, Plus, Loader2, Eye, EyeOff, Bot } from "lucide-react"
+import { useState, useRef, useCallback } from "react"
+import { X, Plus, Loader2, Eye, EyeOff, Bot, ImageIcon, Trash2 } from "lucide-react"
 import { useCreateChannel, usePlatformsStatus } from "../hooks/use-channels"
 import { useAuthStore } from "@/stores/auth-store"
 import { PLATFORM_META, PLATFORMS } from "../types"
 import type { Platform, CreateChannelPayload } from "../types"
 import { AgentMultiSelect } from "./AgentMultiSelect"
+import { uploadMedia } from "@/features/inbox/services/inbox-service"
+import { toast } from "sonner"
 
 /* ──────────── CSS ──────────── */
 const CSS = `
@@ -126,6 +128,96 @@ function OriginsEditor({ value, onChange }: { value: string; onChange: (v: strin
     )
 }
 
+/* ═══ Icon Upload ═══ */
+function IconUpload({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+    const fileRef = useRef<HTMLInputElement>(null)
+    const [uploading, setUploading] = useState(false)
+    const [preview, setPreview] = useState<string>(value || "")
+
+    const handleFile = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+        if (!file) return
+        if (!file.type.startsWith("image/")) { toast.error("يرجى اختيار ملف صورة"); return }
+        if (file.size > 5 * 1024 * 1024) { toast.error("الحد الأقصى 5MB"); return }
+
+        // Show local preview immediately
+        const localUrl = URL.createObjectURL(file)
+        setPreview(localUrl)
+        setUploading(true)
+
+        try {
+            const res = await uploadMedia(file, { platform: "webchat", source: "channel_icon" })
+            const url = res.public_url || res.proxy_url
+            onChange(url)
+            setPreview(url)
+            toast.success("تم رفع الأيقونة بنجاح")
+        } catch {
+            toast.error("فشل رفع الأيقونة")
+            setPreview("")
+            onChange("")
+        } finally {
+            setUploading(false)
+            if (fileRef.current) fileRef.current.value = ""
+        }
+    }, [onChange])
+
+    const remove = useCallback(() => {
+        onChange("")
+        setPreview("")
+        if (fileRef.current) fileRef.current.value = ""
+    }, [onChange])
+
+    return (
+        <div>
+            <FieldLabel>أيقونة الويدجت (اختياري)</FieldLabel>
+            <input ref={fileRef} type="file" accept="image/*" onChange={handleFile} style={{ display: "none" }} />
+            {preview ? (
+                <div style={{
+                    display: "flex", alignItems: "center", gap: 10,
+                    padding: "6px 10px", borderRadius: 9, border: "1.5px solid #e0e3e7", background: "#fafafa",
+                }}>
+                    <img src={preview} alt="icon" style={{
+                        width: 32, height: 32, borderRadius: 7, objectFit: "cover",
+                        border: "1px solid #e0e3e7",
+                    }} />
+                    <span style={{ flex: 1, fontSize: 11, color: "#6b7280", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", direction: "ltr" }}>
+                        {uploading ? "جاري الرفع..." : value || "uploaded"}
+                    </span>
+                    {uploading ? (
+                        <Loader2 size={14} style={{ color: "#004786", animation: "spin 1s linear infinite", flexShrink: 0 }} />
+                    ) : (
+                        <button type="button" onClick={remove} style={{
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                            width: 26, height: 26, borderRadius: 6, border: "none",
+                            background: "rgba(220,38,38,0.06)", cursor: "pointer", color: "#dc2626",
+                            flexShrink: 0, transition: "all .12s",
+                        }}
+                            onMouseEnter={e => { e.currentTarget.style.background = "rgba(220,38,38,0.12)" }}
+                            onMouseLeave={e => { e.currentTarget.style.background = "rgba(220,38,38,0.06)" }}
+                        >
+                            <Trash2 size={12} />
+                        </button>
+                    )}
+                </div>
+            ) : (
+                <button type="button" onClick={() => fileRef.current?.click()} style={{
+                    display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                    width: "100%", padding: "10px 12px", borderRadius: 9,
+                    border: "1.5px dashed #d1d5db", background: "#fafafa",
+                    cursor: "pointer", transition: "all .15s", color: "#9ca3af",
+                    fontSize: 12, fontWeight: 600, fontFamily: "inherit",
+                }}
+                    onMouseEnter={e => { e.currentTarget.style.borderColor = "#004786"; e.currentTarget.style.color = "#004786" }}
+                    onMouseLeave={e => { e.currentTarget.style.borderColor = "#d1d5db"; e.currentTarget.style.color = "#9ca3af" }}
+                >
+                    <ImageIcon size={16} />
+                    اختر صورة الأيقونة
+                </button>
+            )}
+        </div>
+    )
+}
+
 /* ═══ Field label wrapper ═══ */
 function FieldLabel({ children }: { children: React.ReactNode }) {
     return <label className="dlg-label">{children}</label>
@@ -214,8 +306,8 @@ export function AddChannelDialog({ defaultPlatform, onClose }: { defaultPlatform
                     <FieldLabel>النطاقات المسموحة (Allowed Origins) *</FieldLabel>
                     <OriginsEditor value={form.allowed_origins} onChange={v => set("allowed_origins", v)} />
                 </div>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 10 }}>
-                    {textField("أيقونة الويدجت (اختياري)", "icon", "https://cdn.example.com/icon.png")}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 10, alignItems: "end" }}>
+                    <IconUpload value={form.icon} onChange={v => set("icon", v)} />
                     <div>
                         <FieldLabel>لون الويدجت</FieldLabel>
                         <input type="color" value={form.color} onChange={e => set("color", e.target.value)}

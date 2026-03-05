@@ -118,7 +118,10 @@ export function FilterBar({ availableFilters }: Props) {
                         <FilterDropdown
                             label="المنصة"
                             value={advancedFilters.platform}
-                            options={(availableFilters?.platforms ?? []).map(p => ({ value: p, label: p }))}
+                            options={(availableFilters?.platforms ?? []).map(p => {
+                                const val = typeof p === "object" && p !== null ? String((p as any).value ?? (p as any).name ?? JSON.stringify(p)) : String(p)
+                                return { value: val, label: val }
+                            })}
                             onChange={(v) => setFilter("platform", v)}
                         />
                         <FilterDropdown
@@ -150,10 +153,14 @@ export function FilterBar({ availableFilters }: Props) {
                         <FilterDropdown
                             label="الحساب"
                             value={advancedFilters.account_id}
-                            options={(accountsData?.accounts ?? []).map(a => ({
-                                value: a.account_id,
-                                label: `${a.platform === "whatsapp" ? "📱" : a.platform === "facebook" ? "📘" : "📸"} ${a.account_id} (${a.customer_count})`,
-                            }))}
+                            options={(accountsData?.accounts ?? []).map((a: any) => {
+                                const emoji = a.platform === "whatsapp" ? "📱" : a.platform === "facebook" ? "📘" : a.platform === "instagram" ? "📸" : a.platform === "webchat" ? "🌐" : "💬"
+                                const displayName = a.name || a.account_id
+                                return {
+                                    value: a.account_id,
+                                    label: `${emoji} ${displayName} (${a.customer_count})`,
+                                }
+                            })}
                             onChange={(v) => setFilter("account_id", v)}
                         />
                     </div>
