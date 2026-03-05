@@ -91,13 +91,13 @@ const ALL_SEARCHABLE_ITEMS = [
     { title: "جهات الاتصال", href: "/dashboard/contacts", icon: BookUser, keywords: "contacts عملاء أرقام زبائن العملاء" },
     { title: "قاعدة المعرفة", href: "/dashboard/knowledge", icon: BookOpen, keywords: "knowledge docs مستندات وثائق ملفات" },
     { title: "إدارة القوائم", href: "/dashboard/menu-manager", icon: ListTree, keywords: "menus قوائم القوائم" },
-    { title: "المستخدمين", href: "/dashboard/users", icon: Users, keywords: "users أعضاء مستخدمين" },
-    { title: "الفرق", href: "/dashboard/settings/organization", icon: Users, keywords: "teams فريق فرق الفرق مجموعات" },
-    { title: "الأدوار والصلاحيات", href: "/dashboard/roles", icon: Shield, keywords: "roles permissions صلاحيات أدوار الصلاحيات" },
-    { title: "القنوات", href: "/dashboard/channels", icon: MessageSquare, keywords: "channels واتساب whatsapp قنوات" },
+    { title: "المستخدمين", href: "/dashboard/settings/organization?tab=users", icon: Users, keywords: "users أعضاء مستخدمين" },
+    { title: "الفرق", href: "/dashboard/settings/organization?tab=teams", icon: Users, keywords: "teams فريق فرق الفرق مجموعات" },
+    { title: "الأدوار والصلاحيات", href: "/dashboard/settings/organization?tab=roles", icon: Shield, keywords: "roles permissions صلاحيات أدوار الصلاحيات" },
+    { title: "القنوات", href: "/dashboard/settings/organization?tab=channels", icon: MessageSquare, keywords: "channels واتساب whatsapp قنوات" },
     { title: "إعدادات المؤسسة", href: "/dashboard/settings/organization", icon: Building2, keywords: "settings organization مؤسسة إعدادات المؤسسة" },
     { title: "الإعدادات الشخصية", href: "/dashboard/settings/profile", icon: User, keywords: "profile حساب شخصي الملف الشخصي" },
-    { title: "إعدادات AI", href: "/dashboard/settings/ai", icon: Brain, keywords: "ai ذكاء اصطناعي الذكاء" },
+    { title: "إعدادات AI", href: "/dashboard/settings/organization?tab=ai", icon: Brain, keywords: "ai ذكاء اصطناعي الذكاء" },
     { title: "الاشتراك والفوترة", href: "/dashboard/settings/organization?tab=billing", icon: CreditCard, keywords: "billing subscription فواتير اشتراك دفع الاشتراك" },
 ]
 
@@ -433,10 +433,10 @@ export function AdminLayout() {
                                 {/* ── Quick links ── */}
                                 <div style={{ padding: "4px 4px" }}>
                                     {[
-                                        { label: "القنوات", icon: MessageSquare, href: "/dashboard/settings/organization" },
-                                        { label: "المستخدمين", icon: Users, href: "/dashboard/settings/organization" },
-                                        { label: "الاشتراك", icon: CreditCard, href: "/dashboard/settings/organization" },
-                                        { label: "إعدادات AI", icon: Brain, href: "/dashboard/settings/ai" },
+                                        { label: "القنوات", icon: MessageSquare, href: "/dashboard/settings/organization?tab=channels" },
+                                        { label: "المستخدمين", icon: Users, href: "/dashboard/settings/organization?tab=users" },
+                                        { label: "الاشتراك", icon: CreditCard, href: "/dashboard/settings/organization?tab=billing" },
+                                        { label: "إعدادات AI", icon: Brain, href: "/dashboard/settings/organization?tab=ai" },
                                     ].map((item) => (
                                         <button
                                             key={item.label}

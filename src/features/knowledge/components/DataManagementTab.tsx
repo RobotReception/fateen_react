@@ -246,6 +246,7 @@ const TrainUploadModal = memo(function TrainUploadModal({ categories, activeDept
 
     const handleUpload = useCallback(async () => {
         if (files.length === 0 && !url) return
+        if (!categoryId) { toast.error("يرجى اختيار الفئة أولاً"); return }
         setUploading(true); setResult(null)
         try {
             const fd = new FormData()
@@ -285,7 +286,7 @@ const TrainUploadModal = memo(function TrainUploadModal({ categories, activeDept
         } finally { setUploading(false) }
     }, [files, activeDeptId, categoryId, url, tab, hasHeader, delimiter, encoding, questionCol, answerCol, tenantId, onSuccess])
 
-    const canUpload = files.length > 0 || url.trim()
+    const canUpload = (files.length > 0 || url.trim()) && !!categoryId
 
     return (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={onClose}>
@@ -327,10 +328,11 @@ const TrainUploadModal = memo(function TrainUploadModal({ categories, activeDept
                 <div className="max-h-[60vh] overflow-y-auto p-5 space-y-4" key={tab} style={{ animation: "fadeIn .15s ease-out" }}>
                     {/* Category */}
                     <div>
-                        <label className="mb-1.5 block text-xs font-semibold text-gray-500">الفئة</label>
+                        <label className="mb-1.5 block text-xs font-semibold text-gray-500">الفئة <span style={{ color: "#dc2626" }}>*</span></label>
                         <select value={categoryId} onChange={e => setCategoryId(e.target.value)}
-                            className="w-full rounded-xl border border-gray-200 bg-gray-50 py-2.5 px-3 text-sm text-gray-700 outline-none focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-100">
-                            <option value="">بدون فئة</option>
+                            className="w-full rounded-xl border border-gray-200 bg-gray-50 py-2.5 px-3 text-sm text-gray-700 outline-none focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-100"
+                            style={!categoryId ? { borderColor: "#fca5a5" } : undefined}>
+                            <option value="">— اختر الفئة —</option>
                             {categories.map(c => <option key={c.category_id} value={c.category_id}>{c.icon} {c.name_ar || c.name}</option>)}
                         </select>
                     </div>
@@ -490,6 +492,7 @@ const AddTextModal = memo(function AddTextModal({ categories, activeDeptId, acti
 
     const handleSubmit = useCallback(async () => {
         if (!text.trim()) return
+        if (!categoryId) { toast.error("يرجى اختيار الفئة أولاً"); return }
         setSubmitting(true)
         try {
             const res = await addDataJson({ text: text.trim(), department_id: activeDeptId, category_id: categoryId || undefined }, tenantId)
@@ -520,9 +523,9 @@ const AddTextModal = memo(function AddTextModal({ categories, activeDeptId, acti
                 </div>
                 <div style={{ padding: 20, display: "flex", flexDirection: "column", gap: 16 }}>
                     <div>
-                        <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: "var(--t-text-faint, #9ca3af)", marginBottom: 6 }}>الفئة</label>
-                        <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)} style={{ width: "100%", borderRadius: 8, border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-surface, #f9fafb)", padding: "8px 12px", fontSize: 13, color: "var(--t-text, #374151)", outline: "none" }}>
-                            <option value="">بدون فئة</option>
+                        <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: "var(--t-text-faint, #9ca3af)", marginBottom: 6 }}>الفئة <span style={{ color: "#dc2626" }}>*</span></label>
+                        <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)} style={{ width: "100%", borderRadius: 8, border: `1px solid ${!categoryId ? '#fca5a5' : 'var(--t-border-light, #e5e7eb)'}`, background: "var(--t-surface, #f9fafb)", padding: "8px 12px", fontSize: 13, color: "var(--t-text, #374151)", outline: "none" }}>
+                            <option value="">— اختر الفئة —</option>
                             {categories.map((c) => <option key={c.category_id} value={c.category_id}>{c.icon} {c.name_ar || c.name}</option>)}
                         </select>
                     </div>
@@ -534,7 +537,7 @@ const AddTextModal = memo(function AddTextModal({ categories, activeDeptId, acti
                 </div>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 8, borderTop: "1px solid var(--t-border-light, #f0f0f0)", padding: "12px 20px" }}>
                     <button onClick={onClose} disabled={submitting} style={{ padding: "7px 16px", borderRadius: 7, border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-card, #fff)", fontSize: 13, fontWeight: 500, color: "var(--t-text-secondary, #6b7280)", cursor: "pointer" }}>إلغاء</button>
-                    <button onClick={handleSubmit} disabled={submitting || !text.trim()} style={{ display: "flex", alignItems: "center", gap: 6, padding: "7px 18px", borderRadius: 7, border: "none", background: "#004786", color: "#fff", fontSize: 13, fontWeight: 500, cursor: "pointer", opacity: (submitting || !text.trim()) ? 0.5 : 1 }}>
+                    <button onClick={handleSubmit} disabled={submitting || !text.trim() || !categoryId} style={{ display: "flex", alignItems: "center", gap: 6, padding: "7px 18px", borderRadius: 7, border: "none", background: "#004786", color: "#fff", fontSize: 13, fontWeight: 500, cursor: "pointer", opacity: (submitting || !text.trim() || !categoryId) ? 0.5 : 1 }}>
                         {submitting && <Loader2 size={14} className="animate-spin" />}
                         إضافة النص
                     </button>
