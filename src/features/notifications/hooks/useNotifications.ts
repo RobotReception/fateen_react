@@ -74,8 +74,9 @@ export function useNotifications() {
         wsRef.current = ws
 
         ws.onopen = () => {
-            // إرسال التوكن كأول رسالة للمصادقة (خلال 10 ثوان)
-            ws.send(`auth:${token}`)
+            // استخدم أحدث توكن من localStorage (يُحدّث عند التجديد التلقائي)
+            const freshToken = localStorage.getItem("access_token") || token
+            ws.send(`auth:${freshToken}`)
             // Fetch list now if not already fetched
             initialLoad()
         }
