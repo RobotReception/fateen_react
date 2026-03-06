@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom"
+import { useParams, useSearchParams } from "react-router-dom"
 import { useInboxStore } from "../../store/inbox.store"
 import { useCustomers } from "../../hooks/use-customers"
 import { ConversationItem } from "./ConversationItem"
@@ -8,6 +8,8 @@ import type { SessionStatus } from "../../types/inbox.types"
 
 export function ConversationListPanel() {
     const { id: selectedId } = useParams()
+    const [searchParams] = useSearchParams()
+    const selectedAcc = searchParams.get("acc") ?? undefined
 
     const {
         statusFilter,
@@ -97,9 +99,12 @@ export function ConversationListPanel() {
                         </div>
                         {customers.map((customer) => (
                             <ConversationItem
-                                key={customer.customer_id}
+                                key={`${customer.customer_id}:${customer.account_id ?? ""}`}
                                 customer={customer}
-                                isSelected={customer.customer_id === selectedId}
+                                isSelected={
+                                    customer.customer_id === selectedId &&
+                                    (selectedAcc ? customer.account_id === selectedAcc : true)
+                                }
                             />
                         ))}
                     </>

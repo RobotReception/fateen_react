@@ -1,4 +1,4 @@
-import { useState, useRef } from "react"
+import { useState, useRef, memo } from "react"
 import { useNavigate } from "react-router-dom"
 import { useQueryClient } from "@tanstack/react-query"
 import { Avatar } from "../ui/Avatar"
@@ -22,7 +22,7 @@ interface ConversationItemProps {
     isSelected: boolean
 }
 
-export function ConversationItem({ customer: c, isSelected }: ConversationItemProps) {
+export const ConversationItem = memo(function ConversationItem({ customer: c, isSelected }: ConversationItemProps) {
     const navigate = useNavigate()
     const queryClient = useQueryClient()
     const displayName = c.sender_name?.trim() || c.customer_id
@@ -38,8 +38,8 @@ export function ConversationItem({ customer: c, isSelected }: ConversationItemPr
             onClick={(e) => {
                 if (menuOpen) return
                 if (menuBtnRef.current?.contains(e.target as Node)) return
-                navigate(`/dashboard/inbox/${c.customer_id}`)
-                // Optimistically clear unread badge in cache + background refresh
+                const accParam = c.account_id ? `?acc=${encodeURIComponent(c.account_id)}` : ""
+                navigate(`/dashboard/inbox/${c.customer_id}${accParam}`)
                 queryClient.setQueriesData<any>(
                     { queryKey: ["inbox-customers"] },
                     (old: any) => {
@@ -47,14 +47,14 @@ export function ConversationItem({ customer: c, isSelected }: ConversationItemPr
                         return {
                             ...old,
                             items: old.items.map((item: any) =>
-                                item.customer_id === c.customer_id
+                                item.customer_id === c.customer_id && item.account_id === c.account_id
                                     ? { ...item, unread_count: 0, isRead: true }
                                     : item
                             ),
                         }
                     }
                 )
-                queryClient.invalidateQueries({ queryKey: ["customer-messages", c.customer_id] })
+                queryClient.invalidateQueries({ queryKey: ["customer-messages", c.customer_id, c.account_id] })
             }}
             onMouseEnter={() => setHovered(true)}
             onMouseLeave={() => { if (!menuOpen) setHovered(false) }}
@@ -312,4 +312,24 @@ export function ConversationItem({ customer: c, isSelected }: ConversationItemPr
             `}</style>
         </div>
     )
-}
+}, (prev, next) => {
+    const a = prev.customer
+    const b = next.customer
+    return (
+        prev.isSelected === next.isSelected &&
+        a.customer_id === b.customer_id &&
+        a.unread_count === b.unread_count &&
+        a.last_message === b.last_message &&
+        a.last_timestamp === b.last_timestamp &&
+        a.session_status === b.session_status &&
+        a.sender_name === b.sender_name &&
+        a.favorite === b.favorite &&
+        a.muted === b.muted &&
+        a.last_direction === b.last_direction &&
+        a.last_message_status === b.last_message_status &&
+        a.last_message_type === b.last_message_type &&
+        a.assigned?.assigned_to === b.assigned?.assigned_to &&
+        a.lifecycle?.code === b.lifecycle?.code &&
+        a.conversation_status?.is_closed === b.conversation_status?.is_closed
+    )
+})

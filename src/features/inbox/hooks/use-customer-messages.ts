@@ -6,9 +6,8 @@ const PAGE_SIZE = 20
 
 export function useCustomerMessages(customerId: string | null, accountId?: string) {
     return useInfiniteQuery<MessagesResponse, Error>({
-        // Key intentionally excludes accountId to keep it stable as customer data loads.
-        // accountId is still forwarded to the API via the queryFn closure.
-        queryKey: ["customer-messages", customerId],
+        // Key includes accountId for cache isolation across accounts
+        queryKey: ["customer-messages", customerId, accountId],
         queryFn: ({ pageParam }) =>
             getCustomerMessages(customerId!, {
                 page: pageParam as number,
@@ -27,7 +26,7 @@ export function useCustomerMessages(customerId: string | null, accountId?: strin
         staleTime: 0,                    // always consider data stale → refetch on navigation
         refetchOnMount: "always",        // fetch fresh messages every time conversation opens
         refetchOnWindowFocus: true,      // refresh when user tabs back in
-        refetchInterval: 8_000,          // background poll every 8s
+        refetchInterval: 10_000,
         // Limit to 3 pages so polling only re-fetches the 3 most recent pages,
         // not the entire history (which would never surface new messages at page 1)
         maxPages: 3,
