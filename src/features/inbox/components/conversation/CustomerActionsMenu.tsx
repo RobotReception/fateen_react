@@ -51,15 +51,15 @@ export function CustomerActionsMenu({ customer: c, open, onClose, anchorRef }: P
     })
     const allUsers = briefData?.users ?? []
 
-    const closeMut = useCloseConversation(c.customer_id)
-    const reopenMut = useReopenConversation(c.customer_id)
-    const assignMut = useAssignAgent(c.customer_id)
-    const lifecycleMut = useUpdateLifecycle(c.customer_id)
-    const aiMut = useToggleAI(c.customer_id)
-    const assignTeamsMut = useAssignTeams(c.customer_id)
-    const removeTeamsMut = useRemoveTeams(c.customer_id)
-    const favMut = useToggleFavorite(c.customer_id)
-    const muteMut = useToggleMuted(c.customer_id)
+    const closeMut = useCloseConversation(c.customer_id, c.account_id)
+    const reopenMut = useReopenConversation(c.customer_id, c.account_id)
+    const assignMut = useAssignAgent(c.customer_id, c.account_id)
+    const lifecycleMut = useUpdateLifecycle(c.customer_id, c.account_id)
+    const aiMut = useToggleAI(c.customer_id, c.account_id)
+    const assignTeamsMut = useAssignTeams(c.customer_id, c.account_id)
+    const removeTeamsMut = useRemoveTeams(c.customer_id, c.account_id)
+    const favMut = useToggleFavorite(c.customer_id, c.account_id)
+    const muteMut = useToggleMuted(c.customer_id, c.account_id)
 
     const isClosed = c.conversation_status?.is_closed ?? false
 

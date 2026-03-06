@@ -33,13 +33,13 @@ export function AssignPanel({ customer: c }: Props) {
     const canAI = canPerformAction(PAGE_BITS.INBOX, ACTION_BITS.TOGGLE_AI)
     const canSession = canPerformAction(PAGE_BITS.INBOX, ACTION_BITS.UPDATE_SESSION_STATUS)
 
-    const closeMut = useCloseConversation(c.customer_id)
-    const reopenMut = useReopenConversation(c.customer_id)
-    const assignMut = useAssignAgent(c.customer_id)
-    const lifecycleMut = useUpdateLifecycle(c.customer_id)
-    const aiMut = useToggleAI(c.customer_id)
-    const teamMut = useAssignTeams(c.customer_id)
-    const unassignTeamMut = useRemoveTeams(c.customer_id)
+    const closeMut = useCloseConversation(c.customer_id, c.account_id)
+    const reopenMut = useReopenConversation(c.customer_id, c.account_id)
+    const assignMut = useAssignAgent(c.customer_id, c.account_id)
+    const lifecycleMut = useUpdateLifecycle(c.customer_id, c.account_id)
+    const aiMut = useToggleAI(c.customer_id, c.account_id)
+    const teamMut = useAssignTeams(c.customer_id, c.account_id)
+    const unassignTeamMut = useRemoveTeams(c.customer_id, c.account_id)
 
     const { data: briefData } = useQuery({
         queryKey: ["brief-users"],

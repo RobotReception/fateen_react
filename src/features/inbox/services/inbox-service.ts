@@ -162,11 +162,12 @@ export async function updateCustomerLifecycle(customerId: string, lifecycleCode:
     return data.data
 }
 
-// PATCH /customers/{id}/enable-ai  (account_id في الـ Body — الاستثناء الوحيد)
+// PATCH /customers/{id}/enable-ai
 export async function toggleCustomerAI(customerId: string, enableAi: boolean, accountId?: string) {
     const { data } = await apiClient.patch(`/customers/${customerId}/enable-ai`, {
         enable_ai: enableAi,
-        ...(accountId && { account_id: accountId }),
+    }, {
+        params: accountId ? { account_id: accountId } : undefined,
     })
     return data.data
 }
@@ -265,9 +266,11 @@ export async function getCustomerAICheck(customerId: string, accountId?: string)
 }
 
 // PUT /contacts/{id}/custom-fields — Smart Update (updates only existing fields)
-export async function updateContactCustomFields(customerId: string, customFields: Record<string, string>) {
+export async function updateContactCustomFields(customerId: string, customFields: Record<string, string>, accountId?: string) {
     const { data } = await apiClient.put(`/contacts/${customerId}/custom-fields`, {
         custom_fields: customFields,
+    }, {
+        params: accountId ? { account_id: accountId } : undefined,
     })
     return data
 }

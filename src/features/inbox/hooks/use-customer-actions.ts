@@ -58,11 +58,15 @@ function patchCustomer(
     qc: ReturnType<typeof useQueryClient>,
     customerId: string,
     updater: (c: Customer) => Partial<Customer>,
+    accountId?: string,
 ) {
     const queries = qc.getQueriesData<CustomersResponse>({ queryKey: ["inbox-customers"] })
     for (const [key, data] of queries) {
         if (!data?.items) continue
-        const idx = data.items.findIndex(c => c.customer_id === customerId)
+        const idx = data.items.findIndex(c =>
+            c.customer_id === customerId &&
+            (accountId ? c.account_id === accountId : true)
+        )
         if (idx === -1) continue
         const updated = { ...data.items[idx], ...updater(data.items[idx]) }
         const newItems = [...data.items]
@@ -97,7 +101,7 @@ export function useCloseConversation(customerId: string, accountId?: string) {
                     close_category: p.category,
                     closed_at: new Date().toISOString(),
                 },
-            }))
+            }), accountId)
             return snap
         },
         onSuccess: () => toast.success("تم إغلاق المحادثة"),
@@ -120,7 +124,7 @@ export function useReopenConversation(customerId: string, accountId?: string) {
             const snap = snapshotInbox(qc)
             patchCustomer(qc, customerId, () => ({
                 conversation_status: null,
-            }))
+            }), accountId)
             return snap
         },
         onSuccess: () => toast.success("تم إعادة فتح المحادثة"),
@@ -154,7 +158,7 @@ export function useAssignAgent(customerId: string, accountId?: string) {
                     updated_at: new Date().toISOString(),
                 },
                 assigned_to: p.assigned_to,
-            }))
+            }), accountId)
             return snap
         },
         onSuccess: (_d, v) => toast.success(v.is_assigned ? "تم تعيين الموظف" : "تم إلغاء التعيين"),
@@ -183,7 +187,7 @@ export function useUpdateLifecycle(customerId: string, accountId?: string) {
 
             if (!code) {
                 // Remove lifecycle
-                patchCustomer(qc, customerId, () => ({ lifecycle: null }))
+                patchCustomer(qc, customerId, () => ({ lifecycle: null }), accountId)
             } else {
                 // Find lifecycle info from summary cache
                 const summaries = qc.getQueriesData<SidebarSummary>({ queryKey: ["inbox-summary"] })
@@ -195,7 +199,7 @@ export function useUpdateLifecycle(customerId: string, accountId?: string) {
                 }
                 patchCustomer(qc, customerId, () => ({
                     lifecycle: { code, name: lcName, icon: lcIcon },
-                }))
+                }), accountId)
             }
             return snap
         },
@@ -222,7 +226,7 @@ export function useToggleAI(customerId: string, accountId?: string) {
         onMutate: async (enableAi) => {
             await qc.cancelQueries({ queryKey: ["inbox-customers"] })
             const snap = snapshotInbox(qc)
-            patchCustomer(qc, customerId, () => ({ enable_ai: enableAi }))
+            patchCustomer(qc, customerId, () => ({ enable_ai: enableAi }), accountId)
             return snap
         },
         onSuccess: (_d, v) => toast.success(v ? "تم تفعيل AI" : "تم تعطيل AI"),
@@ -248,7 +252,7 @@ export function useToggleFavorite(customerId: string, accountId?: string) {
         onMutate: async (favorite) => {
             await qc.cancelQueries({ queryKey: ["inbox-customers"] })
             const snap = snapshotInbox(qc)
-            patchCustomer(qc, customerId, () => ({ favorite }))
+            patchCustomer(qc, customerId, () => ({ favorite }), accountId)
             return snap
         },
         onSuccess: (_d, v) => toast.success(v ? "أُضيف إلى المفضلة" : "أُزيل من المفضلة"),
@@ -269,7 +273,7 @@ export function useToggleMuted(customerId: string, accountId?: string) {
         onMutate: async (muted) => {
             await qc.cancelQueries({ queryKey: ["inbox-customers"] })
             const snap = snapshotInbox(qc)
-            patchCustomer(qc, customerId, () => ({ muted }))
+            patchCustomer(qc, customerId, () => ({ muted }), accountId)
             return snap
         },
         onSuccess: (_d, v) => toast.success(v ? "تم كتم المحادثة" : "تم إلغاء الكتم"),
@@ -292,7 +296,7 @@ export function useUpdateSessionStatus(customerId: string, accountId?: string) {
         onMutate: async (status) => {
             await qc.cancelQueries({ queryKey: ["inbox-customers"] })
             const snap = snapshotInbox(qc)
-            patchCustomer(qc, customerId, () => ({ session_status: status }))
+            patchCustomer(qc, customerId, () => ({ session_status: status }), accountId)
             return snap
         },
         onSuccess: () => toast.success("تم تحديث حالة الجلسة"),
@@ -330,7 +334,7 @@ export function useAssignTeams(customerId: string, accountId?: string) {
                         is_assigned_team: true,
                     },
                 }
-            })
+            }, accountId)
             return snap
         },
         onSuccess: () => toast.success("تم تعيين الفرق"),
@@ -359,7 +363,7 @@ export function useRemoveTeams(customerId: string, accountId?: string) {
                         is_assigned_team: remaining.length > 0,
                     },
                 }
-            })
+            }, accountId)
             return snap
         },
         onSuccess: () => toast.success("تم إزالة الفرق"),

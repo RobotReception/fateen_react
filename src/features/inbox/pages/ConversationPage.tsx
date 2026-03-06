@@ -34,20 +34,49 @@ function findCustomerInCache(
 function shallowEqual(a: Customer | null, b: Customer | null): boolean {
     if (a === b) return true
     if (!a || !b) return false
-    return (
-        a.customer_id === b.customer_id &&
-        a.account_id === b.account_id &&
-        a.unread_count === b.unread_count &&
-        a.last_message === b.last_message &&
-        a.last_timestamp === b.last_timestamp &&
-        a.session_status === b.session_status &&
-        a.enable_ai === b.enable_ai &&
-        a.favorite === b.favorite &&
-        a.muted === b.muted &&
-        a.sender_name === b.sender_name &&
-        a.assigned?.assigned_to === b.assigned?.assigned_to &&
-        a.lifecycle?.code === b.lifecycle?.code
-    )
+
+    // Identity fields
+    if (a.customer_id !== b.customer_id || a.account_id !== b.account_id) return false
+
+    // Message/unread fields
+    if (a.unread_count !== b.unread_count) return false
+    if (a.last_message !== b.last_message) return false
+    if (a.last_timestamp !== b.last_timestamp) return false
+
+    // Status fields
+    if (a.session_status !== b.session_status) return false
+    if (a.enable_ai !== b.enable_ai) return false
+    if (a.favorite !== b.favorite) return false
+    if (a.muted !== b.muted) return false
+    if (a.sender_name !== b.sender_name) return false
+
+    // Assigned agent
+    if (a.assigned?.assigned_to !== b.assigned?.assigned_to) return false
+    if (a.assigned?.is_assigned !== b.assigned?.is_assigned) return false
+
+    // Lifecycle
+    if (a.lifecycle?.code !== b.lifecycle?.code) return false
+
+    // Conversation status (close/reopen)
+    if (a.conversation_status?.is_closed !== b.conversation_status?.is_closed) return false
+
+    // Teams — compare team IDs
+    const aTeams = a.team_ids?.teams ?? []
+    const bTeams = b.team_ids?.teams ?? []
+    if (aTeams.length !== bTeams.length) return false
+    for (let i = 0; i < aTeams.length; i++) {
+        if (aTeams[i].team_id !== bTeams[i].team_id) return false
+    }
+
+    // Tags (TagDetail objects — compare by id)
+    const aTags = a.tags ?? []
+    const bTags = b.tags ?? []
+    if (aTags.length !== bTags.length) return false
+    for (let i = 0; i < aTags.length; i++) {
+        if (aTags[i]?.id !== bTags[i]?.id) return false
+    }
+
+    return true
 }
 
 function useCachedCustomer(customerId: string, accountId?: string): Customer | null {

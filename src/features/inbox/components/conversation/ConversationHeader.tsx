@@ -1,11 +1,22 @@
 import { Avatar } from "../ui/Avatar"
+import { useQueryClient } from "@tanstack/react-query"
 import type { Customer } from "../../types/inbox.types"
 import { AssignPanel } from "./AssignPanel"
 
 interface Props { customer: Customer }
 
 export function ConversationHeader({ customer: c }: Props) {
-    const displayName = c.sender_name?.trim() || c.customer_id
+    const customName = [c.custom_fields?.first_name, c.custom_fields?.last_name].filter(Boolean).join(" ").trim()
+    const displayName = customName || c.sender_name?.trim() || c.customer_id
+    const queryClient = useQueryClient()
+
+    // Resolve account name from cached accounts data
+    const accountName = (() => {
+        if (!c.account_id) return null
+        const accountsData = queryClient.getQueryData<{ accounts?: { account_id: string; name?: string; platform?: string }[] }>(["customer-accounts"])
+        const account = accountsData?.accounts?.find(a => a.account_id === c.account_id)
+        return account?.name || c.platform || null
+    })()
 
     return (
         <div className="ch-row">
@@ -35,6 +46,11 @@ export function ConversationHeader({ customer: c }: Props) {
                         <img src={c.platform_icon} alt={c.platform || ""} title={c.platform || ""}
                             style={{ width: 16, height: 16, flexShrink: 0 }} />
                     </>
+                )}
+                {accountName && (
+                    <span className="ch-account-name" title={`الحساب: ${accountName}`}>
+                        {accountName}
+                    </span>
                 )}
             </div>
 
@@ -100,6 +116,15 @@ export function ConversationHeader({ customer: c }: Props) {
                     color:#004786;
                     border:1px solid rgba(0,71,134,0.1);
                 }
+                .ch-account-name {
+                    font-size:10.5px; font-weight:600;
+                    color:var(--t-text-muted, #6b7280);
+                    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+                    max-width:140px; flex-shrink:1;
+                    padding:2px 8px; border-radius:5px;
+                    background:var(--t-surface, #f3f4f6);
+                    border:1px solid var(--t-border-light, #e5e7eb);
+                }
                 .ch-platform {
                     display:inline-flex; align-items:center; gap:3px;
                     font-size:11px; color:var(--t-text-faint);
@@ -131,3 +156,4 @@ export function ConversationHeader({ customer: c }: Props) {
         </div>
     )
 }
+

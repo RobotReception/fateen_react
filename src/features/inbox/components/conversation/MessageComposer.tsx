@@ -83,7 +83,7 @@ export function MessageComposer({ customerId, customer }: Props) {
     const mentionRef = useRef<HTMLDivElement>(null)
 
     const queryClient = useQueryClient()
-    const { mutate: send, isPending } = useSendMessage(customerId)
+    const { mutate: send, isPending } = useSendMessage(customerId, customer?.account_id)
     const { setIsSending, replyTo, setReplyTo } = useConversationStore()
     const { user } = useAuthStore()
     const { canPerformAction } = usePermissions()
@@ -135,7 +135,7 @@ export function MessageComposer({ customerId, customer }: Props) {
         onSuccess: (_data, _payload, context) => {
             if (!context) return
             const { tempId, optimisticComment } = context
-            const queryKey = ["customer-messages", customerId]
+            const queryKey = ["customer-messages", customerId, customer?.account_id]
 
             // 1. Inject into React Query cache so it survives the pending removal
             queryClient.setQueryData<{ pages: any[]; pageParams: unknown[] }>(

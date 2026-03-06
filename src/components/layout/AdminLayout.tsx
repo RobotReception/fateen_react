@@ -121,7 +121,11 @@ export function AdminLayout() {
     const {
         notifications: notifList,
         unreadCount: notifUnread,
+        totalCount: notifTotal,
         loading: notifLoading,
+        loadingMore: notifLoadingMore,
+        hasMore: notifHasMore,
+        loadMore: notifLoadMore,
         markAsRead: notifMarkRead,
         markAllAsRead: notifMarkAllRead,
     } = useNotifications()
@@ -681,6 +685,10 @@ export function AdminLayout() {
                                 notifications={notifList}
                                 loading={notifLoading}
                                 unreadCount={notifUnread}
+                                totalCount={notifTotal}
+                                hasMore={notifHasMore}
+                                loadingMore={notifLoadingMore}
+                                onLoadMore={notifLoadMore}
                                 onMarkAsRead={notifMarkRead}
                                 onMarkAllAsRead={notifMarkAllRead}
                                 onClose={() => setNotificationsOpen(false)}

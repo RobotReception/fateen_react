@@ -318,6 +318,7 @@ export const ConversationItem = memo(function ConversationItem({ customer: c, is
     return (
         prev.isSelected === next.isSelected &&
         a.customer_id === b.customer_id &&
+        a.account_id === b.account_id &&
         a.unread_count === b.unread_count &&
         a.last_message === b.last_message &&
         a.last_timestamp === b.last_timestamp &&
@@ -325,6 +326,7 @@ export const ConversationItem = memo(function ConversationItem({ customer: c, is
         a.sender_name === b.sender_name &&
         a.favorite === b.favorite &&
         a.muted === b.muted &&
+        a.enable_ai === b.enable_ai &&
         a.last_direction === b.last_direction &&
         a.last_message_status === b.last_message_status &&
         a.last_message_type === b.last_message_type &&

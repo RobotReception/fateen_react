@@ -12,7 +12,7 @@ import { toast } from "sonner"
  *                THEN silently refetches for server sync
  * 3) onError   → removes pending + shows toast
  */
-export function useSendMessage(customerId: string) {
+export function useSendMessage(customerId: string, accountId?: string) {
     const queryClient = useQueryClient()
 
     return useMutation({
@@ -48,7 +48,7 @@ export function useSendMessage(customerId: string) {
             if (!context) return
 
             const { tempId, optimisticMsg } = context
-            const queryKey = ["customer-messages", customerId]
+            const queryKey = ["customer-messages", customerId, accountId]
 
             // 1. Inject the optimistic message into the query cache so it
             //    stays visible even after removing from pending store

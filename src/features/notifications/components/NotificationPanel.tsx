@@ -2,10 +2,10 @@ import { useRef, useEffect, useState } from "react"
 import { createPortal } from "react-dom"
 import { useNavigate } from "react-router-dom"
 import {
-    Bell, BellOff, CheckCheck, X, ChevronRight,
+    Bell, BellOff, CheckCheck, X, ChevronRight, ChevronDown,
     MessageSquare, ShieldAlert, Package, Megaphone,
     Clock, ClipboardList, Zap, ShoppingCart, ArrowRight,
-    LogIn, ArrowRightLeft, AtSign,
+    LogIn, ArrowRightLeft, AtSign, ExternalLink, Loader2, Info,
 } from "lucide-react"
 import type { NotificationItem } from "../services/notification-service"
 
@@ -36,6 +36,29 @@ function getTypeConfig(type?: string | null) {
     return { icon: Bell, color: "#6b7280", bg: "#f3f4f6", label: "إشعار" }
 }
 
+/* ── Human-readable data key labels ── */
+const DATA_LABELS: Record<string, string> = {
+    customer_id: "معرّف العميل",
+    account_id: "معرّف الحساب",
+    platform: "المنصة",
+    agent_name: "اسم الموظف",
+    team_name: "اسم الفريق",
+    reason: "السبب",
+    device: "الجهاز",
+    ip_address: "عنوان IP",
+    browser: "المتصفح",
+    location: "الموقع",
+    order_id: "رقم الطلب",
+    amount: "المبلغ",
+    status: "الحالة",
+    sender_name: "اسم المرسل",
+    message_preview: "معاينة الرسالة",
+}
+
+function getDataLabel(key: string): string {
+    return DATA_LABELS[key] || key.replace(/_/g, " ")
+}
+
 function timeAgo(dateStr: string): string {
     const diff = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000)
     if (diff < 60) return "الآن"
@@ -52,74 +75,117 @@ function formatFullDate(dateStr: string): string {
     })
 }
 
-/* ── Detail View ── */
+/* ═══════════════════════════════════════════════════════════
+   Enhanced Detail View
+═══════════════════════════════════════════════════════════ */
 function NotificationDetail({
-    notification,
+    notification: n,
     onBack,
     onMarkAsRead,
+    onNavigate,
 }: {
     notification: NotificationItem
     onBack: () => void
     onMarkAsRead: (id: string) => void
+    onNavigate: (customerId: string, accountId?: string) => void
 }) {
     useEffect(() => {
-        if (!notification.is_read) onMarkAsRead(notification.id)
-    }, [notification.id])
+        if (!n.is_read) onMarkAsRead(n.id)
+    }, [n.id])
+
+    const cfg = getTypeConfig(n.data?.type)
+    const Icon = cfg.icon
+    const customerId = n.data?.customer_id
+    const accountId = n.data?.account_id
+    const canNavigate = !!customerId
+
+    // Extract all data fields (excluding "type" which is shown as badge)
+    const dataEntries = Object.entries(n.data ?? {}).filter(
+        ([key, val]) => key !== "type" && val != null && val !== ""
+    )
 
     return (
         <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
             {/* Back bar */}
             <button
                 onClick={onBack}
-                style={{
-                    display: "flex", alignItems: "center", gap: 6,
-                    padding: "10px 14px",
-                    background: "none", border: "none",
-                    borderBottom: "1px solid var(--t-border-light, #f0f0f0)",
-                    cursor: "pointer", color: "var(--t-primary, #2563eb)",
-                    fontSize: 12, fontWeight: 600,
-                    transition: "opacity 0.15s",
-                }}
-                onMouseEnter={(e) => { e.currentTarget.style.opacity = "0.7" }}
-                onMouseLeave={(e) => { e.currentTarget.style.opacity = "1" }}
+                className="np-back-btn"
             >
                 <ArrowRight size={13} />
                 العودة للإشعارات
             </button>
 
             {/* Detail body */}
-            <div style={{ flex: 1, overflowY: "auto", padding: "16px" }}>
-                {/* Title */}
-                <div style={{
-                    fontSize: 14, fontWeight: 700,
-                    color: "var(--t-text, #111827)",
-                    marginBottom: 10, lineHeight: 1.5,
-                }}>
-                    {notification.title}
+            <div style={{ flex: 1, overflowY: "auto", padding: "16px 14px" }}>
+                {/* Type badge + status */}
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
+                    <div className="np-detail-icon" style={{ background: cfg.bg }}>
+                        <Icon size={16} strokeWidth={1.8} style={{ color: cfg.color }} />
+                    </div>
+                    <div style={{ flex: 1 }}>
+                        <span className="np-type-badge" style={{ background: cfg.bg, color: cfg.color }}>
+                            {cfg.label}
+                        </span>
+                    </div>
+                    <span className="np-read-badge" data-read={n.is_read}>
+                        {n.is_read ? "مقروء" : "غير مقروء"}
+                    </span>
                 </div>
+
+                {/* Title */}
+                <h3 className="np-detail-title">{n.title}</h3>
 
                 {/* Full body */}
-                <div style={{
-                    fontSize: 13, color: "var(--t-text-secondary, #374151)",
-                    lineHeight: 1.75,
-                }}>
-                    {notification.body}
+                <p className="np-detail-body">{n.body}</p>
+
+                {/* Data Fields */}
+                {dataEntries.length > 0 && (
+                    <div className="np-data-section">
+                        <div className="np-data-header">
+                            <Info size={11} />
+                            <span>التفاصيل</span>
+                        </div>
+                        {dataEntries.map(([key, val]) => (
+                            <div className="np-data-row" key={key}>
+                                <span className="np-data-label">{getDataLabel(key)}</span>
+                                <span className="np-data-value" dir="ltr">{val}</span>
+                            </div>
+                        ))}
+                    </div>
+                )}
+
+                {/* Timestamp */}
+                <div className="np-detail-time">
+                    <Clock size={11} />
+                    {formatFullDate(n.created_at)}
                 </div>
 
-                {/* Timestamp only */}
-                <div style={{ marginTop: 16, fontSize: 11, color: "var(--t-text-faint, #9ca3af)" }}>
-                    {formatFullDate(notification.created_at)}
-                </div>
+                {/* Navigation button */}
+                {canNavigate && (
+                    <button
+                        className="np-nav-btn"
+                        onClick={() => onNavigate(customerId!, accountId)}
+                    >
+                        <ExternalLink size={14} />
+                        فتح المحادثة
+                    </button>
+                )}
             </div>
         </div>
     )
 }
 
-/* ── Main Panel ── */
+/* ═══════════════════════════════════════════════════════════
+   Main Panel
+═══════════════════════════════════════════════════════════ */
 interface NotificationPanelProps {
     notifications: NotificationItem[]
     loading: boolean
     unreadCount: number
+    totalCount: number
+    hasMore: boolean
+    loadingMore: boolean
+    onLoadMore: () => void
     onMarkAsRead: (id: string) => void
     onMarkAllAsRead: () => void
     onClose: () => void
@@ -129,6 +195,10 @@ export default function NotificationPanel({
     notifications,
     loading,
     unreadCount,
+    totalCount,
+    hasMore,
+    loadingMore,
+    onLoadMore,
     onMarkAsRead,
     onMarkAllAsRead,
     onClose,
@@ -137,22 +207,16 @@ export default function NotificationPanel({
     const [selected, setSelected] = useState<NotificationItem | null>(null)
     const navigate = useNavigate()
 
-    /* Handle notification click — navigate or show detail */
+    /* Handle navigation from detail view */
+    const handleNavigate = (customerId: string, accountId?: string) => {
+        onClose()
+        const accParam = accountId ? `?acc=${accountId}` : ""
+        navigate(`/dashboard/inbox/${customerId}${accParam}`)
+    }
+
+    /* Handle notification click — always show detail */
     const handleNotificationClick = (n: NotificationItem) => {
-        const type = n.data?.type
-        const customerId = n.data?.customer_id
-
-        // Mark as read
         if (!n.is_read) onMarkAsRead(n.id)
-
-        // Navigate to conversation for message/handover types
-        if ((type === "message" || type === "handover" || type === "mention") && customerId) {
-            onClose()
-            navigate(`/dashboard/inbox/${customerId}`)
-            return
-        }
-
-        // Otherwise show detail view
         setSelected(n)
     }
 
@@ -184,69 +248,28 @@ export default function NotificationPanel({
         <div
             ref={panelRef}
             dir="rtl"
-            style={{
-                position: "fixed",
-                top: 56,
-                left: 72,
-                width: "min(360px, calc(100vw - 24px))",
-                maxHeight: "min(500px, calc(100vh - 72px))",
-                borderRadius: 14,
-                background: "var(--t-card, #fff)",
-                border: "1px solid var(--t-border-light, #e5e7eb)",
-                boxShadow: "0 16px 48px -8px rgba(0,0,0,0.18), 0 4px 16px -4px rgba(0,0,0,0.08)",
-                zIndex: 9998,
-                overflow: "hidden",
-                display: "flex",
-                flexDirection: "column",
-                animation: "npIn .18s cubic-bezier(0.16,1,0.3,1)",
-            }}
+            className="np-container"
         >
             {/* ── Header ── */}
-            <div style={{
-                display: "flex", alignItems: "center", justifyContent: "space-between",
-                padding: "10px 14px 9px",
-                borderBottom: "1px solid var(--t-border-light, #f0f0f0)",
-                flexShrink: 0,
-            }}>
+            <div className="np-header">
                 <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
-                    <span style={{ fontSize: 13, fontWeight: 700, color: "var(--t-text, #111827)" }}>
-                        الإشعارات
-                    </span>
+                    <span className="np-header-title">الإشعارات</span>
                     {unreadCount > 0 && (
-                        <span style={{
-                            fontSize: 10, fontWeight: 800,
-                            color: "#fff", background: "#ef4444",
-                            borderRadius: 8, padding: "0px 6px", minWidth: 16,
-                            textAlign: "center", lineHeight: "16px",
-                        }}>
+                        <span className="np-unread-badge">
                             {unreadCount > 99 ? "99+" : unreadCount}
                         </span>
+                    )}
+                    {totalCount > 0 && (
+                        <span className="np-total-label">{totalCount} إشعار</span>
                     )}
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 2 }}>
                     {unreadCount > 0 && !selected && (
-                        <button onClick={onMarkAllAsRead} style={{
-                            display: "flex", alignItems: "center", gap: 3,
-                            background: "none", border: "none", cursor: "pointer",
-                            color: "var(--t-primary, #2563eb)", fontSize: 11, fontWeight: 600,
-                            padding: "3px 7px", borderRadius: 7, transition: "background 0.15s",
-                        }}
-                            onMouseEnter={(e) => { e.currentTarget.style.background = "var(--t-surface, #f3f4f6)" }}
-                            onMouseLeave={(e) => { e.currentTarget.style.background = "none" }}
-                        >
+                        <button onClick={onMarkAllAsRead} className="np-mark-all-btn">
                             <CheckCheck size={12} /> قراءة الكل
                         </button>
                     )}
-                    <button onClick={onClose} style={{
-                        width: 26, height: 26, borderRadius: 7,
-                        background: "none", border: "none", cursor: "pointer",
-                        color: "var(--t-text-faint, #9ca3af)",
-                        display: "flex", alignItems: "center", justifyContent: "center",
-                        transition: "all 0.15s",
-                    }}
-                        onMouseEnter={(e) => { e.currentTarget.style.background = "var(--t-surface, #f3f4f6)"; e.currentTarget.style.color = "#111" }}
-                        onMouseLeave={(e) => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "var(--t-text-faint, #9ca3af)" }}
-                    >
+                    <button onClick={onClose} className="np-close-btn">
                         <X size={14} />
                     </button>
                 </div>
@@ -258,100 +281,339 @@ export default function NotificationPanel({
                     notification={selected}
                     onBack={() => setSelected(null)}
                     onMarkAsRead={onMarkAsRead}
+                    onNavigate={handleNavigate}
                 />
             ) : (
                 <div style={{ flex: 1, overflowY: "auto" }}>
                     {loading ? (
-                        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "36px 20px", gap: 8 }}>
-                            <div style={{
-                                width: 20, height: 20,
-                                border: "2px solid var(--t-border-light, #e5e7eb)",
-                                borderTopColor: "var(--t-primary, #2563eb)",
-                                borderRadius: "50%", animation: "spin .6s linear infinite",
-                            }} />
+                        <div className="np-empty-state">
+                            <div className="np-spinner" />
                             <span style={{ fontSize: 12, color: "var(--t-text-faint, #9ca3af)" }}>جاري التحميل...</span>
                         </div>
                     ) : notifications.length === 0 ? (
-                        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "40px 20px", gap: 8 }}>
-                            <div style={{ width: 48, height: 48, borderRadius: 14, background: "var(--t-surface, #f3f4f6)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <div className="np-empty-state">
+                            <div className="np-empty-icon">
                                 <BellOff size={22} style={{ color: "var(--t-text-faint, #d1d5db)" }} />
                             </div>
                             <span style={{ fontSize: 13, fontWeight: 600, color: "var(--t-text-secondary, #6b7280)" }}>لا توجد إشعارات</span>
                             <span style={{ fontSize: 11, color: "var(--t-text-faint, #9ca3af)" }}>ستظهر إشعاراتك هنا</span>
                         </div>
                     ) : (
-                        notifications.map((n) => {
-                            const cfg = getTypeConfig(n.data?.type)
-                            const Icon = cfg.icon
-                            return (
-                                <button
-                                    key={n.id}
-                                    onClick={() => handleNotificationClick(n)}
-                                    style={{
-                                        display: "flex", gap: 10,
-                                        width: "100%", padding: "9px 14px",
-                                        border: "none",
-                                        borderBottom: "1px solid var(--t-border-light, #f5f5f5)",
-                                        background: n.is_read ? "transparent" : "rgba(37,99,235,0.035)",
-                                        cursor: "pointer", transition: "background 0.1s",
-                                        textAlign: "right", color: "inherit",
-                                        alignItems: "flex-start",
-                                    }}
-                                    onMouseEnter={(e) => { e.currentTarget.style.background = n.is_read ? "var(--t-card-hover, #fafafa)" : "rgba(37,99,235,0.07)" }}
-                                    onMouseLeave={(e) => { e.currentTarget.style.background = n.is_read ? "transparent" : "rgba(37,99,235,0.035)" }}
-                                >
-                                    {/* Icon */}
-                                    <div style={{
-                                        width: 32, height: 32, borderRadius: 10,
-                                        background: cfg.bg, flexShrink: 0,
-                                        display: "flex", alignItems: "center", justifyContent: "center",
-                                    }}>
-                                        <Icon size={14} strokeWidth={1.8} style={{ color: cfg.color }} />
-                                    </div>
-
-                                    {/* Text */}
-                                    <div style={{ flex: 1, minWidth: 0 }}>
-                                        <div style={{ display: "flex", alignItems: "center", gap: 4, marginBottom: 1 }}>
-                                            <span style={{
-                                                fontSize: 11, fontWeight: n.is_read ? 400 : 700,
-                                                color: "var(--t-text, #111827)",
-                                                overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-                                                flex: 1,
-                                            }}>
-                                                {n.title}
-                                            </span>
-                                            <span style={{ fontSize: 10, color: "var(--t-text-faint, #9ca3af)", flexShrink: 0 }}>
-                                                {timeAgo(n.created_at)}
-                                            </span>
+                        <>
+                            {notifications.map((n) => {
+                                const cfg = getTypeConfig(n.data?.type)
+                                const Icon = cfg.icon
+                                const hasCustomerId = !!n.data?.customer_id
+                                return (
+                                    <button
+                                        key={n.id}
+                                        onClick={() => handleNotificationClick(n)}
+                                        className="np-item"
+                                        data-unread={!n.is_read}
+                                    >
+                                        {/* Icon */}
+                                        <div className="np-item-icon" style={{ background: cfg.bg }}>
+                                            <Icon size={14} strokeWidth={1.8} style={{ color: cfg.color }} />
                                         </div>
-                                        <div style={{
-                                            fontSize: 11, color: "var(--t-text-faint, #6b7280)",
-                                            overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-                                        }}>
-                                            {n.body}
-                                        </div>
-                                    </div>
 
-                                    {/* Indicators */}
-                                    <div style={{ display: "flex", alignItems: "center", gap: 4, flexShrink: 0, marginTop: 6 }}>
-                                        {!n.is_read && (
-                                            <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#2563eb" }} />
+                                        {/* Text */}
+                                        <div style={{ flex: 1, minWidth: 0 }}>
+                                            <div style={{ display: "flex", alignItems: "center", gap: 4, marginBottom: 2 }}>
+                                                <span className="np-item-title" data-unread={!n.is_read}>
+                                                    {n.title}
+                                                </span>
+                                                <span className="np-item-time">
+                                                    {timeAgo(n.created_at)}
+                                                </span>
+                                            </div>
+                                            <div className="np-item-body">
+                                                {n.body}
+                                            </div>
+                                            {/* Type + navigation hint */}
+                                            <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 3 }}>
+                                                <span className="np-item-type-tag" style={{ background: cfg.bg, color: cfg.color }}>
+                                                    {cfg.label}
+                                                </span>
+                                                {hasCustomerId && (
+                                                    <span className="np-item-nav-hint">
+                                                        <ExternalLink size={9} /> محادثة
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        {/* Indicators */}
+                                        <div style={{ display: "flex", alignItems: "center", gap: 4, flexShrink: 0, marginTop: 4 }}>
+                                            {!n.is_read && <div className="np-unread-dot" />}
+                                            <ChevronRight size={12} style={{ color: "var(--t-text-faint, #c4c8cf)" }} />
+                                        </div>
+                                    </button>
+                                )
+                            })}
+
+                            {/* Load More */}
+                            {hasMore && (
+                                <div className="np-load-more-wrap">
+                                    <button
+                                        className="np-load-more-btn"
+                                        onClick={onLoadMore}
+                                        disabled={loadingMore}
+                                    >
+                                        {loadingMore ? (
+                                            <>
+                                                <Loader2 size={13} className="np-spin" />
+                                                جاري التحميل...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <ChevronDown size={13} />
+                                                تحميل المزيد
+                                            </>
                                         )}
-                                        <ChevronRight size={12} style={{ color: "var(--t-text-faint, #9ca3af)" }} />
-                                    </div>
-                                </button>
-                            )
-                        })
+                                    </button>
+                                </div>
+                            )}
+                        </>
                     )}
                 </div>
             )}
 
             <style>{`
+                /* ── Container ── */
+                .np-container {
+                    position: fixed; top: 56px; left: 72px;
+                    width: min(380px, calc(100vw - 24px));
+                    max-height: min(560px, calc(100vh - 72px));
+                    border-radius: 16px;
+                    background: var(--t-card, #fff);
+                    border: 1px solid var(--t-border-light, #e5e7eb);
+                    box-shadow: 0 20px 56px -8px rgba(0,0,0,0.2), 0 6px 20px -6px rgba(0,0,0,0.1);
+                    z-index: 9998; overflow: hidden;
+                    display: flex; flex-direction: column;
+                    animation: npIn .18s cubic-bezier(0.16,1,0.3,1);
+                }
+
+                /* ── Header ── */
+                .np-header {
+                    display: flex; align-items: center; justify-content: space-between;
+                    padding: 11px 14px 10px;
+                    border-bottom: 1px solid var(--t-border-light, #f0f0f0);
+                    flex-shrink: 0;
+                }
+                .np-header-title { font-size: 13.5px; font-weight: 800; color: var(--t-text, #111827); }
+                .np-unread-badge {
+                    font-size: 10px; font-weight: 800; color: #fff;
+                    background: linear-gradient(135deg, #ef4444, #dc2626);
+                    border-radius: 8px; padding: 0px 6px; min-width: 16px;
+                    text-align: center; line-height: 17px;
+                }
+                .np-total-label {
+                    font-size: 10px; color: var(--t-text-faint, #9ca3af);
+                    font-weight: 500;
+                }
+                .np-mark-all-btn {
+                    display: flex; align-items: center; gap: 3;
+                    background: none; border: none; cursor: pointer;
+                    color: var(--t-primary, #0072b5); font-size: 11px; font-weight: 600;
+                    padding: 4px 8px; border-radius: 7px; transition: background 0.15s;
+                    font-family: inherit;
+                }
+                .np-mark-all-btn:hover { background: var(--t-surface, #f3f4f6); }
+                .np-close-btn {
+                    width: 28px; height: 28px; border-radius: 8px;
+                    background: none; border: none; cursor: pointer;
+                    color: var(--t-text-faint, #9ca3af);
+                    display: flex; align-items: center; justify-content: center;
+                    transition: all 0.15s;
+                }
+                .np-close-btn:hover { background: var(--t-surface, #f3f4f6); color: var(--t-text, #111); }
+
+                /* ── List items ── */
+                .np-item {
+                    display: flex; gap: 10px; width: 100%; padding: 10px 14px;
+                    border: none; border-bottom: 1px solid var(--t-border-light, #f5f5f5);
+                    background: transparent; cursor: pointer; transition: background 0.1s;
+                    text-align: right; color: inherit; align-items: flex-start;
+                    font-family: inherit;
+                }
+                .np-item[data-unread="true"] { background: rgba(0,114,181,0.035); }
+                .np-item:hover { background: var(--t-surface, rgba(0,114,181,0.06)); }
+                .np-item[data-unread="true"]:hover { background: rgba(0,114,181,0.07); }
+
+                .np-item-icon {
+                    width: 34px; height: 34px; border-radius: 10px;
+                    flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+                }
+                .np-item-title {
+                    font-size: 11.5px; font-weight: 500;
+                    color: var(--t-text, #111827);
+                    overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;
+                }
+                .np-item-title[data-unread="true"] { font-weight: 700; }
+                .np-item-time {
+                    font-size: 10px; color: var(--t-text-faint, #9ca3af); flex-shrink: 0;
+                }
+                .np-item-body {
+                    font-size: 11px; color: var(--t-text-faint, #6b7280);
+                    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+                }
+                .np-item-type-tag {
+                    font-size: 9px; font-weight: 700; padding: 1px 6px;
+                    border-radius: 5px; white-space: nowrap;
+                }
+                .np-item-nav-hint {
+                    font-size: 9px; color: var(--t-primary, #0072b5);
+                    display: inline-flex; align-items: center; gap: 2;
+                    font-weight: 600; opacity: 0.7;
+                }
+                .np-unread-dot {
+                    width: 7px; height: 7px; border-radius: 50%;
+                    background: linear-gradient(135deg, #0072b5, #004786);
+                    box-shadow: 0 0 6px rgba(0,114,181,0.4);
+                }
+
+                /* ── Load more ── */
+                .np-load-more-wrap {
+                    padding: 8px 14px 12px; display: flex; justify-content: center;
+                }
+                .np-load-more-btn {
+                    display: flex; align-items: center; gap: 5;
+                    padding: 7px 18px; border-radius: 8px;
+                    border: 1px solid var(--t-border, #e5e7eb);
+                    background: var(--t-surface, #f9fafb);
+                    color: var(--t-text-secondary, #4b5563);
+                    font-size: 11.5px; font-weight: 600; cursor: pointer;
+                    transition: all 0.15s; font-family: inherit;
+                }
+                .np-load-more-btn:hover:not(:disabled) {
+                    background: var(--t-card, #fff);
+                    border-color: var(--t-primary, #0072b5);
+                    color: var(--t-primary, #0072b5);
+                    box-shadow: 0 2px 8px rgba(0,114,181,0.1);
+                }
+                .np-load-more-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+                /* ── Detail view ── */
+                .np-back-btn {
+                    display: flex; align-items: center; gap: 6;
+                    padding: 10px 14px; background: none; border: none;
+                    border-bottom: 1px solid var(--t-border-light, #f0f0f0);
+                    cursor: pointer; color: var(--t-primary, #0072b5);
+                    font-size: 12px; font-weight: 600; transition: all 0.15s;
+                    font-family: inherit; flex-shrink: 0;
+                }
+                .np-back-btn:hover { background: var(--t-surface, #f9fafb); }
+
+                .np-detail-icon {
+                    width: 40px; height: 40px; border-radius: 12px;
+                    display: flex; align-items: center; justify-content: center;
+                    flex-shrink: 0;
+                }
+                .np-type-badge {
+                    display: inline-flex; align-items: center; gap: 4;
+                    font-size: 10.5px; font-weight: 700; padding: 3px 10px;
+                    border-radius: 7px;
+                }
+                .np-read-badge {
+                    font-size: 9px; font-weight: 700; padding: 2px 8px;
+                    border-radius: 6px;
+                }
+                .np-read-badge[data-read="true"] {
+                    background: var(--t-surface, #f3f4f6);
+                    color: var(--t-text-faint, #9ca3af);
+                }
+                .np-read-badge[data-read="false"] {
+                    background: rgba(0,114,181,0.1);
+                    color: #0072b5;
+                }
+
+                .np-detail-title {
+                    font-size: 14.5px; font-weight: 800; color: var(--t-text, #111827);
+                    margin: 0 0 8px; line-height: 1.5; letter-spacing: -0.01em;
+                }
+                .np-detail-body {
+                    font-size: 13px; color: var(--t-text-secondary, #374151);
+                    line-height: 1.8; margin: 0 0 16px; white-space: pre-wrap;
+                }
+
+                /* ── Data section ── */
+                .np-data-section {
+                    background: var(--t-surface, #f9fafb);
+                    border: 1px solid var(--t-border-light, #f0f0f0);
+                    border-radius: 10px; padding: 10px 12px;
+                    margin-bottom: 14px;
+                }
+                .np-data-header {
+                    display: flex; align-items: center; gap: 5;
+                    font-size: 10px; font-weight: 700; color: var(--t-text-faint, #9ca3af);
+                    text-transform: uppercase; letter-spacing: 0.04em;
+                    margin-bottom: 8px; padding-bottom: 6px;
+                    border-bottom: 1px solid var(--t-border-light, #e5e7eb);
+                }
+                .np-data-row {
+                    display: flex; align-items: center; justify-content: space-between;
+                    padding: 4px 0; gap: 8;
+                }
+                .np-data-row + .np-data-row {
+                    border-top: 1px solid var(--t-border-light, #f0f0f0);
+                    padding-top: 5px;
+                }
+                .np-data-label {
+                    font-size: 11px; font-weight: 600; color: var(--t-text-muted, #6b7280);
+                    flex-shrink: 0;
+                }
+                .np-data-value {
+                    font-size: 11px; font-weight: 500; color: var(--t-text, #111827);
+                    text-align: left; overflow: hidden; text-overflow: ellipsis;
+                    white-space: nowrap; max-width: 180px;
+                    font-family: 'SF Mono', 'Fira Code', monospace;
+                }
+
+                .np-detail-time {
+                    display: flex; align-items: center; gap: 5;
+                    font-size: 11px; color: var(--t-text-faint, #9ca3af);
+                    margin-bottom: 16px;
+                }
+
+                /* ── Navigation button ── */
+                .np-nav-btn {
+                    display: flex; align-items: center; justify-content: center; gap: 7;
+                    width: 100%; padding: 10px; border-radius: 10px; border: none;
+                    background: linear-gradient(135deg, #0072b5, #004786);
+                    color: #fff; font-size: 12.5px; font-weight: 700;
+                    cursor: pointer; transition: all 0.2s; font-family: inherit;
+                    box-shadow: 0 4px 14px rgba(0,71,134,0.25);
+                }
+                .np-nav-btn:hover {
+                    transform: translateY(-1px);
+                    box-shadow: 0 6px 20px rgba(0,71,134,0.35);
+                }
+                .np-nav-btn:active { transform: translateY(0); }
+
+                /* ── Empty / loading ── */
+                .np-empty-state {
+                    display: flex; flex-direction: column; align-items: center;
+                    justify-content: center; padding: 40px 20px; gap: 8;
+                }
+                .np-empty-icon {
+                    width: 48px; height: 48px; border-radius: 14px;
+                    background: var(--t-surface, #f3f4f6);
+                    display: flex; align-items: center; justify-content: center;
+                }
+                .np-spinner {
+                    width: 22px; height: 22px;
+                    border: 2.5px solid var(--t-border-light, #e5e7eb);
+                    border-top-color: var(--t-primary, #0072b5);
+                    border-radius: 50%; animation: npSpin .6s linear infinite;
+                }
+
+                /* ── Animations ── */
                 @keyframes npIn {
                     from { opacity: 0; transform: translateY(-6px) scale(0.97); }
                     to   { opacity: 1; transform: translateY(0) scale(1); }
                 }
-                @keyframes spin { to { transform: rotate(360deg); } }
+                @keyframes npSpin { to { transform: rotate(360deg); } }
+                .np-spin { animation: npSpin .8s linear infinite; }
             `}</style>
         </div>,
         document.body

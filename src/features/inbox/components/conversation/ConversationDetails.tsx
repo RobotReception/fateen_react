@@ -440,10 +440,10 @@ function ContactTab({ customer: c }: { customer: Customer }) {
     const [saving, setSaving] = useState(false)
 
     // Merge custom_fields + contact_fields into one object for display
-    const fieldValues: Record<string, string> = {
+    const fieldValues: Record<string, string> = useMemo(() => ({
         ...(c.contact_fields ?? {}),
         ...(c.custom_fields ?? {}),
-    }
+    }), [c.contact_fields, c.custom_fields])
 
     // Local edits — only stores fields the user has changed
     const [localFields, setLocalFields] = useState<Record<string, string>>({})
@@ -451,15 +451,13 @@ function ContactTab({ customer: c }: { customer: Customer }) {
     // Reset local edits when customer changes
     useEffect(() => {
         setLocalFields({})
-    }, [c.customer_id])
+    }, [c.customer_id, c.account_id])
 
     // Detect if any field has changed from server value
-    const hasChanges = useMemo(() => {
-        return Object.entries(localFields).some(([key, val]) => {
-            const original = fieldValues[key] ?? ""
-            return val !== original
-        })
-    }, [localFields, fieldValues])
+    const hasChanges = Object.entries(localFields).some(([key, val]) => {
+        const original = fieldValues[key] ?? ""
+        return val !== original
+    })
 
     // Save all changed fields in one API call
     const saveAllFields = async () => {
@@ -474,7 +472,7 @@ function ContactTab({ customer: c }: { customer: Customer }) {
         }
 
         try {
-            await updateContactCustomFields(c.customer_id, changedFields)
+            await updateContactCustomFields(c.customer_id, changedFields, c.account_id)
             invalidateCustomerCaches(queryClient, c.customer_id)
             setLocalFields({})
             toast.success("تم تحديث الحقول بنجاح")
@@ -613,17 +611,18 @@ function ContactTab({ customer: c }: { customer: Customer }) {
                         )
                     })}
 
-                    {/* Bulk Update Button — only shown if there are changes AND permission exists */}
-                    {hasChanges && canEditFields && (
+                    {/* Bulk Update Button — only shown if there are changes */}
+                    {hasChanges && (
                         <button
                             onClick={saveAllFields}
-                            disabled={saving}
+                            disabled={saving || !canEditFields}
+                            title={!canEditFields ? "ليس لديك صلاحية التعديل" : ""}
                             style={{
                                 width: "100%", padding: "8px 0",
                                 border: "none", borderRadius: 8,
-                                background: saving ? "#94a3b8" : "linear-gradient(135deg, #0072b5, #004786)",
+                                background: saving ? "#94a3b8" : !canEditFields ? "#94a3b8" : "linear-gradient(135deg, #0072b5, #004786)",
                                 color: "#fff", fontSize: 12.5, fontWeight: 700,
-                                fontFamily: "inherit", cursor: saving ? "not-allowed" : "pointer",
+                                fontFamily: "inherit", cursor: (saving || !canEditFields) ? "not-allowed" : "pointer",
                                 display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
                                 transition: "all .15s", marginTop: 4, marginBottom: 2,
                                 boxShadow: saving ? "none" : "0 2px 8px rgba(0,71,134,0.18)",
@@ -728,7 +727,7 @@ function TagsSection({ customer }: { customer: Customer }) {
         setLocalTags(old => [...old, tagId])
 
         // Fire API in background
-        addCustomerTags(customer.customer_id, [tagId])
+        addCustomerTags(customer.customer_id, [tagId], customer.account_id)
             .then(() => {
                 invalidateCustomerCaches(queryClient, customer.customer_id)
             })
@@ -744,7 +743,7 @@ function TagsSection({ customer }: { customer: Customer }) {
         setLocalTags(old => old.filter(id => id !== tagId))
 
         // Fire API in background
-        removeCustomerTags(customer.customer_id, [tagId])
+        removeCustomerTags(customer.customer_id, [tagId], customer.account_id)
             .then(() => {
                 invalidateCustomerCaches(queryClient, customer.customer_id)
             })

@@ -14,9 +14,10 @@ import { useNotificationSound } from "./use-notification-sound"
    - List جلب مرة عند أول تحميل (cached)
    - WS يرسل count → إذا زاد الـ unread → silent background refresh
    - Panel يفتح فوراً بدون loading (من الـ cache)
-   - لا manual fetch عند فتح الـ panel
+   - loadMore() يجلب الصفحة التالية ويدمجها
 ═══════════════════════════════════════════════════════════ */
 
+const PAGE_SIZE = 20
 const WS_PROTOCOL = window.location.protocol === "https:" ? "wss:" : "ws:"
 const WS_NOTIFICATIONS_URL = `${WS_PROTOCOL}//${window.location.host}/api/backend/v2/notifications/ws`
 
@@ -28,6 +29,7 @@ export function useNotifications() {
     const [unreadCount, setUnreadCount] = useState(0)
     const [totalCount, setTotalCount] = useState(0)
     const [initialLoading, setInitialLoading] = useState(false) // only first load
+    const [loadingMore, setLoadingMore] = useState(false)
     const [hasFetched, setHasFetched] = useState(false)
 
     const wsRef = useRef<WebSocket | null>(null)
@@ -36,13 +38,17 @@ export function useNotifications() {
     const lastUnread = useRef(0)
     const isFetching = useRef(false) // prevent concurrent fetches
 
+    // Derive hasMore from total vs loaded count
+    const hasMore = notifications.length < totalCount
+
     // ── Silent background list refresh (no spinner) ───────
     const silentRefresh = useCallback(async () => {
         if (!token || isFetching.current) return
         isFetching.current = true
         try {
-            const d = await getNotifications(20, 0)
+            const d = await getNotifications(PAGE_SIZE, 0)
             setNotifications(d.notifications ?? [])
+            setTotalCount(d.total ?? 0)
             setHasFetched(true)
         } catch { /* silent — don't disrupt UI */ }
         finally { isFetching.current = false }
@@ -54,8 +60,9 @@ export function useNotifications() {
         isFetching.current = true
         setInitialLoading(true)
         try {
-            const d = await getNotifications(20, 0)
+            const d = await getNotifications(PAGE_SIZE, 0)
             setNotifications(d.notifications ?? [])
+            setTotalCount(d.total ?? 0)
             setHasFetched(true)
         } catch (err) {
             console.error("Failed to fetch notifications:", err)
@@ -64,6 +71,30 @@ export function useNotifications() {
             isFetching.current = false
         }
     }, [token, hasFetched])
+
+    // ── Load more (append next page) ─────────────────────
+    const loadMore = useCallback(async () => {
+        if (!token || loadingMore || isFetching.current || !hasMore) return
+        isFetching.current = true
+        setLoadingMore(true)
+        try {
+            const offset = notifications.length
+            const d = await getNotifications(PAGE_SIZE, offset)
+            const newItems = d.notifications ?? []
+            // Deduplicate by id (safety)
+            setNotifications(prev => {
+                const existingIds = new Set(prev.map(n => n.id))
+                const unique = newItems.filter(n => !existingIds.has(n.id))
+                return [...prev, ...unique]
+            })
+            setTotalCount(d.total ?? totalCount)
+        } catch (err) {
+            console.error("Failed to load more notifications:", err)
+        } finally {
+            setLoadingMore(false)
+            isFetching.current = false
+        }
+    }, [token, loadingMore, hasMore, notifications.length, totalCount])
 
     // ── WebSocket connect ─────────────────────────────────
     const connectWS = useCallback(() => {
@@ -163,6 +194,9 @@ export function useNotifications() {
         unreadCount,
         totalCount,
         loading: initialLoading, // only true on very first load
+        loadingMore,
+        hasMore,
+        loadMore,
         markAsRead: handleMarkAsRead,
         markAllAsRead: handleMarkAllAsRead,
     }
