@@ -30,7 +30,8 @@ interface ContactsState {
 
     // Selection
     selectedContactId: string | null
-    setSelectedContactId: (id: string | null) => void
+    selectedAccountId: string | undefined
+    setSelectedContactId: (id: string | null, accountId?: string) => void
 
     // Pagination
     currentPage: number
@@ -68,7 +69,8 @@ export const useContactsStore = create<ContactsState>((set) => ({
     toggleFilterPanel: () => set((s) => ({ filterPanelOpen: !s.filterPanelOpen })),
 
     selectedContactId: null,
-    setSelectedContactId: (selectedContactId) => set({ selectedContactId }),
+    selectedAccountId: undefined,
+    setSelectedContactId: (selectedContactId, selectedAccountId) => set({ selectedContactId, selectedAccountId }),
 
     currentPage: 1,
     pageSize: 25,

@@ -87,8 +87,8 @@ const CSS = `
 `
 
 export function ContactDetailPanel() {
-    const { selectedContactId, setSelectedContactId } = useContactsStore()
-    const { data: contact, isLoading } = useContactDetail(selectedContactId)
+    const { selectedContactId, selectedAccountId, setSelectedContactId } = useContactsStore()
+    const { data: contact, isLoading } = useContactDetail(selectedContactId, selectedAccountId)
     const { lifecycleMap } = useContactLookups()
     const tid = useAuthStore((s) => s.user?.tenant_id) ?? ""
     const { data: dynamicFields = [] } = useDynamicFields(tid)
@@ -104,11 +104,11 @@ export function ContactDetailPanel() {
     const [editFields, setEditFields] = useState<Record<string, string>>({})
     const [confirmDelete, setConfirmDelete] = useState(false)
 
-    // ── Mutations ──
-    const updateMutation = useUpdateContact(selectedContactId ?? "", undefined)
-    const updateFieldsMutation = useUpdateContactCustomFields(selectedContactId ?? "", undefined)
-    const deleteMutation = useDeleteContact(selectedContactId ?? "", undefined)
-    const convertMutation = useConvertContact(selectedContactId ?? "", undefined)
+    // ── Mutations (with account_id) ──
+    const updateMutation = useUpdateContact(selectedContactId ?? "", selectedAccountId)
+    const updateFieldsMutation = useUpdateContactCustomFields(selectedContactId ?? "", selectedAccountId)
+    const deleteMutation = useDeleteContact(selectedContactId ?? "", selectedAccountId)
+    const convertMutation = useConvertContact(selectedContactId ?? "", selectedAccountId)
 
     // Reset edit state when contact changes or editing toggled
     useEffect(() => {
@@ -150,7 +150,8 @@ export function ContactDetailPanel() {
         <div className="cd-empty"><style>{CSS}</style><div style={{ fontSize: 13, fontWeight: 600, color: "#9ca3af" }}>لم يتم العثور على جهة الاتصال</div></div>
     )
 
-    const name = contact.sender_name?.trim() || contact.customer_id
+    const customName = [contact.custom_fields?.first_name, contact.custom_fields?.last_name].filter(Boolean).join(" ").trim()
+    const name = customName || contact.sender_name?.trim() || contact.customer_id
     const initials = name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase()
     const phone = contact.custom_fields?.phone || ""
     const email = contact.custom_fields?.email || ""

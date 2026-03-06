@@ -10,7 +10,8 @@ interface ContactItemProps {
 }
 
 export function ContactItem({ contact: c, isSelected, onClick, lifecycleMap, customFieldKeys }: ContactItemProps) {
-    const name = c.sender_name?.trim() || c.customer_id
+    const customName = [c.custom_fields?.first_name, c.custom_fields?.last_name].filter(Boolean).join(" ").trim()
+    const name = customName || c.sender_name?.trim() || c.customer_id
     const initials = name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase()
     const lc = c.lifecycle ? lifecycleMap.get(c.lifecycle) : null
     const isClosed = c.conversation_status?.is_closed
@@ -77,7 +78,7 @@ export function ContactItem({ contact: c, isSelected, onClick, lifecycleMap, cus
                 .ci-row:hover{background:#f9fafb}
                 .ci-sel{background:rgba(0,71,134,.03)!important}
                 .ci-sel:hover{background:rgba(0,71,134,.05)!important}
-                .ci-td{padding:9px 12px;font-size:12px;color:#6b7280;white-space:nowrap;vertical-align:middle}
+                .ci-td{padding:9px 12px;font-size:12.5px;color:#374151;white-space:nowrap;vertical-align:middle;font-weight:500}
                 .ci-td-chk{width:36px;text-align:center}
                 .ci-chk{width:13px;height:13px;border-radius:3px;cursor:pointer;accent-color:#004786}
                 .ci-td-name{min-width:160px}

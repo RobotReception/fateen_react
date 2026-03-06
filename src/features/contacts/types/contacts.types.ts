@@ -29,6 +29,7 @@ export interface ContactTag {
 export interface Contact {
     id: string
     customer_id: string
+    account_id?: string
     session_id?: string | null
     is_contacts: boolean
     sender_name: string

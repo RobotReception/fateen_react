@@ -4,6 +4,7 @@ import { useContacts, useContactsFilters } from "../hooks/use-contacts"
 import { useContactLookups } from "../hooks/use-contact-lookups"
 import { ContactItem } from "./ContactItem"
 import { useAuthStore } from "@/stores/auth-store"
+import { useDynamicFields } from "../../settings/hooks/use-contact-fields"
 
 interface TableColumn {
     key: string
@@ -73,13 +74,14 @@ export function ContactsListPanel() {
     const totalCount = pagination?.totalCount ?? 0
     const totalPages = pagination?.totalPages ?? 1
 
-    const customFieldKeys = Array.from(
-        new Set(contacts.flatMap(c => Object.keys(c.custom_fields ?? {})))
-    )
+    const { data: dynamicFields = [] } = useDynamicFields(useAuthStore.getState().user?.tenant_id ?? "")
+    const activeFieldsMeta = (dynamicFields as any[]).filter((f: any) => f.is_active)
+
+    const customFieldKeys = activeFieldsMeta.map((f: any) => f.field_name)
 
     const TABLE_COLUMNS: TableColumn[] = [
         ...STATIC_COLUMNS_LEFT,
-        ...customFieldKeys.map(key => ({ key: `cf_${key}`, label: formatFieldLabel(key) })),
+        ...activeFieldsMeta.map((f: any) => ({ key: `cf_${f.field_name}`, label: f.label_ar || f.field_label || formatFieldLabel(f.field_name) })),
         ...STATIC_COLUMNS_RIGHT,
     ]
     const startItem = totalCount === 0 ? 0 : skip + 1
@@ -254,7 +256,8 @@ export function ContactsListPanel() {
                                     contact={contact}
                                     isSelected={contact.customer_id === selectedContactId}
                                     onClick={() => setSelectedContactId(
-                                        contact.customer_id === selectedContactId ? null : contact.customer_id
+                                        contact.customer_id === selectedContactId ? null : contact.customer_id,
+                                        contact.account_id
                                     )}
                                     tagMap={tagMap}
                                     lifecycleMap={lifecycleMap}
