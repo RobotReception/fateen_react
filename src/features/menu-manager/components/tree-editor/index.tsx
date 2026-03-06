@@ -474,7 +474,7 @@ export function TreeEditorTab({ selectedTemplateId }: TreeEditorTabProps) {
     const [eDesc, setEDesc] = useState("")
     const [eActive, setEActive] = useState(true)
     const [eContent, setEContent] = useState<ContentFormState>(defaultContentForm())
-    const [aKey, setAKey] = useState("")
+
     const [aTitle, setATitle] = useState("")
     const [aType, setAType] = useState<MenuItemType>("text")
     const [aDesc, setADesc] = useState("")
@@ -553,15 +553,15 @@ export function TreeEditorTab({ selectedTemplateId }: TreeEditorTabProps) {
     }
 
     const resetAdd = () => {
-        setAddParentId(null); setAKey(""); setATitle("")
+        setAddParentId(null); setATitle("")
         setAType("text"); setADesc(""); setAContent(defaultContentForm())
     }
 
     const handleAdd = async () => {
-        if (!addParentId || !tid || !aKey.trim() || !aTitle.trim()) return
+        if (!addParentId || !tid || !aTitle.trim()) return
         setSubmitting(true)
         try {
-            const p: CreateMenuItemPayload = { parent_id: addParentId, key: aKey.trim(), type: aType, title: aTitle.trim() }
+            const p: CreateMenuItemPayload = { parent_id: addParentId, type: aType, title: aTitle.trim() }
             if (aDesc.trim()) p.description = aDesc.trim()
             const content = buildContent(aType, aContent)
             if (content) p.content = content
@@ -798,7 +798,7 @@ export function TreeEditorTab({ selectedTemplateId }: TreeEditorTabProps) {
                             <div>
                                 <label style={labelSt}>نوع العنصر</label>
                                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(88px, 1fr))", gap: 6 }}>
-                                    {MENU_ITEM_TYPES.map(t => {
+                                    {MENU_ITEM_TYPES.filter(t => !["action", "buttons", "list", "quick_reply"].includes(t.value)).map(t => {
                                         const I = TYPE_ICONS[t.value]
                                         const sel = aType === t.value
                                         return (
@@ -819,20 +819,19 @@ export function TreeEditorTab({ selectedTemplateId }: TreeEditorTabProps) {
                                     })}
                                 </div>
                             </div>
-                            <div style={{ display: "flex", gap: 10 }}>
-                                <div style={{ flex: 1 }}><label style={labelSt}>المفتاح (key) *</label><input value={aKey} onChange={e => setAKey(e.target.value)} placeholder="مثال: new_item" style={inputSt} dir="ltr" /></div>
-                                <div style={{ flex: 1 }}><label style={labelSt}>العنوان *</label><input value={aTitle} onChange={e => setATitle(e.target.value)} placeholder="عنوان العنصر" style={inputSt} /></div>
+                            <div>
+                                <label style={labelSt}>العنوان *</label><input value={aTitle} onChange={e => setATitle(e.target.value)} placeholder="عنوان العنصر" style={inputSt} />
                             </div>
                             <div><label style={labelSt}>الوصف (اختياري)</label><input value={aDesc} onChange={e => setADesc(e.target.value)} placeholder="وصف قصير..." style={inputSt} /></div>
                             <ContentFields type={aType} form={aContent} setForm={setAContent} mode="add" />
                         </div>
                         <div style={{ padding: "12px 20px", borderTop: "1px solid var(--t-border-light)", display: "flex", justifyContent: "flex-end", gap: 8, flexShrink: 0 }}>
                             <button onClick={resetAdd} style={{ padding: "8px 18px", borderRadius: 8, border: "1px solid var(--t-border-light)", background: "transparent", color: "var(--t-text-secondary)", fontSize: 13, cursor: "pointer" }}>إلغاء</button>
-                            <button onClick={handleAdd} disabled={submitting || !aKey.trim() || !aTitle.trim()} style={{
+                            <button onClick={handleAdd} disabled={submitting || !aTitle.trim()} style={{
                                 padding: "8px 20px", borderRadius: 8, border: "none",
-                                background: aKey.trim() && aTitle.trim() ? "linear-gradient(135deg, #004786, #0098d6)" : "#e5e7eb",
-                                color: aKey.trim() && aTitle.trim() ? "#fff" : "#9ca3af",
-                                fontSize: 13, fontWeight: 600, cursor: aKey.trim() && aTitle.trim() ? "pointer" : "default",
+                                background: aTitle.trim() ? "linear-gradient(135deg, #004786, #0098d6)" : "#e5e7eb",
+                                color: aTitle.trim() ? "#fff" : "#9ca3af",
+                                fontSize: 13, fontWeight: 600, cursor: aTitle.trim() ? "pointer" : "default",
                                 display: "flex", alignItems: "center", gap: 6,
                                 opacity: submitting ? 0.7 : 1,
                             }}>

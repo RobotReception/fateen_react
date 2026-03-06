@@ -127,7 +127,7 @@ export interface ItemsListData {
 
 export interface CreateMenuItemPayload {
     parent_id: string
-    key: string
+    key?: string
     type: MenuItemType
     title: string
     description?: string
