@@ -464,7 +464,7 @@ export interface PageWithPermission {
  * @param pageBit - الـ base_bit للصفحة (من PAGE_BITS)
  */
 export function hasPageAccess(totalPages: number, pageBit: number): boolean {
-    return (totalPages & pageBit) !== 0
+    return (BigInt(totalPages) & BigInt(pageBit)) !== 0n
 }
 
 /**
@@ -480,7 +480,8 @@ export function hasActionAccess(
 ): boolean {
     const pagePerm = permissions.find((p) => p.pageValue === pageBit)
     if (!pagePerm) return false
-    return (pagePerm.totalValue & actionBit) !== 0
+    // Use BigInt to avoid 32-bit overflow for action bits >= 2^31
+    return (BigInt(pagePerm.totalValue) & BigInt(actionBit)) !== 0n
 }
 
 /**
@@ -490,7 +491,7 @@ export function hasActionAccess(
  */
 export function getAccessiblePages(totalPages: number): number[] {
     return Object.values(PAGE_BITS).filter(
-        (bit) => (totalPages & bit) !== 0
+        (bit) => (BigInt(totalPages) & BigInt(bit)) !== 0n
     )
 }
 
@@ -507,6 +508,6 @@ export function getAvailableActions(
     const pagePerm = permissions.find((p) => p.pageValue === pageBit)
     if (!pagePerm) return []
     return Object.values(ACTION_BITS).filter(
-        (bit) => (pagePerm.totalValue & bit) !== 0
+        (bit) => (BigInt(pagePerm.totalValue) & BigInt(bit)) !== 0n
     )
 }

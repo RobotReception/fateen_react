@@ -22,9 +22,14 @@ export function useDynamicFields(tid: string) {
         enabled: !!tid,
         select: r => {
             const d = r.data
-            if (Array.isArray(d)) return d
-            if (d && typeof d === "object" && "items" in d) return (d as any).items ?? []
-            return []
+            let list: any[] = []
+            if (Array.isArray(d)) list = d
+            else if (d && typeof d === "object") {
+                if ("data" in d && Array.isArray((d as any).data)) list = (d as any).data
+                else if ("items" in d) list = (d as any).items ?? []
+            }
+            // Sort by display_order (spread first to avoid mutating cache)
+            return [...list].sort((a: any, b: any) => (a.display_order ?? 999) - (b.display_order ?? 999))
         },
     })
 }

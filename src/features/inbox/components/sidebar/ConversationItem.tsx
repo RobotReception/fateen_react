@@ -25,7 +25,8 @@ interface ConversationItemProps {
 export const ConversationItem = memo(function ConversationItem({ customer: c, isSelected }: ConversationItemProps) {
     const navigate = useNavigate()
     const queryClient = useQueryClient()
-    const displayName = c.sender_name?.trim() || c.customer_id
+    const customName = [c.custom_fields?.first_name, c.custom_fields?.last_name].filter(Boolean).join(" ").trim()
+    const displayName = customName || c.sender_name?.trim() || c.customer_id
     const hasUnread = c.unread_count > 0
     const isClosed = c.conversation_status?.is_closed
     const [hovered, setHovered] = useState(false)

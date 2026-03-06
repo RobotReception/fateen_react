@@ -324,7 +324,7 @@ export function ContactFieldsTab() {
     const [showForm, setShowForm] = useState(false)
     const [editField, setEditField] = useState<DynamicField | undefined>()
     const [deleteTarget, setDeleteTarget] = useState<DynamicField | null>(null)
-    const [sortField, setSortField] = useState<"field_name" | "created_at">("field_name")
+    const [sortField, setSortField] = useState<"display_order" | "field_name" | "created_at">("display_order")
     const [sortDir, setSortDir] = useState<"asc" | "desc">("asc")
 
     const filtered = (fields as DynamicField[])
@@ -336,11 +336,12 @@ export function ContactFieldsTab() {
         )
         .sort((a, b) => {
             const dir = sortDir === "asc" ? 1 : -1
+            if (sortField === "display_order") return ((a.display_order ?? 999) - (b.display_order ?? 999)) * dir
             if (sortField === "field_name") return a.field_name.localeCompare(b.field_name) * dir
             return ((a.created_at ?? "") > (b.created_at ?? "") ? 1 : -1) * dir
         })
 
-    const toggleSort = (field: "field_name" | "created_at") => {
+    const toggleSort = (field: "display_order" | "field_name" | "created_at") => {
         if (sortField === field) setSortDir(d => d === "asc" ? "desc" : "asc")
         else { setSortField(field); setSortDir("asc") }
     }
@@ -423,6 +424,7 @@ export function ContactFieldsTab() {
                     <table className="cf-table">
                         <thead>
                             <tr>
+                                <th><span className="cf-th-sort" onClick={() => toggleSort("display_order")}># <ArrowUpDown size={10} style={{ opacity: sortField === "display_order" ? 1 : .3 }} /></span></th>
                                 <th><span className="cf-th-sort" onClick={() => toggleSort("field_name")}>الاسم <ArrowUpDown size={10} style={{ opacity: sortField === "field_name" ? 1 : .3 }} /></span></th>
                                 <th>معرّف الحقل</th>
                                 <th>الوصف</th>
@@ -437,6 +439,7 @@ export function ContactFieldsTab() {
                                 const typeColor = TYPE_COLORS[f.field_type] || "#6b7280"
                                 return (
                                     <tr key={f.id ?? f.field_name} style={{ animation: "cfFade .2s ease-out" }}>
+                                        <td><span style={{ fontSize: 11, fontWeight: 700, color: "#9ca3af" }}>{f.display_order ?? "—"}</span></td>
                                         <td>
                                             <span style={{ fontWeight: 700, fontSize: 12.5, color: "#111827" }}>{f.field_label || f.field_name}</span>
                                         </td>

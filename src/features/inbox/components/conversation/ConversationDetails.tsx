@@ -448,10 +448,10 @@ function ContactTab({ customer: c }: { customer: Customer }) {
     // Local edits — only stores fields the user has changed
     const [localFields, setLocalFields] = useState<Record<string, string>>({})
 
-    // Reset local edits when customer changes
+    // Reset local edits when customer or field values change
     useEffect(() => {
         setLocalFields({})
-    }, [c.customer_id, c.account_id])
+    }, [c.customer_id, c.account_id, fieldValues])
 
     // Detect if any field has changed from server value
     const hasChanges = Object.entries(localFields).some(([key, val]) => {
@@ -459,7 +459,8 @@ function ContactTab({ customer: c }: { customer: Customer }) {
         return val !== original
     })
 
-    // Save all changed fields in one API call
+
+    // Save all changed fields in one API call (optimistic)
     const saveAllFields = async () => {
         if (saving || !hasChanges) return
         setSaving(true)
@@ -471,13 +472,54 @@ function ContactTab({ customer: c }: { customer: Customer }) {
             if (val !== original) changedFields[key] = val
         }
 
+        // Build patch function
+        const updatedCustomFields = { ...(c.custom_fields ?? {}), ...changedFields }
+        const patchCustomer = (old: any) => {
+            if (!old) return old
+            if (Array.isArray(old)) {
+                return old.map((cust: any) =>
+                    cust.customer_id === c.customer_id && cust.account_id === c.account_id
+                        ? { ...cust, custom_fields: updatedCustomFields }
+                        : cust
+                )
+            }
+            if (old.customer_id === c.customer_id) {
+                return { ...old, custom_fields: updatedCustomFields }
+            }
+            if (old.data && Array.isArray(old.data)) {
+                return {
+                    ...old, data: old.data.map((cust: any) =>
+                        cust.customer_id === c.customer_id && cust.account_id === c.account_id
+                            ? { ...cust, custom_fields: updatedCustomFields }
+                            : cust
+                    )
+                }
+            }
+            return old
+        }
+
+        // Snapshot caches for rollback
+        const prevInbox = queryClient.getQueriesData({ queryKey: ["inbox-customers"] })
+        const prevBasic = queryClient.getQueriesData({ queryKey: ["customer-basic-info", c.customer_id] })
+        const prevDetail = queryClient.getQueriesData({ queryKey: ["contact-detail", c.customer_id] })
+
+        // ⚡ Optimistic: apply changes immediately
+        queryClient.setQueriesData({ queryKey: ["inbox-customers"] }, patchCustomer)
+        queryClient.setQueriesData({ queryKey: ["customer-basic-info", c.customer_id] }, patchCustomer)
+        queryClient.setQueriesData({ queryKey: ["contact-detail", c.customer_id] }, patchCustomer)
+        toast.success("تم تحديث الحقول بنجاح")
+
         try {
             await updateContactCustomFields(c.customer_id, changedFields, c.account_id)
+            // Refetch fresh data in background
             invalidateCustomerCaches(queryClient, c.customer_id)
-            setLocalFields({})
-            toast.success("تم تحديث الحقول بنجاح")
         } catch {
-            toast.error("حدث خطأ أثناء الحفظ")
+            // ❌ Rollback on error
+            prevInbox.forEach(([key, data]) => queryClient.setQueryData(key, data))
+            prevBasic.forEach(([key, data]) => queryClient.setQueryData(key, data))
+            prevDetail.forEach(([key, data]) => queryClient.setQueryData(key, data))
+            setLocalFields(changedFields)
+            toast.error("حدث خطأ — تم التراجع عن التغييرات")
         } finally {
             setSaving(false)
         }
