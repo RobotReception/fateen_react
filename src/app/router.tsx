@@ -3,6 +3,8 @@ import { AdminLayout } from "@/components/layout"
 import { PermissionGuard } from "@/components/guards/PermissionGuard"
 import { PAGE_BITS } from "@/lib/permissions"
 import { useAuthStore } from "@/stores/auth-store"
+import { useSessionBootstrap } from "@/hooks/useSessionBootstrap"
+import { Loader2 } from "lucide-react"
 
 // Auth Pages
 import { LoginPage } from "@/features/auth/pages/LoginPage"
@@ -25,29 +27,19 @@ import { ConversationPage } from "@/features/inbox/pages/ConversationPage"
 import { ContactsPage } from "@/features/contacts/pages/ContactsPage"
 import { MenuManagerPage } from "@/features/menu-manager/pages/MenuManagerPage"
 
-/**
- * فحص صلاحية JWT — يتحقق من تاريخ الانتهاء (exp)
- * يعود true فقط إذا التوكن صالح وغير منتهي
- */
-function isTokenValid(token: string | null): boolean {
-    if (!token) return false
-    try {
-        const payload = JSON.parse(atob(token.split(".")[1]))
-        // exp بالثواني — نقارن مع الوقت الحالي مع هامش 30 ثانية
-        return payload.exp * 1000 > Date.now() - 30000
-    } catch {
-        return false
-    }
-}
-
-/** يتحقق من تسجيل الدخول + صلاحية التوكن — يحوّل لصفحة Login إذا انتهى */
+/** يتحقق من تسجيل الدخول — يحوّل لصفحة Login إذا لم يكن مسجلاً */
 function AuthGuard({ children }: { children: React.ReactNode }) {
-    const { isAuthenticated, token, logout } = useAuthStore()
+    const { isAuthenticated, token } = useAuthStore()
 
-    // تحقق فعلي من صلاحية التوكن (ليس مجرد وجوده)
-    if (!isAuthenticated || !isTokenValid(token)) {
-        // إذا عنده بيانات قديمة → نظّف كل شيء
-        if (isAuthenticated) logout()
+    // بعد useSessionBootstrap(ready=true):
+    // - لو الجلسة صالحة → isAuthenticated=true + token موجود
+    // - لو فشل الـ refresh → bootstrap استدعى logout() → isAuthenticated=false
+    // لذا نتحقق فقط من isAuthenticated + وجود التوكن (بدون فحص exp)
+    // فحص exp غير ضروري هنا لأن:
+    // 1. useSessionBootstrap يجدد التوكن عند reload
+    // 2. api-client interceptor يجدد تلقائياً عند 401
+    // 3. silentRefresh كل 12 دقيقة يضمن التوكن صالح
+    if (!isAuthenticated || !token) {
         return <Navigate to="/login" replace />
     }
 
@@ -63,6 +55,16 @@ function GuestGuard({ children }: { children: React.ReactNode }) {
 }
 
 export function AppRouter() {
+    // ── Session Bootstrap: تحقق من السيرفر عند تحميل التطبيق ──
+    const ready = useSessionBootstrap()
+    if (!ready) {
+        return (
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh" }}>
+                <Loader2 style={{ width: 32, height: 32, animation: "spin 1s linear infinite", color: "#0098d6" }} />
+            </div>
+        )
+    }
+
     return (
         <Routes>
             {/* Redirect root to login */}

@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query"
 import { toast } from "sonner"
 import { knowledgeKeys } from "./query-keys"
+import { pendingKeys } from "@/features/pending-requests/hooks/query-keys"
 import {
     getUserFilesData,
     deleteDocsByUsername,
@@ -33,8 +34,9 @@ export function useDeleteUserData(tenantId: string) {
         mutationFn: (payload: DeleteDocsByUsernamePayload) => deleteDocsByUsername(payload, tenantId),
         onSuccess: (res, payload) => {
             if (res.success) {
-                toast.success(`تم حذف جميع بيانات ${payload.username}`)
+                toast.success(`تم تقديم طلب حذف بيانات ${payload.username} — يمكنك متابعته من الطلبات المعلقة`)
                 qc.invalidateQueries({ queryKey: knowledgeKeys.users.all(tenantId) })
+                qc.invalidateQueries({ queryKey: pendingKeys.all(tenantId) })
             } else {
                 toast.error(res.message || "فشل الحذف")
             }
@@ -49,8 +51,9 @@ export function useDeleteUserFile(tenantId: string) {
         mutationFn: (payload: DeleteDocsByFilenamePayload) => deleteDocsByFilename(payload, tenantId),
         onSuccess: (res, payload) => {
             if (res.success) {
-                toast.success(`تم حذف الملف: ${payload.filename}`)
+                toast.success(`تم تقديم طلب حذف الملف: ${payload.filename} — يمكنك متابعته من الطلبات المعلقة`)
                 qc.invalidateQueries({ queryKey: knowledgeKeys.users.all(tenantId) })
+                qc.invalidateQueries({ queryKey: pendingKeys.all(tenantId) })
             } else {
                 toast.error(res.message || "فشل حذف الملف")
             }
@@ -65,8 +68,9 @@ export function useDeleteCollection(tenantId: string) {
         mutationFn: () => requestDeleteCollectionAdmin(tenantId),
         onSuccess: (res) => {
             if (res.success) {
-                toast.success("تم حذف جميع البيانات بنجاح")
+                toast.success("تم تقديم طلب حذف جميع البيانات — يمكنك متابعته من الطلبات المعلقة")
                 qc.invalidateQueries({ queryKey: knowledgeKeys.users.all(tenantId) })
+                qc.invalidateQueries({ queryKey: pendingKeys.all(tenantId) })
             } else {
                 toast.error(res.message || "فشل حذف البيانات")
             }

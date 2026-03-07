@@ -51,7 +51,7 @@ export function useDeleteDocuments(tenantId: string) {
         onSuccess: (res, payload) => {
             const count = Array.isArray(payload.doc_id) ? payload.doc_id.length : 1
             if (res.success) {
-                toast.success(`تم حذف ${count} مستند بنجاح`)
+                toast.success(`تم تقديم طلب حذف ${count} مستند — يمكنك متابعته من الطلبات المعلقة`)
                 events.onDocumentDeleted()
             } else {
                 toast.error(res.message || "فشل الحذف")

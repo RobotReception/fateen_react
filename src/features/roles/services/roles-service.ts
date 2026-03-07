@@ -16,11 +16,12 @@ import type {
 } from "../types"
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || "/api/backend/v2"
+import { useAuthStore } from "@/stores/auth-store"
 
 /* ─── auth helpers (same pattern as settings-service) ─── */
 
 function getToken(): string | null {
-    return localStorage.getItem("access_token")
+    return useAuthStore.getState().token
 }
 
 function authHeaders(tenantId?: string, lang = "ar"): Record<string, string> {

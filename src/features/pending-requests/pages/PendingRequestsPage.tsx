@@ -22,6 +22,12 @@ import {
     Building2,
     Tag,
     Calendar,
+
+    FileDown,
+    Layers,
+    Settings2,
+    CheckCircle,
+    AlertCircle,
 } from "lucide-react"
 import { useAuthStore } from "@/stores/auth-store"
 import {
@@ -56,15 +62,24 @@ function formatDate(iso: string) {
     } catch { return iso }
 }
 
+const OPERATION_MAP: Record<string, { label: string; color: string; bg: string; border: string }> = {
+    train: { label: "🎓 تدريب ملف", color: "#2563eb", bg: "rgba(37,99,235,0.06)", border: "rgba(37,99,235,0.18)" },
+    add: { label: "➕ إضافة نص", color: "#059669", bg: "rgba(5,150,105,0.06)", border: "rgba(5,150,105,0.18)" },
+    delete: { label: "🗑️ حذف مستند", color: "#dc2626", bg: "rgba(220,38,38,0.06)", border: "rgba(220,38,38,0.18)" },
+    update: { label: "✏️ تحديث مستند", color: "#d97706", bg: "rgba(217,119,6,0.06)", border: "rgba(217,119,6,0.18)" },
+    train_data_request: { label: "🎓 طلب تدريب بيانات", color: "#2563eb", bg: "rgba(37,99,235,0.06)", border: "rgba(37,99,235,0.18)" },
+    document_upload: { label: "📄 رفع مستند", color: "#7c3aed", bg: "rgba(124,58,237,0.06)", border: "rgba(124,58,237,0.18)" },
+    add_data_request: { label: "➕ طلب إضافة بيانات", color: "#059669", bg: "rgba(5,150,105,0.06)", border: "rgba(5,150,105,0.18)" },
+    update_data_request: { label: "✏️ طلب تحديث بيانات", color: "#d97706", bg: "rgba(217,119,6,0.06)", border: "rgba(217,119,6,0.18)" },
+    delete_data_request: { label: "🗑️ طلب حذف بيانات", color: "#dc2626", bg: "rgba(220,38,38,0.06)", border: "rgba(220,38,38,0.18)" },
+}
+
 function operationLabel(op: string) {
-    const map: Record<string, string> = {
-        train_data_request: "طلب تدريب بيانات",
-        document_upload: "رفع مستند",
-        add_data_request: "طلب إضافة بيانات",
-        update_data_request: "طلب تحديث بيانات",
-        delete_data_request: "طلب حذف بيانات",
-    }
-    return map[op] || op
+    return OPERATION_MAP[op]?.label || op
+}
+
+function operationStyle(op: string) {
+    return OPERATION_MAP[op] || { label: op, color: "#6b7280", bg: "rgba(107,114,128,0.06)", border: "rgba(107,114,128,0.18)" }
 }
 
 function statusBadge(status: string) {
@@ -74,6 +89,45 @@ function statusBadge(status: string) {
     if (s === "rejected") return { text: "مرفوض", cls: "bg-red-50 text-red-600 border-red-200", icon: XCircle }
     return { text: status || "—", cls: "bg-gray-50 text-gray-500 border-gray-200", icon: Clock }
 }
+
+/* ═══════════════ DETAIL FIELD LABELS ═══════════════ */
+const FIELD_LABELS: Record<string, string> = {
+    id: "المعرّف",
+    operation: "نوع العملية",
+    username: "المستخدم",
+    status: "الحالة",
+    created_at: "تاريخ الإنشاء",
+    completed_at: "تاريخ الإتمام",
+    approved_by: "تمت الموافقة بواسطة",
+    rejection_reason: "سبب الرفض",
+    file_name: "اسم الملف",
+    file_path: "مسار الملف",
+    file_url: "رابط الملف",
+    file_size: "حجم الملف",
+    media_id: "معرّف الوسائط",
+    public_url: "الرابط العام",
+    proxy_url: "رابط البروكسي",
+    department_id: "القسم",
+    category_id: "التصنيف",
+    has_header: "يحتوي عناوين أعمدة",
+    delimiter: "الفاصل",
+    encoding: "الترميز",
+    question_col: "عمود السؤال",
+    answer_col: "عمود الجواب",
+    sheet: "رقم الورقة",
+    text: "النص / المحتوى",
+    doc_id: "معرّف المستند",
+    tenant_id: "معرّف الشركة",
+}
+
+
+
+// Groups for the details view
+const BASIC_FIELDS = ["operation", "username", "status", "created_at", "completed_at", "approved_by", "rejection_reason"]
+const FILE_FIELDS = ["file_name", "file_size", "department_id", "category_id", "has_header", "delimiter", "encoding", "question_col", "answer_col", "sheet"]
+const LINK_FIELDS = ["file_url", "file_path", "public_url", "proxy_url", "media_id"]
+const CONTENT_FIELDS = ["text", "doc_id"]
+const ALL_KNOWN_FIELDS = new Set(["id", "index", "tenant_id", ...BASIC_FIELDS, ...FILE_FIELDS, ...LINK_FIELDS, ...CONTENT_FIELDS])
 
 /* ═══════════════ SKELETON ═══════════════ */
 const SkeletonRow = memo(function SkeletonRow({ delay = 0 }: { delay?: number }) {
@@ -87,56 +141,171 @@ const SkeletonRow = memo(function SkeletonRow({ delay = 0 }: { delay?: number })
 })
 
 /* ═══════════════ DETAILS MODAL ═══════════════ */
-const DetailsModal = memo(function DetailsModal({ details, loading, onClose }: { details: RequestDetails | null; loading: boolean; onClose: () => void }) {
+
+
+
+
+function InfoField({ icon: Icon, label, value, mono }: { icon: typeof Hash; label: string; value: string; mono?: boolean }) {
+    return (
+        <div style={{ borderRadius: 10, background: "#f9fafb", border: "1px solid #f3f4f6", padding: "8px 12px" }}>
+            <p style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 10, fontWeight: 600, color: "#9ca3af", marginBottom: 3 }}><Icon size={10} />{label}</p>
+            <p style={{ fontSize: 13, color: "#374151", fontFamily: mono ? "monospace" : "inherit", wordBreak: "break-all" }}>{value || "—"}</p>
+        </div>
+    )
+}
+
+function SectionHeader({ icon: Icon, title }: { icon: typeof Hash; title: string }) {
+    return (
+        <div style={{ display: "flex", alignItems: "center", gap: 7, paddingBottom: 6, borderBottom: "1px solid #f3f4f6", marginBottom: 10 }}>
+            <div style={{ width: 22, height: 22, borderRadius: 6, background: "linear-gradient(135deg, #004786, #0098d6)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <Icon size={11} style={{ color: "#fff" }} />
+            </div>
+            <span style={{ fontSize: 12, fontWeight: 700, color: "#374151" }}>{title}</span>
+        </div>
+    )
+}
+
+const DetailsModal = memo(function DetailsModal({
+    details, loading, onClose, onDownloadFile, downloadingFile,
+}: {
+    details: RequestDetails | null; loading: boolean; onClose: () => void
+    onDownloadFile: () => void; downloadingFile: boolean
+}) {
+    const hasFile = details && (details.file_url || details.media_id || details.public_url || details.proxy_url)
+    const opStyle = details ? operationStyle(details.operation) : null
+
+    // Detect extra unknown fields not in our known set
+    const extraFields = details
+        ? Object.entries(details).filter(([key, val]) => !ALL_KNOWN_FIELDS.has(key) && val != null && val !== "")
+        : []
+
     return (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={onClose}>
-            <div className="mx-4 w-full max-w-lg overflow-hidden bg-white" onClick={(e) => e.stopPropagation()} style={{ animation: "prModalIn .18s ease-out", borderRadius: 12, border: "1px solid var(--t-border-light, #e5e7eb)" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 20px", borderBottom: "1px solid var(--t-border-light, #f0f0f0)" }}>
+            <div className="mx-4 w-full max-w-xl overflow-hidden bg-white" onClick={(e) => e.stopPropagation()} style={{ animation: "prModalIn .18s ease-out", borderRadius: 14, border: "1px solid #e5e7eb", boxShadow: "0 20px 60px rgba(0,0,0,0.12)" }}>
+                {/* Header */}
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 20px", borderBottom: "1px solid #f0f0f0", background: "linear-gradient(135deg, rgba(0,71,134,0.03), rgba(0,152,214,0.03))" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                        <div style={{ width: 30, height: 30, borderRadius: 8, background: "linear-gradient(135deg, #004786, #0098d6)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                            <ClipboardList size={14} style={{ color: "#fff" }} />
+                        <div style={{ width: 32, height: 32, borderRadius: 8, background: "linear-gradient(135deg, #004786, #0098d6)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                            <ClipboardList size={15} style={{ color: "#fff" }} />
                         </div>
-                        <h3 style={{ fontSize: 14, fontWeight: 600, color: "var(--t-text, #1f2937)" }}>تفاصيل الطلب</h3>
+                        <div>
+                            <h3 style={{ fontSize: 14, fontWeight: 700, color: "#1f2937", margin: 0 }}>تفاصيل الطلب</h3>
+                            {details && <p style={{ fontSize: 10, color: "#9ca3af", fontFamily: "monospace", marginTop: 2 }}>#{details.id}</p>}
+                        </div>
                     </div>
-                    <button onClick={onClose} style={{ borderRadius: 6, padding: 5, border: "none", background: "transparent", cursor: "pointer", color: "var(--t-text-faint, #9ca3af)" }}><X size={16} /></button>
+                    <button onClick={onClose} style={{ borderRadius: 7, padding: 6, border: "1px solid #f3f4f6", background: "#fff", cursor: "pointer", color: "#9ca3af", display: "flex", alignItems: "center", justifyContent: "center" }}><X size={15} /></button>
                 </div>
+
                 {loading || !details ? (
                     <div className="flex items-center justify-center py-16"><Loader2 size={28} className="animate-spin text-blue-500" /></div>
                 ) : (
-                    <div className="max-h-[60vh] overflow-y-auto p-5 space-y-4" dir="rtl">
-                        <div className="grid grid-cols-2 gap-3">
-                            <InfoField icon={Hash} label="المعرّف" value={details.id} mono />
-                            <InfoField icon={User} label="المستخدم" value={details.username} />
-                            <InfoField icon={FileText} label="نوع العملية" value={operationLabel(details.operation)} />
-                            <InfoField icon={Clock} label="الحالة" value={statusBadge(details.status).text} />
-                            <InfoField icon={Calendar} label="تاريخ الإنشاء" value={formatDate(details.created_at)} />
-                            {details.doc_id && <InfoField icon={Hash} label="معرّف المستند" value={details.doc_id} mono />}
-                            {details.department && <InfoField icon={Building2} label="القسم" value={details.department} />}
-                            {details.category && <InfoField icon={Tag} label="الفئة" value={details.category} />}
-                            {details.file_name && <InfoField icon={FileText} label="اسم الملف" value={details.file_name} />}
-                            {details.file_size && <InfoField icon={FileText} label="حجم الملف" value={details.file_size} />}
-                        </div>
-                        {details.text && (
-                            <div>
-                                <p className="mb-1.5 text-xs font-semibold text-gray-500">محتوى الطلب</p>
-                                <div className="rounded-xl bg-gray-50 border border-gray-100 p-3 text-sm text-gray-700 leading-relaxed whitespace-pre-wrap" dir="auto">{details.text}</div>
+                    <div style={{ maxHeight: "65vh", overflowY: "auto", padding: "16px 20px" }} dir="rtl">
+                        {/* ── Operation Badge (top) ── */}
+                        {opStyle && (
+                            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16, padding: "10px 14px", borderRadius: 10, background: opStyle.bg, border: `1px solid ${opStyle.border}` }}>
+                                <FileText size={14} style={{ color: opStyle.color }} />
+                                <span style={{ fontSize: 13, fontWeight: 700, color: opStyle.color }}>{opStyle.label}</span>
+                                <span style={{ marginRight: "auto" }} />
+                                {(() => {
+                                    const b = statusBadge(details.status); const BadgeIcon = b.icon; return (
+                                        <span className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-[10px] font-semibold ${b.cls}`}><BadgeIcon size={10} />{b.text}</span>
+                                    )
+                                })()}
                             </div>
                         )}
+
+                        {/* ── Section: Basic Info ── */}
+                        <div style={{ marginBottom: 18 }}>
+                            <SectionHeader icon={User} title="معلومات أساسية" />
+                            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                                <InfoField icon={User} label="المستخدم" value={details.username} />
+                                <InfoField icon={Calendar} label="تاريخ الإنشاء" value={formatDate(details.created_at)} />
+                                {details.completed_at && <InfoField icon={CheckCircle} label="تاريخ الإتمام" value={formatDate(details.completed_at)} />}
+                                {details.approved_by && <InfoField icon={CheckCircle2} label="تمت الموافقة بواسطة" value={details.approved_by} />}
+                                {details.rejection_reason && (
+                                    <div style={{ gridColumn: "1 / -1", borderRadius: 10, background: "rgba(220,38,38,0.04)", border: "1px solid rgba(220,38,38,0.12)", padding: "8px 12px" }}>
+                                        <p style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 10, fontWeight: 600, color: "#dc2626", marginBottom: 3 }}><AlertCircle size={10} />سبب الرفض</p>
+                                        <p style={{ fontSize: 13, color: "#991b1b" }}>{details.rejection_reason}</p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* ── Section: File Info ── */}
+                        {(details.file_name || details.department_id || details.category_id || details.has_header != null) && (
+                            <div style={{ marginBottom: 18 }}>
+                                <SectionHeader icon={FileText} title="معلومات الملف" />
+                                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                                    {details.file_name && <InfoField icon={FileText} label="اسم الملف" value={details.file_name} />}
+                                    {details.file_size && <InfoField icon={FileText} label="حجم الملف" value={details.file_size} />}
+                                    {details.department_id && <InfoField icon={Building2} label="القسم" value={details.department_id} />}
+                                    {details.category_id && <InfoField icon={Tag} label="التصنيف" value={details.category_id} />}
+                                    {details.has_header != null && <InfoField icon={Settings2} label="عناوين أعمدة" value={details.has_header ? "نعم" : "لا"} />}
+                                    {details.delimiter && <InfoField icon={Settings2} label="الفاصل" value={details.delimiter} />}
+                                    {details.encoding && <InfoField icon={Settings2} label="الترميز" value={details.encoding} />}
+                                    {details.question_col != null && <InfoField icon={Layers} label="عمود السؤال" value={String(details.question_col)} />}
+                                    {details.answer_col != null && <InfoField icon={Layers} label="عمود الجواب" value={String(details.answer_col)} />}
+                                    {details.sheet != null && <InfoField icon={Layers} label="رقم الورقة" value={String(details.sheet)} />}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Links & Media section hidden — download available via footer button */}
+
+                        {/* ── Section: Content ── */}
+                        {(details.text || details.doc_id) && (
+                            <div style={{ marginBottom: 18 }}>
+                                <SectionHeader icon={FileText} title="المحتوى" />
+                                {details.doc_id && (
+                                    <div style={{ marginBottom: 8 }}>
+                                        <InfoField icon={Hash} label="معرّف المستند" value={details.doc_id} mono />
+                                    </div>
+                                )}
+                                {details.text && (
+                                    <div style={{ borderRadius: 10, background: "#f9fafb", border: "1px solid #f3f4f6", padding: 12 }}>
+                                        <p style={{ fontSize: 10, fontWeight: 600, color: "#9ca3af", marginBottom: 6 }}>محتوى الطلب</p>
+                                        <div dir="auto" style={{ fontSize: 13, color: "#374151", lineHeight: 1.7, whiteSpace: "pre-wrap", maxHeight: 200, overflowY: "auto" }}>{details.text}</div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                        {/* ── Extra (unknown) fields ── */}
+                        {extraFields.length > 0 && (
+                            <div style={{ marginBottom: 18 }}>
+                                <SectionHeader icon={Settings2} title="حقول إضافية" />
+                                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                                    {extraFields.map(([key, val]) => {
+                                        const strVal = typeof val === "object" ? JSON.stringify(val) : String(val)
+                                        return <InfoField key={key} icon={Hash} label={FIELD_LABELS[key] || key} value={strVal} />
+                                    })}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {/* ── Footer with Download Button ── */}
+                {details && hasFile && (
+                    <div style={{ padding: "12px 20px", borderTop: "1px solid #f0f0f0", background: "#fafafa", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <ActionGuard pageBit={PAGE_BITS.PENDING_REQUESTS} actionBit={ACTION_BITS.DOWNLOAD_REQUEST_TRAIN_FILE}>
+                            <button onClick={onDownloadFile} disabled={downloadingFile}
+                                style={{
+                                    display: "flex", alignItems: "center", gap: 8, padding: "9px 28px", borderRadius: 9,
+                                    border: "none", background: "linear-gradient(135deg, #004786, #0098d6)", color: "#fff",
+                                    fontSize: 13, fontWeight: 600, cursor: "pointer", opacity: downloadingFile ? 0.6 : 1,
+                                    transition: "all .2s", boxShadow: "0 2px 8px rgba(0,71,134,0.18)",
+                                }}>
+                                {downloadingFile ? <Loader2 size={15} className="animate-spin" /> : <FileDown size={15} />}
+                                {downloadingFile ? "جارٍ التحميل..." : "تحميل الملف"}
+                            </button>
+                        </ActionGuard>
                     </div>
                 )}
             </div>
         </div>
     )
 })
-
-function InfoField({ icon: Icon, label, value, mono }: { icon: typeof Hash; label: string; value: string; mono?: boolean }) {
-    return (
-        <div className="rounded-xl bg-gray-50 border border-gray-100 p-2.5">
-            <p className="flex items-center gap-1.5 text-[10px] font-semibold text-gray-400 mb-1"><Icon size={10} />{label}</p>
-            <p className={`text-sm text-gray-700 ${mono ? "font-mono text-xs" : ""}`}>{value || "—"}</p>
-        </div>
-    )
-}
 
 /* ═══════════════ APPROVE MODAL ═══════════════ */
 const ApproveModal = memo(function ApproveModal({ order, onClose, onConfirm, loading }: { order: PendingOrder; onClose: () => void; onConfirm: () => void; loading: boolean }) {
@@ -203,8 +372,9 @@ const OrderRow = memo(function OrderRow({
 }) {
     const badge = statusBadge(order.status)
     const BadgeIcon = badge.icon
+    const opStyle = operationStyle(order.operation)
     const isPending = order.status?.toLowerCase() === "pending"
-    const hasFile = order.operation?.toLowerCase().includes("train") || order.operation?.toLowerCase().includes("add")
+    const hasFile = !!(order.file_url || order.media_id || order.public_url)
 
     return (
         <tr className="group transition-colors hover:bg-gray-50/80" style={{ animation: `prRowFade 0.3s ease-out ${idx * 0.03}s both` }}>
@@ -213,8 +383,8 @@ const OrderRow = memo(function OrderRow({
                 <span className="inline-flex items-center gap-1 font-mono text-[11px] text-gray-500 bg-gray-50 rounded px-1.5 py-0.5"><Hash size={9} className="text-gray-400" />{truncateId(order.id)}</span>
             </td>
             <td className="px-4 py-3.5">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-indigo-50 border border-indigo-200 px-2.5 py-0.5 text-[11px] font-semibold text-indigo-600">
-                    <FileText size={10} />{operationLabel(order.operation)}
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 5, borderRadius: 20, background: opStyle.bg, border: `1px solid ${opStyle.border}`, padding: "3px 10px", fontSize: 11, fontWeight: 600, color: opStyle.color }}>
+                    {opStyle.label}
                 </span>
             </td>
             <td className="px-4 py-3.5"><span className="inline-flex items-center gap-1.5 text-xs text-gray-600"><User size={11} className="text-gray-400" />{order.username || "—"}</span></td>
@@ -224,9 +394,26 @@ const OrderRow = memo(function OrderRow({
                 </span>
             </td>
             <td className="px-4 py-3.5"><span className="text-xs text-gray-400 whitespace-nowrap">{formatDate(order.created_at)}</span></td>
-            <td className="px-4 py-3.5"><p className="text-xs text-gray-500 max-w-[180px] truncate" title={order.text}>{truncate(order.text, 50)}</p></td>
             <td className="px-4 py-3.5">
-                <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                <div style={{ display: "flex", flexDirection: "column", gap: 2, maxWidth: 200 }}>
+                    {order.file_name ? (
+                        <span className="text-xs text-gray-600 truncate" title={order.file_name} style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                            <FileText size={10} className="text-gray-400 shrink-0" />{truncate(order.file_name, 35)}
+                        </span>
+                    ) : order.text ? (
+                        <span className="text-xs text-gray-500 truncate" title={order.text}>{truncate(order.text, 50)}</span>
+                    ) : (
+                        <span className="text-xs text-gray-300">—</span>
+                    )}
+                    {order.media_id && (
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: 3, fontSize: 9, color: "#7c3aed", background: "rgba(124,58,237,0.05)", border: "1px solid rgba(124,58,237,0.12)", borderRadius: 4, padding: "1px 6px", fontFamily: "monospace", maxWidth: "fit-content" }} title={order.media_id}>
+                            <Hash size={8} />{order.media_id.slice(0, 10)}…
+                        </span>
+                    )}
+                </div>
+            </td>
+            <td className="px-4 py-3.5">
+                <div className="flex items-center gap-1">
                     <ActionGuard pageBit={PAGE_BITS.PENDING_REQUESTS} actionBit={ACTION_BITS.GET_REQUEST_DETAILS}>
                         <button onClick={() => onView(order)} className="rounded-lg p-1.5 text-gray-400 hover:bg-blue-50 hover:text-blue-500 transition-colors" title="عرض التفاصيل"><Eye size={14} /></button>
                     </ActionGuard>
@@ -242,7 +429,9 @@ const OrderRow = memo(function OrderRow({
                     )}
                     {hasFile && (
                         <ActionGuard pageBit={PAGE_BITS.PENDING_REQUESTS} actionBit={ACTION_BITS.DOWNLOAD_REQUEST_TRAIN_FILE}>
-                            <button onClick={() => onDownload(order)} className="rounded-lg p-1.5 text-gray-400 hover:bg-purple-50 hover:text-purple-500 transition-colors" title="تحميل الملف"><Download size={14} /></button>
+                            <button onClick={() => onDownload(order)} style={{ display: "flex", alignItems: "center", gap: 4, borderRadius: 7, padding: "4px 8px", border: "none", background: "linear-gradient(135deg, #004786, #0098d6)", color: "#fff", fontSize: 10, fontWeight: 600, cursor: "pointer" }} title="تحميل الملف">
+                                <Download size={11} />تحميل
+                            </button>
                         </ActionGuard>
                     )}
                 </div>
@@ -267,6 +456,7 @@ export function PendingRequestsPage() {
     const [detailsTarget, setDetailsTarget] = useState<PendingOrder | null>(null)
     const [detailsData, setDetailsData] = useState<RequestDetails | null>(null)
     const [loadingDetails, setLoadingDetails] = useState(false)
+    const [downloadingFile, setDownloadingFile] = useState(false)
     const [approveTarget, setApproveTarget] = useState<PendingOrder | null>(null)
     const [rejectTarget, setRejectTarget] = useState<PendingOrder | null>(null)
 
@@ -338,14 +528,14 @@ export function PendingRequestsPage() {
         })
     }, [rejectTarget, rejectMutation])
 
-    /* ─── Download ─── */
+    /* ─── Download (from table row or details modal) ─── */
     const handleDownload = useCallback(async (order: PendingOrder) => {
         try {
             const blob = await downloadRequestTrainFile(order.id, tenantId)
             const url = URL.createObjectURL(blob)
             const a = document.createElement("a")
             a.href = url
-            a.download = `request_${order.id}_file`
+            a.download = order.file_name || `request_${order.id}_file`
             document.body.appendChild(a)
             a.click()
             a.remove()
@@ -353,6 +543,25 @@ export function PendingRequestsPage() {
             toast.success("تم بدء التحميل")
         } catch { toast.error("فشل تحميل الملف") }
     }, [tenantId])
+
+    /* ─── Download from details modal ─── */
+    const handleDownloadFromDetails = useCallback(async () => {
+        if (!detailsTarget) return
+        setDownloadingFile(true)
+        try {
+            const blob = await downloadRequestTrainFile(detailsTarget.id, tenantId)
+            const url = URL.createObjectURL(blob)
+            const a = document.createElement("a")
+            a.href = url
+            a.download = detailsData?.file_name || detailsTarget.file_name || `request_${detailsTarget.id}_file`
+            document.body.appendChild(a)
+            a.click()
+            a.remove()
+            URL.revokeObjectURL(url)
+            toast.success("تم بدء التحميل")
+        } catch { toast.error("فشل تحميل الملف") }
+        finally { setDownloadingFile(false) }
+    }, [detailsTarget, detailsData, tenantId])
 
     /* ─── Client-side text filter ─── */
     const filtered = useMemo(() => {
@@ -362,7 +571,9 @@ export function PendingRequestsPage() {
             o.id.toLowerCase().includes(q) ||
             o.username.toLowerCase().includes(q) ||
             o.text?.toLowerCase().includes(q) ||
-            o.operation.toLowerCase().includes(q)
+            o.operation.toLowerCase().includes(q) ||
+            o.file_name?.toLowerCase().includes(q) ||
+            o.media_id?.toLowerCase().includes(q)
         )
     }, [orders, searchQuery])
 
@@ -394,7 +605,7 @@ export function PendingRequestsPage() {
             <div className="flex flex-col gap-3 sm:flex-row">
                 <div className="relative flex-1">
                     <Search size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                    <input type="text" placeholder="بحث سريع..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
+                    <input type="text" placeholder="بحث سريع (معرّف، مستخدم، محتوى، ملف)..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
                         className="w-full rounded-xl border border-gray-200 bg-white py-2.5 pr-10 pl-10 text-sm text-gray-700 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100" />
                     {searchQuery && <button onClick={() => setSearchQuery("")} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500"><X size={14} /></button>}
                 </div>
@@ -431,7 +642,7 @@ export function PendingRequestsPage() {
                     <table style={{ width: "100%", borderCollapse: "collapse" }}>
                         <thead>
                             <tr style={{ borderBottom: "1px solid var(--t-border-light, #f0f0f0)", background: "var(--t-surface, #fafafa)", textAlign: "right" }}>
-                                {["#", "المعرّف", "العملية", "المستخدم", "الحالة", "التاريخ", "المحتوى", "الإجراءات"].map(h => (
+                                {["#", "المعرّف", "العملية", "المستخدم", "الحالة", "التاريخ", "المحتوى / الملف", "الإجراءات"].map(h => (
                                     <th key={h} style={{ padding: "10px 16px", fontSize: 11, fontWeight: 600, color: "var(--t-text-faint, #9ca3af)", letterSpacing: "0.3px" }}>{h}</th>
                                 ))}
                             </tr>
@@ -482,7 +693,15 @@ export function PendingRequestsPage() {
             )}
 
             {/* Modals */}
-            {detailsTarget && <DetailsModal details={detailsData} loading={loadingDetails} onClose={() => { setDetailsTarget(null); setDetailsData(null) }} />}
+            {detailsTarget && (
+                <DetailsModal
+                    details={detailsData}
+                    loading={loadingDetails}
+                    onClose={() => { setDetailsTarget(null); setDetailsData(null); setDownloadingFile(false) }}
+                    onDownloadFile={handleDownloadFromDetails}
+                    downloadingFile={downloadingFile}
+                />
+            )}
             {approveTarget && <ApproveModal order={approveTarget} onClose={() => setApproveTarget(null)} onConfirm={handleApprove} loading={processing} />}
             {rejectTarget && <RejectModal order={rejectTarget} onClose={() => setRejectTarget(null)} onConfirm={handleReject} loading={processing} />}
 

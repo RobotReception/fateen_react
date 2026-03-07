@@ -152,7 +152,7 @@ const EditModal = memo(function EditModal({ doc, onClose, onSave, saving }: { do
                     <button onClick={onClose} disabled={saving} style={{ padding: "7px 16px", borderRadius: 7, border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-card, #fff)", fontSize: 13, fontWeight: 500, color: "var(--t-text-secondary, #6b7280)", cursor: "pointer" }}>إلغاء</button>
                     <button onClick={() => onSave(newText)} disabled={saving || !changed} style={{ display: "flex", alignItems: "center", gap: 6, padding: "7px 18px", borderRadius: 7, border: "none", background: "#004786", color: "#fff", fontSize: 13, fontWeight: 500, cursor: "pointer", opacity: (saving || !changed) ? 0.5 : 1 }}>
                         {saving && <Loader2 size={14} className="animate-spin" />}
-                        حفظ التعديل
+                        تقديم طلب التعديل
                     </button>
                 </div>
             </div>
@@ -169,15 +169,15 @@ const DeleteModal = memo(function DeleteModal({ count, onClose, onConfirm, delet
                     <div style={{ width: 52, height: 52, borderRadius: 14, background: "rgba(220,38,38,0.06)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 14px" }}>
                         <Trash2 size={22} style={{ color: "#dc2626" }} />
                     </div>
-                    <h3 style={{ fontSize: 16, fontWeight: 700, color: "var(--t-text, #1f2937)" }}>تأكيد الحذف</h3>
-                    <p style={{ fontSize: 13, color: "var(--t-text-secondary, #6b7280)", marginTop: 8 }}>هل أنت متأكد من حذف <span style={{ fontWeight: 700, color: "#dc2626" }}>{count}</span> {count === 1 ? "مستند" : "مستندات"}؟</p>
-                    <p style={{ fontSize: 11, color: "var(--t-text-faint, #9ca3af)", marginTop: 4 }}>لا يمكن التراجع عن هذا الإجراء</p>
+                    <h3 style={{ fontSize: 16, fontWeight: 700, color: "var(--t-text, #1f2937)" }}>طلب حذف</h3>
+                    <p style={{ fontSize: 13, color: "var(--t-text-secondary, #6b7280)", marginTop: 8 }}>هل أنت متأكد من طلب حذف <span style={{ fontWeight: 700, color: "#dc2626" }}>{count}</span> {count === 1 ? "مستند" : "مستندات"}؟</p>
+                    <p style={{ fontSize: 11, color: "var(--t-text-faint, #9ca3af)", marginTop: 4 }}>سيتم إرسال الطلب للمراجعة والموافقة</p>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, borderTop: "1px solid var(--t-border-light, #f0f0f0)", padding: "14px 24px" }}>
                     <button onClick={onClose} disabled={deleting} style={{ padding: "8px 20px", borderRadius: 7, border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-card, #fff)", fontSize: 13, fontWeight: 500, color: "var(--t-text-secondary, #6b7280)", cursor: "pointer" }}>إلغاء</button>
                     <button onClick={onConfirm} disabled={deleting} style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 20px", borderRadius: 7, border: "none", background: "#dc2626", color: "#fff", fontSize: 13, fontWeight: 500, cursor: "pointer", opacity: deleting ? 0.5 : 1 }}>
                         {deleting && <Loader2 size={14} className="animate-spin" />}
-                        حذف
+                        تقديم الطلب
                     </button>
                 </div>
             </div>

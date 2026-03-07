@@ -17,10 +17,11 @@ const AGENTS_BASE =
         .replace(/\/api\/backend\/v2\/?$/, "/api/backend/v2/agents")
 
 const client = axios.create({ baseURL: AGENTS_BASE, withCredentials: true, timeout: 30000 })
+import { useAuthStore } from "@/stores/auth-store"
 
 // Inject JWT + tenant-id automatically
 client.interceptors.request.use((cfg) => {
-    const token = localStorage.getItem("access_token")
+    const token = useAuthStore.getState().token
     if (token) cfg.headers.Authorization = `Bearer ${token}`
     cfg.headers["Content-Type"] = "application/json"
     return cfg

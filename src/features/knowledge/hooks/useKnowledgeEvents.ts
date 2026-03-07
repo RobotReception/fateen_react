@@ -47,8 +47,9 @@ export function useKnowledgeEvents(tenantId: string) {
         qc.invalidateQueries({ queryKey: knowledgeKeys.documents.all(tenantId) })
     }, [qc, tenantId])
 
-    /** After deleting document(s) → immediate effect */
+    /** After deleting document(s) → creates a pending request */
     const onDocumentDeleted = useCallback(() => {
+        qc.invalidateQueries({ queryKey: pendingKeys.all(tenantId) })
         qc.invalidateQueries({ queryKey: knowledgeKeys.analytics.all(tenantId) })
         qc.invalidateQueries({ queryKey: knowledgeKeys.documents.all(tenantId) })
         qc.invalidateQueries({ queryKey: knowledgeKeys.users.all(tenantId) })

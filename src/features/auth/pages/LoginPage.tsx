@@ -33,7 +33,7 @@ export function LoginPage() {
 
     /** Completes login using standard user+token response */
     const completeLogin = (data: any) => {
-        const { user, token, refresh_token } = data
+        const { user, token } = data
 
         if (!user.onboarding_complete) {
             setRegistrationData(user.id, user.email)
@@ -57,7 +57,6 @@ export function LoginPage() {
                 pageWithPermission: user.pageWithPermission,
             },
             token,
-            refresh_token
         )
 
         navigate("/dashboard")

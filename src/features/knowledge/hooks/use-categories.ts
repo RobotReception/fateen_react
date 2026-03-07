@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query"
 import { toast } from "sonner"
 import { knowledgeKeys } from "./query-keys"
+import { pendingKeys } from "@/features/pending-requests/hooks/query-keys"
 import {
     listCategories,
     createCategory,
@@ -78,8 +79,9 @@ export function useDeleteCategory(tenantId: string) {
         mutationFn: (categoryId: string) => deleteCategory(categoryId, tenantId),
         onSuccess: (res) => {
             if (res.success) {
-                toast.success("تم حذف الفئة بنجاح")
+                toast.success("تم تقديم طلب حذف الفئة — يمكنك متابعته من الطلبات المعلقة")
                 qc.invalidateQueries({ queryKey: knowledgeKeys.categories.all(tenantId) })
+                qc.invalidateQueries({ queryKey: pendingKeys.all(tenantId) })
             } else {
                 toast.error(res.message || "فشل الحذف")
             }
@@ -95,9 +97,10 @@ export function useDeleteCategoryData(tenantId: string) {
         mutationFn: (payload: DeleteByCategoryPayload) => requestDeleteByCategory(payload, tenantId),
         onSuccess: (res) => {
             if (res.success) {
-                toast.success("تم حذف بيانات الفئة بنجاح")
+                toast.success("تم تقديم طلب حذف بيانات الفئة — يمكنك متابعته من الطلبات المعلقة")
                 qc.invalidateQueries({ queryKey: knowledgeKeys.categories.all(tenantId) })
                 qc.invalidateQueries({ queryKey: knowledgeKeys.documents.all(tenantId) })
+                qc.invalidateQueries({ queryKey: pendingKeys.all(tenantId) })
             } else {
                 toast.error(res.message || "فشل حذف البيانات")
             }

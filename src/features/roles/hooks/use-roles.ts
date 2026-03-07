@@ -173,11 +173,13 @@ export function useUsersWithRole(role: string) {
 export function useMyPermissions() {
     const tenantId = useTenantId()
     const isAuth = useAuthStore(s => s.isAuthenticated)
+    const token = useAuthStore(s => s.token)
 
     return useQuery({
         queryKey: rolesKeys.myPermissions(),
         queryFn: () => getMyPermissions(tenantId),
-        enabled: !!tenantId && isAuth,
+        // ⚠️ token مطلوب — بدونه الطلب يفشل بـ 401 والـ interceptor يطلب refresh إضافي
+        enabled: !!tenantId && isAuth && !!token,
         staleTime: 5 * 60 * 1000,
         refetchOnWindowFocus: true,
         select: (res) => res?.data?.pageWithPermission ?? null,

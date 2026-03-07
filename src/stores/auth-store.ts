@@ -5,6 +5,10 @@ import {
     hasActionAccess as checkActionAccess,
 } from "@/lib/permissions"
 
+// ── One-time migration: حذف المفاتيح القديمة من localStorage ──
+localStorage.removeItem("access_token")
+localStorage.removeItem("refresh_token")
+
 export interface User {
     id: string
     email: string
@@ -26,7 +30,6 @@ export interface User {
 interface AuthState {
     user: User | null
     token: string | null
-    refreshToken: string | null
     isAuthenticated: boolean
 
     // Registration flow state
@@ -34,7 +37,7 @@ interface AuthState {
     registrationEmail: string | null
 
     // Actions
-    login: (user: User, token: string, refreshToken: string) => void
+    login: (user: User, token: string) => void
     logout: () => void
     setUser: (user: User) => void
     setToken: (token: string) => void
@@ -53,18 +56,14 @@ export const useAuthStore = create<AuthState>()(
         (set, get) => ({
             user: null,
             token: null,
-            refreshToken: null,
             isAuthenticated: false,
             registrationUserId: null,
             registrationEmail: null,
 
-            login: (user, token, refreshToken) => {
-                localStorage.setItem("access_token", token)
-                localStorage.setItem("refresh_token", refreshToken)
+            login: (user, token) => {
                 set({
                     user,
                     token,
-                    refreshToken,
                     isAuthenticated: true,
                     registrationUserId: null,
                     registrationEmail: null,
@@ -72,12 +71,9 @@ export const useAuthStore = create<AuthState>()(
             },
 
             logout: () => {
-                localStorage.removeItem("access_token")
-                localStorage.removeItem("refresh_token")
                 set({
                     user: null,
                     token: null,
-                    refreshToken: null,
                     isAuthenticated: false,
                     registrationUserId: null,
                     registrationEmail: null,
@@ -87,7 +83,6 @@ export const useAuthStore = create<AuthState>()(
             setUser: (user) => set({ user }),
 
             setToken: (token) => {
-                localStorage.setItem("access_token", token)
                 set({ token })
             },
 
@@ -122,8 +117,6 @@ export const useAuthStore = create<AuthState>()(
             name: "fateen-auth-storage",
             partialize: (state) => ({
                 user: state.user,
-                token: state.token,
-                refreshToken: state.refreshToken,
                 isAuthenticated: state.isAuthenticated,
                 registrationUserId: state.registrationUserId,
                 registrationEmail: state.registrationEmail,

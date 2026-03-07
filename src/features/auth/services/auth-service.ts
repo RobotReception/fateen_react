@@ -185,9 +185,9 @@ export async function getOnboardingOptions(): Promise<OnboardingOptionsResponse>
     return data
 }
 
-/** Refresh token */
-export async function refreshToken(refresh_token: string) {
-    const { data } = await apiClient.post("/auth/refresh-token", { refresh_token })
+/** Refresh token — server reads refresh_token from HttpOnly cookie */
+export async function refreshToken() {
+    const { data } = await apiClient.post("/auth/refresh-token", {})
     return data
 }
 

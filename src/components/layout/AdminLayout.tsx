@@ -9,6 +9,7 @@ import { logout as logoutApi } from "@/features/auth/services/auth-service"
 import { toast } from "sonner"
 import { useNotifications } from "@/features/notifications/hooks/useNotifications"
 import NotificationPanel from "@/features/notifications/components/NotificationPanel"
+import { useOrganization } from "@/features/settings/hooks/use-settings"
 import { InboxIcon } from "@/components/icons/InboxIcon"
 import {
     Users,
@@ -129,6 +130,14 @@ export function AdminLayout() {
         markAsRead: notifMarkRead,
         markAllAsRead: notifMarkAllRead,
     } = useNotifications()
+
+    /* ── Trial data ── */
+    const { data: org } = useOrganization(user?.tenant_id || "")
+    const trialDays = useMemo(() => {
+        if (!org?.trial_ends_at) return null
+        const d = new Date(org.trial_ends_at).getTime() - Date.now()
+        return Math.max(0, Math.ceil(d / 86_400_000))
+    }, [org?.trial_ends_at])
 
     const visibleNavItems = NAV_ITEMS.filter((item) => {
         if (!item.pageBit) return true
@@ -532,6 +541,7 @@ export function AdminLayout() {
 
             {/* ── Main Content ── */}
             <div className="flex flex-1 flex-col overflow-hidden">
+
                 {/* ── Professional Top Bar ── */}
                 <header
                     className="flex h-14 items-center justify-between px-3 sm:px-4 lg:px-6"
@@ -638,6 +648,37 @@ export function AdminLayout() {
                             </div>
                         </button>
                     </div>
+
+                    {/* ── Trial info (inline in header) ── */}
+                    {trialDays !== null && (
+                        <button
+                            onClick={() => navigate("/dashboard/settings/organization?tab=billing")}
+                            className="hidden sm:flex items-center"
+                            style={{
+                                gap: 8,
+                                padding: "5px 12px 5px 8px",
+                                borderRadius: 8,
+                                background: "linear-gradient(135deg, #004786, #0072b5)",
+                                border: "none",
+                                cursor: "pointer",
+                                transition: "all 0.15s",
+                                flexShrink: 0,
+                            }}
+                            onMouseEnter={e => { e.currentTarget.style.opacity = "0.9" }}
+                            onMouseLeave={e => { e.currentTarget.style.opacity = "1" }}
+                        >
+                            <span style={{
+                                display: "flex", alignItems: "center", justifyContent: "center",
+                                width: 22, height: 22, borderRadius: 6,
+                                background: "rgba(255,255,255,0.15)",
+                                fontSize: 10, fontWeight: 800, color: "#fff",
+                            }}>{trialDays}</span>
+                            <span style={{
+                                fontSize: 11.5, fontWeight: 600, color: "#fff",
+                                whiteSpace: "nowrap",
+                            }}>{trialDays > 0 ? "يوم متبقي" : "انتهت التجربة"}</span>
+                        </button>
+                    )}
 
                     {/* ── Left side: actions ── */}
                     <div className="flex items-center gap-1 sm:gap-1.5">
@@ -1129,6 +1170,19 @@ export function AdminLayout() {
                         opacity: 1;
                         transform: translateY(0) scale(1);
                     }
+                }
+                @keyframes trialPulse {
+                    0%, 100% { opacity: 1; transform: scale(1); }
+                    50% { opacity: 0.5; transform: scale(1.3); }
+                }
+                @keyframes trialShimmer {
+                    0% { background-position: 200% 0; }
+                    100% { background-position: -200% 0; }
+                }
+                @keyframes trialGradient {
+                    0% { background-position: 0% 50%; }
+                    50% { background-position: 100% 50%; }
+                    100% { background-position: 0% 50%; }
                 }
             `}</style>
         </div>

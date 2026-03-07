@@ -68,7 +68,7 @@ const EditModal = memo(function EditModal({ doc, onClose, onSave, saving }: {
                     <button onClick={() => onSave(newText)} disabled={!changed || saving}
                         className="flex items-center gap-1.5 rounded-xl bg-gray-900 px-4 py-2 text-xs font-medium text-white  disabled:opacity-50">
                         {saving && <Loader2 size={14} className="animate-spin" />}
-                        حفظ التعديل
+                        تقديم طلب التعديل
                     </button>
                 </div>
             </div>
@@ -85,14 +85,14 @@ const DeleteModal = memo(function DeleteModal({ count, onClose, onConfirm, delet
             <div className="mx-4 w-full max-w-md overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl" onClick={(e) => e.stopPropagation()} style={{ animation: "uaModalIn .18s ease-out" }}>
                 <div className="p-6 text-center">
                     <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-red-50"><Trash2 size={24} className="text-red-500" /></div>
-                    <h3 className="text-lg font-bold text-gray-800">حذف {count} سجل</h3>
-                    <p className="mt-2 text-sm text-gray-500">هل أنت متأكد من حذف {count === 1 ? "هذا السجل" : `هذه السجلات (${count})`}؟ لا يمكن التراجع عن هذا الإجراء.</p>
+                    <h3 className="text-lg font-bold text-gray-800">طلب حذف {count} سجل</h3>
+                    <p className="mt-2 text-sm text-gray-500">هل أنت متأكد من طلب حذف {count === 1 ? "هذا السجل" : `هذه السجلات (${count})`}؟ سيتم إرسال الطلب للمراجعة والموافقة.</p>
                 </div>
                 <div className="flex items-center justify-center gap-3 border-t border-gray-100 px-6 py-4">
                     <button onClick={onClose} disabled={deleting} className="rounded-xl border border-gray-200 px-5 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50">إلغاء</button>
                     <button onClick={onConfirm} disabled={deleting} className="flex items-center gap-2 rounded-xl bg-gray-800 px-5 py-2.5 text-sm font-medium text-white  disabled:opacity-50">
                         {deleting && <Loader2 size={14} className="animate-spin" />}
-                        حذف
+                        تقديم الطلب
                     </button>
                 </div>
             </div>
@@ -242,7 +242,7 @@ export const FileDataModal = memo(function FileDataModal({ username, filename, f
         setDeleting(true)
         try {
             const res = await deleteDocuments({ doc_id: deleteTargets.length === 1 ? deleteTargets[0] : deleteTargets }, tenantId)
-            if (res.success) { toast.success(`تم حذف ${deleteTargets.length} سجل بنجاح`); setDeleteTargets(null); setSelected(new Set()); fetchDocuments() }
+            if (res.success) { toast.success(`تم تقديم طلب حذف ${deleteTargets.length} سجل — يمكنك متابعته من الطلبات المعلقة`); setDeleteTargets(null); setSelected(new Set()); fetchDocuments() }
             else toast.error(res.message || "فشل الحذف")
         } catch { toast.error("حدث خطأ أثناء الحذف") }
         finally { setDeleting(false) }

@@ -9,17 +9,41 @@ export interface PendingOrder {
     id: string
     operation: string
     username: string
+    tenant_id?: string
     status: string
     created_at: string
-    text: string
-    doc_id: string
+    text?: string
+    doc_id?: string
+
+    // File / train fields
+    file_name?: string
+    file_path?: string
+    file_url?: string
+    media_id?: string
+    public_url?: string
+    proxy_url?: string
+
+    // Classification
+    department_id?: string
+    category_id?: string
+
+    // CSV / Excel specifics
+    has_header?: boolean
+    delimiter?: string | null
+    encoding?: string | null
+    question_col?: number
+    answer_col?: number
+    sheet?: number
+
+    // Allow unknown future fields
+    [key: string]: unknown
 }
 
 export interface RequestDetails extends PendingOrder {
-    file_name?: string
+    completed_at?: string
+    approved_by?: string
+    rejection_reason?: string
     file_size?: string
-    department?: string
-    category?: string
 }
 
 export interface PendingPagination {

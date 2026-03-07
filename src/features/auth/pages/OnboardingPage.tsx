@@ -94,8 +94,8 @@ export function OnboardingPage() {
                 domain: domain || undefined,
             })
 
-            const { user, token, refresh_token } = res.data
-            authLogin(user, token, refresh_token)
+            const { user, token } = res.data
+            authLogin(user, token)
             navigate("/dashboard")
         } catch (err: any) {
             const msg = err.response?.data?.message

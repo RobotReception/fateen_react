@@ -105,9 +105,8 @@ export function useNotifications() {
         wsRef.current = ws
 
         ws.onopen = () => {
-            // استخدم أحدث توكن من localStorage (يُحدّث عند التجديد التلقائي)
-            const freshToken = localStorage.getItem("access_token") || token
-            ws.send(`auth:${freshToken}`)
+            // Token from Zustand state (already the latest value)
+            if (token) ws.send(`auth:${token}`)
             // Fetch list now if not already fetched
             initialLoad()
         }

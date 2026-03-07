@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query"
 import { toast } from "sonner"
 import { knowledgeKeys } from "./query-keys"
+import { pendingKeys } from "@/features/pending-requests/hooks/query-keys"
 import {
     getDepartmentsLookup,
     listDepartments,
@@ -109,9 +110,10 @@ export function useDeleteDepartmentData(tenantId: string) {
         mutationFn: (payload: DeleteByDepartmentPayload) => requestDeleteByDepartment(payload, tenantId),
         onSuccess: (res) => {
             if (res.success) {
-                toast.success("تم إرسال طلب حذف بيانات القسم")
+                toast.success("تم إرسال طلب حذف بيانات القسم — يمكنك متابعته من الطلبات المعلقة")
                 qc.invalidateQueries({ queryKey: knowledgeKeys.departments.all(tenantId) })
                 qc.invalidateQueries({ queryKey: knowledgeKeys.documents.all(tenantId) })
+                qc.invalidateQueries({ queryKey: pendingKeys.all(tenantId) })
             } else {
                 toast.error(res.message || "فشل حذف البيانات")
             }

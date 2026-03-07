@@ -6,10 +6,11 @@ import type {
 } from "../types"
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || "/api/backend/v2"
+import { useAuthStore } from "@/stores/auth-store"
 
-/** Get current access token from localStorage */
+/** Get current access token from Zustand memory state */
 function getToken(): string | null {
-    return localStorage.getItem("access_token")
+    return useAuthStore.getState().token
 }
 
 /** Build standard auth headers */

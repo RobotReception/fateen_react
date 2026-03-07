@@ -9,7 +9,7 @@ import { useAuthStore } from "@/stores/auth-store"
 import {
     useDepartmentsList, useDepartmentCategories,
     useCreateDepartment, useUpdateDepartment, useDeleteDepartment, useDeleteDepartmentData,
-    useLinkCategory, useUnlinkCategory,
+    useLinkCategory,
 } from "../hooks/use-departments"
 import { useCategoriesLookup, useDeleteCategoryData } from "../hooks/use-categories"
 import { usePrefetchDepartments } from "../hooks/use-prefetch"
@@ -237,7 +237,6 @@ const CategoryLinkPanel = memo(function CategoryLinkPanel({
     const { data: catRes, isLoading: loading } = useCategoriesLookup(tenantId)
     const { data: linkedRes } = useDepartmentCategories(tenantId, deptId)
     const linkMutation = useLinkCategory(tenantId)
-    const unlinkMutation = useUnlinkCategory(tenantId)
     const deleteCatDataMutation = useDeleteCategoryData(tenantId)
 
     const [deleteCatTarget, setDeleteCatTarget] = useState<CategoryItem | null>(null)
@@ -252,24 +251,20 @@ const CategoryLinkPanel = memo(function CategoryLinkPanel({
         linkMutation.mutate({ departmentId: deptId, payload: { category_id: catId } })
     }
 
-    /* Merged: delete data + unlink in one action */
+    /* Submit a pending request to delete category data — category stays linked until approved */
     const handleRemoveCategory = async () => {
         if (!deleteCatTarget) return
         const catId = deleteCatTarget.category_id
         setRemovingCatId(catId)
         try {
-            // 1. Delete category data first
             await new Promise<void>((resolve, reject) => {
                 deleteCatDataMutation.mutate(
                     { category_id: catId, username: null },
                     { onSuccess: () => resolve(), onError: () => reject() }
                 )
             })
-            // 2. Then unlink
-            unlinkMutation.mutate({ departmentId: deptId, categoryId: catId })
         } catch {
-            // If data delete fails, still try to unlink
-            unlinkMutation.mutate({ departmentId: deptId, categoryId: catId })
+            // Error already handled by mutation
         } finally {
             setRemovingCatId(null)
             setDeleteCatTarget(null)
@@ -360,9 +355,9 @@ const CategoryLinkPanel = memo(function CategoryLinkPanel({
             {/* Delete + Unlink confirm */}
             {deleteCatTarget && (
                 <DeleteDataConfirmModal
-                    title="حذف الفئة وبياناتها"
-                    subtitle={`سيتم إلغاء ربط الفئة "${deleteCatTarget.name_ar || deleteCatTarget.name}" وحذف جميع بياناتها`}
-                    warning="سيتم حذف جميع المستندات والسجلات المرتبطة بهذه الفئة نهائياً ثم إلغاء ربطها — لا يمكن التراجع"
+                    title="طلب حذف بيانات الفئة"
+                    subtitle={`سيتم تقديم طلب حذف جميع بيانات الفئة "${deleteCatTarget.name_ar || deleteCatTarget.name}" للمراجعة`}
+                    warning="سيتم إرسال طلب حذف البيانات للموافقة — لن يتم إلغاء ربط الفئة إلا بعد الموافقة على الحذف"
                     onClose={() => setDeleteCatTarget(null)}
                     onConfirm={handleRemoveCategory}
                     deleting={isRemoving}
@@ -632,8 +627,8 @@ export function DepartmentsTab() {
             {deleteDataTarget && (
                 <DeleteDataConfirmModal
                     title="حذف بيانات القسم"
-                    subtitle={`هل أنت متأكد من حذف جميع بيانات القسم "${deleteDataTarget.name_ar || deleteDataTarget.name}"؟`}
-                    warning="سيتم حذف جميع المستندات والسجلات المرتبطة بهذا القسم نهائياً — لا يمكن التراجع"
+                    subtitle={`هل أنت متأكد من طلب حذف جميع بيانات القسم "${deleteDataTarget.name_ar || deleteDataTarget.name}"؟`}
+                    warning="سيتم إرسال طلب حذف البيانات للمراجعة والموافقة"
                     onClose={() => setDeleteDataTarget(null)}
                     onConfirm={handleDeleteDataConfirm}
                     deleting={deletingData}

@@ -106,7 +106,7 @@ const UserFilesModal = memo(function UserFilesModal({
         try {
             const res = await deleteDocsByFilename({ username, filename: confirmDeleteFile.filename, text: "Deleted from admin panel" }, tenantId)
             if (res.success) {
-                toast.success(`تم حذف الملف: ${confirmDeleteFile.filepath || confirmDeleteFile.filename}`)
+                toast.success(`تم تقديم طلب حذف الملف: ${confirmDeleteFile.filepath || confirmDeleteFile.filename} — يمكنك متابعته من الطلبات المعلقة`)
                 setConfirmDeleteFile(null); fetchFiles(); onFileDeleted()
             } else toast.error(res.message || "فشل حذف الملف")
         } catch { toast.error("حدث خطأ أثناء الحذف") }
@@ -117,7 +117,7 @@ const UserFilesModal = memo(function UserFilesModal({
         setDeletingAll(true)
         try {
             const res = await deleteDocsByUsername({ username, text: "All data deleted from admin panel" }, tenantId)
-            if (res.success) { toast.success(`تم حذف جميع بيانات ${username}`); setConfirmDeleteAll(false); onAllDeleted(); onClose() }
+            if (res.success) { toast.success(`تم تقديم طلب حذف جميع بيانات ${username} — يمكنك متابعته من الطلبات المعلقة`); setConfirmDeleteAll(false); onAllDeleted(); onClose() }
             else toast.error(res.message || "فشل الحذف")
         } catch { toast.error("حدث خطأ أثناء الحذف") }
         finally { setDeletingAll(false) }
@@ -205,10 +205,10 @@ const UserFilesModal = memo(function UserFilesModal({
                 </div>
             </div>
             {confirmDeleteFile && (
-                <DeleteConfirmModal title="حذف الملف" subtitle={`هل أنت متأكد من حذف "${confirmDeleteFile.filepath || confirmDeleteFile.filename}"؟`} warning={`سيتم حذف ${confirmDeleteFile.id_count} سجل مرتبط بهذا الملف نهائياً — لا يمكن التراجع`} onClose={() => setConfirmDeleteFile(null)} onConfirm={handleDeleteFile} deleting={!!deletingFile} />
+                <DeleteConfirmModal title="طلب حذف الملف" subtitle={`هل أنت متأكد من طلب حذف "${confirmDeleteFile.filepath || confirmDeleteFile.filename}"؟`} warning={`سيتم إرسال طلب حذف ${confirmDeleteFile.id_count} سجل مرتبط بهذا الملف للمراجعة والموافقة`} onClose={() => setConfirmDeleteFile(null)} onConfirm={handleDeleteFile} deleting={!!deletingFile} />
             )}
             {confirmDeleteAll && (
-                <DeleteConfirmModal title="حذف جميع بيانات المستخدم" subtitle={`هل أنت متأكد من حذف جميع بيانات "${username}"؟`} warning="سيتم حذف جميع الملفات والسجلات المرتبطة بهذا المستخدم نهائياً — هذا إجراء لا يمكن التراجع عنه" onClose={() => setConfirmDeleteAll(false)} onConfirm={handleDeleteAll} deleting={deletingAll} />
+                <DeleteConfirmModal title="طلب حذف جميع بيانات المستخدم" subtitle={`هل أنت متأكد من طلب حذف جميع بيانات "${username}"؟`} warning="سيتم إرسال طلب حذف جميع الملفات والسجلات المرتبطة بهذا المستخدم للمراجعة والموافقة" onClose={() => setConfirmDeleteAll(false)} onConfirm={handleDeleteAll} deleting={deletingAll} />
             )}
             {viewDataFile && (
                 <FileDataModal username={username} filename={viewDataFile.filename} filepath={viewDataFile.filepath || viewDataFile.filename} tenantId={tenantId} departmentId={departmentId} categoryId={categoryId} onClose={() => setViewDataFile(null)} />

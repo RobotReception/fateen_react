@@ -1,4 +1,5 @@
 import axios from "axios"
+import { useAuthStore } from "@/stores/auth-store"
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "/api/backend/v2"
 
@@ -33,23 +34,18 @@ function isPublicEndpoint(url: string | undefined): boolean {
 apiClient.interceptors.request.use(
     (config) => {
         if (!isPublicEndpoint(config.url)) {
-            const token = localStorage.getItem("access_token")
+            // Read token from Zustand memory state (not localStorage)
+            const token = useAuthStore.getState().token
             if (token) {
                 config.headers.Authorization = `Bearer ${token}`
             }
 
-            // Inject X-Tenant-ID from persisted auth store
+            // Inject X-Tenant-ID from persisted auth store (user data is still persisted)
             if (!config.headers["X-Tenant-ID"]) {
-                try {
-                    const stored = localStorage.getItem("fateen-auth-storage")
-                    if (stored) {
-                        const parsed = JSON.parse(stored)
-                        const tenantId = parsed?.state?.user?.tenant_id
-                        if (tenantId) {
-                            config.headers["X-Tenant-ID"] = tenantId
-                        }
-                    }
-                } catch { /* silent */ }
+                const tenantId = useAuthStore.getState().user?.tenant_id
+                if (tenantId) {
+                    config.headers["X-Tenant-ID"] = tenantId
+                }
             }
         }
         return config
@@ -100,40 +96,17 @@ apiClient.interceptors.response.use(
             originalRequest._retry = true
             isRefreshing = true
 
-            const refreshToken = localStorage.getItem("refresh_token")
-            if (!refreshToken) {
-                // No refresh token — clear and redirect
-                isRefreshing = false
-                localStorage.removeItem("access_token")
-                localStorage.removeItem("refresh_token")
-                localStorage.removeItem("fateen-auth-storage")
-                window.location.href = "/login"
-                return Promise.reject(error)
-            }
-
             try {
                 const { data } = await axios.post(
                     `${API_BASE_URL}/auth/refresh-token`,
-                    { refresh_token: refreshToken },
+                    {},
                     { headers: { "Content-Type": "application/json" }, withCredentials: true }
                 )
 
                 const newToken = data.data.token
-                const newRefresh = data.data.refresh_token
 
-                localStorage.setItem("access_token", newToken)
-                localStorage.setItem("refresh_token", newRefresh)
-
-                // Update Zustand persisted store
-                try {
-                    const stored = localStorage.getItem("fateen-auth-storage")
-                    if (stored) {
-                        const parsed = JSON.parse(stored)
-                        parsed.state.token = newToken
-                        parsed.state.refreshToken = newRefresh
-                        localStorage.setItem("fateen-auth-storage", JSON.stringify(parsed))
-                    }
-                } catch { /* silent */ }
+                // Update Zustand memory state with new token
+                useAuthStore.getState().setToken(newToken)
 
                 // Resolve queued requests with the new token, THEN reset flag
                 processQueue(null, newToken)
@@ -144,9 +117,7 @@ apiClient.interceptors.response.use(
             } catch (refreshError) {
                 processQueue(refreshError, null)
                 isRefreshing = false
-                localStorage.removeItem("access_token")
-                localStorage.removeItem("refresh_token")
-                localStorage.removeItem("fateen-auth-storage")
+                useAuthStore.getState().logout()
                 window.location.href = "/login"
                 return Promise.reject(refreshError)
             }
