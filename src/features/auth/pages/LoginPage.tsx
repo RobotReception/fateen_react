@@ -25,6 +25,23 @@ export function LoginPage() {
     const [showPassword, setShowPassword] = useState(false)
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState("")
+    const [touched, setTouched] = useState<Record<string, boolean>>({})
+    const [submitted, setSubmitted] = useState(false)
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+    const fieldErrors = {
+        email: !email.trim() ? "البريد الإلكتروني مطلوب" : !emailRegex.test(email) ? "صيغة البريد الإلكتروني غير صحيحة" : "",
+        password: !password ? "كلمة المرور مطلوبة" : "",
+    }
+
+    const showFieldError = (field: keyof typeof fieldErrors) =>
+        (submitted || touched[field]) && fieldErrors[field]
+
+    const fieldClass = (field: keyof typeof fieldErrors, extra = "") =>
+        `w-full rounded-xl border ${showFieldError(field) ? "border-red-400 bg-red-50/30" : "border-gray-200 bg-gray-50/50"} px-4 py-3 text-sm text-gray-900 outline-none transition-all duration-300 placeholder:text-gray-400 focus:border-[#0098d6]/50 focus:bg-white focus:ring-2 focus:ring-[#0098d6]/10 ${extra}`
+
+    const handleBlur = (field: string) => setTouched(p => ({ ...p, [field]: true }))
 
     // ── Multi-tenant state ──
     const [tenants, setTenants] = useState<TenantInfo[]>([])
@@ -67,8 +84,9 @@ export function LoginPage() {
         e.preventDefault()
         setError("")
 
-        if (!email || !password) {
-            setError("يرجى ملء جميع الحقول")
+        setSubmitted(true)
+
+        if (fieldErrors.email || fieldErrors.password) {
             return
         }
 
@@ -249,10 +267,12 @@ export function LoginPage() {
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        onBlur={() => handleBlur("email")}
                         placeholder="example@company.com"
-                        className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-3 text-sm text-gray-900 outline-none transition-all duration-300 placeholder:text-gray-400 focus:border-[#0098d6]/50 focus:bg-white focus:ring-2 focus:ring-[#0098d6]/10"
+                        className={fieldClass("email")}
                         dir="ltr"
                     />
+                    {showFieldError("email") && <p className="mt-1 text-xs text-red-500">{fieldErrors.email}</p>}
                 </div>
 
                 {/* Password */}
@@ -274,8 +294,9 @@ export function LoginPage() {
                             type={showPassword ? "text" : "password"}
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
+                            onBlur={() => handleBlur("password")}
                             placeholder="••••••••"
-                            className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-3 pl-12 text-sm text-gray-900 outline-none transition-all duration-300 placeholder:text-gray-400 focus:border-[#0098d6]/50 focus:bg-white focus:ring-2 focus:ring-[#0098d6]/10"
+                            className={fieldClass("password", "pl-12")}
                             dir="ltr"
                         />
                         <button
@@ -286,6 +307,7 @@ export function LoginPage() {
                             {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                         </button>
                     </div>
+                    {showFieldError("password") && <p className="mt-1 text-xs text-red-500">{fieldErrors.password}</p>}
                 </div>
 
                 {/* Submit */}
@@ -320,6 +342,6 @@ export function LoginPage() {
                     أنشئ حساب جديد
                 </Link>
             </p>
-        </AuthLayout>
+        </AuthLayout >
     )
 }

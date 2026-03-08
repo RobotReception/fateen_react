@@ -17,25 +17,35 @@ export function RegisterPage() {
     const [showPassword, setShowPassword] = useState(false)
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState("")
+    const [touched, setTouched] = useState<Record<string, boolean>>({})
+    const [submitted, setSubmitted] = useState(false)
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+    const fieldErrors = {
+        firstName: !firstName.trim() ? "الاسم الأول مطلوب" : firstName.trim().length < 2 ? "الاسم قصير جداً" : "",
+        lastName: !lastName.trim() ? "الاسم الأخير مطلوب" : lastName.trim().length < 2 ? "الاسم قصير جداً" : "",
+        email: !email.trim() ? "البريد الإلكتروني مطلوب" : !emailRegex.test(email) ? "صيغة البريد غير صحيحة" : "",
+        password: !password ? "كلمة المرور مطلوبة" : password.length < 8 ? "يجب أن تكون 8 أحرف على الأقل" : !/[a-zA-Z]/.test(password) || !/\d/.test(password) ? "يجب أن تحتوي على أحرف وأرقام" : "",
+        confirmPassword: !confirmPassword ? "تأكيد كلمة المرور مطلوب" : password !== confirmPassword ? "كلمتا المرور غير متطابقتين" : "",
+    }
+
+    const showFieldError = (field: keyof typeof fieldErrors) =>
+        (submitted || touched[field]) && fieldErrors[field]
+
+    const fieldClass = (field: keyof typeof fieldErrors, extra = "") =>
+        `w-full rounded-xl border ${showFieldError(field) ? "border-red-400 bg-red-50/30" : "border-gray-200 bg-gray-50/50"} px-4 py-3 text-sm text-gray-900 outline-none transition-all duration-300 placeholder:text-gray-400 focus:border-[#0098d6]/50 focus:bg-white focus:ring-2 focus:ring-[#0098d6]/10 ${extra}`
+
+    const handleBlur = (field: string) => setTouched(p => ({ ...p, [field]: true }))
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault()
         setError("")
 
-        if (!firstName || !lastName || !email || !password) {
-            setError("يرجى ملء جميع الحقول المطلوبة")
-            return
-        }
+        setSubmitted(true)
 
-        if (password.length < 8) {
-            setError("كلمة المرور يجب أن تكون 8 أحرف على الأقل")
-            return
-        }
-
-        if (password !== confirmPassword) {
-            setError("كلمتا المرور غير متطابقتين")
-            return
-        }
+        const hasErrors = Object.values(fieldErrors).some(e => e)
+        if (hasErrors) return
 
         setLoading(true)
         try {
@@ -88,9 +98,11 @@ export function RegisterPage() {
                             type="text"
                             value={firstName}
                             onChange={(e) => setFirstName(e.target.value)}
+                            onBlur={() => handleBlur("firstName")}
                             placeholder="أحمد"
-                            className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-3 text-sm text-gray-900 outline-none transition-all duration-300 placeholder:text-gray-400 focus:border-[#0098d6]/50 focus:bg-white focus:ring-2 focus:ring-[#0098d6]/10"
+                            className={fieldClass("firstName")}
                         />
+                        {showFieldError("firstName") && <p className="mt-1 text-xs text-red-500">{fieldErrors.firstName}</p>}
                     </div>
                     <div>
                         <label htmlFor="lastName" className="mb-1.5 block text-sm font-medium text-gray-700">
@@ -101,9 +113,11 @@ export function RegisterPage() {
                             type="text"
                             value={lastName}
                             onChange={(e) => setLastName(e.target.value)}
+                            onBlur={() => handleBlur("lastName")}
                             placeholder="محمد"
-                            className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-3 text-sm text-gray-900 outline-none transition-all duration-300 placeholder:text-gray-400 focus:border-[#0098d6]/50 focus:bg-white focus:ring-2 focus:ring-[#0098d6]/10"
+                            className={fieldClass("lastName")}
                         />
+                        {showFieldError("lastName") && <p className="mt-1 text-xs text-red-500">{fieldErrors.lastName}</p>}
                     </div>
                 </div>
 
@@ -117,10 +131,12 @@ export function RegisterPage() {
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        onBlur={() => handleBlur("email")}
                         placeholder="example@company.com"
-                        className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-3 text-sm text-gray-900 outline-none transition-all duration-300 placeholder:text-gray-400 focus:border-[#0098d6]/50 focus:bg-white focus:ring-2 focus:ring-[#0098d6]/10"
+                        className={fieldClass("email")}
                         dir="ltr"
                     />
+                    {showFieldError("email") && <p className="mt-1 text-xs text-red-500">{fieldErrors.email}</p>}
                 </div>
 
                 {/* Password */}
@@ -134,8 +150,9 @@ export function RegisterPage() {
                             type={showPassword ? "text" : "password"}
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
+                            onBlur={() => handleBlur("password")}
                             placeholder="8 أحرف على الأقل"
-                            className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-3 pl-12 text-sm text-gray-900 outline-none transition-all duration-300 placeholder:text-gray-400 focus:border-[#0098d6]/50 focus:bg-white focus:ring-2 focus:ring-[#0098d6]/10"
+                            className={fieldClass("password", "pl-12")}
                             dir="ltr"
                         />
                         <button
@@ -146,6 +163,7 @@ export function RegisterPage() {
                             {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                         </button>
                     </div>
+                    {showFieldError("password") && <p className="mt-1 text-xs text-red-500">{fieldErrors.password}</p>}
                 </div>
 
                 {/* Confirm Password */}
@@ -158,10 +176,12 @@ export function RegisterPage() {
                         type={showPassword ? "text" : "password"}
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
+                        onBlur={() => handleBlur("confirmPassword")}
                         placeholder="أعد كتابة كلمة المرور"
-                        className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-3 text-sm text-gray-900 outline-none transition-all duration-300 placeholder:text-gray-400 focus:border-[#0098d6]/50 focus:bg-white focus:ring-2 focus:ring-[#0098d6]/10"
+                        className={fieldClass("confirmPassword")}
                         dir="ltr"
                     />
+                    {showFieldError("confirmPassword") && <p className="mt-1 text-xs text-red-500">{fieldErrors.confirmPassword}</p>}
                 </div>
 
                 {/* Submit */}

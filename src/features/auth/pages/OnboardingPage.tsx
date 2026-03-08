@@ -1,6 +1,6 @@
 import { useState, useEffect, type FormEvent } from "react"
 import { useNavigate } from "react-router-dom"
-import { Building2, Loader2, ChevronLeft, ChevronRight } from "lucide-react"
+import { Building2, Loader2, ChevronLeft, ChevronRight, CheckCircle2 } from "lucide-react"
 import {
     completeOnboarding,
     getOnboardingOptions,
@@ -21,13 +21,14 @@ interface Options {
 
 export function OnboardingPage() {
     const navigate = useNavigate()
-    const { registrationUserId, registrationEmail, login: authLogin } = useAuthStore()
+    const { registrationUserId, registrationEmail } = useAuthStore()
 
     const [step, setStep] = useState(1)
     const [loading, setLoading] = useState(false)
     const [optionsLoading, setOptionsLoading] = useState(true)
     const [error, setError] = useState("")
     const [options, setOptions] = useState<Options | null>(null)
+    const [onboardingComplete, setOnboardingComplete] = useState(false)
 
     // Form fields
     const [organizationName, setOrganizationName] = useState("")
@@ -63,10 +64,31 @@ export function OnboardingPage() {
         load()
     }, [])
 
-    const canProceedStep1 = organizationName && phone && industry && userPosition
+    const phoneRegex = /^\+?[0-9]{9,15}$/
+
+    const step1Errors = {
+        organizationName: !organizationName.trim() ? "اسم المؤسسة مطلوب" : organizationName.trim().length < 2 ? "اسم المؤسسة قصير جداً" : "",
+        phone: !phone.trim() ? "رقم الهاتف مطلوب" : !phoneRegex.test(phone.replace(/\s/g, "")) ? "رقم الهاتف غير صحيح" : "",
+        industry: !industry ? "القطاع مطلوب" : "",
+        userPosition: !userPosition ? "المنصب مطلوب" : "",
+    }
+
+    const [touched, setTouched] = useState<Record<string, boolean>>({})
+    const [step1Submitted, setStep1Submitted] = useState(false)
+
+    const showStep1Error = (field: keyof typeof step1Errors) =>
+        (step1Submitted || touched[field]) && step1Errors[field]
+
+    const step1Class = (field: keyof typeof step1Errors, extra = "") =>
+        `w-full rounded-xl border ${showStep1Error(field) ? "border-red-400 bg-red-50/30" : "border-gray-200 bg-gray-50/50"} px-4 py-3 text-sm text-gray-900 outline-none transition-all duration-300 placeholder:text-gray-400 focus:border-[#0098d6]/50 focus:bg-white focus:ring-2 focus:ring-[#0098d6]/10 ${extra}`
+
+    const handleBlur = (field: string) => setTouched(p => ({ ...p, [field]: true }))
+
+    const canProceedStep1 = !step1Errors.organizationName && !step1Errors.phone && !step1Errors.industry && !step1Errors.userPosition
     const canProceedStep2 = employeeCount && primaryCustomer && customerAcquisition && contactReason && dataStorage
 
     const handleNext = () => {
+        setStep1Submitted(true)
         if (step === 1 && canProceedStep1) setStep(2)
     }
 
@@ -80,7 +102,7 @@ export function OnboardingPage() {
         setError("")
         setLoading(true)
         try {
-            const res = await completeOnboarding({
+            await completeOnboarding({
                 user_id: registrationUserId!,
                 organization_name: organizationName,
                 phone,
@@ -94,9 +116,7 @@ export function OnboardingPage() {
                 domain: domain || undefined,
             })
 
-            const { user, token } = res.data
-            authLogin(user, token)
-            navigate("/dashboard")
+            setOnboardingComplete(true)
         } catch (err: any) {
             const msg = err.response?.data?.message
             const errType = err.response?.data?.error_type
@@ -153,6 +173,28 @@ export function OnboardingPage() {
         )
     }
 
+    if (onboardingComplete) {
+        return (
+            <AuthLayout>
+                <div className="flex flex-col items-center text-center py-6">
+                    <div className="mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-100">
+                        <CheckCircle2 className="h-10 w-10 text-green-500" />
+                    </div>
+                    <h1 className="mb-2 text-2xl font-bold text-gray-900">تم إنشاء المؤسسة بنجاح!</h1>
+                    <p className="mb-1 text-sm text-gray-500">مؤسستك <strong className="text-gray-700">{organizationName}</strong> جاهزة للاستخدام</p>
+                    <p className="mb-8 text-sm text-gray-400">سجّل دخولك للوصول إلى لوحة التحكم</p>
+                    <button
+                        onClick={() => navigate("/login")}
+                        className="group relative w-full overflow-hidden rounded-xl bg-gradient-to-l from-[#0098d6] to-[#004786] px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-[#0098d6]/20 transition-all duration-300 hover:shadow-xl hover:shadow-[#0098d6]/30 hover:-translate-y-0.5"
+                    >
+                        <span className="relative z-10 flex items-center justify-center gap-2">تسجيل الدخول</span>
+                        <div className="absolute inset-0 bg-gradient-to-l from-[#00b4ff] to-[#0066aa] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                    </button>
+                </div>
+            </AuthLayout>
+        )
+    }
+
     return (
         <AuthLayout>
             {/* Icon + Header */}
@@ -188,9 +230,11 @@ export function OnboardingPage() {
                                 type="text"
                                 value={organizationName}
                                 onChange={(e) => setOrganizationName(e.target.value)}
+                                onBlur={() => handleBlur("organizationName")}
                                 placeholder="مثال: شركة فاتن"
-                                className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-3 text-sm text-gray-900 outline-none transition-all duration-300 placeholder:text-gray-400 focus:border-[#0098d6]/50 focus:bg-white focus:ring-2 focus:ring-[#0098d6]/10"
+                                className={step1Class("organizationName")}
                             />
+                            {showStep1Error("organizationName") && <p className="mt-1 text-xs text-red-500">{step1Errors.organizationName}</p>}
                         </div>
 
                         {/* Phone */}
@@ -202,10 +246,12 @@ export function OnboardingPage() {
                                 type="tel"
                                 value={phone}
                                 onChange={(e) => setPhone(e.target.value)}
+                                onBlur={() => handleBlur("phone")}
                                 placeholder="+967771234567"
-                                className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-3 text-sm text-gray-900 outline-none transition-all duration-300 placeholder:text-gray-400 focus:border-[#0098d6]/50 focus:bg-white focus:ring-2 focus:ring-[#0098d6]/10"
+                                className={step1Class("phone")}
                                 dir="ltr"
                             />
+                            {showStep1Error("phone") && <p className="mt-1 text-xs text-red-500">{step1Errors.phone}</p>}
                         </div>
 
                         {/* Domain (optional) */}
