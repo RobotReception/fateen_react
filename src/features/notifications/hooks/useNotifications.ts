@@ -18,8 +18,12 @@ import { useNotificationSound } from "./use-notification-sound"
 ═══════════════════════════════════════════════════════════ */
 
 const PAGE_SIZE = 20
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "/api/backend/v2"
+const WS_HOST = (() => {
+    try { return new URL(API_BASE).host } catch { return window.location.host }
+})()
 const WS_PROTOCOL = window.location.protocol === "https:" ? "wss:" : "ws:"
-const WS_NOTIFICATIONS_URL = `${WS_PROTOCOL}//${window.location.host}/api/backend/v2/notifications/ws`
+const WS_NOTIFICATIONS_URL = `${WS_PROTOCOL}//${WS_HOST}/api/backend/v2/notifications/ws`
 
 export function useNotifications() {
     const { token } = useAuthStore()

@@ -19,7 +19,7 @@ export default defineConfig({
     strictPort: true,
     proxy: {
       '/api': {
-        target: 'https://fateen_backend_dashboard.prideidea.com/',
+        target: 'https://fateen-backend-dashboard.prideidea.com/',
         changeOrigin: true,
         secure: false,
         ws: true,
