@@ -10,7 +10,7 @@ const RESEND_COOLDOWN = 60
 
 export function VerifyEmailPage() {
     const navigate = useNavigate()
-    const { registrationEmail, registrationUserId } = useAuthStore()
+    const { registrationEmail } = useAuthStore()
 
     const [otp, setOtp] = useState<string[]>(Array(OTP_LENGTH).fill(""))
     const [loading, setLoading] = useState(false)

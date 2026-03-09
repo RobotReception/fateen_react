@@ -21,7 +21,7 @@ interface Options {
 
 export function OnboardingPage() {
     const navigate = useNavigate()
-    const { registrationUserId, registrationEmail } = useAuthStore()
+    const { registrationUserId } = useAuthStore()
 
     const [step, setStep] = useState(1)
     const [loading, setLoading] = useState(false)

@@ -1,14 +1,18 @@
 import { useInboxStore } from "../../store/inbox.store"
-import { useConversations } from "../../hooks/use-conversations"
+import { useCustomers } from "../../hooks/use-customers"
 import { SidebarHeader } from "./SidebarHeader"
 import { FilterTabs } from "./FilterTabs"
 import { ConversationList } from "./ConversationList"
 import { useParams } from "react-router-dom"
 
 export function InboxSidebar() {
-    const { filter, setFilter, searchQuery, setSearchQuery } = useInboxStore()
+    const { statusFilter, setStatusFilter, searchQuery, setSearchQuery } = useInboxStore()
     const { id: selectedId } = useParams()
-    const { data: conversations = [], isLoading } = useConversations(filter, searchQuery)
+    const { data, isLoading } = useCustomers({
+        session_status: statusFilter === "all" ? undefined : statusFilter as any,
+        search: searchQuery || undefined,
+    })
+    const conversations = data?.items ?? []
 
     return (
         <aside style={{
@@ -22,7 +26,7 @@ export function InboxSidebar() {
             overflow: "hidden",
         }}>
             <SidebarHeader searchQuery={searchQuery} onSearch={setSearchQuery} />
-            <FilterTabs active={filter} onChange={setFilter} />
+            <FilterTabs active={statusFilter} onChange={setStatusFilter} />
             <div style={{ flex: 1, overflowY: "auto" }}>
                 <ConversationList
                     conversations={conversations}

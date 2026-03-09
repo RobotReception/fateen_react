@@ -3,9 +3,7 @@ import { toast } from "sonner"
 import {
     Search, X, Loader2, ChevronLeft, ChevronRight,
     Eye, Pencil, Trash2, Copy, Check, Database, FileText,
-    AlertTriangle,
 } from "lucide-react"
-import { useAuthStore } from "@/stores/auth-store"
 import { getFileDocs, updateDocument, deleteDocuments } from "../services/knowledge-service"
 import type { SearchDocumentResult, SearchPagination } from "../types"
 
@@ -155,7 +153,7 @@ export const FileDataModal = memo(function FileDataModal({ username, filename, f
     // ── Search ──
     const [query, setQuery] = useState("")
     const [debouncedQuery, setDebouncedQuery] = useState("")
-    const debounceRef = useRef<ReturnType<typeof setTimeout>>()
+    const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined)
 
     // ── Results ──
     const [results, setResults] = useState<SearchDocumentResult[]>([])

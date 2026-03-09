@@ -1,6 +1,5 @@
-import { useState } from "react"
 import { Loader2, Bell, BarChart3, Database, Gauge, Shield, Timer, RefreshCw, AlertTriangle, WifiOff, Settings2 } from "lucide-react"
-import { useFeaturesSettings, useUpdateFeaturesSettings } from "../hooks/use-ai-settings"
+import { useAIFeatures, useUpdateAIFeatures } from "../hooks/use-ai-settings"
 
 /* ── CSS ── */
 const CSS = `
@@ -166,8 +165,8 @@ function NumberRow({ icon: Icon, title, desc, value, onSave, min, max, step = 1 
    MAIN FEATURES TAB
    ══════════════════════════════════════════════════════════════ */
 export function FeaturesTab({ agentId }: { agentId: string }) {
-    const { data: features, isLoading, isError, error, refetch, isRefetching } = useFeaturesSettings(agentId)
-    const updateF = useUpdateFeaturesSettings(agentId)
+    const { data: features, isLoading, isError, error, refetch, isRefetching } = useAIFeatures(agentId)
+    const updateF = useUpdateAIFeatures(agentId)
 
     if (isLoading) return <Skeleton />
     if (isError && !features) return <ErrorPanel error={error} onRetry={() => refetch()} retrying={isRefetching} />
@@ -224,13 +223,13 @@ export function FeaturesTab({ agentId }: { agentId: string }) {
                         </div>
                         <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                             <FeatureRow icon={Bell} title="الإشعارات" desc="تفعيل نظام الإشعارات"
-                                on={features!.enable_notifications} onChange={() => updateF.mutate({ enable_notifications: !features!.enable_notifications })} />
+                                on={features!.enable_notifications ?? false} onChange={() => updateF.mutate({ enable_notifications: !features!.enable_notifications })} />
                             <FeatureRow icon={BarChart3} title="التحليلات" desc="تتبع وتحليل البيانات"
-                                on={features!.enable_analytics} onChange={() => updateF.mutate({ enable_analytics: !features!.enable_analytics })} />
+                                on={features!.enable_analytics ?? false} onChange={() => updateF.mutate({ enable_analytics: !features!.enable_analytics })} />
                             <FeatureRow icon={Database} title="التخزين المؤقت" desc="تفعيل ذاكرة التخزين المؤقت"
-                                on={features!.enable_caching} onChange={() => updateF.mutate({ enable_caching: !features!.enable_caching })} />
+                                on={features!.enable_caching ?? false} onChange={() => updateF.mutate({ enable_caching: !features!.enable_caching })} />
                             <FeatureRow icon={Shield} title="تحديد المعدل" desc="تقييد عدد الطلبات في فترة زمنية"
-                                on={features!.enable_rate_limiting} onChange={() => updateF.mutate({ enable_rate_limiting: !features!.enable_rate_limiting })} />
+                                on={features!.enable_rate_limiting ?? false} onChange={() => updateF.mutate({ enable_rate_limiting: !features!.enable_rate_limiting })} />
                         </div>
                     </div>
 
@@ -242,11 +241,11 @@ export function FeaturesTab({ agentId }: { agentId: string }) {
                         </div>
                         <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                             <NumberRow icon={Timer} title="مهلة التخزين المؤقت" desc="مدة الاحتفاظ بالبيانات المؤقتة (ثوانٍ)"
-                                value={features!.cache_ttl_seconds} onSave={v => updateF.mutate({ cache_ttl_seconds: v })} min={0} max={86400} />
+                                value={features!.cache_ttl_seconds ?? 0} onSave={v => updateF.mutate({ cache_ttl_seconds: v })} min={0} max={86400} />
                             <NumberRow icon={Gauge} title="حد الطلبات" desc="الحد الأقصى للطلبات في كل نافذة"
-                                value={features!.rate_limit_requests} onSave={v => updateF.mutate({ rate_limit_requests: v })} min={1} max={100000} />
+                                value={features!.rate_limit_requests ?? 0} onSave={v => updateF.mutate({ rate_limit_requests: v })} min={1} max={100000} />
                             <NumberRow icon={Timer} title="نافذة تحديد المعدل" desc="مدة النافذة الزمنية (ثوانٍ)"
-                                value={features!.rate_limit_window} onSave={v => updateF.mutate({ rate_limit_window: v })} min={1} max={3600} />
+                                value={features!.rate_limit_window ?? 0} onSave={v => updateF.mutate({ rate_limit_window: v })} min={1} max={3600} />
                         </div>
                     </div>
                 </>

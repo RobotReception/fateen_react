@@ -60,6 +60,13 @@ export interface AIFeatures {
     enable_sentiment_analysis: boolean
     enable_auto_classification: boolean
     enable_summarization: boolean
+    enable_notifications?: boolean
+    enable_analytics?: boolean
+    enable_caching?: boolean
+    enable_rate_limiting?: boolean
+    cache_ttl_seconds?: number
+    rate_limit_requests?: number
+    rate_limit_window?: number
 }
 
 export interface AISettings {

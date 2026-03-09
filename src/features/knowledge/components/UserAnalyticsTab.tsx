@@ -350,12 +350,6 @@ export function UserAnalyticsTab() {
         setPage(1)
     }, [])
 
-    /* ─── Stats ─── */
-    const stats = useMemo(() => {
-        const totalFiles = users.reduce((a, u) => a + u.file_count, 0)
-        const totalIds = users.reduce((a, u) => a + u.total_ids, 0)
-        return { userCount: totalCount, totalFiles, totalIds }
-    }, [users, totalCount])
 
     /* ─── Delete user handler ─── */
     const handleDeleteUser = () => {

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, type FormEvent, type KeyboardEvent } from "react"
-import { Link, useNavigate } from "react-router-dom"
+import { Link } from "react-router-dom"
 import { KeyRound, Loader2, RotateCcw, ShieldCheck, CheckCircle2, Eye, EyeOff } from "lucide-react"
 import {
     requestPasswordReset,
@@ -11,7 +11,6 @@ import { AuthLayout } from "@/features/auth/components/AuthLayout"
 const OTP_LENGTH = 6
 
 export function ForgotPasswordPage() {
-    const navigate = useNavigate()
     const [step, setStep] = useState<1 | 2 | 3 | 4>(1) // 1=email, 2=otp, 3=new password, 4=done
     const [email, setEmail] = useState("")
     const [otp, setOtp] = useState<string[]>(Array(OTP_LENGTH).fill(""))

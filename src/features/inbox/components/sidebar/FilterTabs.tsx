@@ -1,15 +1,15 @@
-import type { InboxFilter } from "../../types/inbox.types"
+import type { StatusFilter } from "../../store/inbox.store"
 
-const TABS: { key: InboxFilter; label: string }[] = [
+const TABS: { key: StatusFilter; label: string }[] = [
     { key: "all", label: "الكل" },
     { key: "open", label: "مفتوح" },
     { key: "closed", label: "مغلق" },
-    { key: "mine", label: "لي" },
+    { key: "pending", label: "معلق" },
 ]
 
 interface FilterTabsProps {
-    active: InboxFilter
-    onChange: (f: InboxFilter) => void
+    active: StatusFilter
+    onChange: (f: StatusFilter) => void
 }
 
 export function FilterTabs({ active, onChange }: FilterTabsProps) {

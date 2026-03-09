@@ -1068,22 +1068,6 @@ function ConversationTab({ customer: c }: { customer: Customer }) {
     )
 }
 
-/* ═════════ Field Row ═════════ */
-function FieldRow({ label, icon, value, empty }: {
-    label: string; icon: React.ReactNode
-    value?: string | null; empty?: string
-}) {
-    return (
-        <div className="cd-field">
-            <p className="cd-field-label">{icon} {label}</p>
-            {value ? (
-                <p className="cd-field-value">{value}</p>
-            ) : (
-                <p className="cd-field-empty">{empty || "—"}</p>
-            )}
-        </div>
-    )
-}
 
 /* ═════════ Info Card ═════════ */
 function InfoCard({ icon, label, value }: {

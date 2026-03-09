@@ -1,4 +1,4 @@
-import { UserCircle, UserX, ChevronDown, ChevronRight, Plus, PanelLeftClose, PanelLeftOpen, Inbox, Users } from "lucide-react"
+import { UserCircle, UserX, ChevronDown, ChevronRight, Plus, PanelLeftClose, PanelLeftOpen, Inbox } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import { useInboxStore, type InboxSection } from "../../store/inbox.store"
 import { useInboxSummary } from "../../hooks/use-inbox-summary"
@@ -346,7 +346,7 @@ export function InboxNavSidebar() {
 
 // ── Helpers ───────────────────────────────────────────────
 
-function NavItem({ children, isActive, collapsed, onClick, title }: {
+function NavItem({ children, isActive, collapsed: _collapsed, onClick, title }: {
     children: React.ReactNode; isActive: boolean; collapsed: boolean;
     onClick: () => void; title?: string
 }) {

@@ -3,7 +3,7 @@ import { createPortal } from "react-dom"
 import { useAuthStore } from "@/stores/auth-store"
 import {
     Search, X, Plus, Radio, Trash2, Settings2, Loader2,
-    Copy, Bot, Globe, ExternalLink, MoreHorizontal, ChevronLeft,
+    Copy, Globe, ExternalLink, MoreHorizontal, ChevronLeft,
 } from "lucide-react"
 
 import { toast } from "sonner"

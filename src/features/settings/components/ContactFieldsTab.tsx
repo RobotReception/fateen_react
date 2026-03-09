@@ -5,7 +5,7 @@ import type { DynamicField, DynamicFieldType } from "../types/teams-tags"
 import {
     Plus, Trash2, Pencil, X, Loader2, Search,
     AlertTriangle, Check, MoreVertical, ArrowUpDown,
-    FileSliders, Settings2, Database, Hash, Mail, Phone,
+    FileSliders, Database, Hash, Mail, Phone,
     Calendar, ToggleLeft, List, Link2, AlignLeft, Type,
 } from "lucide-react"
 import { ActionGuard } from "@/components/guards/ActionGuard"

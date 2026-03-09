@@ -1,10 +1,9 @@
 import { useState, useEffect } from "react"
 import {
     Loader2, Save, MessageSquareText, RefreshCw, AlertTriangle,
-    WifiOff, RotateCcw, BookOpen, FileText, Type,
+    WifiOff, RotateCcw, BookOpen,
 } from "lucide-react"
 import { usePromptsSettings, useUpdatePromptsSettings } from "../hooks/use-ai-settings"
-import type { PromptsSettings } from "../types"
 
 const CSS = `
 @keyframes prFade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}

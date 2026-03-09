@@ -2,7 +2,7 @@ import { useState } from "react"
 import {
     Loader2, Volume2, ChevronDown, Eye, EyeOff,
     RefreshCw, AlertTriangle, WifiOff, Mic, Globe,
-    Cpu, KeyRound, AudioWaveform, Server, Power, Settings2,
+    Cpu, KeyRound, AudioWaveform, Power, Settings2,
 } from "lucide-react"
 import { useTTSSettings, useUpdateTTSSettings, useToggleTTS, useUpdateTTSProvider } from "../hooks/use-ai-settings"
 import type { TTSProvider } from "../types"

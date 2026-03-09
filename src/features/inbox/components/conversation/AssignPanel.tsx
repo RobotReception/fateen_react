@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react"
 import { createPortal } from "react-dom"
 import {
-    UserCircle, Bot, BotOff, ChevronDown, CheckCircle, X, Search, Users, Tag
+    UserCircle, Bot, BotOff, ChevronDown, CheckCircle, X, Search, Users,
 } from "lucide-react"
 import React from "react"
 import { useQuery } from "@tanstack/react-query"
