@@ -154,12 +154,22 @@ function SettingsTab({ channel, tenantId }: { channel: Channel; tenantId: string
     const [icon, setIcon] = useState(channel.icon || "")
     const [color, setColor] = useState(channel.color || "#4A90E2")
     const [originsRaw, setOriginsRaw] = useState((channel.allowed_origins || []).join(", "))
+    const [phoneNumberId, setPhoneNumberId] = useState(channel.phone_number_id || channel.identifier || "")
+    const [wabaId, setWabaId] = useState(channel.waba_id || "")
+    const [pageId, setPageId] = useState(channel.page_id || channel.identifier || "")
+    const [igAccountId, setIgAccountId] = useState(channel.ig_account_id || "")
+    const [appId, setAppId] = useState(channel.app_id || channel.identifier || "")
 
     const isDirty = name !== (channel.name || "") || token !== (channel.access_token || "") ||
         secret !== (channel.META_APP_SECRET || "") ||
         JSON.stringify([...agentIds].sort()) !== JSON.stringify([...(channel.agent_ids || [])].sort()) ||
         icon !== (channel.icon || "") || color !== (channel.color || "#4A90E2") ||
-        originsRaw !== (channel.allowed_origins || []).join(", ")
+        originsRaw !== (channel.allowed_origins || []).join(", ") ||
+        phoneNumberId !== (channel.phone_number_id || channel.identifier || "") ||
+        wabaId !== (channel.waba_id || "") ||
+        pageId !== (channel.page_id || channel.identifier || "") ||
+        igAccountId !== (channel.ig_account_id || "") ||
+        appId !== (channel.app_id || channel.identifier || "")
 
     const save = () => {
         const origins = originsRaw.split(",").map((s: string) => s.trim()).filter(Boolean)
@@ -173,6 +183,10 @@ function SettingsTab({ channel, tenantId }: { channel: Channel; tenantId: string
                 icon: icon || undefined,
                 color: color || undefined,
                 allowed_origins: origins.length ? origins : undefined,
+                phone_number_id: channel.platform === "whatsapp" ? (phoneNumberId || undefined) : undefined,
+                waba_id: channel.platform === "whatsapp" ? (wabaId || undefined) : undefined,
+                page_id: (channel.platform === "facebook" || channel.platform === "instagram") ? (pageId || undefined) : undefined,
+                ig_account_id: channel.platform === "instagram" ? (igAccountId || undefined) : undefined,
             }
         })
     }
@@ -192,8 +206,8 @@ function SettingsTab({ channel, tenantId }: { channel: Channel; tenantId: string
                     <div>
                         <label className="mdl-label">Phone Number ID</label>
                         <div style={{ display: "flex", gap: 6 }}>
-                            <input className="mdl-field" dir="ltr" value={channel.phone_number_id || channel.identifier} readOnly style={{ fontFamily: "monospace", opacity: 0.7, cursor: "default" }} />
-                            <button type="button" onClick={() => { navigator.clipboard.writeText(channel.phone_number_id || channel.identifier); toast.success("تم النسخ") }} style={{
+                            <input className="mdl-field" dir="ltr" value={phoneNumberId} onChange={e => setPhoneNumberId(e.target.value)} style={{ fontFamily: "monospace" }} />
+                            <button type="button" onClick={() => { navigator.clipboard.writeText(phoneNumberId); toast.success("تم النسخ") }} style={{
                                 width: 38, height: 38, borderRadius: 9, border: "1.5px solid #e0e3e7", flexShrink: 0,
                                 background: "#fafafa", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
                                 color: "#9ca3af", transition: "all .12s",
@@ -208,8 +222,8 @@ function SettingsTab({ channel, tenantId }: { channel: Channel; tenantId: string
                     <div>
                         <label className="mdl-label">WABA ID</label>
                         <div style={{ display: "flex", gap: 6 }}>
-                            <input className="mdl-field" dir="ltr" value={channel.waba_id || ""} readOnly style={{ fontFamily: "monospace", opacity: 0.7, cursor: "default" }} />
-                            <button type="button" onClick={() => { navigator.clipboard.writeText(channel.waba_id || ""); toast.success("تم النسخ") }} style={{
+                            <input className="mdl-field" dir="ltr" value={wabaId} onChange={e => setWabaId(e.target.value)} style={{ fontFamily: "monospace" }} />
+                            <button type="button" onClick={() => { navigator.clipboard.writeText(wabaId); toast.success("تم النسخ") }} style={{
                                 width: 38, height: 38, borderRadius: 9, border: "1.5px solid #e0e3e7", flexShrink: 0,
                                 background: "#fafafa", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
                                 color: "#9ca3af", transition: "all .12s",
@@ -229,8 +243,8 @@ function SettingsTab({ channel, tenantId }: { channel: Channel; tenantId: string
                     <div>
                         <label className="mdl-label">Page ID</label>
                         <div style={{ display: "flex", gap: 6 }}>
-                            <input className="mdl-field" dir="ltr" value={channel.page_id || channel.identifier} readOnly style={{ fontFamily: "monospace", opacity: 0.7, cursor: "default" }} />
-                            <button type="button" onClick={() => { navigator.clipboard.writeText(channel.page_id || channel.identifier); toast.success("تم النسخ") }} style={{
+                            <input className="mdl-field" dir="ltr" value={pageId} onChange={e => setPageId(e.target.value)} style={{ fontFamily: "monospace" }} />
+                            <button type="button" onClick={() => { navigator.clipboard.writeText(pageId); toast.success("تم النسخ") }} style={{
                                 width: 38, height: 38, borderRadius: 9, border: "1.5px solid #e0e3e7", flexShrink: 0,
                                 background: "#fafafa", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
                                 color: "#9ca3af", transition: "all .12s",
@@ -246,8 +260,8 @@ function SettingsTab({ channel, tenantId }: { channel: Channel; tenantId: string
                         <div>
                             <label className="mdl-label">IG Account ID</label>
                             <div style={{ display: "flex", gap: 6 }}>
-                                <input className="mdl-field" dir="ltr" value={channel.ig_account_id || ""} readOnly style={{ fontFamily: "monospace", opacity: 0.7, cursor: "default" }} />
-                                <button type="button" onClick={() => { navigator.clipboard.writeText(channel.ig_account_id || ""); toast.success("تم النسخ") }} style={{
+                                <input className="mdl-field" dir="ltr" value={igAccountId} onChange={e => setIgAccountId(e.target.value)} style={{ fontFamily: "monospace" }} />
+                                <button type="button" onClick={() => { navigator.clipboard.writeText(igAccountId); toast.success("تم النسخ") }} style={{
                                     width: 38, height: 38, borderRadius: 9, border: "1.5px solid #e0e3e7", flexShrink: 0,
                                     background: "#fafafa", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
                                     color: "#9ca3af", transition: "all .12s",
@@ -267,8 +281,8 @@ function SettingsTab({ channel, tenantId }: { channel: Channel; tenantId: string
                 <div>
                     <label className="mdl-label">App ID</label>
                     <div style={{ display: "flex", gap: 6 }}>
-                        <input className="mdl-field" dir="ltr" value={channel.app_id || channel.identifier} readOnly style={{ fontFamily: "monospace", opacity: 0.7, cursor: "default" }} />
-                        <button type="button" onClick={() => { navigator.clipboard.writeText(channel.app_id || channel.identifier); toast.success("تم النسخ") }} style={{
+                        <input className="mdl-field" dir="ltr" value={appId} onChange={e => setAppId(e.target.value)} style={{ fontFamily: "monospace" }} />
+                        <button type="button" onClick={() => { navigator.clipboard.writeText(appId); toast.success("تم النسخ") }} style={{
                             width: 38, height: 38, borderRadius: 9, border: "1.5px solid #e0e3e7", flexShrink: 0,
                             background: "#fafafa", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
                             color: "#9ca3af", transition: "all .12s",

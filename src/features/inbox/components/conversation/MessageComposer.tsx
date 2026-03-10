@@ -14,6 +14,7 @@ import type { Customer } from "../../types/inbox.types"
 import type { Snippet } from "@/features/settings/types/teams-tags"
 import { usePermissions } from "@/lib/usePermissions"
 import { PAGE_BITS, ACTION_BITS } from "@/lib/permissions"
+import { PlatformLogo, getPlatformColor } from "@/utils/platform-icons"
 
 interface Props {
     customerId: string
@@ -508,7 +509,9 @@ export function MessageComposer({ customerId, customer }: Props) {
                         padding: "6px 14px", borderBottom: "1px solid var(--t-border-light)",
                     }}>
                         <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, fontWeight: 600, color: "var(--t-text)" }}>
-                            {customer?.platform_icon && <img src={customer.platform_icon} alt="" style={{ width: 16, height: 16, objectFit: "contain" }} />}
+                            <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 16, height: 16, borderRadius: "50%", background: getPlatformColor(customer?.platform) }}>
+                                <PlatformLogo platform={customer?.platform} fill="#fff" size={10} />
+                            </span>
                             <span>{platformLabel}</span>
                             <ChevronDown size={12} style={{ color: "var(--t-text-faint)" }} />
                         </div>

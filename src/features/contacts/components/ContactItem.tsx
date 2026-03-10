@@ -1,4 +1,5 @@
 import type { Contact } from "../types/contacts.types"
+import { PlatformLogo, getPlatformColor } from "@/utils/platform-icons"
 
 interface ContactItemProps {
     contact: Contact
@@ -35,11 +36,9 @@ export function ContactItem({ contact: c, isSelected, onClick, lifecycleMap, cus
             </td>
 
             <td className="ci-td">
-                {c.platform_icon ? (
-                    <img src={c.platform_icon} alt={c.platform} className="ci-channel" />
-                ) : (
-                    <span className="ci-channel-text">{c.platform || "—"}</span>
-                )}
+                <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 18, height: 18, borderRadius: "50%", background: getPlatformColor(c.platform) }}>
+                    <PlatformLogo platform={c.platform} fill="#fff" size={11} />
+                </span>
             </td>
 
             <td className="ci-td">

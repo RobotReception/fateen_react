@@ -2,6 +2,7 @@ import { Avatar } from "../ui/Avatar"
 import { useQueryClient } from "@tanstack/react-query"
 import type { Customer } from "../../types/inbox.types"
 import { AssignPanel } from "./AssignPanel"
+import { PlatformLogo, getPlatformColor } from "@/utils/platform-icons"
 
 interface Props { customer: Customer }
 
@@ -40,13 +41,12 @@ export function ConversationHeader({ customer: c }: Props) {
                         </span>
                     </>
                 )}
-                {c.platform_icon && (
-                    <>
-                        <span className="ch-sep">›</span>
-                        <img src={c.platform_icon} alt={c.platform || ""} title={c.platform || ""}
-                            style={{ width: 16, height: 16, flexShrink: 0 }} />
-                    </>
-                )}
+                <>
+                    <span className="ch-sep">›</span>
+                    <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 16, height: 16, borderRadius: "50%", background: getPlatformColor(c.platform), flexShrink: 0 }}>
+                        <PlatformLogo platform={c.platform} fill="#fff" size={10} />
+                    </span>
+                </>
                 {accountName && (
                     <span className="ch-account-name" title={`الحساب: ${accountName}`}>
                         {accountName}

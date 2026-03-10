@@ -6,6 +6,7 @@ import { Star, BellOff, Check, CheckCheck, MoreHorizontal } from "lucide-react"
 import type { Customer } from "../../types/inbox.types"
 import { CustomerActionsMenu } from "../conversation/CustomerActionsMenu"
 import { getTimeOrDate } from "../../../../utils/time"
+import { PlatformLogo, getPlatformColor } from "@/utils/platform-icons"
 
 
 function sessionDot(status?: string): string {
@@ -69,9 +70,9 @@ export const ConversationItem = memo(function ConversationItem({ customer: c, is
                     <Avatar name={displayName} size={42} />
                 )}
                 <span className="ci-status-dot" style={{ background: sessionDot(c.session_status) }} />
-                {c.platform_icon && (
-                    <img src={c.platform_icon} alt={c.platform} className="ci-platform-badge" />
-                )}
+                <span className="ci-platform-badge" style={{ background: getPlatformColor(c.platform) }}>
+                    <PlatformLogo platform={c.platform} fill="#fff" size={10} />
+                </span>
             </div>
 
             {/* ── Content ── */}
@@ -203,9 +204,9 @@ export const ConversationItem = memo(function ConversationItem({ customer: c, is
                 }
                 .ci-platform-badge {
                     position:absolute; top:-2px; left:-2px;
-                    width:16px; height:16px; object-fit:contain;
-                    background:var(--t-card); border-radius:50%;
-                    padding:1px;
+                    width:16px; height:16px;
+                    border-radius:50%;
+                    display:flex; align-items:center; justify-content:center;
                     box-shadow:0 1px 3px rgba(0,0,0,0.1);
                 }
 

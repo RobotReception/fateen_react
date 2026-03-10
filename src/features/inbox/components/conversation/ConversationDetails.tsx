@@ -9,6 +9,7 @@ import { toast } from "sonner"
 import { invalidateCustomerCaches } from "@/lib/query-keys"
 import type { Customer } from "../../types/inbox.types"
 import { Avatar } from "../ui/Avatar"
+import { PlatformLogo, getPlatformColor } from "@/utils/platform-icons"
 import { addCustomerTags, removeCustomerTags, updateContactCustomFields } from "../../services/inbox-service"
 import type { ActivityEvent } from "../../services/inbox-service"
 import { useTags } from "../../../settings/hooks/use-tags"
@@ -566,7 +567,9 @@ function ContactTab({ customer: c }: { customer: Customer }) {
             {/* Channel */}
             <div className="cd-channel-row">
                 <div className="cd-channel-badge">
-                    {c.platform_icon && <img src={c.platform_icon} alt="" style={{ width: 14, height: 14 }} />}
+                    <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 14, height: 14, borderRadius: "50%", background: getPlatformColor(c.platform) }}>
+                        <PlatformLogo platform={c.platform} fill="#fff" size={9} />
+                    </span>
                     <span>{c.platform || "—"}</span>
                 </div>
                 <span style={{ fontSize: 11, color: "var(--t-text-faint)" }}>القنوات</span>

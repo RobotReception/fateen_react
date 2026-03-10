@@ -18,6 +18,7 @@ import { useAuthStore } from "@/stores/auth-store"
 import type { DynamicField } from "../../settings/types/contact-fields.types"
 import { usePermissions } from "@/lib/usePermissions"
 import { PAGE_BITS, ACTION_BITS } from "@/lib/permissions"
+import { PlatformLogo, getPlatformColor } from "@/utils/platform-icons"
 
 function formatDate(str?: string | null): string {
     if (!str) return "—"
@@ -329,7 +330,9 @@ export function ContactDetailPanel() {
                         {email && <InfoRow icon={<Mail size={11} />} label="البريد" value={email} />}
                         <InfoRow icon={<Globe size={11} />} label="المنصة" value={
                             <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-                                {contact.platform_icon && <img src={contact.platform_icon} alt="" style={{ width: 14, height: 14 }} />}
+                                <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 14, height: 14, borderRadius: "50%", background: getPlatformColor(contact.platform) }}>
+                                    <PlatformLogo platform={contact.platform} fill="#fff" size={9} />
+                                </span>
                                 <span style={{ textTransform: "capitalize" }}>{contact.platform}</span>
                             </div>
                         } />
