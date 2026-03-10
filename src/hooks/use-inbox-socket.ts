@@ -31,8 +31,22 @@ import { useQueryClient } from "@tanstack/react-query"
 import { useAuthStore } from "@/stores/auth-store"
 import type { Customer, CustomersResponse } from "@/features/inbox/types/inbox.types"
 
-const WS_PROTOCOL = window.location.protocol === "https:" ? "wss:" : "ws:"
-const WS_INBOX_URL = `${WS_PROTOCOL}//${window.location.host}/api/backend/v2/ws/inbox`
+// ── Derive WebSocket URL from API base URL ──────────────────
+// In production: VITE_API_BASE_URL = "https://fateen-backend-dashboard.prideidea.com/api/backend/v2"
+// → WS URL = "wss://fateen-backend-dashboard.prideidea.com/api/backend/v2/ws/inbox"
+// In dev: no env var → fallback to window.location.host (Vite proxy handles it)
+function buildWsUrl(): string {
+    const apiBase = import.meta.env.VITE_API_BASE_URL as string | undefined
+    if (apiBase) {
+        // Convert https://host/path → wss://host/path/ws/inbox
+        const wsBase = apiBase.replace(/^https:/, "wss:").replace(/^http:/, "ws:")
+        return `${wsBase}/ws/inbox`
+    }
+    // Fallback: same host (dev mode with Vite proxy)
+    const protocol = window.location.protocol === "https:" ? "wss:" : "ws:"
+    return `${protocol}//${window.location.host}/api/backend/v2/ws/inbox`
+}
+const WS_INBOX_URL = buildWsUrl()
 
 const RECONNECT_DELAY_MS = 3_000
 const HEARTBEAT_INTERVAL_MS = 25_000
@@ -283,7 +297,11 @@ export function useInboxSocket() {
                 if (event.customer_id) {
                     patchCustomerInCache(event.customer_id, (c) => ({
                         ...c,
-                        lifecycle: String(payload.new_lifecycle || c.lifecycle),
+                        lifecycle: {
+                            ...(c.lifecycle || { code: "", name: "" }),
+                            code: String(payload.new_lifecycle || c.lifecycle?.code || ""),
+                            name: String(payload.new_lifecycle_name || c.lifecycle?.name || ""),
+                        },
                     }))
                 }
                 // Sidebar يتحدث — أعداد المراحل تغيّرت
