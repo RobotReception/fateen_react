@@ -187,12 +187,88 @@ function SettingsTab({ channel, tenantId }: { channel: Channel; tenantId: string
                 <input className="mdl-field" dir="rtl" value={name} onChange={e => setName(e.target.value)} placeholder="اسم القناة" />
             </div>
 
-            {channel.platform !== "webchat" && (
+            {channel.platform === "whatsapp" && (
+                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                    <div>
+                        <label className="mdl-label">Phone Number ID</label>
+                        <div style={{ display: "flex", gap: 6 }}>
+                            <input className="mdl-field" dir="ltr" value={channel.phone_number_id || channel.identifier} readOnly style={{ fontFamily: "monospace", opacity: 0.7, cursor: "default" }} />
+                            <button type="button" onClick={() => { navigator.clipboard.writeText(channel.phone_number_id || channel.identifier); toast.success("تم النسخ") }} style={{
+                                width: 38, height: 38, borderRadius: 9, border: "1.5px solid #e0e3e7", flexShrink: 0,
+                                background: "#fafafa", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+                                color: "#9ca3af", transition: "all .12s",
+                            }}
+                                onMouseEnter={e => { e.currentTarget.style.borderColor = "#004786"; e.currentTarget.style.color = "#004786" }}
+                                onMouseLeave={e => { e.currentTarget.style.borderColor = "#e0e3e7"; e.currentTarget.style.color = "#9ca3af" }}
+                            >
+                                <Copy size={14} />
+                            </button>
+                        </div>
+                    </div>
+                    <div>
+                        <label className="mdl-label">WABA ID</label>
+                        <div style={{ display: "flex", gap: 6 }}>
+                            <input className="mdl-field" dir="ltr" value={channel.waba_id || ""} readOnly style={{ fontFamily: "monospace", opacity: 0.7, cursor: "default" }} />
+                            <button type="button" onClick={() => { navigator.clipboard.writeText(channel.waba_id || ""); toast.success("تم النسخ") }} style={{
+                                width: 38, height: 38, borderRadius: 9, border: "1.5px solid #e0e3e7", flexShrink: 0,
+                                background: "#fafafa", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+                                color: "#9ca3af", transition: "all .12s",
+                            }}
+                                onMouseEnter={e => { e.currentTarget.style.borderColor = "#004786"; e.currentTarget.style.color = "#004786" }}
+                                onMouseLeave={e => { e.currentTarget.style.borderColor = "#e0e3e7"; e.currentTarget.style.color = "#9ca3af" }}
+                            >
+                                <Copy size={14} />
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {(channel.platform === "facebook" || channel.platform === "instagram") && (
+                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                    <div>
+                        <label className="mdl-label">Page ID</label>
+                        <div style={{ display: "flex", gap: 6 }}>
+                            <input className="mdl-field" dir="ltr" value={channel.page_id || channel.identifier} readOnly style={{ fontFamily: "monospace", opacity: 0.7, cursor: "default" }} />
+                            <button type="button" onClick={() => { navigator.clipboard.writeText(channel.page_id || channel.identifier); toast.success("تم النسخ") }} style={{
+                                width: 38, height: 38, borderRadius: 9, border: "1.5px solid #e0e3e7", flexShrink: 0,
+                                background: "#fafafa", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+                                color: "#9ca3af", transition: "all .12s",
+                            }}
+                                onMouseEnter={e => { e.currentTarget.style.borderColor = "#004786"; e.currentTarget.style.color = "#004786" }}
+                                onMouseLeave={e => { e.currentTarget.style.borderColor = "#e0e3e7"; e.currentTarget.style.color = "#9ca3af" }}
+                            >
+                                <Copy size={14} />
+                            </button>
+                        </div>
+                    </div>
+                    {channel.platform === "instagram" && (
+                        <div>
+                            <label className="mdl-label">IG Account ID</label>
+                            <div style={{ display: "flex", gap: 6 }}>
+                                <input className="mdl-field" dir="ltr" value={channel.ig_account_id || ""} readOnly style={{ fontFamily: "monospace", opacity: 0.7, cursor: "default" }} />
+                                <button type="button" onClick={() => { navigator.clipboard.writeText(channel.ig_account_id || ""); toast.success("تم النسخ") }} style={{
+                                    width: 38, height: 38, borderRadius: 9, border: "1.5px solid #e0e3e7", flexShrink: 0,
+                                    background: "#fafafa", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+                                    color: "#9ca3af", transition: "all .12s",
+                                }}
+                                    onMouseEnter={e => { e.currentTarget.style.borderColor = "#004786"; e.currentTarget.style.color = "#004786" }}
+                                    onMouseLeave={e => { e.currentTarget.style.borderColor = "#e0e3e7"; e.currentTarget.style.color = "#9ca3af" }}
+                                >
+                                    <Copy size={14} />
+                                </button>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {channel.platform === "appchat" && (
                 <div>
-                    <label className="mdl-label">المعرّف (identifier)</label>
+                    <label className="mdl-label">App ID</label>
                     <div style={{ display: "flex", gap: 6 }}>
-                        <input className="mdl-field" dir="ltr" value={channel.identifier} readOnly style={{ fontFamily: "monospace", opacity: 0.7, cursor: "default" }} />
-                        <button type="button" onClick={() => { navigator.clipboard.writeText(channel.identifier); toast.success("تم النسخ") }} style={{
+                        <input className="mdl-field" dir="ltr" value={channel.app_id || channel.identifier} readOnly style={{ fontFamily: "monospace", opacity: 0.7, cursor: "default" }} />
+                        <button type="button" onClick={() => { navigator.clipboard.writeText(channel.app_id || channel.identifier); toast.success("تم النسخ") }} style={{
                             width: 38, height: 38, borderRadius: 9, border: "1.5px solid #e0e3e7", flexShrink: 0,
                             background: "#fafafa", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
                             color: "#9ca3af", transition: "all .12s",
