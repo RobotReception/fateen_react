@@ -8,6 +8,7 @@ import { MessagesList } from "../components/conversation/MessagesList"
 import { MessageComposer } from "../components/conversation/MessageComposer"
 import { useCustomerMessages, flattenMessages } from "../hooks/use-customer-messages"
 import { useConversationStore } from "../store/conversation.store"
+import { useInboxSocket } from "@/hooks/use-inbox-socket"
 import type { Customer, CustomersResponse } from "../types/inbox.types"
 
 const ConversationDetails = lazy(() =>
@@ -132,6 +133,9 @@ function ConversationPageInner({ id, accountId }: { id: string; accountId?: stri
     const queryClient = useQueryClient()
     const customer = useCachedCustomer(id, accountId)
     const resolvedAccountId = customer?.account_id ?? accountId
+
+    // Live inbox events via WebSocket
+    useInboxSocket()
 
     const {
         data, isLoading: loadingMsgs,

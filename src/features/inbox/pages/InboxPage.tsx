@@ -1,7 +1,11 @@
 import { InboxNavSidebar } from "../components/sidebar/InboxNavSidebar"
 import { ConversationListPanel } from "../components/sidebar/ConversationListPanel"
+import { useInboxSocket } from "@/hooks/use-inbox-socket"
 
 export function InboxPage() {
+    // Live inbox events via WebSocket (messages, conversation updates)
+    useInboxSocket()
+
     return (
         <div style={{
             display: "flex",

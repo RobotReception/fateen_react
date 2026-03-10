@@ -22,11 +22,12 @@ export function useCustomerMessages(customerId: string | null, accountId?: strin
             return current + 1
         },
         // ── Refresh behaviour ──────────────────────────────
+        // Live updates come via WebSocket (useInboxSocket).
+        // Polling is kept as a fallback only — 60s instead of 10s.
         enabled: !!customerId,
-        staleTime: 0,                    // always consider data stale → refetch on navigation
         refetchOnMount: "always",        // fetch fresh messages every time conversation opens
         refetchOnWindowFocus: true,      // refresh when user tabs back in
-        refetchInterval: 10_000,
+        refetchInterval: 60_000,         // fallback polling (was 10_000 before WebSocket)
         // Limit to 3 pages so polling only re-fetches the 3 most recent pages,
         // not the entire history (which would never surface new messages at page 1)
         maxPages: 3,

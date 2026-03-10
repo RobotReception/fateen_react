@@ -32,6 +32,6 @@ export function useCustomers(params: UseCustomersParams) {
             page_size: params.page_size ?? 80,
             include_filters: true,   // always fetch filter options
         }),
-        refetchInterval: 30_000,
+        refetchInterval: 60_000,
     })
 }
