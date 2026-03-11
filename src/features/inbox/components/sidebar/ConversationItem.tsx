@@ -1,4 +1,4 @@
-import { useState, useRef, memo } from "react"
+import { useState, useRef, useCallback, memo } from "react"
 import { useNavigate } from "react-router-dom"
 import { useQueryClient } from "@tanstack/react-query"
 import { Avatar } from "../ui/Avatar"
@@ -7,16 +7,19 @@ import type { Customer } from "../../types/inbox.types"
 import { CustomerActionsMenu } from "../conversation/CustomerActionsMenu"
 import { getTimeOrDate } from "../../../../utils/time"
 import { PlatformLogo, getPlatformColor } from "@/utils/platform-icons"
+import { getCustomerMessages } from "../../services/inbox-service"
 
 
 function sessionDot(status?: string): string {
     switch (status) {
-        case "open": return "#10b981"
-        case "pending": return "#f59e0b"
+        case "open": return "var(--t-success)"
+        case "pending": return "var(--t-warning)"
         case "closed": return "var(--t-text-faint)"
         default: return "var(--t-text-faint)"
     }
 }
+
+const PREFETCH_PAGE_SIZE = 20
 
 interface ConversationItemProps {
     customer: Customer
@@ -33,6 +36,22 @@ export const ConversationItem = memo(function ConversationItem({ customer: c, is
     const [hovered, setHovered] = useState(false)
     const [menuOpen, setMenuOpen] = useState(false)
     const menuBtnRef = useRef<HTMLButtonElement>(null)
+
+    // ── Prefetch messages on hover — data ready before click ──
+    const handleMouseEnter = useCallback(() => {
+        setHovered(true)
+        queryClient.prefetchInfiniteQuery({
+            queryKey: ["customer-messages", c.customer_id, c.account_id],
+            queryFn: () =>
+                getCustomerMessages(c.customer_id, {
+                    page: 1,
+                    page_size: PREFETCH_PAGE_SIZE,
+                    ...(c.account_id && { account_id: c.account_id }),
+                }),
+            initialPageParam: 1,
+            staleTime: 30_000,
+        })
+    }, [queryClient, c.customer_id, c.account_id])
 
     return (
         <div
@@ -56,9 +75,8 @@ export const ConversationItem = memo(function ConversationItem({ customer: c, is
                         }
                     }
                 )
-                queryClient.invalidateQueries({ queryKey: ["customer-messages", c.customer_id, c.account_id] })
             }}
-            onMouseEnter={() => setHovered(true)}
+            onMouseEnter={handleMouseEnter}
             onMouseLeave={() => { if (!menuOpen) setHovered(false) }}
         >
             {/* ── Avatar ── */}
@@ -114,7 +132,7 @@ export const ConversationItem = memo(function ConversationItem({ customer: c, is
                         {c.last_direction === "outbound" && (
                             <span className="ci-tick">
                                 {c.last_message_status === "read"
-                                    ? <CheckCheck size={13} style={{ color: "#0072b5" }} />
+                                    ? <CheckCheck size={13} style={{ color: "var(--t-accent-secondary)" }} />
                                     : c.last_message_status === "delivered"
                                         ? <CheckCheck size={13} />
                                         : <Check size={13} />
@@ -131,7 +149,7 @@ export const ConversationItem = memo(function ConversationItem({ customer: c, is
                         </p>
                     </div>
                     <div className="ci-badges">
-                        {c.favorite && <Star size={12} style={{ color: "#f59e0b", fill: "#f59e0b" }} />}
+                        {c.favorite && <Star size={12} style={{ color: "var(--t-warning)", fill: "var(--t-warning)" }} />}
                         {c.muted && <BellOff size={12} className="ci-muted-icon" />}
                         {hasUnread && (
                             <span className="ci-unread-badge">
@@ -175,8 +193,8 @@ export const ConversationItem = memo(function ConversationItem({ customer: c, is
                     background:var(--t-surface);
                 }
                 .ci-selected {
-                    background:rgba(0,71,134,0.06) !important;
-                    border-right-color:#0072b5 !important;
+                    background:rgba(27,80,145,0.06) !important;
+                    border-right-color:var(--t-accent-secondary) !important;
                 }
                 .ci-selected::before {
                     content:'';
@@ -234,7 +252,7 @@ export const ConversationItem = memo(function ConversationItem({ customer: c, is
                     color:var(--t-text-faint);
                 }
                 .ci-time-accent {
-                    color:#0072b5; font-weight:700;
+                    color:var(--t-accent-secondary); font-weight:700;
                 }
                 .ci-menu-btn {
                     width:22px; height:22px; border-radius:6px;
@@ -277,10 +295,10 @@ export const ConversationItem = memo(function ConversationItem({ customer: c, is
                 .ci-unread-badge {
                     font-size:10px; font-weight:700;
                     padding:1px 6px; border-radius:10px;
-                    background:linear-gradient(135deg, #004786, #0072b5);
+                    background:var(--t-brand-orange);
                     color:#fff; min-width:18px; text-align:center;
                     line-height:16px;
-                    box-shadow:0 1px 4px rgba(0,71,134,0.25);
+                    box-shadow:0 1px 4px rgba(27,80,145,0.25);
                 }
 
                 /* Row 3: chips */
@@ -297,18 +315,18 @@ export const ConversationItem = memo(function ConversationItem({ customer: c, is
                 }
                 .ci-chip-icon { font-size:10px; }
                 .ci-chip-lc {
-                    background:rgba(0,71,134,0.06);
-                    color:#004786;
-                    border-color:rgba(0,71,134,0.1);
+                    background:rgba(27,80,145,0.06);
+                    color:var(--t-accent);
+                    border-color:rgba(27,80,145,0.1);
                 }
                 .ci-chip-agent {
-                    background:rgba(0,114,181,0.08);
-                    color:#0072b5;
+                    background:var(--t-accent-muted);
+                    color:var(--t-accent-secondary);
                     border-color:rgba(0,114,181,0.12);
                 }
                 .ci-chip-closed {
                     background:var(--t-danger-soft, rgba(239,68,68,0.08));
-                    color:var(--t-danger, #ef4444);
+                    color:var(--t-danger, var(--t-danger));
                     border-color:rgba(239,68,68,0.12);
                 }
             `}</style>

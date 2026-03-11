@@ -19,13 +19,13 @@ const CSS = `
 @keyframes aiFade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 @keyframes aiShimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 @keyframes aiSweep{0%{transform:translateX(-100%)}100%{transform:translateX(200%)}}
-.ai2-field{width:100%;padding:8px 11px;border-radius:8px;border:1.5px solid #e5e7eb;background:#fff;font-size:12.5px;color:#111827;outline:none;transition:border-color .15s,box-shadow .15s;font-family:inherit;box-sizing:border-box}
-.ai2-field:focus{border-color:#004786;box-shadow:0 0 0 3px rgba(0,71,134,.06)}
-.ai2-btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:8px;border:none;cursor:pointer;background:linear-gradient(135deg,#004786,#0072b5);color:#fff;font-size:11px;font-weight:700;transition:all .15s;font-family:inherit;box-shadow:0 1px 5px rgba(0,71,134,.13)}
-.ai2-btn:hover{box-shadow:0 3px 12px rgba(0,71,134,.2)}.ai2-btn:disabled{opacity:.5;cursor:default;box-shadow:none}
-.ai2-ghost{display:inline-flex;align-items:center;gap:4px;padding:6px 12px;border-radius:8px;cursor:pointer;border:1.5px solid #e5e7eb;background:#fff;color:#6b7280;font-size:11px;font-weight:600;font-family:inherit;transition:all .12s}
-.ai2-ghost:hover{border-color:#d1d5db;color:#374151}
-.ai2-lbl{font-size:10px;font-weight:700;color:#9ca3af;display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.06em}
+.ai2-field{width:100%;padding:8px 11px;border-radius:8px;border:1.5px solid var(--t-border);background:#fff;font-size:12.5px;color:var(--t-text);outline:none;transition:border-color .15s,box-shadow .15s;font-family:inherit;box-sizing:border-box}
+.ai2-field:focus{border-color:var(--t-accent);box-shadow:0 0 0 3px rgba(27,80,145,.06)}
+.ai2-btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:8px;border:none;cursor:pointer;background:var(--t-brand-orange);color:#fff;font-size:11px;font-weight:700;transition:all .15s;font-family:inherit;box-shadow:0 1px 5px rgba(27,80,145,.13)}
+.ai2-btn:hover{box-shadow:0 3px 12px rgba(27,80,145,.2)}.ai2-btn:disabled{opacity:.5;cursor:default;box-shadow:none}
+.ai2-ghost{display:inline-flex;align-items:center;gap:4px;padding:6px 12px;border-radius:8px;cursor:pointer;border:1.5px solid var(--t-border);background:#fff;color:var(--t-text-muted);font-size:11px;font-weight:600;font-family:inherit;transition:all .12s}
+.ai2-ghost:hover{border-color:var(--t-border-medium);color:var(--t-text-secondary)}
+.ai2-lbl{font-size:10px;font-weight:700;color:var(--t-text-faint);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.06em}
 `
 
 /* ── Toggle ── */
@@ -35,8 +35,8 @@ function Toggle({ on, onToggle, size = "md" }: { on: boolean; onToggle: () => vo
         <button onClick={onToggle} style={{
             width: W, height: H, borderRadius: H, border: "none", flexShrink: 0,
             position: "relative", cursor: "pointer",
-            background: on ? "linear-gradient(135deg, #004786, #0072b5)" : "#e5e7eb",
-            transition: "background .2s", boxShadow: on ? "0 1px 5px rgba(0,71,134,.15)" : "none",
+            background: on ? "var(--t-gradient-accent)" : "var(--t-border)",
+            transition: "background .2s", boxShadow: on ? "0 1px 5px rgba(27,80,145,.15)" : "none",
         }}>
             <span style={{ position: "absolute", top: P, left: on ? W - D - P : P, width: D, height: D, borderRadius: "50%", background: "white", boxShadow: "0 1px 3px rgba(0,0,0,.18)", transition: "left .2s" }} />
         </button>
@@ -44,19 +44,19 @@ function Toggle({ on, onToggle, size = "md" }: { on: boolean; onToggle: () => vo
 }
 
 /* ── Skeleton ── */
-const sk = (w: string, h = 12, r = 6) => ({ width: w, height: h, borderRadius: r, background: "linear-gradient(110deg,#f0f1f3 30%,#f9fafb 50%,#f0f1f3 70%)", backgroundSize: "200% 100%", animation: "aiShimmer 1.6s ease-in-out infinite", flexShrink: 0 } as React.CSSProperties)
+const sk = (w: string, h = 12, r = 6) => ({ width: w, height: h, borderRadius: r, background: "linear-gradient(110deg,#f0f1f3 30%,var(--t-page) 50%,#f0f1f3 70%)", backgroundSize: "200% 100%", animation: "aiShimmer 1.6s ease-in-out infinite", flexShrink: 0 } as React.CSSProperties)
 
 function Skeleton() {
     return (
         <div style={{ animation: "aiFade .3s ease-out" }}>
             <style>{CSS}</style>
             {/* Header skeleton */}
-            <div style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 18px", borderRadius: 12, border: "1px solid #ebeef2", background: "#fff", marginBottom: 14 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 18px", borderRadius: 12, border: "1px solid var(--t-border)", background: "#fff", marginBottom: 14 }}>
                 <div style={sk("36px", 36, 10)} /><div style={{ flex: 1 }}><div style={sk("140px", 14)} /><div style={{ ...sk("200px", 10), marginTop: 6 }} /></div><div style={sk("44px", 22, 11)} />
             </div>
             {/* Grid skeleton */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-                {[0, 1].map(i => <div key={i} style={{ borderRadius: 12, border: "1px solid #ebeef2", background: "#fff", padding: 16 }}><div style={{ display: "flex", gap: 10, alignItems: "center", marginBottom: 14 }}><div style={sk("34px", 34, 8)} /><div><div style={sk("90px", 12)} /><div style={{ ...sk("60px", 9), marginTop: 4 }} /></div></div><div style={sk("100%", 60, 8)} /></div>)}
+                {[0, 1].map(i => <div key={i} style={{ borderRadius: 12, border: "1px solid var(--t-border)", background: "#fff", padding: 16 }}><div style={{ display: "flex", gap: 10, alignItems: "center", marginBottom: 14 }}><div style={sk("34px", 34, 8)} /><div><div style={sk("90px", 12)} /><div style={{ ...sk("60px", 9), marginTop: 4 }} /></div></div><div style={sk("100%", 60, 8)} /></div>)}
             </div>
         </div>
     )
@@ -67,12 +67,12 @@ function ErrorState({ error, onRetry, retrying }: { error: unknown; onRetry: () 
     const ax = error as any
     const isNet = ax?.code === "ERR_NETWORK" || ax?.code === "ECONNABORTED"
     return (
-        <div style={{ borderRadius: 12, padding: "40px 24px", textAlign: "center", border: "1px solid #ebeef2", background: "#fff", animation: "aiFade .3s ease-out" }}>
+        <div style={{ borderRadius: 12, padding: "40px 24px", textAlign: "center", border: "1px solid var(--t-border)", background: "#fff", animation: "aiFade .3s ease-out" }}>
             <style>{CSS}</style>
             <div style={{ width: 48, height: 48, borderRadius: 14, margin: "0 auto 14px", background: "#fef2f2", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                {isNet ? <WifiOff size={22} style={{ color: "#dc2626" }} /> : <AlertTriangle size={22} style={{ color: "#dc2626" }} />}
+                {isNet ? <WifiOff size={22} style={{ color: "var(--t-danger)" }} /> : <AlertTriangle size={22} style={{ color: "var(--t-danger)" }} />}
             </div>
-            <div style={{ fontSize: 15, fontWeight: 800, color: "#111827", marginBottom: 6 }}>{isNet ? "لا يمكن الاتصال" : "خطأ في التحميل"}</div>
+            <div style={{ fontSize: 15, fontWeight: 800, color: "var(--t-text)", marginBottom: 6 }}>{isNet ? "لا يمكن الاتصال" : "خطأ في التحميل"}</div>
             <button className="ai2-btn" onClick={onRetry} style={{ opacity: retrying ? .7 : 1, marginTop: 8 }}>{retrying ? <Loader2 size={12} className="animate-spin" /> : <RefreshCw size={12} />} إعادة المحاولة</button>
         </div>
     )
@@ -140,48 +140,48 @@ function ProviderCard({ name, prov, agentId }: { name: string; prov: LLMProvider
 
     return (
         <div style={{
-            borderRadius: 12, border: `1px solid ${dirty ? "rgba(0,71,134,.25)" : open ? "rgba(0,71,134,.15)" : "#ebeef2"}`, background: "#fff",
+            borderRadius: 12, border: `1px solid ${dirty ? "rgba(27,80,145,.25)" : open ? "rgba(27,80,145,.15)" : "var(--t-border)"}`, background: "#fff",
             overflow: "hidden", transition: "all .2s",
-            boxShadow: dirty ? "0 0 0 3px rgba(0,71,134,.04)" : open ? "0 4px 20px rgba(0,0,0,.05)" : "none",
+            boxShadow: dirty ? "0 0 0 3px rgba(27,80,145,.04)" : open ? "0 4px 20px rgba(0,0,0,.05)" : "none",
         }}>
             {/* Top accent when dirty */}
-            {dirty && <div style={{ height: 2, background: "linear-gradient(90deg, #004786, #0072b5)" }} />}
+            {dirty && <div style={{ height: 2, background: "linear-gradient(90deg, var(--t-accent), var(--t-accent-secondary))" }} />}
 
             {/* Header */}
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 14px", cursor: "pointer" }} onClick={() => setOpen(!open)}>
                 <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0, flex: 1 }}>
                     <div style={{
                         width: 34, height: 34, borderRadius: 8, flexShrink: 0,
-                        background: prov.enabled ? "linear-gradient(135deg, #004786, #0072b5)" : "#f0f1f3",
+                        background: prov.enabled ? "var(--t-gradient-accent)" : "#f0f1f3",
                         display: "flex", alignItems: "center", justifyContent: "center", transition: "all .15s",
                     }}>
-                        <Server size={14} style={{ color: prov.enabled ? "#fff" : "#9ca3af" }} />
+                        <Server size={14} style={{ color: prov.enabled ? "#fff" : "var(--t-text-faint)" }} />
                     </div>
                     <div style={{ minWidth: 0, flex: 1 }}>
                         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                            <span style={{ fontSize: 13, fontWeight: 700, color: "#111827" }}>{displayName}</span>
+                            <span style={{ fontSize: 13, fontWeight: 700, color: "var(--t-text)" }}>{displayName}</span>
                             <span style={{
                                 fontSize: 8.5, fontWeight: 700, padding: "2px 7px", borderRadius: 20,
-                                background: prov.enabled ? "rgba(22,163,74,.06)" : "#f5f6f8",
-                                color: prov.enabled ? "#16a34a" : "#9ca3af",
+                                background: prov.enabled ? "rgba(22,163,74,.06)" : "var(--t-surface)",
+                                color: prov.enabled ? "#16a34a" : "var(--t-text-faint)",
                             }}>{prov.enabled ? "مُفعَّل" : "معطّل"}</span>
-                            {dirty && <span style={{ fontSize: 8, fontWeight: 700, padding: "2px 7px", borderRadius: 20, background: "rgba(0,71,134,.06)", color: "#004786" }}>غير محفوظ</span>}
+                            {dirty && <span style={{ fontSize: 8, fontWeight: 700, padding: "2px 7px", borderRadius: 20, background: "rgba(27,80,145,.06)", color: "var(--t-accent)" }}>غير محفوظ</span>}
                         </div>
-                        <div style={{ fontSize: 10, color: "#9ca3af", marginTop: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                            {prov.selected_model ? <code style={{ fontFamily: "monospace", fontSize: 9.5, background: "#f5f6f8", padding: "0 4px", borderRadius: 3 }}>{prov.selected_model}</code> : "–"}
+                        <div style={{ fontSize: 10, color: "var(--t-text-faint)", marginTop: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                            {prov.selected_model ? <code style={{ fontFamily: "monospace", fontSize: 9.5, background: "var(--t-surface)", padding: "0 4px", borderRadius: 3 }}>{prov.selected_model}</code> : "–"}
                             <span style={{ marginRight: 5 }}>· {models.length} موديل</span>
                         </div>
                     </div>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 6 }} onClick={e => e.stopPropagation()}>
                     <Toggle on={prov.enabled} size="sm" onToggle={() => updateP.mutate({ name, payload: { enabled: !prov.enabled } })} />
-                    <ChevronDown size={13} style={{ color: "#9ca3af", transition: "transform .2s", transform: open ? "rotate(180deg)" : "none", cursor: "pointer" }} onClick={() => setOpen(!open)} />
+                    <ChevronDown size={13} style={{ color: "var(--t-text-faint)", transition: "transform .2s", transform: open ? "rotate(180deg)" : "none", cursor: "pointer" }} onClick={() => setOpen(!open)} />
                 </div>
             </div>
 
             {/* Expanded Form */}
             {open && (
-                <div style={{ borderTop: "1px solid #ebeef2", padding: "14px", animation: "aiFade .12s ease-out" }}>
+                <div style={{ borderTop: "1px solid var(--t-border)", padding: "14px", animation: "aiFade .12s ease-out" }}>
                     {/* API Key */}
                     <div style={{ marginBottom: 12 }}>
                         <div className="ai2-lbl">مفتاح API</div>
@@ -230,11 +230,11 @@ function ProviderCard({ name, prov, agentId }: { name: string; prov: LLMProvider
                             {models.map(m => (
                                 <span key={m} style={{
                                     display: "inline-flex", alignItems: "center", gap: 4, padding: "3px 9px", borderRadius: 6, fontSize: 10, fontWeight: 600,
-                                    fontFamily: "monospace", background: prov.selected_model === m ? "rgba(0,71,134,.06)" : "#f5f6f8",
-                                    color: prov.selected_model === m ? "#004786" : "#6b7280", border: `1px solid ${prov.selected_model === m ? "rgba(0,71,134,.15)" : "#ebeef2"}`,
+                                    fontFamily: "monospace", background: prov.selected_model === m ? "rgba(27,80,145,.06)" : "var(--t-surface)",
+                                    color: prov.selected_model === m ? "var(--t-accent)" : "var(--t-text-muted)", border: `1px solid ${prov.selected_model === m ? "rgba(27,80,145,.15)" : "var(--t-border)"}`,
                                 }}>
                                     {m}
-                                    <button onClick={() => delM.mutate({ provider: name, modelId: m })} style={{ border: "none", background: "none", cursor: "pointer", padding: 0, color: "#dc2626", display: "flex", lineHeight: 1 }}><X size={8} /></button>
+                                    <button onClick={() => delM.mutate({ provider: name, modelId: m })} style={{ border: "none", background: "none", cursor: "pointer", padding: 0, color: "var(--t-danger)", display: "flex", lineHeight: 1 }}><X size={8} /></button>
                                 </span>
                             ))}
                             {addingModel ? (
@@ -248,11 +248,11 @@ function ProviderCard({ name, prov, agentId }: { name: string; prov: LLMProvider
                                 </div>
                             ) : (
                                 <button onClick={() => setAddingModel(true)} style={{
-                                    display: "inline-flex", alignItems: "center", gap: 3, padding: "3px 9px", borderRadius: 6, border: "1.5px dashed #d1d5db",
-                                    background: "transparent", color: "#9ca3af", fontSize: 10, cursor: "pointer", fontFamily: "inherit", transition: "all .1s",
+                                    display: "inline-flex", alignItems: "center", gap: 3, padding: "3px 9px", borderRadius: 6, border: "1.5px dashed var(--t-border-medium)",
+                                    background: "transparent", color: "var(--t-text-faint)", fontSize: 10, cursor: "pointer", fontFamily: "inherit", transition: "all .1s",
                                 }}
-                                    onMouseEnter={e => { e.currentTarget.style.borderColor = "#004786"; e.currentTarget.style.color = "#004786" }}
-                                    onMouseLeave={e => { e.currentTarget.style.borderColor = "#d1d5db"; e.currentTarget.style.color = "#9ca3af" }}>
+                                    onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--t-accent)"; e.currentTarget.style.color = "var(--t-accent)" }}
+                                    onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--t-border-medium)"; e.currentTarget.style.color = "var(--t-text-faint)" }}>
                                     <Plus size={9} /> إضافة
                                 </button>
                             )}
@@ -276,12 +276,12 @@ function ProviderCard({ name, prov, agentId }: { name: string; prov: LLMProvider
                         {!confirmDel ? (
                             <button onClick={() => setConfirmDel(true)} style={{
                                 display: "inline-flex", alignItems: "center", gap: 4, padding: "5px 10px", borderRadius: 6, cursor: "pointer",
-                                border: "1px solid rgba(239,68,68,.15)", background: "rgba(239,68,68,.03)", color: "#dc2626", fontSize: 10, fontWeight: 600, fontFamily: "inherit",
+                                border: "1px solid rgba(239,68,68,.15)", background: "rgba(239,68,68,.03)", color: "var(--t-danger)", fontSize: 10, fontWeight: 600, fontFamily: "inherit",
                             }}><Trash2 size={10} /> حذف المزود</button>
                         ) : (
                             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                                <span style={{ fontSize: 11, color: "#dc2626", fontWeight: 600 }}>حذف "{displayName}"؟</span>
-                                <button onClick={() => deleteP.mutate(name)} className="ai2-btn" style={{ background: "#dc2626", padding: "4px 10px", fontSize: 10, boxShadow: "0 1px 4px rgba(220,38,38,.15)" }}>حذف</button>
+                                <span style={{ fontSize: 11, color: "var(--t-danger)", fontWeight: 600 }}>حذف "{displayName}"؟</span>
+                                <button onClick={() => deleteP.mutate(name)} className="ai2-btn" style={{ background: "var(--t-danger)", padding: "4px 10px", fontSize: 10, boxShadow: "0 1px 4px rgba(220,38,38,.15)" }}>حذف</button>
                                 <button onClick={() => setConfirmDel(false)} className="ai2-ghost" style={{ padding: "4px 8px", fontSize: 10 }}>إلغاء</button>
                             </div>
                         )}
@@ -300,18 +300,18 @@ function AddProviderForm({ agentId }: { agentId: string }) {
 
     if (!open) return (
         <button onClick={() => setOpen(true)} style={{
-            width: "100%", padding: "10px 0", borderRadius: 10, border: "1.5px dashed #d1d5db", background: "transparent",
-            color: "#9ca3af", fontSize: 12, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 5, transition: "all .15s", fontFamily: "inherit",
+            width: "100%", padding: "10px 0", borderRadius: 10, border: "1.5px dashed var(--t-border-medium)", background: "transparent",
+            color: "var(--t-text-faint)", fontSize: 12, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 5, transition: "all .15s", fontFamily: "inherit",
         }}
-            onMouseEnter={e => { e.currentTarget.style.borderColor = "#004786"; e.currentTarget.style.color = "#004786" }}
-            onMouseLeave={e => { e.currentTarget.style.borderColor = "#d1d5db"; e.currentTarget.style.color = "#9ca3af" }}>
+            onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--t-accent)"; e.currentTarget.style.color = "var(--t-accent)" }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--t-border-medium)"; e.currentTarget.style.color = "var(--t-text-faint)" }}>
             <Plus size={13} /> إضافة مزود جديد
         </button>
     )
 
     return (
-        <div style={{ borderRadius: 12, border: "1.5px solid rgba(0,71,134,.2)", background: "#fff", padding: "14px 16px", boxShadow: "0 2px 12px rgba(0,71,134,.05)", gridColumn: "1 / -1" }}>
-            <div style={{ fontSize: 13, fontWeight: 700, color: "#111827", marginBottom: 10 }}>مزود LLM جديد</div>
+        <div style={{ borderRadius: 12, border: "1.5px solid rgba(27,80,145,.2)", background: "#fff", padding: "14px 16px", boxShadow: "0 2px 12px rgba(27,80,145,.05)", gridColumn: "1 / -1" }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "var(--t-text)", marginBottom: 10 }}>مزود LLM جديد</div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 10 }}>
                 <div><div className="ai2-lbl">اسم المزود</div><input className="ai2-field" dir="ltr" value={name} onChange={e => setName(e.target.value.toLowerCase().replace(/\s+/g, "_"))} placeholder="anthropic" /></div>
                 <div><div className="ai2-lbl">مفتاح API</div><input className="ai2-field" dir="ltr" type="password" value={key} onChange={e => setKey(e.target.value)} placeholder="sk-..." /></div>
@@ -353,36 +353,36 @@ export function AITab({ agentId }: { agentId: string }) {
 
             {/* Loading sweep */}
             {(rAIng || rFeatng) && (
-                <div style={{ height: 2, borderRadius: 1, marginBottom: 12, overflow: "hidden", background: "#ebeef2", position: "relative" }}>
-                    <div style={{ position: "absolute", inset: 0, background: "linear-gradient(90deg,transparent,#004786,transparent)", animation: "aiSweep 1.3s ease-in-out infinite" }} />
+                <div style={{ height: 2, borderRadius: 1, marginBottom: 12, overflow: "hidden", background: "var(--t-border)", position: "relative" }}>
+                    <div style={{ position: "absolute", inset: 0, background: "linear-gradient(90deg,transparent,var(--t-accent),transparent)", animation: "aiSweep 1.3s ease-in-out infinite" }} />
                 </div>
             )}
 
             {/* ─── Section 1: Status Strip ─── */}
             <div style={{
                 display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px",
-                borderRadius: 12, border: "1px solid #ebeef2", background: "#fff", marginBottom: 12, position: "relative", overflow: "hidden",
+                borderRadius: 12, border: "1px solid var(--t-border)", background: "#fff", marginBottom: 12, position: "relative", overflow: "hidden",
             }}>
-                <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 2, background: hasAI && ai!.enabled ? "linear-gradient(90deg, #004786, #0072b5)" : "#e5e7eb" }} />
+                <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 2, background: hasAI && ai!.enabled ? "linear-gradient(90deg, var(--t-accent), var(--t-accent-secondary))" : "var(--t-border)" }} />
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                     <div style={{
                         width: 34, height: 34, borderRadius: 9, flexShrink: 0,
-                        background: hasAI && ai!.enabled ? "linear-gradient(135deg, #004786, #0072b5)" : "#f0f1f3",
+                        background: hasAI && ai!.enabled ? "var(--t-gradient-accent)" : "#f0f1f3",
                         display: "flex", alignItems: "center", justifyContent: "center",
                     }}>
-                        <Power size={15} style={{ color: hasAI && ai!.enabled ? "#fff" : "#9ca3af" }} />
+                        <Power size={15} style={{ color: hasAI && ai!.enabled ? "#fff" : "var(--t-text-faint)" }} />
                     </div>
                     <div>
-                        <div style={{ fontSize: 14, fontWeight: 800, color: "#111827" }}>محرك الذكاء الاصطناعي</div>
-                        <div style={{ fontSize: 11, color: "#9ca3af", display: "flex", alignItems: "center", gap: 8 }}>
+                        <div style={{ fontSize: 14, fontWeight: 800, color: "var(--t-text)" }}>محرك الذكاء الاصطناعي</div>
+                        <div style={{ fontSize: 11, color: "var(--t-text-faint)", display: "flex", alignItems: "center", gap: 8 }}>
                             <span style={{ display: "flex", alignItems: "center", gap: 3 }}>
-                                <span style={{ width: 5, height: 5, borderRadius: "50%", background: hasAI && ai!.enabled ? "#16a34a" : "#d1d5db" }} />
+                                <span style={{ width: 5, height: 5, borderRadius: "50%", background: hasAI && ai!.enabled ? "#16a34a" : "var(--t-border-medium)" }} />
                                 {!hasAI ? "غير مُهيَّأ" : ai!.enabled ? "يعمل" : "متوقف"}
                             </span>
                             {hasAI && <>
                                 <span>·</span>
                                 <span>{enabledCount}/{providers.length} مزود</span>
-                                {ai!.default_llm && <><span>·</span><code style={{ fontFamily: "monospace", fontSize: 10, background: "#f5f6f8", padding: "0 4px", borderRadius: 3 }}>{ai!.default_llm}</code></>}
+                                {ai!.default_llm && <><span>·</span><code style={{ fontFamily: "monospace", fontSize: 10, background: "var(--t-surface)", padding: "0 4px", borderRadius: 3 }}>{ai!.default_llm}</code></>}
                             </>}
                         </div>
                     </div>
@@ -392,9 +392,9 @@ export function AITab({ agentId }: { agentId: string }) {
 
             {/* ─── Section 2: Default LLM ─── */}
             {hasAI && providers.length > 0 && (
-                <div style={{ marginBottom: 12, padding: "10px 16px", borderRadius: 12, border: "1px solid #ebeef2", background: "#fff" }}>
+                <div style={{ marginBottom: 12, padding: "10px 16px", borderRadius: 12, border: "1px solid var(--t-border)", background: "#fff" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        <Settings2 size={13} style={{ color: "#9ca3af" }} />
+                        <Settings2 size={13} style={{ color: "var(--t-text-faint)" }} />
                         <span className="ai2-lbl" style={{ margin: 0 }}>المزود الافتراضي</span>
                         <select className="ai2-field" style={{ fontFamily: "inherit", appearance: "auto" as any, flex: 1, maxWidth: 200, padding: "5px 8px", fontSize: 11 }}
                             value={ai!.default_llm || ""} onChange={e => updateAI.mutate({ default_llm: e.target.value })}>
@@ -408,9 +408,9 @@ export function AITab({ agentId }: { agentId: string }) {
             {/* ─── Section 3: Providers Grid ─── */}
             <div style={{ marginBottom: 14 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
-                    <Layers size={13} style={{ color: "#004786" }} />
-                    <span style={{ fontSize: 13, fontWeight: 800, color: "#111827" }}>المزودون</span>
-                    {providers.length > 0 && <span style={{ fontSize: 9, fontWeight: 700, padding: "1px 7px", borderRadius: 20, background: "rgba(0,71,134,.06)", color: "#004786" }}>{providers.length}</span>}
+                    <Layers size={13} style={{ color: "var(--t-accent)" }} />
+                    <span style={{ fontSize: 13, fontWeight: 800, color: "var(--t-text)" }}>المزودون</span>
+                    {providers.length > 0 && <span style={{ fontSize: 9, fontWeight: 700, padding: "1px 7px", borderRadius: 20, background: "rgba(27,80,145,.06)", color: "var(--t-accent)" }}>{providers.length}</span>}
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: providers.length > 1 ? "1fr 1fr" : "1fr", gap: 10 }}>
                     {providers.map(n => <ProviderCard key={n} name={n} prov={ai!.llm_providers[n]} agentId={agentId} />)}
@@ -423,9 +423,9 @@ export function AITab({ agentId }: { agentId: string }) {
                 <div>
                     <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
                         <Sparkles size={13} style={{ color: "#7c3aed" }} />
-                        <span style={{ fontSize: 13, fontWeight: 800, color: "#111827" }}>ميزات ذكية</span>
+                        <span style={{ fontSize: 13, fontWeight: 800, color: "var(--t-text)" }}>ميزات ذكية</span>
                     </div>
-                    <div style={{ borderRadius: 12, border: "1px solid #ebeef2", background: "#fff", overflow: "hidden" }}>
+                    <div style={{ borderRadius: 12, border: "1px solid var(--t-border)", background: "#fff", overflow: "hidden" }}>
                         {[
                             { icon: Heart, title: "تحليل المشاعر", desc: "تحليل مشاعر المحادثات تلقائياً", on: feat!.enable_sentiment_analysis, toggle: () => updateAIF.mutate({ enable_sentiment_analysis: !feat!.enable_sentiment_analysis }) },
                             { icon: Tags, title: "التصنيف التلقائي", desc: "تصنيف الرسائل والمواضيع تلقائياً", on: feat!.enable_auto_classification, toggle: () => updateAIF.mutate({ enable_auto_classification: !feat!.enable_auto_classification }) },
@@ -434,19 +434,19 @@ export function AITab({ agentId }: { agentId: string }) {
                             <div key={f.title} style={{
                                 display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 14px",
                                 borderBottom: i < arr.length - 1 ? "1px solid #f0f1f3" : "none",
-                                background: f.on ? "rgba(0,71,134,.015)" : "transparent", transition: "background .12s",
+                                background: f.on ? "rgba(27,80,145,.015)" : "transparent", transition: "background .12s",
                             }}>
                                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                                     <div style={{
                                         width: 28, height: 28, borderRadius: 7,
-                                        background: f.on ? "linear-gradient(135deg, #004786, #0072b5)" : "#f5f6f8",
+                                        background: f.on ? "var(--t-gradient-accent)" : "var(--t-surface)",
                                         display: "flex", alignItems: "center", justifyContent: "center", transition: "all .12s",
                                     }}>
-                                        <f.icon size={13} style={{ color: f.on ? "#fff" : "#9ca3af" }} />
+                                        <f.icon size={13} style={{ color: f.on ? "#fff" : "var(--t-text-faint)" }} />
                                     </div>
                                     <div>
-                                        <div style={{ fontSize: 12.5, fontWeight: 700, color: "#111827" }}>{f.title}</div>
-                                        <div style={{ fontSize: 10, color: "#9ca3af" }}>{f.desc}</div>
+                                        <div style={{ fontSize: 12.5, fontWeight: 700, color: "var(--t-text)" }}>{f.title}</div>
+                                        <div style={{ fontSize: 10, color: "var(--t-text-faint)" }}>{f.desc}</div>
                                     </div>
                                 </div>
                                 <Toggle on={f.on} size="sm" onToggle={f.toggle} />

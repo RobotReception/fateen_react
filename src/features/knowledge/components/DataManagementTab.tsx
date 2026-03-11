@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useCallback, useRef, memo, useMemo } from "react"
+import { useState, useEffect, useCallback, useRef, memo, useMemo } from "react"
 import { useQueryClient } from "@tanstack/react-query"
 import { useKnowledgeEvents } from "../hooks/useKnowledgeEvents"
 import { toast } from "sonner"
@@ -102,23 +102,23 @@ const TextModal = memo(function TextModal({ text, onClose }: { text: string; onC
 
     return (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={onClose}>
-            <div className="mx-4 max-h-[80vh] w-full max-w-2xl overflow-hidden bg-white" onClick={(e) => e.stopPropagation()} style={{ animation: "modalIn .18s ease-out", borderRadius: 12, border: "1px solid var(--t-border-light, #e5e7eb)" }}>
+            <div className="mx-4 max-h-[80vh] w-full max-w-2xl overflow-hidden bg-white" onClick={(e) => e.stopPropagation()} style={{ animation: "modalIn .18s ease-out", borderRadius: 12, border: "1px solid var(--t-border-light, var(--t-border))" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 20px", borderBottom: "1px solid var(--t-border-light, #f0f0f0)" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                        <div style={{ width: 30, height: 30, borderRadius: 8, background: "linear-gradient(135deg, #004786, #0098d6)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <div style={{ width: 30, height: 30, borderRadius: 8, background: "var(--t-gradient-accent)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                             <Eye size={14} style={{ color: "#fff" }} />
                         </div>
                         <h3 style={{ fontSize: 14, fontWeight: 600, color: "var(--t-text, #1f2937)" }}>محتوى المستند</h3>
                     </div>
                     <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                        <button onClick={copy} style={{ display: "flex", alignItems: "center", gap: 5, borderRadius: 6, padding: "5px 12px", border: "1px solid var(--t-border-light, #e5e7eb)", background: copied ? "rgba(16,185,129,0.05)" : "var(--t-card, #fff)", fontSize: 11, fontWeight: 500, color: copied ? "#059669" : "var(--t-text-secondary, #6b7280)", cursor: "pointer", transition: "all 0.12s" }}>
+                        <button onClick={copy} style={{ display: "flex", alignItems: "center", gap: 5, borderRadius: 6, padding: "5px 12px", border: "1px solid var(--t-border-light, var(--t-border))", background: copied ? "rgba(16,185,129,0.05)" : "var(--t-card, #fff)", fontSize: 11, fontWeight: 500, color: copied ? "#059669" : "var(--t-text-secondary, var(--t-text-muted))", cursor: "pointer", transition: "all 0.12s" }}>
                             {copied ? <Check size={11} /> : <Copy size={11} />}
                             {copied ? "تم النسخ" : "نسخ"}
                         </button>
-                        <button onClick={onClose} style={{ borderRadius: 6, padding: 5, border: "none", background: "transparent", cursor: "pointer", color: "var(--t-text-faint, #9ca3af)", transition: "color 0.12s" }}><X size={16} /></button>
+                        <button onClick={onClose} style={{ borderRadius: 6, padding: 5, border: "none", background: "transparent", cursor: "pointer", color: "var(--t-text-faint, var(--t-text-faint))", transition: "color 0.12s" }}><X size={16} /></button>
                     </div>
                 </div>
-                <div style={{ maxHeight: "60vh", overflowY: "auto", padding: 20, fontSize: 13, lineHeight: 1.8, color: "var(--t-text, #374151)", whiteSpace: "pre-wrap" }} dir="auto">{text}</div>
+                <div style={{ maxHeight: "60vh", overflowY: "auto", padding: 20, fontSize: 13, lineHeight: 1.8, color: "var(--t-text, var(--t-text-secondary))", whiteSpace: "pre-wrap" }} dir="auto">{text}</div>
             </div>
         </div>
     )
@@ -131,26 +131,26 @@ const EditModal = memo(function EditModal({ doc, onClose, onSave, saving }: { do
 
     return (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={onClose}>
-            <div className="mx-4 w-full max-w-2xl overflow-hidden bg-white" onClick={(e) => e.stopPropagation()} style={{ animation: "modalIn .18s ease-out", borderRadius: 12, border: "1px solid var(--t-border-light, #e5e7eb)" }}>
+            <div className="mx-4 w-full max-w-2xl overflow-hidden bg-white" onClick={(e) => e.stopPropagation()} style={{ animation: "modalIn .18s ease-out", borderRadius: 12, border: "1px solid var(--t-border-light, var(--t-border))" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 20px", borderBottom: "1px solid var(--t-border-light, #f0f0f0)" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                        <div style={{ width: 30, height: 30, borderRadius: 8, background: "linear-gradient(135deg, #004786, #0098d6)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <div style={{ width: 30, height: 30, borderRadius: 8, background: "var(--t-gradient-accent)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                             <Pencil size={14} style={{ color: "#fff" }} />
                         </div>
                         <div>
                             <h3 style={{ fontSize: 14, fontWeight: 600, color: "var(--t-text, #1f2937)" }}>تعديل المستند</h3>
-                            <p style={{ fontSize: 10, color: "var(--t-text-faint, #9ca3af)", fontFamily: "monospace", marginTop: 1 }}>#{doc.doc_id}</p>
+                            <p style={{ fontSize: 10, color: "var(--t-text-faint, var(--t-text-faint))", fontFamily: "monospace", marginTop: 1 }}>#{doc.doc_id}</p>
                         </div>
                     </div>
-                    <button onClick={onClose} style={{ borderRadius: 6, padding: 5, border: "none", background: "transparent", cursor: "pointer", color: "var(--t-text-faint, #9ca3af)" }}><X size={16} /></button>
+                    <button onClick={onClose} style={{ borderRadius: 6, padding: 5, border: "none", background: "transparent", cursor: "pointer", color: "var(--t-text-faint, var(--t-text-faint))" }}><X size={16} /></button>
                 </div>
                 <div style={{ padding: 20 }}>
-                    <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: "var(--t-text-faint, #9ca3af)", marginBottom: 6 }}>النص الجديد</label>
-                    <textarea value={newText} onChange={(e) => setNewText(e.target.value)} rows={10} dir="auto" style={{ width: "100%", borderRadius: 8, border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-surface, #f9fafb)", padding: 12, fontSize: 13, color: "var(--t-text, #374151)", outline: "none", resize: "vertical", transition: "border-color 0.15s", lineHeight: 1.7 }} onFocus={e => { e.currentTarget.style.borderColor = "#004786" }} onBlur={e => { e.currentTarget.style.borderColor = "var(--t-border-light, #e5e7eb)" }} />
+                    <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: "var(--t-text-faint, var(--t-text-faint))", marginBottom: 6 }}>النص الجديد</label>
+                    <textarea value={newText} onChange={(e) => setNewText(e.target.value)} rows={10} dir="auto" style={{ width: "100%", borderRadius: 8, border: "1px solid var(--t-border-light, var(--t-border))", background: "var(--t-surface, var(--t-page))", padding: 12, fontSize: 13, color: "var(--t-text, var(--t-text-secondary))", outline: "none", resize: "vertical", transition: "border-color 0.15s", lineHeight: 1.7 }} onFocus={e => { e.currentTarget.style.borderColor = "var(--t-accent)" }} onBlur={e => { e.currentTarget.style.borderColor = "var(--t-border-light, var(--t-border))" }} />
                 </div>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 8, borderTop: "1px solid var(--t-border-light, #f0f0f0)", padding: "12px 20px" }}>
-                    <button onClick={onClose} disabled={saving} style={{ padding: "7px 16px", borderRadius: 7, border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-card, #fff)", fontSize: 13, fontWeight: 500, color: "var(--t-text-secondary, #6b7280)", cursor: "pointer" }}>إلغاء</button>
-                    <button onClick={() => onSave(newText)} disabled={saving || !changed} style={{ display: "flex", alignItems: "center", gap: 6, padding: "7px 18px", borderRadius: 7, border: "none", background: "#004786", color: "#fff", fontSize: 13, fontWeight: 500, cursor: "pointer", opacity: (saving || !changed) ? 0.5 : 1 }}>
+                    <button onClick={onClose} disabled={saving} style={{ padding: "7px 16px", borderRadius: 7, border: "1px solid var(--t-border-light, var(--t-border))", background: "var(--t-card, #fff)", fontSize: 13, fontWeight: 500, color: "var(--t-text-secondary, var(--t-text-muted))", cursor: "pointer" }}>إلغاء</button>
+                    <button onClick={() => onSave(newText)} disabled={saving || !changed} style={{ display: "flex", alignItems: "center", gap: 6, padding: "7px 18px", borderRadius: 7, border: "none", background: "var(--t-brand-orange)", color: "#fff", fontSize: 13, fontWeight: 500, cursor: "pointer", opacity: (saving || !changed) ? 0.5 : 1 }}>
                         {saving && <Loader2 size={14} className="animate-spin" />}
                         تقديم طلب التعديل
                     </button>
@@ -164,18 +164,18 @@ const EditModal = memo(function EditModal({ doc, onClose, onSave, saving }: { do
 const DeleteModal = memo(function DeleteModal({ count, onClose, onConfirm, deleting }: { count: number; onClose: () => void; onConfirm: () => void; deleting: boolean }) {
     return (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={onClose}>
-            <div className="mx-4 w-full max-w-md overflow-hidden bg-white" onClick={(e) => e.stopPropagation()} style={{ animation: "modalIn .18s ease-out", borderRadius: 12, border: "1px solid var(--t-border-light, #e5e7eb)" }}>
+            <div className="mx-4 w-full max-w-md overflow-hidden bg-white" onClick={(e) => e.stopPropagation()} style={{ animation: "modalIn .18s ease-out", borderRadius: 12, border: "1px solid var(--t-border-light, var(--t-border))" }}>
                 <div style={{ padding: "28px 24px 20px", textAlign: "center" }}>
                     <div style={{ width: 52, height: 52, borderRadius: 14, background: "rgba(220,38,38,0.06)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 14px" }}>
-                        <Trash2 size={22} style={{ color: "#dc2626" }} />
+                        <Trash2 size={22} style={{ color: "var(--t-danger)" }} />
                     </div>
                     <h3 style={{ fontSize: 16, fontWeight: 700, color: "var(--t-text, #1f2937)" }}>طلب حذف</h3>
-                    <p style={{ fontSize: 13, color: "var(--t-text-secondary, #6b7280)", marginTop: 8 }}>هل أنت متأكد من طلب حذف <span style={{ fontWeight: 700, color: "#dc2626" }}>{count}</span> {count === 1 ? "مستند" : "مستندات"}؟</p>
-                    <p style={{ fontSize: 11, color: "var(--t-text-faint, #9ca3af)", marginTop: 4 }}>سيتم إرسال الطلب للمراجعة والموافقة</p>
+                    <p style={{ fontSize: 13, color: "var(--t-text-secondary, var(--t-text-muted))", marginTop: 8 }}>هل أنت متأكد من طلب حذف <span style={{ fontWeight: 700, color: "var(--t-danger)" }}>{count}</span> {count === 1 ? "مستند" : "مستندات"}؟</p>
+                    <p style={{ fontSize: 11, color: "var(--t-text-faint, var(--t-text-faint))", marginTop: 4 }}>سيتم إرسال الطلب للمراجعة والموافقة</p>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, borderTop: "1px solid var(--t-border-light, #f0f0f0)", padding: "14px 24px" }}>
-                    <button onClick={onClose} disabled={deleting} style={{ padding: "8px 20px", borderRadius: 7, border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-card, #fff)", fontSize: 13, fontWeight: 500, color: "var(--t-text-secondary, #6b7280)", cursor: "pointer" }}>إلغاء</button>
-                    <button onClick={onConfirm} disabled={deleting} style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 20px", borderRadius: 7, border: "none", background: "#dc2626", color: "#fff", fontSize: 13, fontWeight: 500, cursor: "pointer", opacity: deleting ? 0.5 : 1 }}>
+                    <button onClick={onClose} disabled={deleting} style={{ padding: "8px 20px", borderRadius: 7, border: "1px solid var(--t-border-light, var(--t-border))", background: "var(--t-card, #fff)", fontSize: 13, fontWeight: 500, color: "var(--t-text-secondary, var(--t-text-muted))", cursor: "pointer" }}>إلغاء</button>
+                    <button onClick={onConfirm} disabled={deleting} style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 20px", borderRadius: 7, border: "none", background: "var(--t-danger)", color: "#fff", fontSize: 13, fontWeight: 500, cursor: "pointer", opacity: deleting ? 0.5 : 1 }}>
                         {deleting && <Loader2 size={14} className="animate-spin" />}
                         تقديم الطلب
                     </button>
@@ -290,20 +290,20 @@ const TrainUploadModal = memo(function TrainUploadModal({ categories, activeDept
 
     return (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={onClose}>
-            <div className="mx-4 w-full max-w-2xl overflow-hidden bg-white" onClick={e => e.stopPropagation()} style={{ animation: "modalIn .18s ease-out", borderRadius: 12, border: "1px solid var(--t-border-light, #e5e7eb)" }}>
+            <div className="mx-4 w-full max-w-2xl overflow-hidden bg-white" onClick={e => e.stopPropagation()} style={{ animation: "modalIn .18s ease-out", borderRadius: 12, border: "1px solid var(--t-border-light, var(--t-border))" }}>
                 {/* ── Header ── */}
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 20px", borderBottom: "1px solid var(--t-border-light, #f0f0f0)" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                        <div style={{ width: 30, height: 30, borderRadius: 8, background: "linear-gradient(135deg, #004786, #0098d6)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <div style={{ width: 30, height: 30, borderRadius: 8, background: "var(--t-gradient-accent)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                             <Upload size={14} style={{ color: "#fff" }} />
                         </div>
                         <div>
                             <h3 style={{ fontSize: 14, fontWeight: 600, color: "var(--t-text, #1f2937)" }}>رفع ملفات التدريب</h3>
-                            <p style={{ fontSize: 10, color: "var(--t-text-faint, #9ca3af)", marginTop: 1 }}>القسم: <span style={{ fontWeight: 600, color: "#004786" }}>{activeDeptName}</span></p>
+                            <p style={{ fontSize: 10, color: "var(--t-text-faint, var(--t-text-faint))", marginTop: 1 }}>القسم: <span style={{ fontWeight: 600, color: "var(--t-accent)" }}>{activeDeptName}</span></p>
                         </div>
                     </div>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        <button onClick={onClose} style={{ borderRadius: 6, padding: 5, border: "none", background: "transparent", cursor: "pointer", color: "var(--t-text-faint, #9ca3af)", transition: "color 0.12s" }}>
+                        <button onClick={onClose} style={{ borderRadius: 6, padding: 5, border: "none", background: "transparent", cursor: "pointer", color: "var(--t-text-faint, var(--t-text-faint))", transition: "color 0.12s" }}>
                             <X size={16} />
                         </button>
                     </div>
@@ -316,7 +316,7 @@ const TrainUploadModal = memo(function TrainUploadModal({ categories, activeDept
                         const on = tab === t.key
                         return (
                             <button key={t.key} onClick={() => setTab(t.key)}
-                                style={{ display: "flex", alignItems: "center", gap: 5, padding: "8px 14px", fontSize: 12, fontWeight: on ? 600 : 500, borderBottom: on ? "2px solid #004786" : "2px solid transparent", color: on ? "#004786" : "var(--t-text-faint, #9ca3af)", background: "transparent", border: "none", borderBottomStyle: "solid", borderBottomWidth: 2, borderBottomColor: on ? "#004786" : "transparent", cursor: "pointer", transition: "all 0.12s" }}>
+                                style={{ display: "flex", alignItems: "center", gap: 5, padding: "8px 14px", fontSize: 12, fontWeight: on ? 600 : 500, borderBottom: on ? "2px solid var(--t-accent)" : "2px solid transparent", color: on ? "var(--t-accent)" : "var(--t-text-faint, var(--t-text-faint))", background: "transparent", border: "none", borderBottomStyle: "solid", borderBottomWidth: 2, borderBottomColor: on ? "var(--t-accent)" : "transparent", cursor: "pointer", transition: "all 0.12s" }}>
                                 <Icon size={13} />
                                 {t.label}
                             </button>
@@ -328,7 +328,7 @@ const TrainUploadModal = memo(function TrainUploadModal({ categories, activeDept
                 <div className="max-h-[60vh] overflow-y-auto p-5 space-y-4" key={tab} style={{ animation: "fadeIn .15s ease-out" }}>
                     {/* Category */}
                     <div>
-                        <label className="mb-1.5 block text-xs font-semibold text-gray-500">الفئة <span style={{ color: "#dc2626" }}>*</span></label>
+                        <label className="mb-1.5 block text-xs font-semibold text-gray-500">الفئة <span style={{ color: "var(--t-danger)" }}>*</span></label>
                         <select value={categoryId} onChange={e => setCategoryId(e.target.value)}
                             className="w-full rounded-xl border border-gray-200 bg-gray-50 py-2.5 px-3 text-sm text-gray-700 outline-none focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-100"
                             style={!categoryId ? { borderColor: "#fca5a5" } : undefined}>
@@ -467,13 +467,13 @@ const TrainUploadModal = memo(function TrainUploadModal({ categories, activeDept
 
                 {/* ── Footer ── */}
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderTop: "1px solid var(--t-border-light, #f0f0f0)", padding: "12px 20px" }}>
-                    <p style={{ fontSize: 10, color: "var(--t-text-faint, #d1d5db)" }}>
+                    <p style={{ fontSize: 10, color: "var(--t-text-faint, var(--t-border-medium))" }}>
                         {tab === "txt" ? "train-txt-request" : "train-csv-request"}
                     </p>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        <button onClick={onClose} disabled={uploading} style={{ padding: "7px 16px", borderRadius: 7, border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-card, #fff)", fontSize: 13, fontWeight: 500, color: "var(--t-text-secondary, #6b7280)", cursor: "pointer" }}>إلغاء</button>
+                        <button onClick={onClose} disabled={uploading} style={{ padding: "7px 16px", borderRadius: 7, border: "1px solid var(--t-border-light, var(--t-border))", background: "var(--t-card, #fff)", fontSize: 13, fontWeight: 500, color: "var(--t-text-secondary, var(--t-text-muted))", cursor: "pointer" }}>إلغاء</button>
                         <button onClick={result ? onClose : handleUpload} disabled={uploading || (!canUpload && !result)}
-                            style={{ display: "flex", alignItems: "center", gap: 6, padding: "7px 20px", borderRadius: 7, border: "none", background: "#004786", color: "#fff", fontSize: 13, fontWeight: 500, cursor: "pointer", opacity: (uploading || (!canUpload && !result)) ? 0.4 : 1, transition: "all 0.15s" }}>
+                            style={{ display: "flex", alignItems: "center", gap: 6, padding: "7px 20px", borderRadius: 7, border: "none", background: "var(--t-brand-orange)", color: "#fff", fontSize: 13, fontWeight: 500, cursor: "pointer", opacity: (uploading || (!canUpload && !result)) ? 0.4 : 1, transition: "all 0.15s" }}>
                             {uploading && <Loader2 size={14} className="animate-spin" />}
                             {result ? "إغلاق" : `رفع${files.length > 0 ? ` (${files.length})` : ""}`}
                         </button>
@@ -508,36 +508,36 @@ const AddTextModal = memo(function AddTextModal({ categories, activeDeptId, acti
 
     return (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={onClose}>
-            <div className="mx-4 w-full max-w-lg overflow-hidden bg-white" onClick={(e) => e.stopPropagation()} style={{ animation: "modalIn .18s ease-out", borderRadius: 12, border: "1px solid var(--t-border-light, #e5e7eb)" }}>
+            <div className="mx-4 w-full max-w-lg overflow-hidden bg-white" onClick={(e) => e.stopPropagation()} style={{ animation: "modalIn .18s ease-out", borderRadius: 12, border: "1px solid var(--t-border-light, var(--t-border))" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 20px", borderBottom: "1px solid var(--t-border-light, #f0f0f0)" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                        <div style={{ width: 30, height: 30, borderRadius: 8, background: "linear-gradient(135deg, #004786, #0098d6)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <div style={{ width: 30, height: 30, borderRadius: 8, background: "var(--t-gradient-accent)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                             <Plus size={14} style={{ color: "#fff" }} />
                         </div>
                         <div>
                             <h3 style={{ fontSize: 14, fontWeight: 600, color: "var(--t-text, #1f2937)" }}>إضافة نص جديد</h3>
-                            <p style={{ fontSize: 10, color: "var(--t-text-faint, #9ca3af)", marginTop: 1 }}>القسم: <span style={{ fontWeight: 600, color: "#004786" }}>{activeDeptName}</span></p>
+                            <p style={{ fontSize: 10, color: "var(--t-text-faint, var(--t-text-faint))", marginTop: 1 }}>القسم: <span style={{ fontWeight: 600, color: "var(--t-accent)" }}>{activeDeptName}</span></p>
                         </div>
                     </div>
-                    <button onClick={onClose} style={{ borderRadius: 6, padding: 5, border: "none", background: "transparent", cursor: "pointer", color: "var(--t-text-faint, #9ca3af)" }}><X size={16} /></button>
+                    <button onClick={onClose} style={{ borderRadius: 6, padding: 5, border: "none", background: "transparent", cursor: "pointer", color: "var(--t-text-faint, var(--t-text-faint))" }}><X size={16} /></button>
                 </div>
                 <div style={{ padding: 20, display: "flex", flexDirection: "column", gap: 16 }}>
                     <div>
-                        <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: "var(--t-text-faint, #9ca3af)", marginBottom: 6 }}>الفئة <span style={{ color: "#dc2626" }}>*</span></label>
-                        <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)} style={{ width: "100%", borderRadius: 8, border: `1px solid ${!categoryId ? '#fca5a5' : 'var(--t-border-light, #e5e7eb)'}`, background: "var(--t-surface, #f9fafb)", padding: "8px 12px", fontSize: 13, color: "var(--t-text, #374151)", outline: "none" }}>
+                        <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: "var(--t-text-faint, var(--t-text-faint))", marginBottom: 6 }}>الفئة <span style={{ color: "var(--t-danger)" }}>*</span></label>
+                        <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)} style={{ width: "100%", borderRadius: 8, border: `1px solid ${!categoryId ? '#fca5a5' : 'var(--t-border-light, var(--t-border))'}`, background: "var(--t-surface, var(--t-page))", padding: "8px 12px", fontSize: 13, color: "var(--t-text, var(--t-text-secondary))", outline: "none" }}>
                             <option value="">— اختر الفئة —</option>
                             {categories.map((c) => <option key={c.category_id} value={c.category_id}>{c.icon} {c.name_ar || c.name}</option>)}
                         </select>
                     </div>
                     <div>
-                        <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: "var(--t-text-faint, #9ca3af)", marginBottom: 6 }}>المحتوى النصي</label>
-                        <textarea value={text} onChange={(e) => setText(e.target.value)} rows={8} dir="auto" placeholder="اكتب أو الصق النص هنا..." style={{ width: "100%", borderRadius: 8, border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-surface, #f9fafb)", padding: 12, fontSize: 13, color: "var(--t-text, #374151)", outline: "none", resize: "vertical", transition: "border-color 0.15s", lineHeight: 1.7 }} onFocus={e => { e.currentTarget.style.borderColor = "#004786" }} onBlur={e => { e.currentTarget.style.borderColor = "var(--t-border-light, #e5e7eb)" }} />
-                        <p style={{ marginTop: 4, textAlign: "left", fontSize: 11, color: "var(--t-text-faint, #9ca3af)" }}>{text.length.toLocaleString()} / 100,000</p>
+                        <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: "var(--t-text-faint, var(--t-text-faint))", marginBottom: 6 }}>المحتوى النصي</label>
+                        <textarea value={text} onChange={(e) => setText(e.target.value)} rows={8} dir="auto" placeholder="اكتب أو الصق النص هنا..." style={{ width: "100%", borderRadius: 8, border: "1px solid var(--t-border-light, var(--t-border))", background: "var(--t-surface, var(--t-page))", padding: 12, fontSize: 13, color: "var(--t-text, var(--t-text-secondary))", outline: "none", resize: "vertical", transition: "border-color 0.15s", lineHeight: 1.7 }} onFocus={e => { e.currentTarget.style.borderColor = "var(--t-accent)" }} onBlur={e => { e.currentTarget.style.borderColor = "var(--t-border-light, var(--t-border))" }} />
+                        <p style={{ marginTop: 4, textAlign: "left", fontSize: 11, color: "var(--t-text-faint, var(--t-text-faint))" }}>{text.length.toLocaleString()} / 100,000</p>
                     </div>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 8, borderTop: "1px solid var(--t-border-light, #f0f0f0)", padding: "12px 20px" }}>
-                    <button onClick={onClose} disabled={submitting} style={{ padding: "7px 16px", borderRadius: 7, border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-card, #fff)", fontSize: 13, fontWeight: 500, color: "var(--t-text-secondary, #6b7280)", cursor: "pointer" }}>إلغاء</button>
-                    <button onClick={handleSubmit} disabled={submitting || !text.trim() || !categoryId} style={{ display: "flex", alignItems: "center", gap: 6, padding: "7px 18px", borderRadius: 7, border: "none", background: "#004786", color: "#fff", fontSize: 13, fontWeight: 500, cursor: "pointer", opacity: (submitting || !text.trim() || !categoryId) ? 0.5 : 1 }}>
+                    <button onClick={onClose} disabled={submitting} style={{ padding: "7px 16px", borderRadius: 7, border: "1px solid var(--t-border-light, var(--t-border))", background: "var(--t-card, #fff)", fontSize: 13, fontWeight: 500, color: "var(--t-text-secondary, var(--t-text-muted))", cursor: "pointer" }}>إلغاء</button>
+                    <button onClick={handleSubmit} disabled={submitting || !text.trim() || !categoryId} style={{ display: "flex", alignItems: "center", gap: 6, padding: "7px 18px", borderRadius: 7, border: "none", background: "var(--t-brand-orange)", color: "#fff", fontSize: 13, fontWeight: 500, cursor: "pointer", opacity: (submitting || !text.trim() || !categoryId) ? 0.5 : 1 }}>
                         {submitting && <Loader2 size={14} className="animate-spin" />}
                         إضافة النص
                     </button>
@@ -560,32 +560,32 @@ const DocRow = memo(function DocRow({
             className={`group transition-colors ${isSelected ? "" : ""}`}
             style={{
                 animation: `rowFade .2s ease-out ${idx * 0.025}s both`,
-                background: isSelected ? "rgba(0,71,134,0.03)" : "transparent",
+                background: isSelected ? "rgba(27,80,145,0.03)" : "transparent",
             }}
-            onMouseEnter={e => { if (!isSelected) e.currentTarget.style.background = "var(--t-card-hover, #f9fafb)" }}
+            onMouseEnter={e => { if (!isSelected) e.currentTarget.style.background = "var(--t-card-hover, var(--t-page))" }}
             onMouseLeave={e => { if (!isSelected) e.currentTarget.style.background = "transparent" }}
         >
             <td style={{ padding: "10px 14px" }}>
-                <button onClick={() => onToggle(doc.doc_id)} style={{ color: isSelected ? "#004786" : "var(--t-text-faint, #9ca3af)", border: "none", background: "transparent", cursor: "pointer" }}>{isSelected ? <CheckSquare size={16} /> : <Square size={16} />}</button>
+                <button onClick={() => onToggle(doc.doc_id)} style={{ color: isSelected ? "var(--t-accent)" : "var(--t-text-faint, var(--t-text-faint))", border: "none", background: "transparent", cursor: "pointer" }}>{isSelected ? <CheckSquare size={16} /> : <Square size={16} />}</button>
             </td>
             <td style={{ padding: "10px 14px" }}>
-                <span style={{ display: "inline-flex", alignItems: "center", gap: 4, fontFamily: "monospace", fontSize: 11, color: "var(--t-text-secondary, #6b7280)", background: "var(--t-surface, #f3f4f6)", borderRadius: 4, padding: "2px 6px" }}><Hash size={9} style={{ color: "var(--t-text-faint, #9ca3af)" }} />{truncateId(doc.doc_id)}</span>
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 4, fontFamily: "monospace", fontSize: 11, color: "var(--t-text-secondary, var(--t-text-muted))", background: "var(--t-surface, var(--t-surface))", borderRadius: 4, padding: "2px 6px" }}><Hash size={9} style={{ color: "var(--t-text-faint, var(--t-text-faint))" }} />{truncateId(doc.doc_id)}</span>
             </td>
             <td style={{ maxWidth: 280, padding: "10px 14px" }}>
-                <button onClick={() => onView(doc)} className="line-clamp-2" style={{ textAlign: "right", fontSize: 13, color: "var(--t-text, #374151)", border: "none", background: "transparent", cursor: "pointer", lineHeight: 1.6, transition: "color 0.12s" }} title="انقر لعرض المحتوى الكامل" onMouseEnter={e => { e.currentTarget.style.color = "#004786" }} onMouseLeave={e => { e.currentTarget.style.color = "var(--t-text, #374151)" }}>{truncate(doc.text)}</button>
+                <button onClick={() => onView(doc)} className="line-clamp-2" style={{ textAlign: "right", fontSize: 13, color: "var(--t-text, var(--t-text-secondary))", border: "none", background: "transparent", cursor: "pointer", lineHeight: 1.6, transition: "color 0.12s" }} title="انقر لعرض المحتوى الكامل" onMouseEnter={e => { e.currentTarget.style.color = "var(--t-accent)" }} onMouseLeave={e => { e.currentTarget.style.color = "var(--t-text, var(--t-text-secondary))" }}>{truncate(doc.text)}</button>
             </td>
-            <td style={{ padding: "10px 14px" }}><span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 12, color: "var(--t-text-secondary, #6b7280)" }}><User size={11} style={{ color: "var(--t-text-faint, #9ca3af)" }} />{doc.user || "—"}</span></td>
-            <td style={{ padding: "10px 14px" }}><span style={{ background: "rgba(0,71,134,0.05)", padding: "3px 10px", borderRadius: 12, fontSize: 10, fontWeight: 600, color: "#004786", whiteSpace: "nowrap" }}>{catLabel}</span></td>
+            <td style={{ padding: "10px 14px" }}><span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 12, color: "var(--t-text-secondary, var(--t-text-muted))" }}><User size={11} style={{ color: "var(--t-text-faint, var(--t-text-faint))" }} />{doc.user || "—"}</span></td>
+            <td style={{ padding: "10px 14px" }}><span style={{ background: "rgba(27,80,145,0.05)", padding: "3px 10px", borderRadius: 12, fontSize: 10, fontWeight: 600, color: "var(--t-accent)", whiteSpace: "nowrap" }}>{catLabel}</span></td>
             <td style={{ padding: "10px 14px" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 2 }}>
                     <ActionGuard pageBit={PAGE_BITS.DOCUMENTS} actionBit={ACTION_BITS.GET_DOCUMENT}>
-                        <button onClick={() => onView(doc)} style={{ borderRadius: 6, padding: 5, border: "none", background: "transparent", cursor: "pointer", color: "var(--t-text-faint, #9ca3af)", transition: "all 0.12s" }} title="عرض" onMouseEnter={e => { e.currentTarget.style.background = "rgba(0,71,134,0.06)"; e.currentTarget.style.color = "#004786" }} onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--t-text-faint, #9ca3af)" }}><Eye size={14} /></button>
+                        <button onClick={() => onView(doc)} style={{ borderRadius: 6, padding: 5, border: "none", background: "transparent", cursor: "pointer", color: "var(--t-text-faint, var(--t-text-faint))", transition: "all 0.12s" }} title="عرض" onMouseEnter={e => { e.currentTarget.style.background = "rgba(27,80,145,0.06)"; e.currentTarget.style.color = "var(--t-accent)" }} onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--t-text-faint, var(--t-text-faint))" }}><Eye size={14} /></button>
                     </ActionGuard>
                     <ActionGuard pageBit={PAGE_BITS.DOCUMENTS} actionBit={ACTION_BITS.UPDATE_DOCUMENT}>
-                        <button onClick={() => onEdit(doc)} style={{ borderRadius: 6, padding: 5, border: "none", background: "transparent", cursor: "pointer", color: "var(--t-text-faint, #9ca3af)", transition: "all 0.12s" }} title="تعديل" onMouseEnter={e => { e.currentTarget.style.background = "rgba(245,158,11,0.08)"; e.currentTarget.style.color = "#d97706" }} onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--t-text-faint, #9ca3af)" }}><Pencil size={14} /></button>
+                        <button onClick={() => onEdit(doc)} style={{ borderRadius: 6, padding: 5, border: "none", background: "transparent", cursor: "pointer", color: "var(--t-text-faint, var(--t-text-faint))", transition: "all 0.12s" }} title="تعديل" onMouseEnter={e => { e.currentTarget.style.background = "rgba(245,158,11,0.08)"; e.currentTarget.style.color = "#d97706" }} onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--t-text-faint, var(--t-text-faint))" }}><Pencil size={14} /></button>
                     </ActionGuard>
                     <ActionGuard pageBit={PAGE_BITS.DOCUMENTS} actionBit={ACTION_BITS.DELETE_DOCUMENT}>
-                        <button onClick={() => onDelete(doc.doc_id)} style={{ borderRadius: 6, padding: 5, border: "none", background: "transparent", cursor: "pointer", color: "var(--t-text-faint, #9ca3af)", transition: "all 0.12s" }} title="حذف" onMouseEnter={e => { e.currentTarget.style.background = "rgba(220,38,38,0.06)"; e.currentTarget.style.color = "#dc2626" }} onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--t-text-faint, #9ca3af)" }}><Trash2 size={14} /></button>
+                        <button onClick={() => onDelete(doc.doc_id)} style={{ borderRadius: 6, padding: 5, border: "none", background: "transparent", cursor: "pointer", color: "var(--t-text-faint, var(--t-text-faint))", transition: "all 0.12s" }} title="حذف" onMouseEnter={e => { e.currentTarget.style.background = "rgba(220,38,38,0.06)"; e.currentTarget.style.color = "var(--t-danger)" }} onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--t-text-faint, var(--t-text-faint))" }}><Trash2 size={14} /></button>
                     </ActionGuard>
                 </div>
             </td>
@@ -730,21 +730,21 @@ export function DataManagementTab({ onNavigateToTab }: { onNavigateToTab?: (tab:
             {/* Header */}
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                    <div style={{ width: 40, height: 40, borderRadius: 10, background: "linear-gradient(135deg, #004786, #0098d6)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <div style={{ width: 40, height: 40, borderRadius: 10, background: "var(--t-gradient-accent)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                         <Database size={20} style={{ color: "#fff" }} />
                     </div>
                     <div>
                         <h2 style={{ fontSize: 18, fontWeight: 700, color: "var(--t-text, #1f2937)", margin: 0 }}>إدارة البيانات</h2>
-                        <p style={{ fontSize: 12, color: "var(--t-text-faint, #9ca3af)", marginTop: 2 }}>تصفح وإدارة المستندات حسب الأقسام</p>
+                        <p style={{ fontSize: 12, color: "var(--t-text-faint, var(--t-text-faint))", marginTop: 2 }}>تصفح وإدارة المستندات حسب الأقسام</p>
                     </div>
                 </div>
                 {activeDeptId && (
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                         <ActionGuard pageBit={PAGE_BITS.DOCUMENTS} actionBit={ACTION_BITS.UPLOAD_DOCUMENT}>
-                            <button onClick={() => setShowUpload(true)} style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 16px", borderRadius: 8, border: "none", background: "#004786", color: "#fff", fontSize: 13, fontWeight: 500, cursor: "pointer", transition: "all 0.15s" }} onMouseEnter={e => { e.currentTarget.style.background = "#003b6f" }} onMouseLeave={e => { e.currentTarget.style.background = "#004786" }}><Upload size={14} />رفع ملف</button>
+                            <button onClick={() => setShowUpload(true)} style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 16px", borderRadius: 8, border: "none", background: "var(--t-brand-orange)", color: "#fff", fontSize: 13, fontWeight: 500, cursor: "pointer", transition: "all 0.15s" }} onMouseEnter={e => { e.currentTarget.style.background = "var(--t-brand-orange-hover)" }} onMouseLeave={e => { e.currentTarget.style.background = "var(--t-brand-orange)" }}><Upload size={14} />رفع ملف</button>
                         </ActionGuard>
                         <ActionGuard pageBit={PAGE_BITS.DOCUMENTS} actionBit={ACTION_BITS.UPLOAD_DOCUMENT}>
-                            <button onClick={() => setShowAddText(true)} style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 16px", borderRadius: 8, border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-card, #fff)", color: "var(--t-text-secondary, #6b7280)", fontSize: 13, fontWeight: 500, cursor: "pointer", transition: "all 0.15s" }} onMouseEnter={e => { e.currentTarget.style.borderColor = "#004786"; e.currentTarget.style.color = "#004786" }} onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--t-border-light, #e5e7eb)"; e.currentTarget.style.color = "var(--t-text-secondary, #6b7280)" }}><Plus size={14} />إضافة نص</button>
+                            <button onClick={() => setShowAddText(true)} style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 16px", borderRadius: 8, border: "1px solid var(--t-border-light, var(--t-border))", background: "var(--t-card, #fff)", color: "var(--t-text-secondary, var(--t-text-muted))", fontSize: 13, fontWeight: 500, cursor: "pointer", transition: "all 0.15s" }} onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--t-accent)"; e.currentTarget.style.color = "var(--t-accent)" }} onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--t-border-light, var(--t-border))"; e.currentTarget.style.color = "var(--t-text-secondary, var(--t-text-muted))" }}><Plus size={14} />إضافة نص</button>
                         </ActionGuard>
                     </div>
                 )}
@@ -756,7 +756,7 @@ export function DataManagementTab({ onNavigateToTab }: { onNavigateToTab?: (tab:
             ) : departments.length === 0 ? (
                 <div className="relative overflow-hidden rounded-2xl border border-dashed border-gray-200 bg-white" style={{ animation: "fadeIn .3s ease-out" }}>
                     {/* Decorative background pattern */}
-                    <div className="pointer-events-none absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "radial-gradient(circle, #3b82f6 1px, transparent 1px)", backgroundSize: "24px 24px" }} />
+                    <div className="pointer-events-none absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "radial-gradient(circle, var(--t-info) 1px, transparent 1px)", backgroundSize: "24px 24px" }} />
                     <div className="relative flex flex-col items-center justify-center px-6 py-16 text-center">
                         {/* Icon stack */}
                         <div className="relative mb-6">
@@ -813,9 +813,9 @@ export function DataManagementTab({ onNavigateToTab }: { onNavigateToTab?: (tab:
                                 style={{
                                     display: "flex", alignItems: "center", gap: 8, flexShrink: 0,
                                     padding: "8px 16px", borderRadius: 8,
-                                    border: isActive ? "1px solid #004786" : "1px solid var(--t-border-light, #e5e7eb)",
-                                    background: isActive ? "rgba(0,71,134,0.06)" : "var(--t-card, #fff)",
-                                    color: isActive ? "#004786" : "var(--t-text-secondary, #6b7280)",
+                                    border: isActive ? "1px solid var(--t-brand-orange)" : "1px solid var(--t-border-light, var(--t-border))",
+                                    background: isActive ? "var(--t-brand-orange-muted)" : "var(--t-card, #fff)",
+                                    color: isActive ? "var(--t-brand-orange)" : "var(--t-text-secondary, var(--t-text-muted))",
                                     fontSize: 13, fontWeight: isActive ? 600 : 500,
                                     cursor: "pointer", transition: "all 0.15s",
                                 }}>
@@ -829,9 +829,9 @@ export function DataManagementTab({ onNavigateToTab }: { onNavigateToTab?: (tab:
                             style={{
                                 display: "flex", alignItems: "center", gap: 5, flexShrink: 0,
                                 padding: "8px 12px", borderRadius: 8,
-                                border: "1px dashed var(--t-text-faint, #d1d5db)",
+                                border: "1px dashed var(--t-text-faint, var(--t-border-medium))",
                                 background: "transparent",
-                                color: "var(--t-text-faint, #9ca3af)",
+                                color: "var(--t-text-faint, var(--t-text-faint))",
                                 fontSize: 12, fontWeight: 500,
                                 cursor: "pointer", transition: "all 0.15s",
                             }}
@@ -864,10 +864,10 @@ export function DataManagementTab({ onNavigateToTab }: { onNavigateToTab?: (tab:
 
             {/* Bulk actions */}
             {selected.size > 0 && (
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderRadius: 8, background: "rgba(0,71,134,0.03)", border: "1px solid rgba(0,71,134,0.1)", padding: "8px 14px", animation: "fadeIn .2s ease-out" }}>
-                    <p style={{ fontSize: 13, fontWeight: 500, color: "#004786" }}>تم تحديد <span style={{ fontWeight: 700 }}>{selected.size}</span> مستند</p>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderRadius: 8, background: "rgba(27,80,145,0.03)", border: "1px solid rgba(27,80,145,0.1)", padding: "8px 14px", animation: "fadeIn .2s ease-out" }}>
+                    <p style={{ fontSize: 13, fontWeight: 500, color: "var(--t-accent)" }}>تم تحديد <span style={{ fontWeight: 700 }}>{selected.size}</span> مستند</p>
                     <ActionGuard pageBit={PAGE_BITS.DOCUMENTS} actionBit={ACTION_BITS.DELETE_DOCUMENT}>
-                        <button onClick={() => setDeleteTargets([...selected])} style={{ display: "flex", alignItems: "center", gap: 5, borderRadius: 6, padding: "5px 12px", border: "none", background: "#dc2626", color: "#fff", fontSize: 12, fontWeight: 500, cursor: "pointer", transition: "background 0.12s" }} onMouseEnter={e => { e.currentTarget.style.background = "#b91c1c" }} onMouseLeave={e => { e.currentTarget.style.background = "#dc2626" }}><Trash2 size={12} /> حذف المحدد</button>
+                        <button onClick={() => setDeleteTargets([...selected])} style={{ display: "flex", alignItems: "center", gap: 5, borderRadius: 6, padding: "5px 12px", border: "none", background: "var(--t-danger)", color: "#fff", fontSize: 12, fontWeight: 500, cursor: "pointer", transition: "background 0.12s" }} onMouseEnter={e => { e.currentTarget.style.background = "#b91c1c" }} onMouseLeave={e => { e.currentTarget.style.background = "var(--t-danger)" }}><Trash2 size={12} /> حذف المحدد</button>
                     </ActionGuard>
                 </div>
             )}
@@ -880,30 +880,30 @@ export function DataManagementTab({ onNavigateToTab }: { onNavigateToTab?: (tab:
                         <div style={{
                             display: "flex", alignItems: "center", justifyContent: "space-between",
                             borderRadius: 8, background: "var(--t-card, #fff)",
-                            border: "1px solid var(--t-border-light, #e5e7eb)",
+                            border: "1px solid var(--t-border-light, var(--t-border))",
                             padding: "8px 14px",
                         }}>
-                            <p style={{ fontSize: 12, color: "var(--t-text-secondary, #6b7280)" }}><span style={{ fontWeight: 700, color: "#004786" }}>{pagination?.totalCount ?? results.length}</span> مستند{debouncedQuery ? ` • "${debouncedQuery}"` : ""}</p>
-                            <p style={{ fontSize: 11, color: "var(--t-text-faint, #9ca3af)" }}>صفحة {pagination?.currentPage || 1} من {pagination?.totalPages || 1}</p>
+                            <p style={{ fontSize: 12, color: "var(--t-text-secondary, var(--t-text-muted))" }}><span style={{ fontWeight: 700, color: "var(--t-brand-orange)" }}>{pagination?.totalCount ?? results.length}</span> مستند{debouncedQuery ? ` • "${debouncedQuery}"` : ""}</p>
+                            <p style={{ fontSize: 11, color: "var(--t-text-faint, var(--t-text-faint))" }}>صفحة {pagination?.currentPage || 1} من {pagination?.totalPages || 1}</p>
                         </div>
                     )}
 
-                    <div style={{ position: "relative", overflow: "hidden", borderRadius: 10, border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-card, #fff)" }}>
+                    <div style={{ position: "relative", overflow: "hidden", borderRadius: 10, border: "1px solid var(--t-border-light, var(--t-border))", background: "var(--t-card, #fff)" }}>
                         <FetchingBar visible={fetchingDocs && !loadingDocs} />
 
                         <div className="overflow-x-auto" style={{ opacity: fetchingDocs && !loadingDocs ? 0.6 : 1, transition: 'opacity 0.2s ease' }}>
                             <table style={{ width: "100%", borderCollapse: "collapse" }}>
                                 <thead>
-                                    <tr style={{ borderBottom: "1px solid var(--t-border-light, #f0f0f0)", background: "var(--t-surface, #fafafa)" }}>
+                                    <tr style={{ borderBottom: "1px solid var(--t-border-light, #f0f0f0)", background: "var(--t-surface, var(--t-card-hover))" }}>
                                         <th style={{ width: 40, padding: "10px 14px" }}>
-                                            <button onClick={toggleAll} style={{ color: allSelected ? "#004786" : "var(--t-text-faint, #9ca3af)", border: "none", background: "transparent", cursor: "pointer", transition: "color 0.12s" }} disabled={results.length === 0 || loadingDocs}>
+                                            <button onClick={toggleAll} style={{ color: allSelected ? "var(--t-accent)" : "var(--t-text-faint, var(--t-text-faint))", border: "none", background: "transparent", cursor: "pointer", transition: "color 0.12s" }} disabled={results.length === 0 || loadingDocs}>
                                                 {allSelected ? <CheckSquare size={16} /> : someSelected ? <MinusSquare size={16} /> : <Square size={16} />}
                                             </button>
                                         </th>
                                         {["المعرف", "المحتوى", "المستخدم", "الفئة"].map(h => (
-                                            <th key={h} style={{ padding: "10px 14px", textAlign: "right", fontSize: 11, fontWeight: 600, color: "var(--t-text-faint, #9ca3af)", letterSpacing: "0.3px" }}>{h}</th>
+                                            <th key={h} style={{ padding: "10px 14px", textAlign: "right", fontSize: 11, fontWeight: 600, color: "var(--t-text-faint, var(--t-text-faint))", letterSpacing: "0.3px" }}>{h}</th>
                                         ))}
-                                        <th style={{ width: 120, padding: "10px 14px", textAlign: "center", fontSize: 11, fontWeight: 600, color: "var(--t-text-faint, #9ca3af)", letterSpacing: "0.3px" }}>الإجراءات</th>
+                                        <th style={{ width: 120, padding: "10px 14px", textAlign: "center", fontSize: 11, fontWeight: 600, color: "var(--t-text-faint, var(--t-text-faint))", letterSpacing: "0.3px" }}>الإجراءات</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-50">
@@ -945,15 +945,15 @@ export function DataManagementTab({ onNavigateToTab }: { onNavigateToTab?: (tab:
                     {/* Pagination */}
                     {pagination && pagination.totalPages > 1 && (
                         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, paddingTop: 8 }}>
-                            <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={!pagination.hasPrevious} style={{ display: "flex", alignItems: "center", gap: 4, padding: "6px 12px", borderRadius: 7, border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-card, #fff)", fontSize: 12, fontWeight: 500, color: "var(--t-text-secondary, #6b7280)", cursor: "pointer", opacity: !pagination.hasPrevious ? 0.4 : 1 }}><ChevronRight size={13} /> السابق</button>
+                            <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={!pagination.hasPrevious} style={{ display: "flex", alignItems: "center", gap: 4, padding: "6px 12px", borderRadius: 7, border: "1px solid var(--t-border-light, var(--t-border))", background: "var(--t-card, #fff)", fontSize: 12, fontWeight: 500, color: "var(--t-text-secondary, var(--t-text-muted))", cursor: "pointer", opacity: !pagination.hasPrevious ? 0.4 : 1 }}><ChevronRight size={13} /> السابق</button>
                             <div style={{ display: "flex", alignItems: "center", gap: 2 }}>
                                 {pageNums(pagination.currentPage, pagination.totalPages).map((pn, i) =>
-                                    pn === "..." ? <span key={`e${i}`} style={{ padding: "0 4px", color: "var(--t-text-faint, #d1d5db)" }}>…</span> : (
-                                        <button key={pn} onClick={() => setPage(pn as number)} style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 30, height: 30, borderRadius: 7, border: "none", fontSize: 12, fontWeight: 500, cursor: "pointer", transition: "all 0.12s", background: page === pn ? "#004786" : "transparent", color: page === pn ? "#fff" : "var(--t-text-secondary, #6b7280)" }}>{pn}</button>
+                                    pn === "..." ? <span key={`e${i}`} style={{ padding: "0 4px", color: "var(--t-text-faint, var(--t-border-medium))" }}>…</span> : (
+                                        <button key={pn} onClick={() => setPage(pn as number)} style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 30, height: 30, borderRadius: 7, border: "none", fontSize: 12, fontWeight: 500, cursor: "pointer", transition: "all 0.12s", background: page === pn ? "var(--t-accent)" : "transparent", color: page === pn ? "#fff" : "var(--t-text-secondary, var(--t-text-muted))" }}>{pn}</button>
                                     )
                                 )}
                             </div>
-                            <button onClick={() => setPage((p) => Math.min(pagination.totalPages, p + 1))} onMouseEnter={() => pagination.hasNext && prefetchNextDocs()} disabled={!pagination.hasNext} style={{ display: "flex", alignItems: "center", gap: 4, padding: "6px 12px", borderRadius: 7, border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-card, #fff)", fontSize: 12, fontWeight: 500, color: "var(--t-text-secondary, #6b7280)", cursor: "pointer", opacity: !pagination.hasNext ? 0.4 : 1 }}>التالي <ChevronLeft size={13} /></button>
+                            <button onClick={() => setPage((p) => Math.min(pagination.totalPages, p + 1))} onMouseEnter={() => pagination.hasNext && prefetchNextDocs()} disabled={!pagination.hasNext} style={{ display: "flex", alignItems: "center", gap: 4, padding: "6px 12px", borderRadius: 7, border: "1px solid var(--t-border-light, var(--t-border))", background: "var(--t-card, #fff)", fontSize: 12, fontWeight: 500, color: "var(--t-text-secondary, var(--t-text-muted))", cursor: "pointer", opacity: !pagination.hasNext ? 0.4 : 1 }}>التالي <ChevronLeft size={13} /></button>
                         </div>
                     )}
                 </>
@@ -972,9 +972,9 @@ export function DataManagementTab({ onNavigateToTab }: { onNavigateToTab?: (tab:
                 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
                 @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
                 @keyframes spin360{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
-                .skeleton-bone{background:linear-gradient(90deg,#f3f4f6 25%,#e5e7eb 37%,#f3f4f6 63%);background-size:200% 100%;animation:shimmer 1.5s ease-in-out infinite}
+                .skeleton-bone{background:linear-gradient(90deg,var(--t-surface) 25%,var(--t-border) 37%,var(--t-surface) 63%);background-size:200% 100%;animation:shimmer 1.5s ease-in-out infinite}
                 .skeleton-shimmer{opacity:0;animation:fadeIn .3s ease-out forwards}
-                .loading-spinner{width:36px;height:36px;border:3px solid #e5e7eb;border-top-color:#3b82f6;border-radius:50%;animation:spin360 .7s linear infinite}
+                .loading-spinner{width:36px;height:36px;border:3px solid var(--t-border);border-top-color:var(--t-info);border-radius:50%;animation:spin360 .7s linear infinite}
                 .hide-scrollbar::-webkit-scrollbar{display:none}
                 .hide-scrollbar{-ms-overflow-style:none;scrollbar-width:none}
                 .line-clamp-2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}

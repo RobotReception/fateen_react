@@ -54,7 +54,7 @@ export function SecurityTab() {
                     }}>
                         <Monitor size={14} style={{ color: "#16a34a" }} />
                     </div>
-                    <span style={{ fontSize: 13, fontWeight: 700, color: "var(--t-text, #111827)" }}>الجلسة النشطة</span>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: "var(--t-text, var(--t-text))" }}>الجلسة النشطة</span>
                     <span style={{
                         width: 6, height: 6, borderRadius: "50%",
                         background: "#22c55e", flexShrink: 0,
@@ -70,7 +70,7 @@ export function SecurityTab() {
                             <InfoBox icon={Clock} label="انتهاء الجلسة" value={fmtDateTime(session.expires_at)} />
                         </div>
                     ) : (
-                        <p style={{ fontSize: 12, color: "#9ca3af", margin: 0 }}>لا توجد بيانات جلسة متاحة</p>
+                        <p style={{ fontSize: 12, color: "var(--t-text-faint)", margin: 0 }}>لا توجد بيانات جلسة متاحة</p>
                     )}
                 </div>
             </div>
@@ -80,12 +80,12 @@ export function SecurityTab() {
                 <div style={sectionHeader}>
                     <div style={{
                         width: 28, height: 28, borderRadius: 8,
-                        background: "linear-gradient(135deg, rgba(0,71,134,0.08), rgba(0,152,214,0.06))",
+                        background: "linear-gradient(135deg, rgba(27,80,145,0.08), rgba(77,166,232,0.06))",
                         display: "flex", alignItems: "center", justifyContent: "center",
                     }}>
-                        <Shield size={14} style={{ color: "#004786" }} />
+                        <Shield size={14} style={{ color: "var(--t-accent)" }} />
                     </div>
-                    <span style={{ fontSize: 13, fontWeight: 700, color: "var(--t-text, #111827)" }}>حالة التحقق</span>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: "var(--t-text, var(--t-text))" }}>حالة التحقق</span>
                 </div>
                 <div style={{ padding: "14px 22px", display: "flex", alignItems: "center", gap: 12 }}>
                     <div style={{
@@ -95,13 +95,13 @@ export function SecurityTab() {
                     }}>
                         {profile?.email_verified
                             ? <CheckCircle2 size={18} style={{ color: "#16a34a" }} />
-                            : <AlertCircle size={18} style={{ color: "#dc2626" }} />}
+                            : <AlertCircle size={18} style={{ color: "var(--t-danger)" }} />}
                     </div>
                     <div>
-                        <div style={{ fontSize: 13, fontWeight: 600, color: "var(--t-text, #111827)" }}>
+                        <div style={{ fontSize: 13, fontWeight: 600, color: "var(--t-text, var(--t-text))" }}>
                             {profile?.email_verified ? "البريد الإلكتروني مؤكد" : "البريد الإلكتروني غير مؤكد"}
                         </div>
-                        <div style={{ fontSize: 11, color: "#9ca3af", marginTop: 1 }}>
+                        <div style={{ fontSize: 11, color: "var(--t-text-faint)", marginTop: 1 }}>
                             {profile?.email} — {profile?.email_verified ? "تم التحقق بنجاح" : "يرجى تأكيد بريدك الإلكتروني"}
                         </div>
                     </div>
@@ -111,7 +111,7 @@ export function SecurityTab() {
             {/* ═══ 3. ACCOUNT INFO ═══ */}
             <div style={card}>
                 <div style={sectionHeader}>
-                    <span style={{ fontSize: 13, fontWeight: 700, color: "var(--t-text, #111827)" }}>معلومات الحساب</span>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: "var(--t-text, var(--t-text))" }}>معلومات الحساب</span>
                 </div>
                 <div style={{ padding: "14px 22px" }}>
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
@@ -133,12 +133,12 @@ function InfoBox({ icon: Icon, label, value, mono, dir }: {
     return (
         <div style={{
             padding: 12, borderRadius: 8,
-            background: "var(--t-surface, #f9fafb)",
+            background: "var(--t-surface, var(--t-page))",
             border: "1px solid var(--t-border-light, #f2f3f5)",
         }}>
             <div style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 5 }}>
-                <Icon size={11} style={{ color: "#9ca3af" }} />
-                <span style={{ fontSize: 10, fontWeight: 600, color: "#9ca3af" }}>{label}</span>
+                <Icon size={11} style={{ color: "var(--t-text-faint)" }} />
+                <span style={{ fontSize: 10, fontWeight: 600, color: "var(--t-text-faint)" }}>{label}</span>
             </div>
             <div style={{
                 fontSize: 12.5, fontWeight: 600, color: "var(--t-text, #1f2937)",

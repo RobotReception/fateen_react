@@ -25,6 +25,8 @@ export function useCustomerMessages(customerId: string | null, accountId?: strin
         // Live updates come via WebSocket (useInboxSocket).
         // Polling is kept as a fallback only — 60s instead of 10s.
         enabled: !!customerId,
+        staleTime: 30_000,               // data valid 30s — show cached instantly, no spinner
+        gcTime: 5 * 60_000,             // keep cache 5 minutes after unmount
         refetchOnMount: "always",        // fetch fresh messages every time conversation opens
         refetchOnWindowFocus: true,      // refresh when user tabs back in
         refetchInterval: 60_000,         // fallback polling (was 10_000 before WebSocket)

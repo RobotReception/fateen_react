@@ -2,7 +2,7 @@ import type { SessionStatus } from "../../types/inbox.types"
 
 const MAP: Record<SessionStatus, { label: string; color: string; bg: string }> = {
     open: { label: "مفتوح", color: "#059669", bg: "#d1fae5" },
-    closed: { label: "مغلق", color: "#6b7280", bg: "#f3f4f6" },
+    closed: { label: "مغلق", color: "var(--t-text-muted)", bg: "var(--t-surface)" },
     pending: { label: "معلق", color: "#d97706", bg: "#fef3c7" },
 }
 

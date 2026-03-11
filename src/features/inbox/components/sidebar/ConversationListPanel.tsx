@@ -124,7 +124,7 @@ export function ConversationListPanel() {
                 /* Brand accent */
                 .clp-accent-strip {
                     height:3px; flex-shrink:0;
-                    background:linear-gradient(90deg, #004786, #0072b5, #004786);
+                    background:var(--t-gradient-accent-h);
                     opacity:0.85;
                 }
 
@@ -135,7 +135,7 @@ export function ConversationListPanel() {
                     transition:background .2s;
                 }
                 .clp-progress-active {
-                    background:linear-gradient(90deg, transparent, #0072b5, transparent);
+                    background:linear-gradient(90deg, transparent, var(--t-accent-secondary), transparent);
                     background-size:200% 100%;
                     animation:clpShimmer 1.5s ease-in-out infinite;
                 }
@@ -170,7 +170,7 @@ export function ConversationListPanel() {
                 }
                 .clp-spinner-mini {
                     width:8px; height:8px; border-radius:50%;
-                    border:1.5px solid #0072b5;
+                    border:1.5px solid var(--t-accent-secondary);
                     border-top-color:transparent;
                     animation:spin .6s linear infinite;
                     display:inline-block;
@@ -197,7 +197,7 @@ function LoadingSpinner() {
             <div style={{
                 width: 32, height: 32, borderRadius: "50%",
                 border: "3px solid var(--t-border-light)",
-                borderTopColor: "#0072b5",
+                borderTopColor: "var(--t-accent-secondary)",
                 animation: "spin 0.7s linear infinite",
             }} />
             <span style={{
@@ -220,10 +220,10 @@ function EmptyState({ hasFilters }: { hasFilters: boolean }) {
         }}>
             <div style={{
                 width: 52, height: 52, borderRadius: "50%",
-                background: "linear-gradient(135deg, rgba(0,71,134,0.08), rgba(0,114,181,0.08))",
+                background: "linear-gradient(135deg, rgba(27,80,145,0.08), var(--t-accent-muted))",
                 display: "flex", alignItems: "center", justifyContent: "center",
                 fontSize: 24,
-                border: "1px solid rgba(0,71,134,0.1)",
+                border: "1px solid rgba(27,80,145,0.1)",
             }}>
                 {hasFilters ? "🔍" : "💬"}
             </div>

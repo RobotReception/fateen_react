@@ -479,12 +479,12 @@ export function MessageComposer({ customerId, customer }: Props) {
                     border: "1px solid rgba(239,68,68,0.12)",
                     width: "100%", justifyContent: "center",
                 }}>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--t-danger)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
                         <path d="M7 11V7a5 5 0 0 1 10 0v4" />
                     </svg>
                     <span style={{
-                        fontSize: 13, fontWeight: 700, color: "#ef4444",
+                        fontSize: 13, fontWeight: 700, color: "var(--t-danger)",
                     }}>الجلسة مغلقة</span>
                 </div>
                 <p style={{
@@ -742,10 +742,10 @@ export function MessageComposer({ customerId, customer }: Props) {
                             <div style={{ display: "flex", alignItems: "center", gap: 6, marginRight: 8 }}>
                                 <span style={{
                                     width: 8, height: 8, borderRadius: "50%",
-                                    background: "#ef4444",
+                                    background: "var(--t-danger)",
                                     animation: "pulse 1s ease-in-out infinite",
                                 }} />
-                                <span style={{ fontSize: 12, fontWeight: 600, color: "#ef4444", fontFamily: "monospace" }}>
+                                <span style={{ fontSize: 12, fontWeight: 600, color: "var(--t-danger)", fontFamily: "monospace" }}>
                                     {Math.floor(recordingTime / 60).toString().padStart(2, "0")}:{(recordingTime % 60).toString().padStart(2, "0")}
                                 </span>
                             </div>
@@ -832,22 +832,22 @@ export function MessageComposer({ customerId, customer }: Props) {
                     }}>
                         <div style={{
                             width: 4, height: 16, borderRadius: 2,
-                            background: "linear-gradient(180deg, #f59e0b, #d97706)",
+                            background: "linear-gradient(180deg, var(--t-warning), #d97706)",
                             flexShrink: 0,
                         }} />
                         <StickyNote size={13} style={{ color: "#d97706", flexShrink: 0 }} />
                         <span style={{ fontSize: 11, fontWeight: 700, color: "#92400e" }}>ملاحظة داخلية</span>
-                        <span style={{ fontSize: 9, color: "#9ca3af", fontWeight: 500 }}>— مرئية فقط لفريقك</span>
+                        <span style={{ fontSize: 9, color: "var(--t-text-faint)", fontWeight: 500 }}>— مرئية فقط لفريقك</span>
                         <span style={{ flex: 1 }} />
                         <button onClick={() => { setMode("reply"); setCommentText(""); setMentionIds([]) }}
                             style={{
                                 width: 20, height: 20, borderRadius: "50%", border: "none",
                                 background: "rgba(0,0,0,0.05)", cursor: "pointer", flexShrink: 0,
                                 display: "flex", alignItems: "center", justifyContent: "center",
-                                color: "#9ca3af", transition: "all .12s",
+                                color: "var(--t-text-faint)", transition: "all .12s",
                             }}
-                            onMouseEnter={e => { e.currentTarget.style.background = "rgba(0,0,0,0.1)"; e.currentTarget.style.color = "#374151" }}
-                            onMouseLeave={e => { e.currentTarget.style.background = "rgba(0,0,0,0.05)"; e.currentTarget.style.color = "#9ca3af" }}
+                            onMouseEnter={e => { e.currentTarget.style.background = "rgba(0,0,0,0.1)"; e.currentTarget.style.color = "var(--t-text-secondary)" }}
+                            onMouseLeave={e => { e.currentTarget.style.background = "rgba(0,0,0,0.05)"; e.currentTarget.style.color = "var(--t-text-faint)" }}
                         >
                             <X size={11} />
                         </button>
@@ -863,8 +863,8 @@ export function MessageComposer({ customerId, customer }: Props) {
                             maxHeight: 200, overflowY: "auto", zIndex: 50,
                         }}>
                             <div style={{ padding: "6px 12px 4px", display: "flex", alignItems: "center", gap: 5, borderBottom: "1px solid var(--t-border-light)" }}>
-                                <AtSign size={11} style={{ color: "#004786" }} />
-                                <span style={{ fontSize: 10, fontWeight: 700, color: "#004786" }}>أذكر شخصاً</span>
+                                <AtSign size={11} style={{ color: "var(--t-accent)" }} />
+                                <span style={{ fontSize: 10, fontWeight: 700, color: "var(--t-accent)" }}>أذكر شخصاً</span>
                             </div>
                             {filteredMentionUsers.length === 0 ? (
                                 <div style={{ padding: "10px 14px", fontSize: 12, color: "var(--t-text-faint)" }}>لا يوجد نتائج</div>
@@ -890,7 +890,7 @@ export function MessageComposer({ customerId, customer }: Props) {
                                     {u.profile_picture ? (
                                         <img src={u.profile_picture} alt="" style={{ width: 26, height: 26, borderRadius: "50%", objectFit: "cover" }} />
                                     ) : (
-                                        <div style={{ width: 26, height: 26, borderRadius: "50%", background: "linear-gradient(135deg, #f59e0b, #d97706)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700 }}>
+                                        <div style={{ width: 26, height: 26, borderRadius: "50%", background: "linear-gradient(135deg, var(--t-warning), #d97706)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 700 }}>
                                             {u.name?.charAt(0) || "?"}
                                         </div>
                                     )}
@@ -965,17 +965,17 @@ export function MessageComposer({ customerId, customer }: Props) {
                                     <span key={uid} style={{
                                         display: "inline-flex", alignItems: "center", gap: 4,
                                         padding: "3px 8px 3px 10px", borderRadius: 12,
-                                        background: "rgba(0,71,134,0.06)",
-                                        color: "#004786", fontSize: 10, fontWeight: 700,
-                                        border: "1px solid rgba(0,71,134,0.1)",
+                                        background: "rgba(27,80,145,0.06)",
+                                        color: "var(--t-accent)", fontSize: 10, fontWeight: 700,
+                                        border: "1px solid rgba(27,80,145,0.1)",
                                     }}>
                                         <AtSign size={9} />
                                         {u?.name || uid}
                                         <button onClick={() => setMentionIds((p) => p.filter((x) => x !== uid))}
                                             style={{
-                                                background: "rgba(0,71,134,0.08)", border: "none",
+                                                background: "rgba(27,80,145,0.08)", border: "none",
                                                 cursor: "pointer", padding: "1px 2px",
-                                                color: "#004786", fontSize: 9, lineHeight: 1,
+                                                color: "var(--t-accent)", fontSize: 9, lineHeight: 1,
                                                 borderRadius: "50%", display: "flex",
                                                 alignItems: "center", justifyContent: "center",
                                                 width: 14, height: 14,
@@ -990,7 +990,7 @@ export function MessageComposer({ customerId, customer }: Props) {
                     <div style={{
                         display: "flex", alignItems: "center", justifyContent: "space-between",
                         padding: "4px 14px 6px",
-                        borderTop: "1px solid #f3f4f6",
+                        borderTop: "1px solid var(--t-surface)",
                     }}>
                         <div style={{ display: "flex", gap: 2 }}>
                             <button onClick={() => { setShowMentions(true); setMentionSearch(""); setCommentText((p) => p + "@"); commentRef.current?.focus() }}
@@ -1013,7 +1013,7 @@ export function MessageComposer({ customerId, customer }: Props) {
                             disabled={!commentText.trim() || isSendingComment}
                             style={{
                                 width: 30, height: 30, borderRadius: "50%", border: "none",
-                                background: commentText.trim() && !isSendingComment ? "linear-gradient(135deg, #f59e0b, #d97706)" : "#e5e7eb",
+                                background: commentText.trim() && !isSendingComment ? "linear-gradient(135deg, var(--t-warning), #d97706)" : "var(--t-border)",
                                 cursor: commentText.trim() && !isSendingComment ? "pointer" : "not-allowed",
                                 display: "flex", alignItems: "center", justifyContent: "center",
                                 color: "#fff", transition: "all .15s",
@@ -1037,16 +1037,16 @@ export function MessageComposer({ customerId, customer }: Props) {
                     style={{
                         display: "flex", alignItems: "center", gap: 5,
                         background: mode === "comment"
-                            ? "rgba(0,71,134,0.08)"
+                            ? "rgba(27,80,145,0.08)"
                             : "linear-gradient(135deg, rgba(245,158,11,0.08), rgba(217,119,6,0.05))",
                         padding: "5px 12px",
                         borderRadius: 8,
                         fontSize: 11,
                         fontWeight: 700,
-                        color: mode === "comment" ? "#004786" : "#92400e",
+                        color: mode === "comment" ? "var(--t-accent)" : "#92400e",
                         cursor: "pointer",
                         transition: "all .15s",
-                        border: mode === "comment" ? "1px solid rgba(0,71,134,0.15)" : "1px solid rgba(245,158,11,0.15)",
+                        border: mode === "comment" ? "1px solid rgba(27,80,145,0.15)" : "1px solid rgba(245,158,11,0.15)",
                     }}
                     onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 2px 6px rgba(0,0,0,0.06)" }}
                     onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none" }}

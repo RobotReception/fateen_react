@@ -1,4 +1,4 @@
-﻿import { useState, useCallback, useMemo, useRef } from "react"
+import { useState, useCallback, useMemo, useRef } from "react"
 import {
     Edit3, Save, X, Loader2, AlertCircle,
     RefreshCw, CheckCircle2, XCircle,
@@ -140,10 +140,10 @@ export function ProfileTab() {
     if (isError) return (
         <div style={{ ...card, padding: "48px 24px", textAlign: "center", animation: "profFade .3s" }}>
             <style>{CSS}</style>
-            <AlertCircle size={28} style={{ color: "#dc2626", margin: "0 auto 10px" }} />
+            <AlertCircle size={28} style={{ color: "var(--t-danger)", margin: "0 auto 10px" }} />
             <p style={{ fontSize: 14, fontWeight: 600, color: "#1f2937", margin: "0 0 4px" }}>فشل تحميل البيانات</p>
-            <p style={{ fontSize: 12, color: "#9ca3af", margin: "0 0 14px" }}>تحقق من اتصالك وأعد المحاولة</p>
-            <button onClick={() => refetch()} style={{ padding: "8px 18px", borderRadius: 8, border: "none", cursor: "pointer", background: "#004786", color: "#fff", fontSize: 12, fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 5 }}>
+            <p style={{ fontSize: 12, color: "var(--t-text-faint)", margin: "0 0 14px" }}>تحقق من اتصالك وأعد المحاولة</p>
+            <button onClick={() => refetch()} style={{ padding: "8px 18px", borderRadius: 8, border: "none", cursor: "pointer", background: "var(--t-brand-orange)", color: "#fff", fontSize: 12, fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 5 }}>
                 <RefreshCw size={12} /> إعادة المحاولة
             </button>
         </div>
@@ -181,7 +181,7 @@ export function ProfileTab() {
                             ) : (
                                 <div style={{
                                     width: 60, height: 60, borderRadius: 14,
-                                    background: "linear-gradient(135deg, #004786, #0072b5)",
+                                    background: "var(--t-brand-orange)",
                                     display: "flex", alignItems: "center", justifyContent: "center",
                                     opacity: uploading ? 0.5 : 1, transition: "opacity .2s",
                                 }}>
@@ -192,7 +192,7 @@ export function ProfileTab() {
                         {/* Upload overlay — always visible on hover */}
                         <div style={{
                             position: "absolute", inset: 0, borderRadius: 14,
-                            background: uploading ? "rgba(0,71,134,0.4)" : "rgba(0,0,0,0.0)",
+                            background: uploading ? "rgba(27,80,145,0.4)" : "rgba(0,0,0,0.0)",
                             display: "flex", alignItems: "center", justifyContent: "center",
                             transition: "background .2s",
                         }}
@@ -209,7 +209,7 @@ export function ProfileTab() {
                             <div style={{
                                 position: "absolute", bottom: -2, left: -2,
                                 width: 14, height: 14, borderRadius: "50%",
-                                background: profile?.is_active ? "#22c55e" : "#d1d5db",
+                                background: profile?.is_active ? "#22c55e" : "var(--t-border-medium)",
                                 border: "2.5px solid var(--t-card, #fff)",
                             }} />
                         )}
@@ -218,19 +218,19 @@ export function ProfileTab() {
                     {/* Identity */}
                     <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                            <h2 style={{ fontSize: 17, fontWeight: 700, color: "var(--t-text, #111827)", margin: 0, letterSpacing: "-0.01em" }}>
+                            <h2 style={{ fontSize: 17, fontWeight: 700, color: "var(--t-text, var(--t-text))", margin: 0, letterSpacing: "-0.01em" }}>
                                 {fullName}
                             </h2>
-                            {profile?.email_verified && <CheckCircle2 size={14} style={{ color: "#004786", flexShrink: 0 }} />}
+                            {profile?.email_verified && <CheckCircle2 size={14} style={{ color: "var(--t-accent)", flexShrink: 0 }} />}
                         </div>
-                        <div style={{ fontSize: 12.5, color: "var(--t-text-faint, #9ca3af)", marginTop: 2, fontFamily: "monospace" }} dir="ltr">
+                        <div style={{ fontSize: 12.5, color: "var(--t-text-faint, var(--t-text-faint))", marginTop: 2, fontFamily: "monospace" }} dir="ltr">
                             {profile?.email}
                         </div>
                         <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 8, flexWrap: "wrap" }}>
                             <span style={{
                                 display: "inline-flex", alignItems: "center", gap: 3,
                                 padding: "3px 10px", borderRadius: 6,
-                                background: "#004786", color: "#fff",
+                                background: "var(--t-brand-orange)", color: "#fff",
                                 fontSize: 10, fontWeight: 700,
                             }}>
                                 <Shield size={9} />
@@ -239,7 +239,7 @@ export function ProfileTab() {
                             {profile?.is_owner && (
                                 <span style={{
                                     padding: "3px 10px", borderRadius: 6,
-                                    background: "rgba(0,71,134,0.06)", color: "#004786",
+                                    background: "rgba(27,80,145,0.06)", color: "var(--t-accent)",
                                     fontSize: 10, fontWeight: 700,
                                 }}>مالك المؤسسة</span>
                             )}
@@ -247,7 +247,7 @@ export function ProfileTab() {
                                 display: "inline-flex", alignItems: "center", gap: 4,
                                 padding: "3px 10px", borderRadius: 6,
                                 background: profile?.is_active ? "rgba(34,197,94,0.08)" : "var(--t-surface, #f5f5f5)",
-                                color: profile?.is_active ? "#16a34a" : "#9ca3af",
+                                color: profile?.is_active ? "#16a34a" : "var(--t-text-faint)",
                                 fontSize: 10, fontWeight: 600,
                             }}>
                                 <span style={{ width: 5, height: 5, borderRadius: "50%", background: "currentColor" }} />
@@ -266,7 +266,7 @@ export function ProfileTab() {
                                 display: "flex", alignItems: "center", gap: 5, flexShrink: 0,
                                 transition: "all .12s",
                             }}
-                                onMouseEnter={e => { e.currentTarget.style.borderColor = "#004786"; e.currentTarget.style.color = "#004786" }}
+                                onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--t-accent)"; e.currentTarget.style.color = "var(--t-accent)" }}
                                 onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--t-border, #dcdfe3)"; e.currentTarget.style.color = "var(--t-text-secondary, #4b5563)" }}
                             >
                                 <Edit3 size={13} /> تعديل
@@ -281,25 +281,25 @@ export function ProfileTab() {
                 <div style={{ ...card, overflow: "hidden", animation: "profFade .15s" }}>
                     <div style={{
                         padding: "12px 22px",
-                        background: "var(--t-surface, #f9fafb)",
+                        background: "var(--t-surface, var(--t-page))",
                         borderBottom: "1px solid var(--t-border-light, #eaedf0)",
                         display: "flex", alignItems: "center", justifyContent: "space-between",
                     }}>
-                        <span style={{ fontSize: 13, fontWeight: 700, color: "var(--t-text, #111827)" }}>تعديل البيانات الشخصية</span>
+                        <span style={{ fontSize: 13, fontWeight: 700, color: "var(--t-text, var(--t-text))" }}>تعديل البيانات الشخصية</span>
                         <div style={{ display: "flex", gap: 8 }}>
                             <button onClick={cancel} disabled={mut.isPending} style={{
                                 padding: "6px 14px", borderRadius: 7, cursor: "pointer",
                                 border: "1px solid var(--t-border, #dcdfe3)", background: "var(--t-card, #fff)",
-                                color: "#6b7280", fontSize: 12, fontWeight: 500,
+                                color: "var(--t-text-muted)", fontSize: 12, fontWeight: 500,
                                 display: "flex", alignItems: "center", gap: 4,
                                 opacity: mut.isPending ? 0.4 : 1,
                             }}><X size={12} /> إلغاء</button>
                             <button onClick={save} disabled={mut.isPending} style={{
                                 padding: "6px 18px", borderRadius: 7, cursor: "pointer",
-                                border: "none", background: "#004786", color: "#fff",
+                                border: "none", background: "var(--t-brand-orange)", color: "#fff",
                                 fontSize: 12, fontWeight: 600,
                                 display: "flex", alignItems: "center", gap: 4,
-                                opacity: mut.isPending ? 0.5 : 1, boxShadow: "0 1px 3px rgba(0,71,134,0.15)",
+                                opacity: mut.isPending ? 0.5 : 1, boxShadow: "0 1px 3px rgba(27,80,145,0.15)",
                             }}>
                                 {mut.isPending ? <Loader2 size={12} className="animate-spin" /> : <Save size={12} />}
                                 حفظ التغييرات
@@ -314,16 +314,16 @@ export function ProfileTab() {
                         </div>
                         {errors.length > 0 && (
                             <div style={{ marginTop: 14, borderRadius: 8, padding: 12, background: "#fef2f2", border: "1px solid #fecaca" }}>
-                                <p style={{ fontSize: 12, fontWeight: 600, color: "#dc2626", margin: "0 0 4px", display: "flex", alignItems: "center", gap: 4 }}><AlertCircle size={12} /> أخطاء في البيانات</p>
+                                <p style={{ fontSize: 12, fontWeight: 600, color: "var(--t-danger)", margin: "0 0 4px", display: "flex", alignItems: "center", gap: 4 }}><AlertCircle size={12} /> أخطاء في البيانات</p>
                                 <ul style={{ margin: 0, paddingRight: 16 }}>
-                                    {errors.map((e, i) => <li key={i} style={{ fontSize: 11, color: "#6b7280" }}><b>{e.field}:</b> {e.message}</li>)}
+                                    {errors.map((e, i) => <li key={i} style={{ fontSize: 11, color: "var(--t-text-muted)" }}><b>{e.field}:</b> {e.message}</li>)}
                                 </ul>
                             </div>
                         )}
                         {mut.isError && errors.length === 0 && (
                             <div style={{ marginTop: 14, borderRadius: 8, padding: 12, background: "#fef2f2", border: "1px solid #fecaca", display: "flex", alignItems: "center", gap: 6 }}>
-                                <AlertCircle size={12} style={{ color: "#dc2626" }} />
-                                <span style={{ fontSize: 12, color: "#6b7280" }}>{(mut.error as any)?.message || "فشل التحديث"}</span>
+                                <AlertCircle size={12} style={{ color: "var(--t-danger)" }} />
+                                <span style={{ fontSize: 12, color: "var(--t-text-muted)" }}>{(mut.error as any)?.message || "فشل التحديث"}</span>
                             </div>
                         )}
                     </div>
@@ -338,7 +338,7 @@ export function ProfileTab() {
                         borderBottom: "1px solid var(--t-border-light, #eaedf0)",
                         display: "flex", alignItems: "center", gap: 8,
                     }}>
-                        <span style={{ fontSize: 13, fontWeight: 700, color: "var(--t-text, #111827)" }}>معلومات الحساب</span>
+                        <span style={{ fontSize: 13, fontWeight: 700, color: "var(--t-text, var(--t-text))" }}>معلومات الحساب</span>
                     </div>
                     <div style={{ padding: "0 22px" }}>
                         <Row icon={Mail} label="البريد الإلكتروني" value={profile?.email} mono dir="ltr" copy />
@@ -358,7 +358,7 @@ export function ProfileTab() {
                         borderBottom: "1px solid var(--t-border-light, #eaedf0)",
                         display: "flex", alignItems: "center", gap: 8,
                     }}>
-                        <span style={{ fontSize: 13, fontWeight: 700, color: "var(--t-text, #111827)" }}>الجلسة الحالية</span>
+                        <span style={{ fontSize: 13, fontWeight: 700, color: "var(--t-text, var(--t-text))" }}>الجلسة الحالية</span>
                         <span style={{
                             width: 6, height: 6, borderRadius: "50%",
                             background: "#22c55e", flexShrink: 0,
@@ -384,7 +384,7 @@ export function ProfileTab() {
                         padding: "14px 22px",
                         borderBottom: "1px solid var(--t-border-light, #eaedf0)",
                     }}>
-                        <span style={{ fontSize: 13, fontWeight: 700, color: "var(--t-text, #111827)" }}>حالة التحقق</span>
+                        <span style={{ fontSize: 13, fontWeight: 700, color: "var(--t-text, var(--t-text))" }}>حالة التحقق</span>
                     </div>
                     <div style={{ padding: "14px 22px", display: "flex", alignItems: "center", gap: 12 }}>
                         <div style={{
@@ -394,13 +394,13 @@ export function ProfileTab() {
                         }}>
                             {profile?.email_verified
                                 ? <CheckCircle2 size={18} style={{ color: "#16a34a" }} />
-                                : <XCircle size={18} style={{ color: "#dc2626" }} />}
+                                : <XCircle size={18} style={{ color: "var(--t-danger)" }} />}
                         </div>
                         <div>
-                            <div style={{ fontSize: 13, fontWeight: 600, color: "var(--t-text, #111827)" }}>
+                            <div style={{ fontSize: 13, fontWeight: 600, color: "var(--t-text, var(--t-text))" }}>
                                 {profile?.email_verified ? "البريد الإلكتروني مؤكد" : "البريد الإلكتروني غير مؤكد"}
                             </div>
-                            <div style={{ fontSize: 11.5, color: "var(--t-text-faint, #9ca3af)", marginTop: 1 }}>
+                            <div style={{ fontSize: 11.5, color: "var(--t-text-faint, var(--t-text-faint))", marginTop: 1 }}>
                                 {profile?.email_verified
                                     ? "تم التحقق من بريدك الإلكتروني بنجاح"
                                     : "يرجى تأكيد بريدك الإلكتروني لتفعيل جميع الميزات"}
@@ -428,15 +428,15 @@ function Row({ icon: Icon, label, value, mono, dir, copy, last }: {
         }}>
             <div style={{
                 width: 30, height: 30, borderRadius: 8,
-                background: "var(--t-surface, #f5f6f8)",
+                background: "var(--t-surface, var(--t-surface))",
                 display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
             }}>
-                <Icon size={13} style={{ color: "var(--t-text-faint, #9ca3af)" }} />
+                <Icon size={13} style={{ color: "var(--t-text-faint, var(--t-text-faint))" }} />
             </div>
-            <span style={{ fontSize: 12.5, color: "var(--t-text-faint, #9ca3af)", width: 120, flexShrink: 0, fontWeight: 500 }}>{label}</span>
+            <span style={{ fontSize: 12.5, color: "var(--t-text-faint, var(--t-text-faint))", width: 120, flexShrink: 0, fontWeight: 500 }}>{label}</span>
             <span style={{
                 flex: 1, fontSize: 13, fontWeight: 500,
-                color: empty ? "var(--t-border, #d1d5db)" : "var(--t-text, #1f2937)",
+                color: empty ? "var(--t-border, var(--t-border-medium))" : "var(--t-text, #1f2937)",
                 fontFamily: mono ? "monospace" : "inherit",
                 overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
             }} dir={dir}>
@@ -454,16 +454,16 @@ function EField({ label, name, value, onChange, placeholder, dir, type = "text" 
     const [f, setF] = useState(false)
     return (
         <div>
-            <label style={{ display: "block", fontSize: 11.5, fontWeight: 600, color: "#9ca3af", marginBottom: 5 }}>{label}</label>
+            <label style={{ display: "block", fontSize: 11.5, fontWeight: 600, color: "var(--t-text-faint)", marginBottom: 5 }}>{label}</label>
             <input type={type} value={value} onChange={e => onChange(name, e.target.value)}
                 placeholder={placeholder} dir={dir}
                 onFocus={() => setF(true)} onBlur={() => setF(false)}
                 style={{
                     width: "100%", padding: "9px 12px", borderRadius: 8,
-                    border: `1.5px solid ${f ? "#004786" : "#e5e7eb"}`,
+                    border: `1.5px solid ${f ? "var(--t-accent)" : "var(--t-border)"}`,
                     background: "var(--t-card, #fff)", fontSize: 13, color: "#1f2937", outline: "none",
                     transition: "border-color .15s, box-shadow .15s",
-                    boxShadow: f ? "0 0 0 3px rgba(0,71,134,0.06)" : "none",
+                    boxShadow: f ? "0 0 0 3px rgba(27,80,145,0.06)" : "none",
                 }} />
         </div>
     )

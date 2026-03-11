@@ -39,7 +39,7 @@ export function LoginPage() {
         (submitted || touched[field]) && fieldErrors[field]
 
     const fieldClass = (field: keyof typeof fieldErrors, extra = "") =>
-        `w-full rounded-xl border ${showFieldError(field) ? "border-red-400 bg-red-50/30" : "border-gray-200 bg-gray-50/50"} px-4 py-3 text-sm text-gray-900 outline-none transition-all duration-300 placeholder:text-gray-400 focus:border-[#0098d6]/50 focus:bg-white focus:ring-2 focus:ring-[#0098d6]/10 ${extra}`
+        `w-full rounded-xl border ${showFieldError(field) ? "border-red-400 bg-red-50/30" : "border-gray-200 bg-gray-50/50"} px-4 py-3 text-sm text-gray-900 outline-none transition-all duration-300 placeholder:text-gray-400 focus:border-[var(--t-brand-orange)]/40 focus:bg-white focus:ring-2 focus:ring-[var(--t-brand-orange)]/10 ${extra}`
 
     const handleBlur = (field: string) => setTouched(p => ({ ...p, [field]: true }))
 
@@ -154,8 +154,8 @@ export function LoginPage() {
         return (
             <AuthLayout>
                 <div className="mb-6 text-center">
-                    <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#0098d6]/10 to-[#004786]/10">
-                        <Building2 className="h-7 w-7 text-[#0098d6]" />
+                    <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#1A6BCC]/10 to-[#2E8FE8]/10">
+                        <Building2 className="h-7 w-7 text-[#1A6BCC]" />
                     </div>
                     <h1 className="mb-1.5 text-xl font-bold text-gray-900">
                         اختر الشركة
@@ -184,17 +184,17 @@ export function LoginPage() {
                                 onClick={() => handleTenantSelect(tenant.tenant_id)}
                                 disabled={isDisabled}
                                 className={`group relative w-full rounded-xl border-2 p-4 text-right transition-all duration-300 ${isSelecting
-                                    ? "border-[#0098d6] bg-[#0098d6]/5 shadow-md shadow-[#0098d6]/10"
+                                    ? "border-[#1A6BCC] bg-[#1A6BCC]/5 shadow-md shadow-[#1A6BCC]/10"
                                     : isDisabled
                                         ? "cursor-not-allowed border-gray-100 bg-gray-50/50 opacity-60"
-                                        : "border-gray-100 bg-white hover:border-[#0098d6]/40 hover:bg-[#0098d6]/[0.02] hover:shadow-md hover:shadow-[#0098d6]/5"
+                                        : "border-gray-100 bg-white hover:border-[#1A6BCC]/40 hover:bg-[#1A6BCC]/[0.02] hover:shadow-md hover:shadow-[#1A6BCC]/5"
                                     }`}
                             >
                                 <div className="flex items-center gap-3">
                                     {/* Company icon */}
                                     <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition-colors duration-300 ${isSelecting
-                                        ? "bg-[#0098d6] text-white"
-                                        : "bg-gray-100 text-gray-500 group-hover:bg-[#0098d6]/10 group-hover:text-[#0098d6]"
+                                        ? "bg-[#1A6BCC] text-white"
+                                        : "bg-gray-100 text-gray-500 group-hover:bg-[#1A6BCC]/10 group-hover:text-[#1A6BCC]"
                                         }`}>
                                         {isSelecting ? (
                                             <Loader2 className="h-5 w-5 animate-spin" />
@@ -220,7 +220,7 @@ export function LoginPage() {
                                     </div>
 
                                     {/* Arrow */}
-                                    <ArrowRight className={`h-4 w-4 shrink-0 rotate-180 text-gray-300 transition-all duration-300 ${!isDisabled ? "group-hover:text-[#0098d6] group-hover:-translate-x-1" : ""
+                                    <ArrowRight className={`h-4 w-4 shrink-0 rotate-180 text-gray-300 transition-all duration-300 ${!isDisabled ? "group-hover:text-[var(--t-accent-light)] group-hover:-translate-x-1" : ""
                                         }`} />
                                 </div>
                             </button>
@@ -283,7 +283,7 @@ export function LoginPage() {
                         </label>
                         <Link
                             to="/forgot-password"
-                            className="text-xs text-[#0098d6] transition-colors hover:text-[#004786]"
+                            className="text-xs text-[var(--t-brand-orange)] transition-colors hover:text-[var(--t-brand-orange-hover)]"
                         >
                             نسيت كلمة المرور؟
                         </Link>
@@ -314,7 +314,7 @@ export function LoginPage() {
                 <button
                     type="submit"
                     disabled={loading}
-                    className="group relative w-full overflow-hidden rounded-xl bg-gradient-to-l from-[#0098d6] to-[#004786] px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-[#0098d6]/20 transition-all duration-300 hover:shadow-xl hover:shadow-[#0098d6]/30 hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+                    className="group relative w-full overflow-hidden rounded-xl bg-gradient-to-l from-[#2E8FE8] to-[#1A6BCC] px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-[#1A6BCC]/20 transition-all duration-300 hover:shadow-xl hover:shadow-[#1A6BCC]/30 hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:translate-y-0"
                 >
                     <span className="relative z-10 flex items-center justify-center gap-2">
                         {loading ? (
@@ -324,7 +324,7 @@ export function LoginPage() {
                         )}
                         {loading ? "جاري تسجيل الدخول..." : "تسجيل الدخول"}
                     </span>
-                    <div className="absolute inset-0 bg-gradient-to-l from-[#00b4ff] to-[#0066aa] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                    <div className="absolute inset-0 bg-gradient-to-l from-[#5AB3FF] to-[#1A6BCC] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
                 </button>
             </form>
 
@@ -338,7 +338,7 @@ export function LoginPage() {
             {/* Register link */}
             <p className="text-center text-sm text-gray-500">
                 ليس لديك حساب؟{" "}
-                <Link to="/register" className="font-semibold text-[#0098d6] transition-colors hover:text-[#004786]">
+                <Link to="/register" className="font-semibold text-[#1A6BCC] transition-colors hover:text-[#2E8FE8]">
                     أنشئ حساب جديد
                 </Link>
             </p>

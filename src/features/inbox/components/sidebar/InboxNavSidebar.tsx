@@ -174,7 +174,7 @@ export function InboxNavSidebar() {
                 /* Brand accent strip at top */
                 .ins-accent-strip {
                     height: 3px; flex-shrink: 0;
-                    background: linear-gradient(90deg, #004786, #0072b5, #004786);
+                    background: var(--t-gradient-accent-h);
                     opacity: 0.85;
                 }
 
@@ -190,7 +190,7 @@ export function InboxNavSidebar() {
                 }
                 .ins-logo-icon {
                     width: 26px; height: 26px; border-radius: 7px;
-                    background: linear-gradient(135deg, #004786, #0072b5);
+                    background: var(--t-gradient-accent);
                     display: flex; align-items: center; justify-content: center;
                     color: #fff; flex-shrink: 0;
                 }
@@ -240,10 +240,10 @@ export function InboxNavSidebar() {
                     border: 1px solid transparent;
                 }
                 .ins-nav-item-active {
-                    background: linear-gradient(135deg, #004786, #0072b5) !important;
+                    background: var(--t-gradient-accent) !important;
                     color: #fff !important;
-                    border-color: rgba(0,71,134,0.2);
-                    box-shadow: 0 2px 8px rgba(0,71,134,0.18);
+                    border-color: var(--t-accent-muted);
+                    box-shadow: 0 2px 8px rgba(27,80,145,0.18);
                 }
                 .ins-nav-item:not(.ins-nav-item-active):hover {
                     background: var(--t-surface);
@@ -277,10 +277,10 @@ export function InboxNavSidebar() {
                     position: absolute; top: 2px; right: 2px;
                     font-size: 8px; font-weight: 700;
                     width: 14px; height: 14px; border-radius: 50%;
-                    background: linear-gradient(135deg, #004786, #0072b5);
+                    background: var(--t-gradient-accent);
                     color: #fff;
                     display: flex; align-items: center; justify-content: center;
-                    box-shadow: 0 1px 4px rgba(0,71,134,0.3);
+                    box-shadow: 0 1px 4px rgba(27,80,145,0.3);
                 }
                 .ins-mini-badge-active {
                     background: rgba(255,255,255,0.3);

@@ -18,10 +18,10 @@ const TYPE_ICONS: Record<MenuItemType, typeof Folder> = {
 }
 
 // �"?�"? Reusable Styles �"?�"?
-const labelSt: React.CSSProperties = { display: "block", fontSize: 12, fontWeight: 600, color: "var(--t-text-secondary, #6b7280)", marginBottom: 5 }
-const inputSt: React.CSSProperties = { width: "100%", padding: "9px 12px", borderRadius: 9, border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-surface, #f9fafb)", fontSize: 13, outline: "none", color: "var(--t-text, #1f2937)" }
-const iconBtn: React.CSSProperties = { background: "transparent", border: "none", borderRadius: 5, padding: 4, cursor: "pointer", color: "var(--t-text-muted, #9ca3af)", transition: "all 0.15s", display: "flex", alignItems: "center" }
-const sectionBox: React.CSSProperties = { display: "flex", flexDirection: "column", gap: 10, padding: 12, borderRadius: 10, background: "var(--t-surface, #f9fafb)", border: "1px solid var(--t-border-light, #e5e7eb)" }
+const labelSt: React.CSSProperties = { display: "block", fontSize: 12, fontWeight: 600, color: "var(--t-text-secondary, var(--t-text-muted))", marginBottom: 5 }
+const inputSt: React.CSSProperties = { width: "100%", padding: "9px 12px", borderRadius: 9, border: "1px solid var(--t-border-light, var(--t-border))", background: "var(--t-surface, var(--t-page))", fontSize: 13, outline: "none", color: "var(--t-text, #1f2937)" }
+const iconBtn: React.CSSProperties = { background: "transparent", border: "none", borderRadius: 5, padding: 4, cursor: "pointer", color: "var(--t-text-muted, var(--t-text-faint))", transition: "all 0.15s", display: "flex", alignItems: "center" }
+const sectionBox: React.CSSProperties = { display: "flex", flexDirection: "column", gap: 10, padding: 12, borderRadius: 10, background: "var(--t-surface, var(--t-page))", border: "1px solid var(--t-border-light, var(--t-border))" }
 
 // �"?�"? Content Form for a specific type (shared between Add & Edit) �"?�"?
 interface UploadingFile { file: File; progress: number; mediaId?: string; error?: string }
@@ -129,20 +129,20 @@ function MediaUploadZone({ form, setForm, accept, label, icon }: {
             {form.assetIds.length > 0 && (
                 <div style={{ display: "flex", flexDirection: "column", gap: 4, marginBottom: 8 }}>
                     {form.assetIds.map((id, i) => (
-                        <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 10px", borderRadius: 8, background: "var(--t-card, #fff)", border: "1px solid var(--t-border-light, #e5e7eb)" }}>
+                        <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 10px", borderRadius: 8, background: "var(--t-card, #fff)", border: "1px solid var(--t-border-light, var(--t-border))" }}>
                             <span style={{ fontSize: 13 }}>{icon}</span>
-                            <span style={{ fontSize: 11, fontFamily: "monospace", color: "#6b7280", flex: 1, wordBreak: "break-all" }}>{id}</span>
+                            <span style={{ fontSize: 11, fontFamily: "monospace", color: "var(--t-text-muted)", flex: 1, wordBreak: "break-all" }}>{id}</span>
                             <span style={{ fontSize: 9, padding: "2px 6px", borderRadius: 6, background: "rgba(34,197,94,0.08)", color: "#22c55e", fontWeight: 600 }}>مرفوع</span>
-                            <button onClick={() => setForm({ ...form, assetIds: form.assetIds.filter((_, j) => j !== i) })} style={{ ...iconBtn, color: "#ef4444" }}><X size={13} /></button>
+                            <button onClick={() => setForm({ ...form, assetIds: form.assetIds.filter((_, j) => j !== i) })} style={{ ...iconBtn, color: "var(--t-danger)" }}><X size={13} /></button>
                         </div>
                     ))}
                 </div>
             )}
             {uploading.map((u, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 10px", borderRadius: 8, background: u.error ? "rgba(239,68,68,0.04)" : "rgba(0,71,134,0.04)", border: "1px solid var(--t-border-light)", marginBottom: 4 }}>
-                    {u.error ? <AlertCircle size={13} style={{ color: "#ef4444" }} /> : <Loader2 size={13} className="animate-spin" style={{ color: "#004786" }} />}
-                    <span style={{ fontSize: 11, color: "#6b7280", flex: 1 }}>{u.file.name}</span>
-                    <span style={{ fontSize: 10, color: u.error ? "#ef4444" : "#004786", fontWeight: 600 }}>{u.error || (u.mediaId ? "تم الرفع" : "جاري الرفع...")}</span>
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 10px", borderRadius: 8, background: u.error ? "rgba(239,68,68,0.04)" : "rgba(27,80,145,0.04)", border: "1px solid var(--t-border-light)", marginBottom: 4 }}>
+                    {u.error ? <AlertCircle size={13} style={{ color: "var(--t-danger)" }} /> : <Loader2 size={13} className="animate-spin" style={{ color: "var(--t-accent)" }} />}
+                    <span style={{ fontSize: 11, color: "var(--t-text-muted)", flex: 1 }}>{u.file.name}</span>
+                    <span style={{ fontSize: 10, color: u.error ? "var(--t-danger)" : "var(--t-accent)", fontWeight: 600 }}>{u.error || (u.mediaId ? "تم الرفع" : "جاري الرفع...")}</span>
                 </div>
             ))}
             <div
@@ -153,15 +153,15 @@ function MediaUploadZone({ form, setForm, accept, label, icon }: {
                 style={{
                     display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 6,
                     padding: "16px 12px", borderRadius: 10, cursor: "pointer", transition: "all 0.2s",
-                    border: `2px dashed ${dragOver ? "#004786" : "var(--t-border-light, #d1d5db)"}`,
-                    background: dragOver ? "rgba(0,71,134,0.04)" : "transparent",
+                    border: `2px dashed ${dragOver ? "var(--t-accent)" : "var(--t-border-light, var(--t-border-medium))"}`,
+                    background: dragOver ? "rgba(27,80,145,0.04)" : "transparent",
                 }}
             >
-                <div style={{ width: 36, height: 36, borderRadius: "50%", background: "rgba(0,71,134,0.08)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <Plus size={16} style={{ color: "#004786" }} />
+                <div style={{ width: 36, height: 36, borderRadius: "50%", background: "rgba(27,80,145,0.08)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <Plus size={16} style={{ color: "var(--t-accent)" }} />
                 </div>
-                <span style={{ fontSize: 12, fontWeight: 500, color: "#004786" }}>اسحب الملفات هنا أو انقر للاختيار</span>
-                <span style={{ fontSize: 10, color: "#9ca3af" }}>{accept}</span>
+                <span style={{ fontSize: 12, fontWeight: 500, color: "var(--t-accent)" }}>اسحب الملفات هنا أو انقر للاختيار</span>
+                <span style={{ fontSize: 10, color: "var(--t-text-faint)" }}>{accept}</span>
             </div>
         </div>
     )
@@ -170,7 +170,7 @@ function MediaUploadZone({ form, setForm, accept, label, icon }: {
 // ── Content Fields Component ──
 function ContentFields({ type, form, setForm, mode }: { type: MenuItemType; form: ContentFormState; setForm: (f: ContentFormState) => void; mode: "add" | "edit" }) {
     const sectionTitle = (icon: string, title: string) => (
-        <p style={{ fontSize: 12, fontWeight: 700, color: "#004786", margin: "0 0 8px", display: "flex", alignItems: "center", gap: 6 }}>{icon} {title}</p>
+        <p style={{ fontSize: 12, fontWeight: 700, color: "var(--t-accent)", margin: "0 0 8px", display: "flex", alignItems: "center", gap: 6 }}>{icon} {title}</p>
     )
     switch (type) {
         case "submenu":
@@ -259,14 +259,14 @@ function ContentFields({ type, form, setForm, mode }: { type: MenuItemType; form
                             </select>
                             <input value={b.title} onChange={e => { const n = [...form.buttonItems]; n[i] = { ...n[i], title: e.target.value }; setForm({ ...form, buttonItems: n }) }} placeholder="نص الزر" style={{ ...inputSt, flex: 1, fontSize: 12, padding: "6px 10px" }} />
                             <input value={b.value} onChange={e => { const n = [...form.buttonItems]; n[i] = { ...n[i], value: e.target.value }; setForm({ ...form, buttonItems: n }) }} placeholder={b.type === "url" ? "https://..." : "القيمة"} style={{ ...inputSt, flex: 1, fontSize: 12, padding: "6px 10px" }} dir="ltr" />
-                            <button onClick={() => { const n = form.buttonItems.filter((_, j) => j !== i); setForm({ ...form, buttonItems: n }) }} style={{ ...iconBtn, color: "#ef4444" }}><X size={14} /></button>
+                            <button onClick={() => { const n = form.buttonItems.filter((_, j) => j !== i); setForm({ ...form, buttonItems: n }) }} style={{ ...iconBtn, color: "var(--t-danger)" }}><X size={14} /></button>
                         </div>
                     ))}
                     <button onClick={() => setForm({ ...form, buttonItems: [...form.buttonItems, { type: "reply", title: "", value: "" }] })}
-                        style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 14px", borderRadius: 8, border: "1px dashed var(--t-border-light)", background: "transparent", color: "#004786", fontSize: 12, fontWeight: 500, cursor: "pointer" }}>
+                        style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 14px", borderRadius: 8, border: "1px dashed var(--t-border-light)", background: "transparent", color: "var(--t-accent)", fontSize: 12, fontWeight: 500, cursor: "pointer" }}>
                         <Plus size={13} /> إضافة زر {form.buttonItems.length > 0 && `(${form.buttonItems.length})`}
                     </button>
-                    {form.buttonItems.length >= 3 && <p style={{ fontSize: 10, color: "#f59e0b", margin: 0 }}>⚠️ الحد الأقصى لواتساب 3 أزرار</p>}
+                    {form.buttonItems.length >= 3 && <p style={{ fontSize: 10, color: "var(--t-warning)", margin: 0 }}>⚠️ الحد الأقصى لواتساب 3 أزرار</p>}
                 </div>
             )
         case "list":
@@ -294,7 +294,7 @@ function ContentFields({ type, form, setForm, mode }: { type: MenuItemType; form
                 </div>
             )
         default:
-            return <p style={{ fontSize: 12, color: "#9ca3af", margin: 0 }}>لا توجد حقول إضافية لهذا النوع</p>
+            return <p style={{ fontSize: 12, color: "var(--t-text-faint)", margin: 0 }}>لا توجد حقول إضافية لهذا النوع</p>
     }
 }
 
@@ -324,17 +324,17 @@ function MediaPreview({ assetIds, type }: { assetIds: string[]; type: "images" |
                 {assetIds.map(id => {
                     const entry = urls[id]
                     if (!entry || entry.loading) return (
-                        <div key={id} style={{ width: type === "images" ? 100 : "100%", height: type === "images" ? 100 : 48, borderRadius: 10, background: "var(--t-surface, #f3f4f6)", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid var(--t-border-light, #e5e7eb)" }}>
-                            <Loader2 size={16} className="animate-spin" style={{ color: "#9ca3af" }} />
+                        <div key={id} style={{ width: type === "images" ? 100 : "100%", height: type === "images" ? 100 : 48, borderRadius: 10, background: "var(--t-surface, var(--t-surface))", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid var(--t-border-light, var(--t-border))" }}>
+                            <Loader2 size={16} className="animate-spin" style={{ color: "var(--t-text-faint)" }} />
                         </div>
                     )
                     if (entry.error) return (
-                        <div key={id} style={{ width: type === "images" ? 100 : "100%", height: type === "images" ? 100 : 48, borderRadius: 10, background: "rgba(239,68,68,0.04)", border: "1px solid rgba(239,68,68,0.15)", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, fontSize: 11, color: "#ef4444" }}>
+                        <div key={id} style={{ width: type === "images" ? 100 : "100%", height: type === "images" ? 100 : 48, borderRadius: 10, background: "rgba(239,68,68,0.04)", border: "1px solid rgba(239,68,68,0.15)", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, fontSize: 11, color: "var(--t-danger)" }}>
                             <AlertCircle size={14} /> {entry.error}
                         </div>
                     )
                     if (type === "images") return (
-                        <div key={id} onClick={() => setLightboxUrl(entry.url)} style={{ width: 100, height: 100, borderRadius: 10, overflow: "hidden", border: "1px solid var(--t-border-light, #e5e7eb)", cursor: "pointer", transition: "all 0.2s" }}
+                        <div key={id} onClick={() => setLightboxUrl(entry.url)} style={{ width: 100, height: 100, borderRadius: 10, overflow: "hidden", border: "1px solid var(--t-border-light, var(--t-border))", cursor: "pointer", transition: "all 0.2s" }}
                             onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 4px 16px rgba(0,0,0,0.12)"; e.currentTarget.style.transform = "scale(1.05)" }}
                             onMouseLeave={e => { e.currentTarget.style.boxShadow = "none"; e.currentTarget.style.transform = "scale(1)" }}>
                             <img src={entry.url} alt={entry.filename} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
@@ -354,7 +354,7 @@ function MediaPreview({ assetIds, type }: { assetIds: string[]; type: "images" |
                             </div>
                             <div style={{ flex: 1, minWidth: 0 }}>
                                 <span style={{ fontSize: 12, fontWeight: 600, color: "var(--t-text, #1f2937)", display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{entry.filename || id}</span>
-                                <span style={{ fontSize: 10, color: "#9ca3af" }}>انقر للتحميل</span>
+                                <span style={{ fontSize: 10, color: "var(--t-text-faint)" }}>انقر للتحميل</span>
                             </div>
                         </a>
                     )
@@ -379,7 +379,7 @@ function DetailContentView({ item }: { item: MenuItem }) {
     if (item.type === "submenu" && c.presentation) {
         return (
             <div style={{ ...sectionBox, marginTop: 10, gap: 6 }}>
-                <span style={{ fontWeight: 700, color: "#004786", fontSize: 11, display: "flex", alignItems: "center", gap: 4 }}>🗂️ إعدادات العرض</span>
+                <span style={{ fontWeight: 700, color: "var(--t-accent)", fontSize: 11, display: "flex", alignItems: "center", gap: 4 }}>🗂️ إعدادات العرض</span>
                 {c.presentation.header && <div style={{ fontSize: 12 }}>📌 <strong>العنوان:</strong> {c.presentation.header}</div>}
                 {c.presentation.footer && <div style={{ fontSize: 12 }}>📄 <strong>التذييل:</strong> {c.presentation.footer}</div>}
                 {c.presentation.button && <div style={{ fontSize: 12 }}>🔘 <strong>الزر:</strong> {c.presentation.button}</div>}
@@ -389,9 +389,9 @@ function DetailContentView({ item }: { item: MenuItem }) {
     if (item.type === "text" && c.reply) {
         return (
             <div style={{ marginTop: 10 }}>
-                <span style={{ fontSize: 11, fontWeight: 600, color: "#6b7280" }}>الرد:</span>
-                <div style={{ padding: 10, borderRadius: 8, background: "var(--t-surface, #f9fafb)", fontSize: 12, whiteSpace: "pre-wrap", lineHeight: 1.7, marginTop: 4 }}>{c.reply}</div>
-                {c.format && c.format !== "plain" && <span style={{ fontSize: 10, color: "#9ca3af", marginTop: 2, display: "block" }}>التنسيق: {c.format}</span>}
+                <span style={{ fontSize: 11, fontWeight: 600, color: "var(--t-text-muted)" }}>الرد:</span>
+                <div style={{ padding: 10, borderRadius: 8, background: "var(--t-surface, var(--t-page))", fontSize: 12, whiteSpace: "pre-wrap", lineHeight: 1.7, marginTop: 4 }}>{c.reply}</div>
+                {c.format && c.format !== "plain" && <span style={{ fontSize: 10, color: "var(--t-text-faint)", marginTop: 2, display: "block" }}>التنسيق: {c.format}</span>}
             </div>
         )
     }
@@ -403,7 +403,7 @@ function DetailContentView({ item }: { item: MenuItem }) {
                 {c.action.params && Object.keys(c.action.params).length > 0 && (
                     <pre style={{ padding: 8, borderRadius: 8, background: "#1f2937", color: "#a5f3fc", fontSize: 11, margin: 0, overflow: "auto", maxHeight: 100 }}>{JSON.stringify(c.action.params, null, 2)}</pre>
                 )}
-                {c.reply && <div style={{ fontSize: 12, color: "#374151" }}>↩️ {c.reply}</div>}
+                {c.reply && <div style={{ fontSize: 12, color: "var(--t-text-secondary)" }}>↩️ {c.reply}</div>}
             </div>
         )
     }
@@ -414,8 +414,8 @@ function DetailContentView({ item }: { item: MenuItem }) {
             <div style={{ ...sectionBox, marginTop: 10, gap: 8 }}>
                 <span style={{ fontWeight: 700, fontSize: 11, display: "flex", alignItems: "center", gap: 4 }}>{icons[item.type]} {labels[item.type]} {c.asset_ids?.length ? `(${c.asset_ids.length})` : ""}</span>
                 {c.asset_ids && c.asset_ids.length > 0 && <MediaPreview assetIds={c.asset_ids} type={item.type as "images" | "files" | "videos"} />}
-                {c.caption && <div style={{ fontSize: 12, color: "#374151" }}>📌 {c.caption}</div>}
-                {c.reply_after_media && <div style={{ fontSize: 12, color: "#374151" }}>↩️ {c.reply_after_media}</div>}
+                {c.caption && <div style={{ fontSize: 12, color: "var(--t-text-secondary)" }}>📌 {c.caption}</div>}
+                {c.reply_after_media && <div style={{ fontSize: 12, color: "var(--t-text-secondary)" }}>↩️ {c.reply_after_media}</div>}
             </div>
         )
     }
@@ -425,9 +425,9 @@ function DetailContentView({ item }: { item: MenuItem }) {
                 <span style={{ fontWeight: 700, color: "#7b1fa2", fontSize: 11, display: "flex", alignItems: "center", gap: 4 }}>🔘 أزرار ({c.buttons.length})</span>
                 {c.buttons.map((b, i) => (
                     <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: 8, borderRadius: 8, background: "var(--t-card, #fff)" }}>
-                        {b.type === "url" ? <Link2 size={13} style={{ color: "#004786", flexShrink: 0 }} /> : <MousePointerClick size={13} style={{ color: "#10b981", flexShrink: 0 }} />}
+                        {b.type === "url" ? <Link2 size={13} style={{ color: "var(--t-accent)", flexShrink: 0 }} /> : <MousePointerClick size={13} style={{ color: "var(--t-success)", flexShrink: 0 }} />}
                         <span style={{ fontSize: 12, fontWeight: 500, flex: 1 }}>{b.title}</span>
-                        <span style={{ fontSize: 9, padding: "2px 6px", borderRadius: 6, background: b.type === "url" ? "rgba(0,71,134,0.08)" : "rgba(16,185,129,0.08)", color: b.type === "url" ? "#004786" : "#10b981", fontWeight: 600 }}>
+                        <span style={{ fontSize: 9, padding: "2px 6px", borderRadius: 6, background: b.type === "url" ? "rgba(27,80,145,0.08)" : "rgba(16,185,129,0.08)", color: b.type === "url" ? "var(--t-accent)" : "var(--t-success)", fontWeight: 600 }}>
                             {b.type === "url" ? "رابط" : "رد"}
                         </span>
                     </div>
@@ -588,8 +588,8 @@ export function TreeEditorTab({ selectedTemplateId }: TreeEditorTabProps) {
                         display: "flex", alignItems: "center", gap: 6,
                         padding: "7px 10px", paddingRight: 16 + depth * 24,
                         borderRadius: 10, cursor: "pointer", position: "relative",
-                        background: isSel ? "rgba(0,71,134,0.06)" : "transparent",
-                        borderRight: isSel ? "3px solid #004786" : "3px solid transparent",
+                        background: isSel ? "rgba(27,80,145,0.06)" : "transparent",
+                        borderRight: isSel ? "3px solid var(--t-accent)" : "3px solid transparent",
                         transition: "all 0.15s", marginBottom: 1,
                         opacity: item.is_active ? 1 : 0.45,
                     }}
@@ -601,21 +601,21 @@ export function TreeEditorTab({ selectedTemplateId }: TreeEditorTabProps) {
                         style={{ width: 20, height: 20, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, borderRadius: 4 }}>
                         {(isSub || hasKids) && (
                             <div style={{ transition: "transform 0.2s", transform: isExpanded ? "rotate(0deg)" : "rotate(-90deg)" }}>
-                                <ChevronDown size={13} style={{ color: isExpanded ? "#004786" : "#9ca3af" }} />
+                                <ChevronDown size={13} style={{ color: isExpanded ? "var(--t-accent)" : "var(--t-text-faint)" }} />
                             </div>
                         )}
                     </div>
-                    <div style={{ width: 28, height: 28, borderRadius: 7, background: `${tc?.color || "#6b7280"}14`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                        <Icon size={13} style={{ color: tc?.color || "#6b7280" }} />
+                    <div style={{ width: 28, height: 28, borderRadius: 7, background: `${tc?.color || "var(--t-text-muted)"}14`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                        <Icon size={13} style={{ color: tc?.color || "var(--t-text-muted)" }} />
                     </div>
                     <span style={{
                         fontSize: 13, fontWeight: isSel ? 600 : 500,
-                        color: item.is_active ? "var(--t-text, #1f2937)" : "var(--t-text-muted, #9ca3af)",
+                        color: item.is_active ? "var(--t-text, #1f2937)" : "var(--t-text-muted, var(--t-text-faint))",
                         flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
                         textDecoration: item.is_active ? "none" : "line-through",
                     }}>{item.title}</span>
-                    {isSub && cnt > 0 && <span style={{ fontSize: 9, padding: "1px 6px", borderRadius: 8, background: "rgba(0,71,134,0.08)", color: "#004786", fontWeight: 700 }}>{cnt}</span>}
-                    <span style={{ fontSize: 10, padding: "2px 6px", borderRadius: 10, background: `${tc?.color || "#6b7280"}10`, color: tc?.color || "#6b7280", fontWeight: 600, flexShrink: 0 }}>
+                    {isSub && cnt > 0 && <span style={{ fontSize: 9, padding: "1px 6px", borderRadius: 8, background: "rgba(27,80,145,0.08)", color: "var(--t-accent)", fontWeight: 700 }}>{cnt}</span>}
+                    <span style={{ fontSize: 10, padding: "2px 6px", borderRadius: 10, background: `${tc?.color || "var(--t-text-muted)"}10`, color: tc?.color || "var(--t-text-muted)", fontWeight: 600, flexShrink: 0 }}>
                         {tc?.label || item.type}
                     </span>
                     <div style={{ display: "flex", gap: 2, flexShrink: 0 }} onClick={e => e.stopPropagation()}>
@@ -623,7 +623,7 @@ export function TreeEditorTab({ selectedTemplateId }: TreeEditorTabProps) {
                         <button onClick={() => selectNode(item.id)} style={iconBtn} title="عرض">
                             {fetchingId === item.id ? <Loader2 size={12} className="animate-spin" /> : <Edit3 size={12} />}
                         </button>
-                        {canDeleteItem && depth > 0 && <button onClick={() => setDeleteConfirmId(item.id)} style={{ ...iconBtn, color: "#ef4444" }} title="حذف"><Trash2 size={12} /></button>}
+                        {canDeleteItem && depth > 0 && <button onClick={() => setDeleteConfirmId(item.id)} style={{ ...iconBtn, color: "var(--t-danger)" }} title="حذف"><Trash2 size={12} /></button>}
                     </div>
                 </div>
                 {isExpanded && hasKids && (
@@ -639,20 +639,20 @@ export function TreeEditorTab({ selectedTemplateId }: TreeEditorTabProps) {
         <div style={{ display: "flex", flexDirection: "column", height: "calc(100vh - 160px)", overflow: "hidden" }}>
 
             {/* ── Shared Top Bar: Template Selector ── */}
-            <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 16px", borderBottom: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-card, #fff)", flexShrink: 0 }}>
-                <FolderTree size={16} style={{ color: "#004786", flexShrink: 0 }} />
+            <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 16px", borderBottom: "1px solid var(--t-border-light, var(--t-border))", background: "var(--t-card, #fff)", flexShrink: 0 }}>
+                <FolderTree size={16} style={{ color: "var(--t-accent)", flexShrink: 0 }} />
                 <select value={tid || ""} onChange={e => { setTid(e.target.value || null); setDetail(null); setSelectedId(null) }}
                     style={{ flex: 1, maxWidth: 360, padding: "7px 12px", borderRadius: 9, border: "1px solid var(--t-border-light)", background: "var(--t-surface)", fontSize: 13, color: "var(--t-text, #1f2937)", outline: "none" }}>
                     <option value="">— اختر قالب —</option>
                     {templates.map(t => <option key={t.template_id} value={t.template_id}>{t.name}</option>)}
                 </select>
-                {tid && <span style={{ fontSize: 11, color: "#6b7280" }}>يتحكم في الشجرة والمحاكي معاً</span>}
+                {tid && <span style={{ fontSize: 11, color: "var(--t-text-muted)" }}>يتحكم في الشجرة والمحاكي معاً</span>}
                 <div style={{ flex: 1 }} />
                 {/* Preview toggle */}
                 <button
                     onClick={() => setPreviewVisible(v => !v)}
                     title={previewVisible ? "إخفاء المحاكي" : "إظهار المحاكي"}
-                    style={{ display: "flex", alignItems: "center", gap: 5, padding: "6px 12px", borderRadius: 8, border: "1px solid var(--t-border-light)", background: previewVisible ? "rgba(0,71,134,0.06)" : "transparent", color: previewVisible ? "#004786" : "var(--t-text-secondary)", fontSize: 12, fontWeight: 500, cursor: "pointer", transition: "all 0.2s" }}>
+                    style={{ display: "flex", alignItems: "center", gap: 5, padding: "6px 12px", borderRadius: 8, border: "1px solid var(--t-border-light)", background: previewVisible ? "rgba(27,80,145,0.06)" : "transparent", color: previewVisible ? "var(--t-accent)" : "var(--t-text-secondary)", fontSize: 12, fontWeight: 500, cursor: "pointer", transition: "all 0.2s" }}>
                     <Phone size={13} />
                     {previewVisible ? "إخفاء المحاكي" : "إظهار المحاكي"}
                 </button>
@@ -668,13 +668,13 @@ export function TreeEditorTab({ selectedTemplateId }: TreeEditorTabProps) {
                     overflow: "hidden",
                     transition: "flex 0.3s cubic-bezier(0.4,0,0.2,1)",
                     display: "flex", flexDirection: "column",
-                    borderLeft: "1px solid var(--t-border-light, #e5e7eb)",
+                    borderLeft: "1px solid var(--t-border-light, var(--t-border))",
                 }}>
                     {/* Tree Header */}
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 14px", borderBottom: "1px solid var(--t-border-light)", flexShrink: 0 }}>
                         <div>
                             <span style={{ fontSize: 14, fontWeight: 700, color: "var(--t-text, #1f2937)" }}>محرر الشجرة</span>
-                            <span style={{ display: "block", fontSize: 11, color: "#6b7280", marginTop: 1 }}>بناء وإدارة هيكل القائمة</span>
+                            <span style={{ display: "block", fontSize: 11, color: "var(--t-text-muted)", marginTop: 1 }}>بناء وإدارة هيكل القائمة</span>
                         </div>
                         {rootNode && (
                             <div style={{ display: "flex", gap: 5 }}>
@@ -694,12 +694,12 @@ export function TreeEditorTab({ selectedTemplateId }: TreeEditorTabProps) {
                         )}
                         {tid && loading && (
                             <div style={{ textAlign: "center", padding: 40 }}>
-                                <Loader2 size={24} className="animate-spin" style={{ color: "#004786", margin: "0 auto 10px" }} />
-                                <p style={{ fontSize: 12, color: "#6b7280" }}>جاري التحميل...</p>
+                                <Loader2 size={24} className="animate-spin" style={{ color: "var(--t-accent)", margin: "0 auto 10px" }} />
+                                <p style={{ fontSize: 12, color: "var(--t-text-muted)" }}>جاري التحميل...</p>
                             </div>
                         )}
                         {error && (
-                            <div style={{ display: "flex", alignItems: "center", gap: 8, padding: 12, borderRadius: 10, background: "rgba(239,68,68,0.06)", color: "#ef4444", fontSize: 12 }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 8, padding: 12, borderRadius: 10, background: "rgba(239,68,68,0.06)", color: "var(--t-danger)", fontSize: 12 }}>
                                 <AlertCircle size={14} /> {error}
                             </div>
                         )}
@@ -726,12 +726,12 @@ export function TreeEditorTab({ selectedTemplateId }: TreeEditorTabProps) {
                     <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 560, maxHeight: "88vh", borderRadius: 18, background: "var(--t-card, #fff)", boxShadow: "0 24px 64px rgba(0,0,0,0.18)", overflow: "hidden", display: "flex", flexDirection: "column", animation: "modalSlideIn .25s cubic-bezier(0.16,1,0.3,1)" }}>
                         {fetchingId && !detail ? (
                             <div style={{ padding: 60, textAlign: "center" }}>
-                                <Loader2 size={24} className="animate-spin" style={{ color: "#004786", margin: "0 auto 12px" }} />
-                                <p style={{ fontSize: 13, color: "#6b7280" }}>جاري الجلب...</p>
+                                <Loader2 size={24} className="animate-spin" style={{ color: "var(--t-accent)", margin: "0 auto 12px" }} />
+                                <p style={{ fontSize: 13, color: "var(--t-text-muted)" }}>جاري الجلب...</p>
                             </div>
                         ) : detail && (
                             <>
-                                <div style={{ background: "linear-gradient(135deg, #004786, #0098d6)", padding: "14px 18px", display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
+                                <div style={{ background: "var(--t-gradient-accent)", padding: "14px 18px", display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
                                     {(() => { const I = TYPE_ICONS[detail.type]; return <div style={{ width: 30, height: 30, borderRadius: 8, background: "rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center" }}><I size={14} style={{ color: "#fff" }} /></div> })()}
                                     <div style={{ flex: 1 }}>
                                         <span style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>{editMode ? "تعديل العنصر" : "خصائص العنصر"}</span>
@@ -748,7 +748,7 @@ export function TreeEditorTab({ selectedTemplateId }: TreeEditorTabProps) {
                                             <ContentFields type={detail.type} form={eContent} setForm={setEContent} mode="edit" />
                                             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 0" }}>
                                                 <label style={{ ...labelSt, margin: 0 }}>مفعّل</label>
-                                                <button onClick={() => setEActive(!eActive)} style={{ width: 40, height: 22, borderRadius: 11, border: "none", cursor: "pointer", background: eActive ? "#004786" : "#d1d5db", position: "relative", transition: "all 0.2s" }}>
+                                                <button onClick={() => setEActive(!eActive)} style={{ width: 40, height: 22, borderRadius: 11, border: "none", cursor: "pointer", background: eActive ? "var(--t-accent)" : "var(--t-border-medium)", position: "relative", transition: "all 0.2s" }}>
                                                     <div style={{ width: 18, height: 18, borderRadius: "50%", background: "#fff", position: "absolute", top: 2, right: eActive ? 2 : 20, transition: "right 0.2s", boxShadow: "0 1px 3px rgba(0,0,0,0.2)" }} />
                                                 </button>
                                             </div>
@@ -757,11 +757,11 @@ export function TreeEditorTab({ selectedTemplateId }: TreeEditorTabProps) {
                                         <>
                                             {([["المعرف", detail.id], ["المفتاح", detail.key], ["العنوان", detail.title], ["النوع", MENU_ITEM_TYPES.find(t => t.value === detail.type)?.label || detail.type], ["الترتيب", String(detail.order)], ["الحالة", detail.is_active ? "نشط ✅" : "معطل ❌"]] as [string, string][]).map(([l, v]) => (
                                                 <div key={l} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: "1px solid var(--t-border-light, #f0f0f0)", fontSize: 12 }}>
-                                                    <span style={{ color: "#6b7280", fontWeight: 500 }}>{l}</span>
+                                                    <span style={{ color: "var(--t-text-muted)", fontWeight: 500 }}>{l}</span>
                                                     <span style={{ color: "#1f2937", fontWeight: 600, textAlign: "left", maxWidth: "60%", wordBreak: "break-all" }}>{v}</span>
                                                 </div>
                                             ))}
-                                            {detail.description && <div style={{ marginTop: 4 }}><span style={{ fontSize: 11, fontWeight: 600, color: "#6b7280" }}>الوصف:</span><p style={{ fontSize: 12, color: "#1f2937", margin: "4px 0 0", lineHeight: 1.6 }}>{detail.description}</p></div>}
+                                            {detail.description && <div style={{ marginTop: 4 }}><span style={{ fontSize: 11, fontWeight: 600, color: "var(--t-text-muted)" }}>الوصف:</span><p style={{ fontSize: 12, color: "#1f2937", margin: "4px 0 0", lineHeight: 1.6 }}>{detail.description}</p></div>}
                                             <DetailContentView item={detail} />
                                         </>
                                     )}
@@ -770,12 +770,12 @@ export function TreeEditorTab({ selectedTemplateId }: TreeEditorTabProps) {
                                     {editMode ? (
                                         <>
                                             <button onClick={() => setEditMode(false)} style={{ flex: 1, padding: "8px 14px", borderRadius: 9, border: "1px solid var(--t-border-light)", background: "transparent", color: "var(--t-text-secondary)", fontSize: 13, cursor: "pointer" }}>إلغاء</button>
-                                            <button onClick={handleSave} disabled={saving} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "8px 14px", borderRadius: 9, border: "none", cursor: "pointer", background: "linear-gradient(135deg, #004786, #0098d6)", color: "#fff", fontSize: 13, fontWeight: 600, opacity: saving ? 0.7 : 1 }}>
+                                            <button onClick={handleSave} disabled={saving} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "8px 14px", borderRadius: 9, border: "none", cursor: "pointer", background: "var(--t-gradient-accent)", color: "#fff", fontSize: 13, fontWeight: 600, opacity: saving ? 0.7 : 1 }}>
                                                 {saving ? <Loader2 size={13} className="animate-spin" /> : <Save size={13} />} حفظ
                                             </button>
                                         </>
                                     ) : (
-                                        canUpdateItem && <button onClick={() => openEdit(detail)} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "9px 16px", borderRadius: 9, border: "none", cursor: "pointer", background: "linear-gradient(135deg, #004786, #0098d6)", color: "#fff", fontSize: 13, fontWeight: 600 }}>
+                                        canUpdateItem && <button onClick={() => openEdit(detail)} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "9px 16px", borderRadius: 9, border: "none", cursor: "pointer", background: "var(--t-gradient-accent)", color: "#fff", fontSize: 13, fontWeight: 600 }}>
                                             <Edit3 size={13} /> تعديل
                                         </button>
                                     )}
@@ -790,7 +790,7 @@ export function TreeEditorTab({ selectedTemplateId }: TreeEditorTabProps) {
             {addParentId && (
                 <div style={{ position: "fixed", inset: 0, zIndex: 200, background: "rgba(0,0,0,0.45)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }} onClick={resetAdd}>
                     <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 580, maxHeight: "90vh", borderRadius: 18, background: "var(--t-card, #fff)", boxShadow: "0 24px 64px rgba(0,0,0,0.18)", overflow: "hidden", animation: "modalSlideIn .25s cubic-bezier(0.16,1,0.3,1)", display: "flex", flexDirection: "column" }}>
-                        <div style={{ background: "linear-gradient(135deg, #004786, #0072b5, #0098d6)", padding: "16px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
+                        <div style={{ background: "linear-gradient(135deg, var(--t-accent), var(--t-accent-secondary), var(--t-accent-light))", padding: "16px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
                             <span style={{ fontSize: 15, fontWeight: 700, color: "#fff" }}>إضافة عنصر جديد</span>
                             <button onClick={resetAdd} style={{ background: "rgba(255,255,255,0.15)", border: "none", borderRadius: 8, padding: 5, cursor: "pointer" }}><X size={14} style={{ color: "#fff" }} /></button>
                         </div>
@@ -805,9 +805,9 @@ export function TreeEditorTab({ selectedTemplateId }: TreeEditorTabProps) {
                                             <button key={t.value} onClick={() => { setAType(t.value); setAContent(defaultContentForm()) }} style={{
                                                 padding: "10px 6px", borderRadius: 10, fontSize: 11, fontWeight: 500,
                                                 border: "2px solid", cursor: "pointer", transition: "all 0.15s",
-                                                borderColor: sel ? t.color : "var(--t-border-light, #e5e7eb)",
+                                                borderColor: sel ? t.color : "var(--t-border-light, var(--t-border))",
                                                 background: sel ? `${t.color}10` : "transparent",
-                                                color: sel ? t.color : "var(--t-text-secondary, #6b7280)",
+                                                color: sel ? t.color : "var(--t-text-secondary, var(--t-text-muted))",
                                                 display: "flex", flexDirection: "column", alignItems: "center", gap: 5,
                                             }}>
                                                 <div style={{ width: 30, height: 30, borderRadius: 8, background: `${t.color}14`, display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -829,8 +829,8 @@ export function TreeEditorTab({ selectedTemplateId }: TreeEditorTabProps) {
                             <button onClick={resetAdd} style={{ padding: "8px 18px", borderRadius: 8, border: "1px solid var(--t-border-light)", background: "transparent", color: "var(--t-text-secondary)", fontSize: 13, cursor: "pointer" }}>إلغاء</button>
                             <button onClick={handleAdd} disabled={submitting || !aTitle.trim()} style={{
                                 padding: "8px 20px", borderRadius: 8, border: "none",
-                                background: aTitle.trim() ? "linear-gradient(135deg, #004786, #0098d6)" : "#e5e7eb",
-                                color: aTitle.trim() ? "#fff" : "#9ca3af",
+                                background: aTitle.trim() ? "var(--t-gradient-accent)" : "var(--t-border)",
+                                color: aTitle.trim() ? "#fff" : "var(--t-text-faint)",
                                 fontSize: 13, fontWeight: 600, cursor: aTitle.trim() ? "pointer" : "default",
                                 display: "flex", alignItems: "center", gap: 6,
                                 opacity: submitting ? 0.7 : 1,
@@ -848,14 +848,14 @@ export function TreeEditorTab({ selectedTemplateId }: TreeEditorTabProps) {
                     <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 400, borderRadius: 18, background: "var(--t-card,#fff)", boxShadow: "0 24px 60px rgba(0,0,0,0.2)", overflow: "hidden", animation: "modalSlideIn .2s ease" }}>
                         <div style={{ padding: "20px 20px 8px", textAlign: "center" }}>
                             <div style={{ width: 52, height: 52, borderRadius: "50%", background: "rgba(239,68,68,0.1)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px" }}>
-                                <Trash2 size={22} style={{ color: "#ef4444" }} />
+                                <Trash2 size={22} style={{ color: "var(--t-danger)" }} />
                             </div>
                             <h3 style={{ fontSize: 16, fontWeight: 700, color: "#1f2937", margin: "0 0 6px" }}>تأكيد الحذف</h3>
-                            <p style={{ fontSize: 13, color: "#6b7280", margin: 0 }}>سيتم حذف هذا العنصر وجميع عناصره الفرعية نهائياً.</p>
+                            <p style={{ fontSize: 13, color: "var(--t-text-muted)", margin: 0 }}>سيتم حذف هذا العنصر وجميع عناصره الفرعية نهائياً.</p>
                         </div>
                         <div style={{ display: "flex", gap: 8, padding: "16px 20px 20px" }}>
                             <button onClick={() => setDeleteConfirmId(null)} style={{ flex: 1, padding: "9px 16px", borderRadius: 9, border: "1px solid var(--t-border-light)", background: "transparent", color: "var(--t-text-secondary)", fontSize: 13, cursor: "pointer" }}>إلغاء</button>
-                            <button onClick={() => handleDelete(deleteConfirmId)} style={{ flex: 1, padding: "9px 16px", borderRadius: 9, border: "none", background: "#ef4444", color: "#fff", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>حذف</button>
+                            <button onClick={() => handleDelete(deleteConfirmId)} style={{ flex: 1, padding: "9px 16px", borderRadius: 9, border: "none", background: "var(--t-danger)", color: "#fff", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>حذف</button>
                         </div>
                     </div>
                 </div>

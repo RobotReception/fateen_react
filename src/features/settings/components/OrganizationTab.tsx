@@ -1,4 +1,4 @@
-﻿import { useState, useCallback } from "react"
+import { useState, useCallback } from "react"
 import {
     Edit3, Save, X, Loader2, AlertCircle, ExternalLink,
     Crown, RefreshCw, Building2, Globe, Phone, MapPin,
@@ -60,7 +60,7 @@ function CopyBtn({ value }: { value: string }) {
         <button onClick={() => { navigator.clipboard.writeText(value); setOk(true); setTimeout(() => setOk(false), 1500) }}
             style={{
                 background: "none", border: "none", cursor: "pointer", padding: 2,
-                color: ok ? "#16a34a" : "var(--t-text-faint, #9ca3af)",
+                color: ok ? "#16a34a" : "var(--t-text-faint, var(--t-text-faint))",
                 transition: "color .15s",
             }}>
             {ok ? <Check size={12} /> : <Copy size={12} />}
@@ -81,20 +81,20 @@ function Row({ icon: Icon, label, value, mono, dir, link, copyable }: {
         }}>
             <div style={{
                 width: 32, height: 32, borderRadius: 8,
-                background: "rgba(0,71,134,0.06)",
+                background: "rgba(27,80,145,0.06)",
                 display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
             }}>
-                <Icon size={14} style={{ color: "#004786" }} />
+                <Icon size={14} style={{ color: "var(--t-accent)" }} />
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 11, fontWeight: 500, color: "var(--t-text-faint, #9ca3af)", marginBottom: 2 }}>{label}</div>
+                <div style={{ fontSize: 11, fontWeight: 500, color: "var(--t-text-faint, var(--t-text-faint))", marginBottom: 2 }}>{label}</div>
                 {link && value ? (
                     <a href={value} target="_blank" rel="noopener noreferrer"
                         style={{
                             fontSize: 13, fontWeight: 600, color: "var(--t-text, #1f2937)",
                             textDecoration: "none", display: "flex", alignItems: "center", gap: 4,
                         }} dir={dir}>
-                        {value} <ExternalLink size={10} style={{ color: "var(--t-text-faint, #9ca3af)" }} />
+                        {value} <ExternalLink size={10} style={{ color: "var(--t-text-faint, var(--t-text-faint))" }} />
                     </a>
                 ) : (
                     <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
@@ -121,26 +121,26 @@ function EField({ label, name, value, onChange, placeholder, dir, type = "text",
 }) {
     const base: React.CSSProperties = {
         width: "100%", borderRadius: 10,
-        border: "1px solid var(--t-border-light, #e0e3e7)",
-        background: "var(--t-surface, #fafafa)",
+        border: "1px solid var(--t-border-light, var(--t-border))",
+        background: "var(--t-surface, var(--t-card-hover))",
         padding: "10px 14px", fontSize: 13, color: "var(--t-text, #1f2937)",
         outline: "none", transition: "border-color .15s, box-shadow .15s",
         fontFamily: dir === "ltr" ? "monospace" : "inherit",
     }
     return (
         <div>
-            <label style={{ display: "block", fontSize: 11.5, fontWeight: 600, color: "var(--t-text-secondary, #6b7280)", marginBottom: 6 }}>{label}</label>
+            <label style={{ display: "block", fontSize: 11.5, fontWeight: 600, color: "var(--t-text-secondary, var(--t-text-muted))", marginBottom: 6 }}>{label}</label>
             {area ? (
                 <textarea value={value} onChange={e => onChange(name, e.target.value)}
                     placeholder={placeholder} dir={dir} rows={3}
                     style={{ ...base, resize: "none" }}
-                    onFocus={e => { e.target.style.borderColor = "#004786"; e.target.style.boxShadow = "0 0 0 3px rgba(0,71,134,0.08)" }}
-                    onBlur={e => { e.target.style.borderColor = "var(--t-border-light, #e0e3e7)"; e.target.style.boxShadow = "none" }} />
+                    onFocus={e => { e.target.style.borderColor = "var(--t-accent)"; e.target.style.boxShadow = "0 0 0 3px rgba(27,80,145,0.08)" }}
+                    onBlur={e => { e.target.style.borderColor = "var(--t-border-light, var(--t-border))"; e.target.style.boxShadow = "none" }} />
             ) : (
                 <input type={type} value={value} onChange={e => onChange(name, e.target.value)}
                     placeholder={placeholder} dir={dir} style={base}
-                    onFocus={e => { e.target.style.borderColor = "#004786"; e.target.style.boxShadow = "0 0 0 3px rgba(0,71,134,0.08)" }}
-                    onBlur={e => { e.target.style.borderColor = "var(--t-border-light, #e0e3e7)"; e.target.style.boxShadow = "none" }} />
+                    onFocus={e => { e.target.style.borderColor = "var(--t-accent)"; e.target.style.boxShadow = "0 0 0 3px rgba(27,80,145,0.08)" }}
+                    onBlur={e => { e.target.style.borderColor = "var(--t-border-light, var(--t-border))"; e.target.style.boxShadow = "none" }} />
             )}
         </div>
     )
@@ -200,12 +200,12 @@ export function OrganizationTab() {
     if (isError || !org) return (
         <div style={{ ...card, padding: "48px 24px", textAlign: "center", animation: "orgFade .3s" }}>
             <style>{CSS}</style>
-            <AlertCircle size={28} style={{ color: "#dc2626", margin: "0 auto 10px" }} />
+            <AlertCircle size={28} style={{ color: "var(--t-danger)", margin: "0 auto 10px" }} />
             <p style={{ fontSize: 14, fontWeight: 600, color: "var(--t-text, #1f2937)", margin: "0 0 4px" }}>فشل تحميل بيانات المؤسسة</p>
-            <p style={{ fontSize: 12, color: "var(--t-text-faint, #9ca3af)", margin: "0 0 14px" }}>تحقق من اتصالك وأعد المحاولة</p>
+            <p style={{ fontSize: 12, color: "var(--t-text-faint, var(--t-text-faint))", margin: "0 0 14px" }}>تحقق من اتصالك وأعد المحاولة</p>
             <button onClick={() => refetch()} style={{
                 padding: "8px 18px", borderRadius: 8, border: "none", cursor: "pointer",
-                background: "#004786", color: "#fff", fontSize: 12, fontWeight: 600,
+                background: "var(--t-brand-orange)", color: "#fff", fontSize: 12, fontWeight: 600,
                 display: "inline-flex", alignItems: "center", gap: 5,
             }}>
                 <RefreshCw size={12} /> إعادة المحاولة
@@ -223,7 +223,7 @@ export function OrganizationTab() {
             {/* ═══ 1. IDENTITY CARD ═══ */}
             <div style={card}>
                 {/* Gradient accent bar */}
-                <div style={{ height: 4, background: "linear-gradient(90deg, #004786, #0072b5, #0098d6)" }} />
+                <div style={{ height: 4, background: "linear-gradient(90deg, var(--t-accent), var(--t-accent-secondary), var(--t-accent-light))" }} />
 
                 <div style={{ padding: "20px 24px" }}>
                     <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16 }}>
@@ -237,7 +237,7 @@ export function OrganizationTab() {
                             ) : (
                                 <div style={{
                                     width: 64, height: 64, borderRadius: 16,
-                                    background: "linear-gradient(135deg, #004786, #0072b5)",
+                                    background: "var(--t-brand-orange)",
                                     display: "flex", alignItems: "center", justifyContent: "center",
                                 }}>
                                     <span style={{ fontSize: 26, fontWeight: 800, color: "#fff" }}>{initials}</span>
@@ -247,12 +247,12 @@ export function OrganizationTab() {
                             {/* Name + meta */}
                             <div>
                                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                                    <h2 style={{ fontSize: 18, fontWeight: 700, color: "var(--t-text, #111827)", margin: 0, letterSpacing: "-0.01em" }}>
+                                    <h2 style={{ fontSize: 18, fontWeight: 700, color: "var(--t-text, var(--t-text))", margin: 0, letterSpacing: "-0.01em" }}>
                                         {org.name}
                                     </h2>
-                                    {org.is_verified && <CheckCircle2 size={15} style={{ color: "#004786" }} />}
+                                    {org.is_verified && <CheckCircle2 size={15} style={{ color: "var(--t-accent)" }} />}
                                 </div>
-                                <div style={{ fontSize: 12.5, color: "var(--t-text-faint, #9ca3af)", marginTop: 3, fontFamily: "monospace" }} dir="ltr">
+                                <div style={{ fontSize: 12.5, color: "var(--t-text-faint, var(--t-text-faint))", marginTop: 3, fontFamily: "monospace" }} dir="ltr">
                                     {org.domain || "—"}
                                 </div>
                                 {/* Badges */}
@@ -260,30 +260,30 @@ export function OrganizationTab() {
                                     <span style={{
                                         display: "inline-flex", alignItems: "center", gap: 4,
                                         padding: "3px 10px", borderRadius: 6,
-                                        background: org.is_active ? "#004786" : "var(--t-surface, #f0f0f0)",
-                                        color: org.is_active ? "#fff" : "var(--t-text-faint, #9ca3af)",
+                                        background: org.is_active ? "var(--t-accent)" : "var(--t-surface, #f0f0f0)",
+                                        color: org.is_active ? "#fff" : "var(--t-text-faint, var(--t-text-faint))",
                                         fontSize: 10, fontWeight: 700,
                                     }}>
-                                        <span style={{ width: 5, height: 5, borderRadius: "50%", background: org.is_active ? "#22c55e" : "#d1d5db" }} />
+                                        <span style={{ width: 5, height: 5, borderRadius: "50%", background: org.is_active ? "#22c55e" : "var(--t-border-medium)" }} />
                                         {org.is_active ? "نشطة" : "غير نشطة"}
                                     </span>
                                     {org.type && (
                                         <span style={{
                                             padding: "3px 10px", borderRadius: 6,
-                                            background: "rgba(0,71,134,0.06)", color: "#004786",
+                                            background: "rgba(27,80,145,0.06)", color: "var(--t-accent)",
                                             fontSize: 10, fontWeight: 600, textTransform: "capitalize",
                                         }}>{org.type}</span>
                                     )}
                                     <span style={{
                                         padding: "3px 10px", borderRadius: 6,
-                                        background: "var(--t-surface, #f5f5f5)", color: "var(--t-text-secondary, #6b7280)",
+                                        background: "var(--t-surface, #f5f5f5)", color: "var(--t-text-secondary, var(--t-text-muted))",
                                         fontSize: 10, fontWeight: 600,
                                     }}>{org.plan_snapshot?.plan_name || org.plan || "—"}</span>
                                     <span style={{
                                         display: "inline-flex", alignItems: "center", gap: 3,
                                         padding: "3px 10px", borderRadius: 6,
                                         background: org.is_verified ? "rgba(22,163,74,0.06)" : "var(--t-surface, #f5f5f5)",
-                                        color: org.is_verified ? "#16a34a" : "var(--t-text-faint, #9ca3af)",
+                                        color: org.is_verified ? "#16a34a" : "var(--t-text-faint, var(--t-text-faint))",
                                         fontSize: 10, fontWeight: 600,
                                     }}>
                                         {org.is_verified ? <CheckCircle2 size={9} /> : <XCircle size={9} />}
@@ -298,13 +298,13 @@ export function OrganizationTab() {
                             <ActionGuard pageBit={PAGE_BITS.ORGANIZATION} actionBit={ACTION_BITS.UPDATE_ORGANIZATION}>
                                 <button onClick={startEdit} style={{
                                     padding: "8px 18px", borderRadius: 9, border: "none", cursor: "pointer",
-                                    background: "#004786", color: "#fff", fontSize: 12, fontWeight: 600,
+                                    background: "var(--t-brand-orange)", color: "#fff", fontSize: 12, fontWeight: 600,
                                     display: "flex", alignItems: "center", gap: 6, flexShrink: 0,
-                                    boxShadow: "0 1px 3px rgba(0,71,134,0.15)",
+                                    boxShadow: "0 1px 3px rgba(27,80,145,0.15)",
                                     transition: "background .15s",
                                 }}
-                                    onMouseEnter={e => { e.currentTarget.style.background = "#003a6e" }}
-                                    onMouseLeave={e => { e.currentTarget.style.background = "#004786" }}>
+                                    onMouseEnter={e => { e.currentTarget.style.background = "var(--t-accent-hover)" }}
+                                    onMouseLeave={e => { e.currentTarget.style.background = "var(--t-accent)" }}>
                                     <Edit3 size={13} /> تعديل البيانات
                                 </button>
                             </ActionGuard>
@@ -322,13 +322,13 @@ export function OrganizationTab() {
                                 <Crown size={13} style={{ color: "#d97706" }} />
                                 {org.owner.name}
                             </div>
-                            <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--t-text-secondary, #6b7280)", fontFamily: "monospace" }} dir="ltr">
-                                <Mail size={12} style={{ color: "var(--t-text-faint, #9ca3af)" }} />
+                            <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--t-text-secondary, var(--t-text-muted))", fontFamily: "monospace" }} dir="ltr">
+                                <Mail size={12} style={{ color: "var(--t-text-faint, var(--t-text-faint))" }} />
                                 {org.owner.email}
                             </div>
                             {org.owner.position && (
-                                <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--t-text-secondary, #6b7280)" }}>
-                                    <Briefcase size={12} style={{ color: "var(--t-text-faint, #9ca3af)" }} />
+                                <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--t-text-secondary, var(--t-text-muted))" }}>
+                                    <Briefcase size={12} style={{ color: "var(--t-text-faint, var(--t-text-faint))" }} />
                                     {org.owner.position}
                                 </div>
                             )}
@@ -342,25 +342,25 @@ export function OrganizationTab() {
                 <div style={{ ...card, animation: "orgFade .15s" }}>
                     <div style={{
                         padding: "14px 24px",
-                        background: "var(--t-surface, #f9fafb)",
+                        background: "var(--t-surface, var(--t-page))",
                         borderBottom: "1px solid var(--t-border-light, #eaedf0)",
                         display: "flex", alignItems: "center", justifyContent: "space-between",
                     }}>
-                        <span style={{ fontSize: 13, fontWeight: 700, color: "var(--t-text, #111827)" }}>تعديل بيانات المؤسسة</span>
+                        <span style={{ fontSize: 13, fontWeight: 700, color: "var(--t-text, var(--t-text))" }}>تعديل بيانات المؤسسة</span>
                         <div style={{ display: "flex", gap: 8 }}>
                             <button onClick={cancel} disabled={mut.isPending} style={{
                                 padding: "7px 16px", borderRadius: 8, cursor: "pointer",
                                 border: "1px solid var(--t-border, #dcdfe3)", background: "var(--t-card, #fff)",
-                                color: "#6b7280", fontSize: 12, fontWeight: 500,
+                                color: "var(--t-text-muted)", fontSize: 12, fontWeight: 500,
                                 display: "flex", alignItems: "center", gap: 4,
                                 opacity: mut.isPending ? 0.4 : 1,
                             }}><X size={12} /> إلغاء</button>
                             <button onClick={save} disabled={mut.isPending} style={{
                                 padding: "7px 20px", borderRadius: 8, cursor: "pointer",
-                                border: "none", background: "#004786", color: "#fff",
+                                border: "none", background: "var(--t-brand-orange)", color: "#fff",
                                 fontSize: 12, fontWeight: 600,
                                 display: "flex", alignItems: "center", gap: 4,
-                                opacity: mut.isPending ? 0.5 : 1, boxShadow: "0 1px 3px rgba(0,71,134,0.15)",
+                                opacity: mut.isPending ? 0.5 : 1, boxShadow: "0 1px 3px rgba(27,80,145,0.15)",
                             }}>
                                 {mut.isPending ? <Loader2 size={12} className="animate-spin" /> : <Save size={12} />}
                                 حفظ التغييرات
@@ -368,7 +368,7 @@ export function OrganizationTab() {
                         </div>
                     </div>
                     <div style={{ padding: "20px 24px" }}>
-                        <p style={{ fontSize: 12, color: "var(--t-text-faint, #9ca3af)", marginBottom: 18 }}>
+                        <p style={{ fontSize: 12, color: "var(--t-text-faint, var(--t-text-faint))", marginBottom: 18 }}>
                             يمكنك تعديل الحقول التالية. لا يمكن تعديل اسم المؤسسة أو النطاق.
                         </p>
                         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
@@ -387,7 +387,7 @@ export function OrganizationTab() {
 
                         {errors.length > 0 && (
                             <div style={{ marginTop: 16, borderRadius: 10, padding: 14, background: "#fef2f2", border: "1px solid #fecaca" }}>
-                                <p style={{ fontSize: 12, fontWeight: 600, color: "#dc2626", margin: "0 0 6px", display: "flex", alignItems: "center", gap: 4 }}><AlertCircle size={12} /> أخطاء في البيانات</p>
+                                <p style={{ fontSize: 12, fontWeight: 600, color: "var(--t-danger)", margin: "0 0 6px", display: "flex", alignItems: "center", gap: 4 }}><AlertCircle size={12} /> أخطاء في البيانات</p>
                                 <ul style={{ margin: 0, paddingRight: 16 }}>
                                     {errors.map((e, i) => (
                                         <li key={i} style={{ fontSize: 12, color: "#7f1d1d", marginBottom: 2 }}>
@@ -399,7 +399,7 @@ export function OrganizationTab() {
                         )}
                         {mut.isError && errors.length === 0 && (
                             <div style={{ marginTop: 16, borderRadius: 10, padding: 14, background: "#fef2f2", border: "1px solid #fecaca", display: "flex", alignItems: "center", gap: 6 }}>
-                                <AlertCircle size={13} style={{ color: "#dc2626", flexShrink: 0 }} />
+                                <AlertCircle size={13} style={{ color: "var(--t-danger)", flexShrink: 0 }} />
                                 <span style={{ fontSize: 12, color: "#7f1d1d", fontWeight: 500 }}>{(mut.error as any)?.message || "فشل التحديث"}</span>
                             </div>
                         )}
@@ -419,12 +419,12 @@ export function OrganizationTab() {
                         }}>
                             <div style={{
                                 width: 28, height: 28, borderRadius: 7,
-                                background: "rgba(0,71,134,0.06)",
+                                background: "rgba(27,80,145,0.06)",
                                 display: "flex", alignItems: "center", justifyContent: "center",
                             }}>
-                                <Building2 size={13} style={{ color: "#004786" }} />
+                                <Building2 size={13} style={{ color: "var(--t-accent)" }} />
                             </div>
-                            <span style={{ fontSize: 13, fontWeight: 700, color: "var(--t-text, #111827)" }}>معلومات المؤسسة</span>
+                            <span style={{ fontSize: 13, fontWeight: 700, color: "var(--t-text, var(--t-text))" }}>معلومات المؤسسة</span>
                         </div>
                         <div style={{ padding: "4px 24px 16px" }}>
                             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 32px" }}>
@@ -446,12 +446,12 @@ export function OrganizationTab() {
                         }}>
                             <div style={{
                                 width: 28, height: 28, borderRadius: 7,
-                                background: "rgba(0,71,134,0.06)",
+                                background: "rgba(27,80,145,0.06)",
                                 display: "flex", alignItems: "center", justifyContent: "center",
                             }}>
-                                <Phone size={13} style={{ color: "#004786" }} />
+                                <Phone size={13} style={{ color: "var(--t-accent)" }} />
                             </div>
-                            <span style={{ fontSize: 13, fontWeight: 700, color: "var(--t-text, #111827)" }}>معلومات الاتصال</span>
+                            <span style={{ fontSize: 13, fontWeight: 700, color: "var(--t-text, var(--t-text))" }}>معلومات الاتصال</span>
                         </div>
                         <div style={{ padding: "4px 24px 16px" }}>
                             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 32px" }}>
@@ -467,7 +467,7 @@ export function OrganizationTab() {
                     {org.description && (
                         <div style={card}>
                             <div style={{ padding: "16px 24px" }}>
-                                <div style={{ fontSize: 11, fontWeight: 600, color: "var(--t-text-faint, #9ca3af)", marginBottom: 6 }}>الوصف</div>
+                                <div style={{ fontSize: 11, fontWeight: 600, color: "var(--t-text-faint, var(--t-text-faint))", marginBottom: 6 }}>الوصف</div>
                                 <p style={{ fontSize: 13, color: "var(--t-text, #1f2937)", lineHeight: 1.7, margin: 0 }}>{org.description}</p>
                             </div>
                         </div>

@@ -3,7 +3,7 @@ import { UserCheck, UserX, Bot } from "lucide-react"
 
 interface CustomerBreakdownProps { assigned: number; unassigned: number; aiEnabled: number }
 
-const COLORS = { assigned: "#3B82F6", unassigned: "#94A3B8" }
+const COLORS = { assigned: "var(--t-info)", unassigned: "var(--t-text-muted)" }
 
 const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: { name: string; value: number; payload: { color: string } }[] }) => {
     if (!active || !payload?.length) return null

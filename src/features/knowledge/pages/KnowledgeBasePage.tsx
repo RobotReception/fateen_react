@@ -110,7 +110,7 @@ export function KnowledgeBasePage() {
                 <div
                     onClick={() => { if (sidebarCollapsed) setSidebarCollapsed(false) }}
                     style={{
-                        background: "linear-gradient(135deg, #004786, #0072b5, #0098d6)",
+                        background: "linear-gradient(135deg, var(--t-accent), var(--t-accent-secondary), var(--t-accent-light))",
                         padding: sidebarCollapsed ? "12px 0" : "12px 14px",
                         position: "relative",
                         overflow: "hidden",
@@ -154,6 +154,9 @@ export function KnowledgeBasePage() {
                     )}
                 </div>
 
+                {/* Orange accent line under header */}
+                <div style={{ height: 2, background: "linear-gradient(to left, var(--t-brand-orange-hover), var(--t-brand-orange), var(--t-brand-orange-hover))", flexShrink: 0 }} />
+
                 {/* ── Sidebar Navigation ── */}
                 <nav style={{ padding: "6px 6px" }}>
                     {visibleTabs.map((tab) => {
@@ -173,7 +176,7 @@ export function KnowledgeBasePage() {
                                     marginBottom: 2,
                                     borderRadius: 8,
                                     border: "none",
-                                    background: isActive ? "var(--t-card-hover, #f3f4f6)" : "transparent",
+                                    background: isActive ? "var(--t-card-hover, var(--t-surface))" : "transparent",
                                     cursor: "pointer",
                                     justifyContent: sidebarCollapsed ? "center" : "flex-start",
                                     position: "relative",
@@ -181,8 +184,8 @@ export function KnowledgeBasePage() {
                                     transition: "background 0.12s",
                                     color: "inherit",
                                 }}
-                                onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = "var(--t-card-hover, #f9fafb)" }}
-                                onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = isActive ? "var(--t-card-hover, #f3f4f6)" : "transparent" }}
+                                onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = "var(--t-card-hover, var(--t-page))" }}
+                                onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = isActive ? "var(--t-card-hover, var(--t-surface))" : "transparent" }}
                             >
                                 {/* Active indicator bar */}
                                 {isActive && !sidebarCollapsed && (
@@ -194,14 +197,14 @@ export function KnowledgeBasePage() {
                                         width: 3,
                                         height: 18,
                                         borderRadius: 3,
-                                        background: "#004786",
+                                        background: "var(--t-brand-orange)",
                                     }} />
                                 )}
                                 <div style={{
                                     width: sidebarCollapsed ? 28 : 26,
                                     height: sidebarCollapsed ? 28 : 26,
                                     borderRadius: 7,
-                                    background: isActive ? "rgba(0,71,134,0.1)" : "var(--t-surface, #f3f4f6)",
+                                    background: isActive ? "var(--t-brand-orange-soft)" : "var(--t-surface, var(--t-surface))",
                                     display: "flex",
                                     alignItems: "center",
                                     justifyContent: "center",
@@ -212,7 +215,7 @@ export function KnowledgeBasePage() {
                                         size={sidebarCollapsed ? 15 : 13}
                                         strokeWidth={isActive ? 2.2 : 1.6}
                                         style={{
-                                            color: isActive ? "#004786" : "var(--t-text-muted, #9ca3af)",
+                                            color: isActive ? "var(--t-brand-orange)" : "var(--t-text-muted, var(--t-text-faint))",
                                             transition: "color 0.15s",
                                         }}
                                     />
@@ -221,7 +224,7 @@ export function KnowledgeBasePage() {
                                     <span style={{
                                         fontSize: 12.5,
                                         fontWeight: isActive ? 600 : 500,
-                                        color: isActive ? "var(--t-text, #1f2937)" : "var(--t-text-secondary, #6b7280)",
+                                        color: isActive ? "var(--t-text, #1f2937)" : "var(--t-text-secondary, var(--t-text-muted))",
                                         transition: "color 0.15s",
                                         overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
                                     }}>{tab.title}</span>
@@ -259,7 +262,7 @@ export function KnowledgeBasePage() {
                     .flex.h-full > aside {
                         width: 100% !important;
                         border-left: none;
-                        border-bottom: 1px solid #e5e7eb;
+                        border-bottom: 1px solid var(--t-border);
                     }
                     .flex.h-full > aside nav {
                         display: flex;

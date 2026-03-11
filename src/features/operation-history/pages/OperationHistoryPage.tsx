@@ -89,15 +89,15 @@ const SkeletonRow = memo(function SkeletonRow({ delay = 0 }: { delay?: number })
 const DetailsModal = memo(function DetailsModal({ details, loading, onClose }: { details: OperationDetails | null; loading: boolean; onClose: () => void }) {
     return (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={onClose}>
-            <div className="mx-4 w-full max-w-lg overflow-hidden bg-white" onClick={(e) => e.stopPropagation()} style={{ animation: "ohModalIn .18s ease-out", borderRadius: 12, border: "1px solid var(--t-border-light, #e5e7eb)" }}>
+            <div className="mx-4 w-full max-w-lg overflow-hidden bg-white" onClick={(e) => e.stopPropagation()} style={{ animation: "ohModalIn .18s ease-out", borderRadius: 12, border: "1px solid var(--t-border-light, var(--t-border))" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 20px", borderBottom: "1px solid var(--t-border-light, #f0f0f0)" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                        <div style={{ width: 30, height: 30, borderRadius: 8, background: "linear-gradient(135deg, #004786, #0098d6)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <div style={{ width: 30, height: 30, borderRadius: 8, background: "var(--t-gradient-accent)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                             <History size={14} style={{ color: "#fff" }} />
                         </div>
                         <h3 style={{ fontSize: 14, fontWeight: 600, color: "var(--t-text, #1f2937)" }}>تفاصيل العملية</h3>
                     </div>
-                    <button onClick={onClose} style={{ borderRadius: 6, padding: 5, border: "none", background: "transparent", cursor: "pointer", color: "var(--t-text-faint, #9ca3af)" }}><X size={16} /></button>
+                    <button onClick={onClose} style={{ borderRadius: 6, padding: 5, border: "none", background: "transparent", cursor: "pointer", color: "var(--t-text-faint, var(--t-text-faint))" }}><X size={16} /></button>
                 </div>
                 {loading || !details ? (
                     <div className="flex items-center justify-center py-16"><Loader2 size={28} className="animate-spin text-blue-500" /></div>
@@ -159,7 +159,7 @@ const OpRow = memo(function OpRow({
                 <span className="inline-flex items-center gap-1 font-mono text-[11px] text-gray-500 bg-gray-50 rounded px-1.5 py-0.5"><Hash size={9} className="text-gray-400" />{truncateId(op.id)}</span>
             </td>
             <td className="px-4 py-3.5">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-indigo-50 border border-indigo-200 px-2.5 py-0.5 text-[11px] font-semibold text-indigo-600">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-orange-50 border border-orange-200 px-2.5 py-0.5 text-[11px] font-semibold text-orange-600">
                     <FileText size={10} />{operationLabel(op.operation)}
                 </span>
             </td>
@@ -175,7 +175,7 @@ const OpRow = memo(function OpRow({
             <td className="px-4 py-3.5">
                 <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
                     <ActionGuard pageBit={PAGE_BITS.OPERATION_HISTORY} actionBit={ACTION_BITS.GET_OPERATION_DETAILS}>
-                        <button onClick={() => onView(op)} className="rounded-lg p-1.5 text-gray-400 hover:bg-blue-50 hover:text-blue-500 transition-colors" title="عرض التفاصيل"><Eye size={14} /></button>
+                        <button onClick={() => onView(op)} className="rounded-lg p-1.5 text-gray-400 hover:bg-orange-50 hover:text-orange-500 transition-colors" title="عرض التفاصيل"><Eye size={14} /></button>
                     </ActionGuard>
                     {hasFile && (
                         <ActionGuard pageBit={PAGE_BITS.OPERATION_HISTORY} actionBit={ACTION_BITS.DOWNLOAD_OPERATION_TRAIN_FILE}>
@@ -323,24 +323,24 @@ export function OperationHistoryPage() {
             {/* Header */}
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                    <div style={{ width: 40, height: 40, borderRadius: 10, background: "linear-gradient(135deg, #004786, #0098d6)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <div style={{ width: 40, height: 40, borderRadius: 10, background: "var(--t-gradient-accent)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                         <History size={20} style={{ color: "#fff" }} />
                     </div>
                     <div>
                         <h2 style={{ fontSize: 18, fontWeight: 700, color: "var(--t-text, #1f2937)", margin: 0 }}>سجل العمليات</h2>
-                        <p style={{ fontSize: 12, color: "var(--t-text-faint, #9ca3af)", marginTop: 2 }}>استعراض وتتبع جميع العمليات المنفذة</p>
+                        <p style={{ fontSize: 12, color: "var(--t-text-faint, var(--t-text-faint))", marginTop: 2 }}>استعراض وتتبع جميع العمليات المنفذة</p>
                     </div>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                     {pagination && (
-                        <span style={{ display: "inline-flex", alignItems: "center", gap: 5, borderRadius: 12, background: "rgba(0,71,134,0.05)", border: "1px solid rgba(0,71,134,0.12)", padding: "5px 12px", fontSize: 11, fontWeight: 600, color: "#004786" }}>
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: 5, borderRadius: 12, background: "var(--t-brand-orange-muted)", border: "1px solid var(--t-brand-orange-soft)", padding: "5px 12px", fontSize: 11, fontWeight: 600, color: "var(--t-brand-orange)" }}>
                             <History size={12} />
                             {pagination.totalCount} عملية
                         </span>
                     )}
                     <ActionGuard pageBit={PAGE_BITS.OPERATION_HISTORY} actionBit={ACTION_BITS.DOWNLOAD_OPERATIONS_CSV}>
                         <button onClick={handleExportCsv} disabled={exporting || loading}
-                            style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 18px", borderRadius: 8, border: "none", background: "#004786", color: "#fff", fontSize: 13, fontWeight: 500, cursor: "pointer", opacity: (exporting || loading) ? 0.5 : 1, transition: "all 0.15s" }}>
+                            style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 18px", borderRadius: 8, border: "none", background: "var(--t-brand-orange)", color: "#fff", fontSize: 13, fontWeight: 500, cursor: "pointer", opacity: (exporting || loading) ? 0.5 : 1, transition: "all 0.15s" }}>
                             {exporting ? <Loader2 size={15} className="animate-spin" /> : <FileSpreadsheet size={15} />}
                             تصدير CSV
                         </button>
@@ -397,21 +397,21 @@ export function OperationHistoryPage() {
 
             {/* Info bar */}
             {!loading && filtered.length > 0 && pagination && (
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderRadius: 8, background: "var(--t-card, #fff)", border: "1px solid var(--t-border-light, #e5e7eb)", padding: "8px 14px" }}>
-                    <p style={{ fontSize: 12, color: "var(--t-text-secondary, #6b7280)" }}><span style={{ fontWeight: 700, color: "#004786" }}>{pagination.totalCount}</span> عملية</p>
-                    <p style={{ fontSize: 11, color: "var(--t-text-faint, #9ca3af)" }}>صفحة {page} من {totalPages}</p>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderRadius: 8, background: "var(--t-card, #fff)", border: "1px solid var(--t-border-light, var(--t-border))", padding: "8px 14px" }}>
+                    <p style={{ fontSize: 12, color: "var(--t-text-secondary, var(--t-text-muted))" }}><span style={{ fontWeight: 700, color: "var(--t-brand-orange)" }}>{pagination.totalCount}</span> عملية</p>
+                    <p style={{ fontSize: 11, color: "var(--t-text-faint, var(--t-text-faint))" }}>صفحة {page} من {totalPages}</p>
                 </div>
             )}
 
             {/* Table */}
-            <div style={{ position: "relative", overflow: "hidden", borderRadius: 10, border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-card, #fff)" }}>
+            <div style={{ position: "relative", overflow: "hidden", borderRadius: 10, border: "1px solid var(--t-border-light, var(--t-border))", background: "var(--t-card, #fff)" }}>
                 <FetchingBar visible={backgroundFetching} />
                 <div className="overflow-x-auto" style={{ opacity: backgroundFetching ? 0.6 : 1, transition: 'opacity 0.2s ease' }}>
                     <table style={{ width: "100%", borderCollapse: "collapse" }}>
                         <thead>
-                            <tr style={{ borderBottom: "1px solid var(--t-border-light, #f0f0f0)", background: "var(--t-surface, #fafafa)", textAlign: "right" }}>
+                            <tr style={{ borderBottom: "1px solid var(--t-border-light, #f0f0f0)", background: "var(--t-surface, var(--t-card-hover))", textAlign: "right" }}>
                                 {["#", "المعرّف", "العملية", "المستخدم", "الحالة", "التاريخ", "الموافق", "تاريخ الإنجاز", "الإجراءات"].map(h => (
-                                    <th key={h} style={{ padding: "10px 16px", fontSize: 11, fontWeight: 600, color: "var(--t-text-faint, #9ca3af)", letterSpacing: "0.3px" }}>{h}</th>
+                                    <th key={h} style={{ padding: "10px 16px", fontSize: 11, fontWeight: 600, color: "var(--t-text-faint, var(--t-text-faint))", letterSpacing: "0.3px" }}>{h}</th>
                                 ))}
                             </tr>
                         </thead>
@@ -447,12 +447,12 @@ export function OperationHistoryPage() {
             {totalPages > 1 && (
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, paddingTop: 8 }}>
                     <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1}
-                        style={{ display: "flex", alignItems: "center", gap: 4, padding: "6px 12px", borderRadius: 7, border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-card, #fff)", fontSize: 12, fontWeight: 500, color: "var(--t-text-secondary, #6b7280)", cursor: "pointer", opacity: page <= 1 ? 0.4 : 1 }}>
+                        style={{ display: "flex", alignItems: "center", gap: 4, padding: "6px 12px", borderRadius: 7, border: "1px solid var(--t-border-light, var(--t-border))", background: "var(--t-card, #fff)", fontSize: 12, fontWeight: 500, color: "var(--t-text-secondary, var(--t-text-muted))", cursor: "pointer", opacity: page <= 1 ? 0.4 : 1 }}>
                         <ChevronRight size={13} /> السابق
                     </button>
-                    <span style={{ display: "flex", height: 30, alignItems: "center", borderRadius: 7, background: "#004786", padding: "0 12px", fontSize: 12, fontWeight: 700, color: "#fff" }}>{page}</span>
+                    <span style={{ display: "flex", height: 30, alignItems: "center", borderRadius: 7, background: "var(--t-brand-orange)", padding: "0 12px", fontSize: 12, fontWeight: 700, color: "#fff" }}>{page}</span>
                     <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} onMouseEnter={() => page < totalPages && prefetchNextPage()} disabled={page >= totalPages}
-                        style={{ display: "flex", alignItems: "center", gap: 4, padding: "6px 12px", borderRadius: 7, border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-card, #fff)", fontSize: 12, fontWeight: 500, color: "var(--t-text-secondary, #6b7280)", cursor: "pointer", opacity: page >= totalPages ? 0.4 : 1 }}>
+                        style={{ display: "flex", alignItems: "center", gap: 4, padding: "6px 12px", borderRadius: 7, border: "1px solid var(--t-border-light, var(--t-border))", background: "var(--t-card, #fff)", fontSize: 12, fontWeight: 500, color: "var(--t-text-secondary, var(--t-text-muted))", cursor: "pointer", opacity: page >= totalPages ? 0.4 : 1 }}>
                         التالي <ChevronLeft size={13} />
                     </button>
                 </div>
@@ -467,9 +467,9 @@ export function OperationHistoryPage() {
                 @keyframes ohFadeIn{from{opacity:0}to{opacity:1}}
                 @keyframes ohRowFade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
                 @keyframes ohShimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
-                .oh-skeleton-bone{background:linear-gradient(90deg,#f3f4f6 25%,#e5e7eb 37%,#f3f4f6 63%);background-size:200% 100%;animation:ohShimmer 1.5s ease-in-out infinite}
+                .oh-skeleton-bone{background:linear-gradient(90deg,var(--t-surface) 25%,var(--t-border) 37%,var(--t-surface) 63%);background-size:200% 100%;animation:ohShimmer 1.5s ease-in-out infinite}
                 .oh-skeleton-shimmer{opacity:0;animation:ohFadeIn .3s ease-out forwards}
-                .oh-loading-spinner{width:36px;height:36px;border:3px solid #e5e7eb;border-top-color:#3b82f6;border-radius:50%;animation:ohSpin .7s linear infinite}
+                .oh-loading-spinner{width:36px;height:36px;border:3px solid var(--t-border);border-top-color:var(--t-info);border-radius:50%;animation:ohSpin .7s linear infinite}
                 @keyframes ohSpin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
             `}</style>
         </div>

@@ -133,7 +133,7 @@ export function OrganizationSettingsPage() {
     return (
         <div className="flex h-full" dir="rtl">
 
-            {/* ── Internal Sidebar (Fateen brand pattern) ── */}
+            {/* ── Internal Sidebar (DarAI brand pattern) ── */}
             <aside
                 className={`shrink-0 bg-white transition-all duration-300 ${collapsed ? "w-[60px]" : "w-56"}`}
                 style={{
@@ -149,7 +149,7 @@ export function OrganizationSettingsPage() {
                 <div
                     onClick={() => { if (collapsed) setCollapsed(false) }}
                     style={{
-                        background: "linear-gradient(135deg, #004786, #0072b5, #0098d6)",
+                        background: "linear-gradient(135deg, var(--t-accent), var(--t-accent-secondary), var(--t-accent-light))",
                         padding: collapsed ? "12px 0" : "12px 14px",
                         position: "relative",
                         overflow: "hidden",
@@ -195,7 +195,7 @@ export function OrganizationSettingsPage() {
                             {/* Section header */}
                             {!collapsed && (
                                 <div style={{
-                                    fontSize: 10, fontWeight: 600, color: "var(--t-text-faint, #9ca3af)",
+                                    fontSize: 10, fontWeight: 600, color: "var(--t-text-faint, var(--t-text-faint))",
                                     padding: si === 0 ? "8px 8px 4px" : "12px 8px 4px",
                                     letterSpacing: "0.02em",
                                 }}>{section.title}</div>
@@ -219,28 +219,28 @@ export function OrganizationSettingsPage() {
                                             alignItems: "center", gap: 10,
                                             padding: collapsed ? "8px 0" : "6px 8px",
                                             marginBottom: 1, borderRadius: 8, border: "none",
-                                            background: isActive ? "var(--t-card-hover, #f3f4f6)" : "transparent",
+                                            background: isActive ? "var(--t-card-hover, var(--t-surface))" : "transparent",
                                             cursor: "pointer",
                                             justifyContent: collapsed ? "center" : "flex-start",
                                             position: "relative", textAlign: "right",
                                             transition: "background 0.12s", color: "inherit",
                                         }}
-                                        onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = "var(--t-card-hover, #f9fafb)" }}
-                                        onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = isActive ? "var(--t-card-hover, #f3f4f6)" : "transparent" }}
+                                        onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = "var(--t-card-hover, var(--t-page))" }}
+                                        onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = isActive ? "var(--t-card-hover, var(--t-surface))" : "transparent" }}
                                     >
                                         {isActive && !collapsed && (
                                             <div style={{
                                                 position: "absolute", right: 0,
                                                 top: "50%", transform: "translateY(-50%)",
                                                 width: 3, height: 16, borderRadius: 3,
-                                                background: "#004786",
+                                                background: "var(--t-brand-orange)",
                                             }} />
                                         )}
                                         <div style={{
                                             width: collapsed ? 28 : 24,
                                             height: collapsed ? 28 : 24,
                                             borderRadius: 6,
-                                            background: isActive ? "rgba(0,71,134,0.1)" : "transparent",
+                                            background: isActive ? "rgba(27,80,145,0.1)" : "transparent",
                                             display: "flex", alignItems: "center", justifyContent: "center",
                                             flexShrink: 0, transition: "all 0.15s",
                                         }}>
@@ -248,7 +248,7 @@ export function OrganizationSettingsPage() {
                                                 size={collapsed ? 15 : 14}
                                                 strokeWidth={isActive ? 2.2 : 1.6}
                                                 style={{
-                                                    color: isActive ? "#004786" : "var(--t-text-muted, #9ca3af)",
+                                                    color: isActive ? "var(--t-accent)" : "var(--t-text-muted, var(--t-text-faint))",
                                                     transition: "color 0.15s",
                                                 }}
                                             />
@@ -256,7 +256,7 @@ export function OrganizationSettingsPage() {
                                         {!collapsed && (
                                             <span style={{
                                                 fontSize: 12.5, fontWeight: isActive ? 600 : 500,
-                                                color: isActive ? "var(--t-text, #1f2937)" : "var(--t-text-secondary, #6b7280)",
+                                                color: isActive ? "var(--t-text, #1f2937)" : "var(--t-text-secondary, var(--t-text-muted))",
                                                 transition: "color 0.15s",
                                                 overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
                                             }}>{item.label}</span>
@@ -273,11 +273,11 @@ export function OrganizationSettingsPage() {
                     <Link to="/dashboard" style={{
                         display: "flex", alignItems: "center", gap: 6,
                         justifyContent: collapsed ? "center" : "flex-start",
-                        fontSize: 11, color: "var(--t-text-faint, #9ca3af)", textDecoration: "none",
+                        fontSize: 11, color: "var(--t-text-faint, var(--t-text-faint))", textDecoration: "none",
                         padding: "7px 8px", borderRadius: 7,
                         transition: "background 0.1s",
                     }}
-                        onMouseEnter={e => { e.currentTarget.style.background = "var(--t-card-hover, #f9fafb)" }}
+                        onMouseEnter={e => { e.currentTarget.style.background = "var(--t-card-hover, var(--t-page))" }}
                         onMouseLeave={e => { e.currentTarget.style.background = "transparent" }}
                     >
                         <ChevronLeft size={12} style={{ transform: "rotate(180deg)" }} />
@@ -290,12 +290,12 @@ export function OrganizationSettingsPage() {
             <main style={{ flex: 1, minWidth: 0, overflowY: "auto", padding: "20px 24px" }}>
 
                 {/* breadcrumb */}
-                <div style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 12, color: "var(--t-text-faint, #9ca3af)", marginBottom: 4 }}>
-                    <Link to="/dashboard" style={{ color: "var(--t-text-faint, #9ca3af)", textDecoration: "none" }}>لوحة التحكم</Link>
-                    <ChevronLeft size={11} style={{ color: "var(--t-text-faint, #9ca3af)" }} />
+                <div style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 12, color: "var(--t-text-faint, var(--t-text-faint))", marginBottom: 4 }}>
+                    <Link to="/dashboard" style={{ color: "var(--t-text-faint, var(--t-text-faint))", textDecoration: "none" }}>لوحة التحكم</Link>
+                    <ChevronLeft size={11} style={{ color: "var(--t-text-faint, var(--t-text-faint))" }} />
                     <span>إعدادات المؤسسة</span>
-                    <ChevronLeft size={11} style={{ color: "var(--t-text-faint, #9ca3af)" }} />
-                    <span style={{ color: "var(--t-text-secondary, #6b7280)", fontWeight: 500 }}>{activeItem?.label}</span>
+                    <ChevronLeft size={11} style={{ color: "var(--t-text-faint, var(--t-text-faint))" }} />
+                    <span style={{ color: "var(--t-text-secondary, var(--t-text-muted))", fontWeight: 500 }}>{activeItem?.label}</span>
                 </div>
 
                 {/* page title */}
@@ -305,7 +305,7 @@ export function OrganizationSettingsPage() {
                 }}>
                     {activeItem?.label}
                 </h1>
-                <p style={{ fontSize: 13, color: "var(--t-text-faint, #9ca3af)", margin: "0 0 20px" }}>
+                <p style={{ fontSize: 13, color: "var(--t-text-faint, var(--t-text-faint))", margin: "0 0 20px" }}>
                     {activeItem?.desc}
                 </p>
 
@@ -314,10 +314,10 @@ export function OrganizationSettingsPage() {
                     /* ── لا توجد صلاحيات لأي تاب ── */
                     <div style={{
                         display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-                        minHeight: 300, gap: 12, color: "var(--t-text-faint, #9ca3af)",
+                        minHeight: 300, gap: 12, color: "var(--t-text-faint, var(--t-text-faint))",
                     }}>
-                        <Shield size={40} strokeWidth={1.2} style={{ color: "var(--t-text-faint, #d1d5db)" }} />
-                        <p style={{ fontSize: 14, fontWeight: 600, color: "var(--t-text-secondary, #6b7280)" }}>لا توجد صلاحيات كافية</p>
+                        <Shield size={40} strokeWidth={1.2} style={{ color: "var(--t-text-faint, var(--t-border-medium))" }} />
+                        <p style={{ fontSize: 14, fontWeight: 600, color: "var(--t-text-secondary, var(--t-text-muted))" }}>لا توجد صلاحيات كافية</p>
                         <p style={{ fontSize: 12 }}>ليس لديك صلاحية الوصول لأي من إعدادات المؤسسة</p>
                     </div>
                 ) : (

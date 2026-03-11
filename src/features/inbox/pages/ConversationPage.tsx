@@ -130,7 +130,6 @@ const DetailsSuspense = memo(function DetailsSuspense({ customer }: { customer: 
 })
 
 function ConversationPageInner({ id, accountId }: { id: string; accountId?: string }) {
-    const queryClient = useQueryClient()
     const customer = useCachedCustomer(id, accountId)
     const resolvedAccountId = customer?.account_id ?? accountId
 
@@ -145,10 +144,6 @@ function ConversationPageInner({ id, accountId }: { id: string; accountId?: stri
     const messages = useMemo(() => flattenMessages(data), [data])
     const pendingMessages = useConversationStore(s => s.pendingMessages)
     const handleLoadMore = useCallback(() => fetchNextPage(), [fetchNextPage])
-
-    useEffect(() => {
-        queryClient.invalidateQueries({ queryKey: ["customer-messages", id, resolvedAccountId] })
-    }, [id, resolvedAccountId, queryClient])
 
     return (
         <div style={{ display: "flex", height: "100%", overflow: "hidden" }}>
@@ -214,7 +209,7 @@ function DetailsSkeleton() {
             <div style={{
                 width: 24, height: 24, borderRadius: "50%",
                 border: "2.5px solid var(--t-border-light)",
-                borderTopColor: "#0072b5",
+                borderTopColor: "var(--t-accent-secondary)",
                 animation: "spin .7s linear infinite",
             }} />
             <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>

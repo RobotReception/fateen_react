@@ -60,7 +60,7 @@ export function AppRouter() {
     if (!ready) {
         return (
             <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh" }}>
-                <Loader2 style={{ width: 32, height: 32, animation: "spin 1s linear infinite", color: "#0098d6" }} />
+                <Loader2 style={{ width: 32, height: 32, animation: "spin 1s linear infinite", color: "var(--t-accent-light)" }} />
             </div>
         )
     }

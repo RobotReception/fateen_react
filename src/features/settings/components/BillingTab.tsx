@@ -1,4 +1,4 @@
-﻿import { useMemo } from "react"
+import { useMemo } from "react"
 import {
     AlertCircle, RefreshCw,
     Calendar, CreditCard, BarChart3,
@@ -16,14 +16,14 @@ const CSS = `
 @keyframes blPulse{0%,100%{opacity:1}50%{opacity:.6}}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-.bl-card{border-radius:14px;border:1px solid #ebeef2;background:#fff;overflow:hidden;animation:blIn .2s ease-out}
+.bl-card{border-radius:14px;border:1px solid var(--t-border);background:#fff;overflow:hidden;animation:blIn .2s ease-out}
 .bl-card-header{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid #f0f1f3}
 .bl-card-body{padding:16px 18px}
 
-.bl-usage-item{padding:12px 14px;border-radius:10px;border:1px solid #ebeef2;background:#fafbfc;transition:all .12s}
-.bl-usage-item:hover{border-color:#d1d5db;background:#f5f6f8}
+.bl-usage-item{padding:12px 14px;border-radius:10px;border:1px solid var(--t-border);background:#fafbfc;transition:all .12s}
+.bl-usage-item:hover{border-color:var(--t-border-medium);background:var(--t-surface)}
 
-.bl-bar-track{height:6px;width:100%;border-radius:4px;background:#ebeef2;overflow:hidden}
+.bl-bar-track{height:6px;width:100%;border-radius:4px;background:var(--t-border);overflow:hidden}
 .bl-bar-fill{height:100%;border-radius:4px;transition:width .8s ease-out}
 
 .bl-data-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f0f1f3}
@@ -44,8 +44,8 @@ const USAGE_ICONS: Record<string, React.ElementType> = {
 }
 
 const USAGE_COLORS: Record<string, string> = {
-    المستخدمون: "#004786", "جهات الاتصال": "#0072b5", الرسائل: "#6366f1",
-    التخزين: "#8b5cf6", "طلبات API": "#f59e0b",
+    المستخدمون: "var(--t-accent)", "جهات الاتصال": "var(--t-accent-secondary)", الرسائل: "#6366f1",
+    التخزين: "#8b5cf6", "طلبات API": "var(--t-warning)",
 }
 
 function UsageItem({ label, limit }: { label: string; limit: LimitItem | undefined }) {
@@ -56,10 +56,10 @@ function UsageItem({ label, limit }: { label: string; limit: LimitItem | undefin
     const unit = limit.max_size_gb !== undefined ? " GB" : ""
     const isHigh = pct > 85
     const isMedium = pct > 60
-    const color = USAGE_COLORS[label] || "#004786"
+    const color = USAGE_COLORS[label] || "var(--t-accent)"
     const Icon = USAGE_ICONS[label] || Database
 
-    const barColor = isHigh ? "#ef4444" : isMedium ? "#f59e0b" : color
+    const barColor = isHigh ? "var(--t-danger)" : isMedium ? "var(--t-warning)" : color
 
     return (
         <div className="bl-usage-item">
@@ -68,9 +68,9 @@ function UsageItem({ label, limit }: { label: string; limit: LimitItem | undefin
                     <div style={{ width: 28, height: 28, borderRadius: 8, background: `${color}08`, border: `1px solid ${color}12`, display: "flex", alignItems: "center", justifyContent: "center" }}>
                         <Icon size={13} style={{ color }} />
                     </div>
-                    <span style={{ fontSize: 12.5, fontWeight: 700, color: "#111827" }}>{label}</span>
+                    <span style={{ fontSize: 12.5, fontWeight: 700, color: "var(--t-text)" }}>{label}</span>
                 </div>
-                <span style={{ fontSize: 12, fontWeight: 700, color: "#111827", fontFamily: "monospace", direction: "ltr" as const }}>
+                <span style={{ fontSize: 12, fontWeight: 700, color: "var(--t-text)", fontFamily: "monospace", direction: "ltr" as const }}>
                     {cur}{unit} <span style={{ color: "#b0b7c3", fontWeight: 500 }}>/ {max}{unit}</span>
                 </span>
             </div>
@@ -78,11 +78,11 @@ function UsageItem({ label, limit }: { label: string; limit: LimitItem | undefin
                 <div className="bl-bar-fill" style={{ width: `${pct}%`, background: `linear-gradient(90deg, ${barColor}, ${barColor}cc)` }} />
             </div>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 5 }}>
-                <span style={{ fontSize: 10, fontWeight: 700, color: isHigh ? "#ef4444" : "#9ca3af" }}>
+                <span style={{ fontSize: 10, fontWeight: 700, color: isHigh ? "var(--t-danger)" : "var(--t-text-faint)" }}>
                     {pct.toFixed(0)}% مستخدم
                 </span>
                 {isHigh && (
-                    <span style={{ fontSize: 9, fontWeight: 700, color: "#ef4444", background: "rgba(239,68,68,.06)", border: "1px solid rgba(239,68,68,.1)", padding: "2px 7px", borderRadius: 5 }}>
+                    <span style={{ fontSize: 9, fontWeight: 700, color: "var(--t-danger)", background: "rgba(239,68,68,.06)", border: "1px solid rgba(239,68,68,.1)", padding: "2px 7px", borderRadius: 5 }}>
                         يقترب من الحد
                     </span>
                 )}
@@ -96,15 +96,15 @@ function DataRow({ label, value, icon }: { label: string; value?: string | null;
         <div className="bl-data-row">
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                 {icon && <span style={{ color: "#b0b7c3" }}>{icon}</span>}
-                <span style={{ fontSize: 12, fontWeight: 600, color: "#6b7280" }}>{label}</span>
+                <span style={{ fontSize: 12, fontWeight: 600, color: "var(--t-text-muted)" }}>{label}</span>
             </div>
-            <span style={{ fontSize: 12, fontWeight: 700, color: value ? "#111827" : "#d1d5db" }}>{value || "—"}</span>
+            <span style={{ fontSize: 12, fontWeight: 700, color: value ? "var(--t-text)" : "var(--t-border-medium)" }}>{value || "—"}</span>
         </div>
     )
 }
 
 function Card({ title, icon: Icon, accent, children }: { title: string; icon: typeof CreditCard; accent?: string; children: React.ReactNode }) {
-    const c = accent || "#004786"
+    const c = accent || "var(--t-accent)"
     return (
         <div className="bl-card">
             <div style={{ height: 3, background: `linear-gradient(90deg, ${c}, ${c}99)` }} />
@@ -112,7 +112,7 @@ function Card({ title, icon: Icon, accent, children }: { title: string; icon: ty
                 <div style={{ width: 30, height: 30, borderRadius: 9, background: `linear-gradient(135deg, ${c}, ${c}cc)`, display: "flex", alignItems: "center", justifyContent: "center" }}>
                     <Icon size={13} style={{ color: "#fff" }} />
                 </div>
-                <span style={{ fontSize: 14, fontWeight: 700, color: "#111827" }}>{title}</span>
+                <span style={{ fontSize: 14, fontWeight: 700, color: "var(--t-text)" }}>{title}</span>
             </div>
             <div className="bl-card-body">{children}</div>
         </div>
@@ -157,18 +157,18 @@ export function BillingTab() {
         <div style={{ direction: "rtl" }}>
             <style>{CSS}</style>
             <div className="bl-card" style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "60px 20px", textAlign: "center" }}>
-                <div style={{ width: 52, height: 52, borderRadius: 14, background: "#f5f6f8", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 12 }}>
-                    <AlertCircle size={22} style={{ color: "#d1d5db" }} />
+                <div style={{ width: 52, height: 52, borderRadius: 14, background: "var(--t-surface)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 12 }}>
+                    <AlertCircle size={22} style={{ color: "var(--t-border-medium)" }} />
                 </div>
-                <div style={{ fontSize: 14, fontWeight: 700, color: "#111827", marginBottom: 4 }}>فشل تحميل بيانات الاشتراك</div>
-                <div style={{ fontSize: 11, color: "#9ca3af", marginBottom: 16 }}>تحقق من الاتصال بالإنترنت وأعد المحاولة</div>
+                <div style={{ fontSize: 14, fontWeight: 700, color: "var(--t-text)", marginBottom: 4 }}>فشل تحميل بيانات الاشتراك</div>
+                <div style={{ fontSize: 11, color: "var(--t-text-faint)", marginBottom: 16 }}>تحقق من الاتصال بالإنترنت وأعد المحاولة</div>
                 <button onClick={() => refetch()} style={{
                     display: "inline-flex", alignItems: "center", gap: 5, padding: "8px 18px", borderRadius: 8,
-                    border: "1.5px solid #ebeef2", background: "#fff", color: "#111827", fontSize: 12, fontWeight: 700,
+                    border: "1.5px solid var(--t-border)", background: "#fff", color: "var(--t-text)", fontSize: 12, fontWeight: 700,
                     cursor: "pointer", fontFamily: "inherit", transition: "all .12s",
                 }}
-                    onMouseEnter={e => { e.currentTarget.style.borderColor = "#004786"; e.currentTarget.style.color = "#004786" }}
-                    onMouseLeave={e => { e.currentTarget.style.borderColor = "#ebeef2"; e.currentTarget.style.color = "#111827" }}>
+                    onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--t-accent)"; e.currentTarget.style.color = "var(--t-accent)" }}
+                    onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--t-border)"; e.currentTarget.style.color = "var(--t-text)" }}>
                     <RefreshCw size={12} /> إعادة المحاولة
                 </button>
             </div>
@@ -179,7 +179,7 @@ export function BillingTab() {
     const planName = org.plan_snapshot?.plan_name || org.plan || "—"
     const status = org.status
 
-    const statusColor = status === "active" ? "#16a34a" : status === "trial" ? "#f59e0b" : "#9ca3af"
+    const statusColor = status === "active" ? "#16a34a" : status === "trial" ? "var(--t-warning)" : "var(--t-text-faint)"
     const statusLabel = status === "active" ? "نشط" : status === "trial" ? "تجريبي" : status === "expired" ? "منتهي" : status || "—"
 
     return (
@@ -191,29 +191,29 @@ export function BillingTab() {
             {trialDays !== null && (
                 <div style={{
                     borderRadius: 12, padding: "12px 16px", display: "flex", alignItems: "center", gap: 10,
-                    border: trialDays > 0 ? "1px solid #ebeef2" : "1px solid #ef4444",
+                    border: trialDays > 0 ? "1px solid var(--t-border)" : "1px solid var(--t-danger)",
                     background: trialDays > 0 ? "#fafbfc" : "rgba(239,68,68,.04)",
                     animation: "blIn .2s ease-out",
                 }}>
                     <div style={{
                         width: 34, height: 34, borderRadius: 9,
-                        background: trialDays > 0 ? "linear-gradient(135deg, #f59e0b, #fbbf24)" : "linear-gradient(135deg, #ef4444, #f87171)",
+                        background: trialDays > 0 ? "linear-gradient(135deg, var(--t-warning), #fbbf24)" : "linear-gradient(135deg, var(--t-danger), #f87171)",
                         display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
                     }}>
                         <Calendar size={15} style={{ color: "#fff" }} />
                     </div>
                     <div style={{ flex: 1 }}>
-                        <div style={{ fontSize: 13, fontWeight: 700, color: trialDays > 0 ? "#111827" : "#ef4444" }}>
+                        <div style={{ fontSize: 13, fontWeight: 700, color: trialDays > 0 ? "var(--t-text)" : "var(--t-danger)" }}>
                             {trialDays > 0 ? `${trialDays} يوم متبقي في الفترة التجريبية` : "انتهت الفترة التجريبية"}
                         </div>
-                        {org.trial_ends_at && <div style={{ fontSize: 10, color: "#9ca3af", marginTop: 1 }}>حتى {fmtDate(org.trial_ends_at)}</div>}
+                        {org.trial_ends_at && <div style={{ fontSize: 10, color: "var(--t-text-faint)", marginTop: 1 }}>حتى {fmtDate(org.trial_ends_at)}</div>}
                     </div>
                     {trialDays === 0 && (
                         <button style={{
                             display: "inline-flex", alignItems: "center", gap: 5, padding: "7px 14px", borderRadius: 8,
-                            border: "none", background: "linear-gradient(135deg, #004786, #0072b5)", color: "#fff",
+                            border: "none", background: "var(--t-brand-orange)", color: "#fff",
                             fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
-                            boxShadow: "0 2px 8px rgba(0,71,134,.15)",
+                            boxShadow: "0 2px 8px rgba(27,80,145,.15)",
                         }}>
                             <Crown size={11} /> ترقية الآن
                         </button>
@@ -224,7 +224,7 @@ export function BillingTab() {
             {/* Plan Overview — Hero */}
             <div className="bl-card">
                 <div style={{
-                    height: 3, background: "linear-gradient(90deg, #004786, #0072b5)",
+                    height: 3, background: "linear-gradient(90deg, var(--t-accent), var(--t-accent-secondary))",
                 }} />
                 <div style={{
                     padding: "20px 20px 16px", display: "flex", alignItems: "center", gap: 14,
@@ -232,15 +232,15 @@ export function BillingTab() {
                 }}>
                     <div style={{
                         width: 48, height: 48, borderRadius: 14,
-                        background: "linear-gradient(135deg, #004786, #0072b5)",
+                        background: "var(--t-brand-orange)",
                         display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
-                        boxShadow: "0 4px 16px rgba(0,71,134,.2)",
+                        boxShadow: "0 4px 16px rgba(27,80,145,.2)",
                     }}>
                         <Crown size={22} style={{ color: "#fff" }} />
                     </div>
                     <div style={{ flex: 1 }}>
                         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                            <span style={{ fontSize: 20, fontWeight: 800, color: "#111827" }}>{planName}</span>
+                            <span style={{ fontSize: 20, fontWeight: 800, color: "var(--t-text)" }}>{planName}</span>
                             <span style={{
                                 fontSize: 10, fontWeight: 700, color: statusColor,
                                 background: `${statusColor}08`, border: `1px solid ${statusColor}18`,
@@ -249,7 +249,7 @@ export function BillingTab() {
                                 {statusLabel}
                             </span>
                         </div>
-                        <div style={{ fontSize: 11, color: "#9ca3af", marginTop: 2 }}>خطة الاشتراك الحالية للمؤسسة</div>
+                        <div style={{ fontSize: 11, color: "var(--t-text-faint)", marginTop: 2 }}>خطة الاشتراك الحالية للمؤسسة</div>
                     </div>
                 </div>
                 <div style={{ padding: "14px 20px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 0 }}>
@@ -266,7 +266,7 @@ export function BillingTab() {
 
             {/* Usage & Limits */}
             {limits && (
-                <Card title="الاستخدام والحدود" icon={BarChart3} accent="#0072b5">
+                <Card title="الاستخدام والحدود" icon={BarChart3} accent="var(--t-accent-secondary)">
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
                         <UsageItem label="المستخدمون" limit={limits.users} />
                         <UsageItem label="جهات الاتصال" limit={limits.contacts} />
@@ -277,10 +277,10 @@ export function BillingTab() {
                     {/* Quick summary */}
                     <div style={{
                         display: "flex", alignItems: "center", gap: 6, marginTop: 12,
-                        padding: "8px 12px", borderRadius: 8, background: "#fafbfc", border: "1px solid #ebeef2",
+                        padding: "8px 12px", borderRadius: 8, background: "#fafbfc", border: "1px solid var(--t-border)",
                     }}>
-                        <TrendingUp size={12} style={{ color: "#004786" }} />
-                        <span style={{ fontSize: 10, color: "#6b7280" }}>
+                        <TrendingUp size={12} style={{ color: "var(--t-accent)" }} />
+                        <span style={{ fontSize: 10, color: "var(--t-text-muted)" }}>
                             يتم تحديث بيانات الاستخدام تلقائياً. تواصل معنا لترقية خطتك.
                         </span>
                     </div>

@@ -11,13 +11,13 @@ import { usePermissions } from "@/lib/usePermissions"
 import { PAGE_BITS, ACTION_BITS } from "@/lib/permissions"
 
 const TYPE_CONFIG: Record<AssignmentType, { label: string; color: string; bg: string; icon: typeof User; priority: number }> = {
-    account: { label: "حساب", color: "#004786", bg: "rgba(0,71,134,0.08)", icon: User, priority: 100 },
-    group: { label: "مجموعة", color: "#0072b5", bg: "rgba(0,114,181,0.08)", icon: Users, priority: 50 },
+    account: { label: "حساب", color: "var(--t-accent)", bg: "rgba(27,80,145,0.08)", icon: User, priority: 100 },
+    group: { label: "مجموعة", color: "var(--t-accent-secondary)", bg: "var(--t-accent-muted)", icon: Users, priority: 50 },
     tenant: { label: "مستأجر", color: "#2e7d32", bg: "rgba(46,125,50,0.08)", icon: Building, priority: 10 },
 }
 
-const labelSt: React.CSSProperties = { display: "block", fontSize: 12, fontWeight: 600, color: "var(--t-text-secondary, #6b7280)", marginBottom: 5 }
-const inputSt: React.CSSProperties = { width: "100%", padding: "10px 14px", borderRadius: 10, border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-surface, #f9fafb)", fontSize: 13, outline: "none", color: "var(--t-text, #1f2937)", transition: "border-color 0.15s" }
+const labelSt: React.CSSProperties = { display: "block", fontSize: 12, fontWeight: 600, color: "var(--t-text-secondary, var(--t-text-muted))", marginBottom: 5 }
+const inputSt: React.CSSProperties = { width: "100%", padding: "10px 14px", borderRadius: 10, border: "1px solid var(--t-border-light, var(--t-border))", background: "var(--t-surface, var(--t-page))", fontSize: 13, outline: "none", color: "var(--t-text, #1f2937)", transition: "border-color 0.15s" }
 
 interface AssignmentsTabProps { onNavigateToTab?: (tab: string) => void }
 
@@ -126,22 +126,22 @@ export function AssignmentsTab(_props: AssignmentsTabProps) {
                 <div style={{
                     display: "flex", alignItems: "center", gap: 8,
                     padding: "8px 14px", borderRadius: 12,
-                    background: "var(--t-card, #fff)", border: "1px solid var(--t-border-light, #e5e7eb)",
+                    background: "var(--t-card, #fff)", border: "1px solid var(--t-border-light, var(--t-border))",
                     flex: "1 1 200px", maxWidth: 360,
                 }}>
-                    <Search size={15} style={{ color: "var(--t-text-muted, #9ca3af)", flexShrink: 0 }} />
+                    <Search size={15} style={{ color: "var(--t-text-muted, var(--t-text-faint))", flexShrink: 0 }} />
                     <input value={search} onChange={e => setSearch(e.target.value)} placeholder="بحث بمعرف الهدف..."
                         style={{ border: "none", background: "transparent", fontSize: 13, outline: "none", flex: 1, color: "var(--t-text, #1f2937)" }} />
-                    {search && <X size={13} style={{ cursor: "pointer", color: "#9ca3af" }} onClick={() => setSearch("")} />}
+                    {search && <X size={13} style={{ cursor: "pointer", color: "var(--t-text-faint)" }} onClick={() => setSearch("")} />}
                 </div>
 
-                <div style={{ display: "flex", gap: 4, padding: 3, borderRadius: 10, background: "var(--t-surface, #f3f4f6)" }}>
+                <div style={{ display: "flex", gap: 4, padding: 3, borderRadius: 10, background: "var(--t-surface, var(--t-surface))" }}>
                     {([["", "الكل"], ["account", "حساب"], ["group", "مجموعة"], ["tenant", "مستأجر"]] as const).map(([val, label]) => (
                         <button key={val} onClick={() => setTypeFilter(val as AssignmentType | "")} style={{
                             padding: "5px 12px", borderRadius: 8, fontSize: 12, fontWeight: 500,
                             border: "none", cursor: "pointer", transition: "all 0.15s",
                             background: typeFilter === val ? "var(--t-card, #fff)" : "transparent",
-                            color: typeFilter === val ? "var(--t-text, #1f2937)" : "var(--t-text-muted, #9ca3af)",
+                            color: typeFilter === val ? "var(--t-text, #1f2937)" : "var(--t-text-muted, var(--t-text-faint))",
                             boxShadow: typeFilter === val ? "0 1px 3px rgba(0,0,0,0.08)" : "none",
                         }}>
                             {label}
@@ -152,8 +152,8 @@ export function AssignmentsTab(_props: AssignmentsTabProps) {
                 {canCreate && <button onClick={() => { resetForm(); setShowCreate(true) }} style={{
                     display: "flex", alignItems: "center", gap: 6,
                     padding: "9px 18px", borderRadius: 10, border: "none", cursor: "pointer",
-                    background: "linear-gradient(135deg, #004786, #0098d6)", color: "#fff",
-                    fontSize: 13, fontWeight: 600, boxShadow: "0 3px 12px rgba(0,71,134,0.25)",
+                    background: "var(--t-gradient-accent)", color: "#fff",
+                    fontSize: 13, fontWeight: 600, boxShadow: "0 3px 12px rgba(27,80,145,0.25)",
                     marginRight: "auto",
                 }}>
                     <Plus size={15} /> إنشاء تعيين
@@ -161,17 +161,17 @@ export function AssignmentsTab(_props: AssignmentsTabProps) {
             </div>
 
             {/* ── Loading / Error ── */}
-            {loading && <div style={{ textAlign: "center", padding: 60 }}><Loader2 size={30} className="animate-spin" style={{ color: "#004786", margin: "0 auto 12px" }} /><p style={{ fontSize: 13, color: "#6b7280" }}>جاري تحميل التعيينات...</p></div>}
-            {error && <div style={{ display: "flex", alignItems: "center", gap: 10, padding: 16, borderRadius: 14, background: "rgba(239,68,68,0.05)", color: "#ef4444", fontSize: 13, border: "1px solid rgba(239,68,68,0.12)" }}><AlertCircle size={18} /> {error}</div>}
+            {loading && <div style={{ textAlign: "center", padding: 60 }}><Loader2 size={30} className="animate-spin" style={{ color: "var(--t-accent)", margin: "0 auto 12px" }} /><p style={{ fontSize: 13, color: "var(--t-text-muted)" }}>جاري تحميل التعيينات...</p></div>}
+            {error && <div style={{ display: "flex", alignItems: "center", gap: 10, padding: 16, borderRadius: 14, background: "rgba(239,68,68,0.05)", color: "var(--t-danger)", fontSize: 13, border: "1px solid rgba(239,68,68,0.12)" }}><AlertCircle size={18} /> {error}</div>}
 
             {/* ── Table ── */}
             {!loading && !error && (
-                <div style={{ borderRadius: 16, border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-card, #fff)", overflow: "hidden" }}>
+                <div style={{ borderRadius: 16, border: "1px solid var(--t-border-light, var(--t-border))", background: "var(--t-card, #fff)", overflow: "hidden" }}>
                     <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
                         <thead>
-                            <tr style={{ background: "var(--t-surface, #f9fafb)" }}>
+                            <tr style={{ background: "var(--t-surface, var(--t-page))" }}>
                                 {["النوع", "الهدف", "القالب", "الأولوية", "الحالة", "الإجراءات"].map(h => (
-                                    <th key={h} style={{ padding: "12px 16px", textAlign: "right", fontWeight: 600, color: "var(--t-text-secondary, #6b7280)", fontSize: 11, textTransform: "uppercase", letterSpacing: 0.3, borderBottom: "1px solid var(--t-border-light, #e5e7eb)" }}>
+                                    <th key={h} style={{ padding: "12px 16px", textAlign: "right", fontWeight: 600, color: "var(--t-text-secondary, var(--t-text-muted))", fontSize: 11, textTransform: "uppercase", letterSpacing: 0.3, borderBottom: "1px solid var(--t-border-light, var(--t-border))" }}>
                                         {h}
                                     </th>
                                 ))}
@@ -183,7 +183,7 @@ export function AssignmentsTab(_props: AssignmentsTabProps) {
                                 const TIcon = tc.icon
                                 return (
                                     <tr key={a.assignment_id} style={{ borderBottom: "1px solid var(--t-border-light, #f0f0f0)", transition: "background 0.12s" }}
-                                        onMouseEnter={e => e.currentTarget.style.background = "var(--t-card-hover, #fafafa)"}
+                                        onMouseEnter={e => e.currentTarget.style.background = "var(--t-card-hover, var(--t-card-hover))"}
                                         onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
                                         <td style={{ padding: "12px 16px" }}>
                                             <span style={{
@@ -197,14 +197,14 @@ export function AssignmentsTab(_props: AssignmentsTabProps) {
                                         <td style={{ padding: "12px 16px" }}>
                                             <span style={{ fontWeight: 600, color: "var(--t-text, #1f2937)", fontSize: 13 }}>{a.target_id}</span>
                                         </td>
-                                        <td style={{ padding: "12px 16px", color: "var(--t-text-secondary, #6b7280)" }}>
+                                        <td style={{ padding: "12px 16px", color: "var(--t-text-secondary, var(--t-text-muted))" }}>
                                             {getTemplateName(a.template_id)}
                                         </td>
                                         <td style={{ padding: "12px 16px" }}>
                                             <span style={{
                                                 display: "inline-flex", alignItems: "center", gap: 3,
                                                 padding: "3px 9px", borderRadius: 8,
-                                                background: "rgba(0,71,134,0.06)", color: "#004786",
+                                                background: "rgba(27,80,145,0.06)", color: "var(--t-accent)",
                                                 fontSize: 12, fontWeight: 700,
                                             }}>
                                                 <Shield size={10} /> {a.priority}
@@ -214,11 +214,11 @@ export function AssignmentsTab(_props: AssignmentsTabProps) {
                                             <span style={{
                                                 display: "inline-flex", alignItems: "center", gap: 5,
                                                 fontSize: 12, fontWeight: 500,
-                                                color: a.is_active ? "#16a34a" : "#9ca3af",
+                                                color: a.is_active ? "#16a34a" : "var(--t-text-faint)",
                                             }}>
                                                 <span style={{
                                                     width: 7, height: 7, borderRadius: "50%",
-                                                    background: a.is_active ? "#16a34a" : "#d1d5db",
+                                                    background: a.is_active ? "#16a34a" : "var(--t-border-medium)",
                                                     boxShadow: a.is_active ? "0 0 6px rgba(22,163,74,0.4)" : "none",
                                                 }} />
                                                 {a.is_active ? "نشط" : "معطّل"}
@@ -228,21 +228,21 @@ export function AssignmentsTab(_props: AssignmentsTabProps) {
                                             <div style={{ display: "flex", gap: 4 }}>
                                                 {canUpdate && <button onClick={() => openEdit(a)} style={{
                                                     background: "transparent", border: "none", borderRadius: 8,
-                                                    padding: 6, cursor: "pointer", color: "var(--t-text-muted, #9ca3af)",
+                                                    padding: 6, cursor: "pointer", color: "var(--t-text-muted, var(--t-text-faint))",
                                                     transition: "all 0.15s", display: "flex", alignItems: "center",
                                                 }}
-                                                    onMouseEnter={e => { e.currentTarget.style.background = "var(--t-surface)"; e.currentTarget.style.color = "#004786" }}
-                                                    onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#9ca3af" }}
+                                                    onMouseEnter={e => { e.currentTarget.style.background = "var(--t-surface)"; e.currentTarget.style.color = "var(--t-accent)" }}
+                                                    onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--t-text-faint)" }}
                                                     title="تعديل">
                                                     <Edit3 size={14} />
                                                 </button>}
                                                 {canDelete && <button onClick={() => handleDelete(a.assignment_id)} style={{
                                                     background: "transparent", border: "none", borderRadius: 8,
-                                                    padding: 6, cursor: "pointer", color: "var(--t-text-muted, #9ca3af)",
+                                                    padding: 6, cursor: "pointer", color: "var(--t-text-muted, var(--t-text-faint))",
                                                     transition: "all 0.15s", display: "flex", alignItems: "center",
                                                 }}
-                                                    onMouseEnter={e => { e.currentTarget.style.background = "rgba(239,68,68,0.06)"; e.currentTarget.style.color = "#ef4444" }}
-                                                    onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#9ca3af" }}
+                                                    onMouseEnter={e => { e.currentTarget.style.background = "rgba(239,68,68,0.06)"; e.currentTarget.style.color = "var(--t-danger)" }}
+                                                    onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--t-text-faint)" }}
                                                     title="حذف">
                                                     <Trash2 size={14} />
                                                 </button>}
@@ -253,8 +253,8 @@ export function AssignmentsTab(_props: AssignmentsTabProps) {
                             })}
                             {filtered.length === 0 && (
                                 <tr>
-                                    <td colSpan={6} style={{ textAlign: "center", padding: 60, color: "var(--t-text-muted, #9ca3af)" }}>
-                                        <div style={{ width: 56, height: 56, borderRadius: 16, background: "var(--t-surface, #f3f4f6)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px" }}>
+                                    <td colSpan={6} style={{ textAlign: "center", padding: 60, color: "var(--t-text-muted, var(--t-text-faint))" }}>
+                                        <div style={{ width: 56, height: 56, borderRadius: 16, background: "var(--t-surface, var(--t-surface))", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px" }}>
                                             <Link2 size={24} style={{ opacity: 0.4 }} />
                                         </div>
                                         <p style={{ fontSize: 14, fontWeight: 600, marginBottom: 4 }}>لا توجد تعيينات</p>
@@ -277,7 +277,7 @@ export function AssignmentsTab(_props: AssignmentsTabProps) {
                         display: "flex", flexDirection: "column",
                     }}>
                         {/* Header */}
-                        <div style={{ background: "linear-gradient(160deg, #004786 0%, #0072b5 50%, #0098d6 100%)", padding: "18px 22px", position: "relative", overflow: "hidden", flexShrink: 0 }}>
+                        <div style={{ background: "var(--t-gradient-accent-wide)", padding: "18px 22px", position: "relative", overflow: "hidden", flexShrink: 0 }}>
                             <div style={{ position: "absolute", top: -20, left: -20, width: 80, height: 80, borderRadius: "50%", background: "rgba(255,255,255,0.06)" }} />
                             <div style={{ position: "relative", zIndex: 1, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -306,12 +306,12 @@ export function AssignmentsTab(_props: AssignmentsTabProps) {
                                                     <button key={key} onClick={() => { setFormType(key); setFormPriority(cfg.priority) }} style={{
                                                         flex: 1, padding: "10px 12px", borderRadius: 10, fontSize: 12, fontWeight: sel ? 600 : 500,
                                                         border: "2px solid", cursor: "pointer", transition: "all 0.2s",
-                                                        borderColor: sel ? cfg.color : "var(--t-border-light, #e5e7eb)",
+                                                        borderColor: sel ? cfg.color : "var(--t-border-light, var(--t-border))",
                                                         background: sel ? cfg.bg : "transparent",
                                                         color: sel ? cfg.color : "var(--t-text-secondary)",
                                                         display: "flex", flexDirection: "column", alignItems: "center", gap: 5,
                                                     }}>
-                                                        <div style={{ width: 28, height: 28, borderRadius: 8, background: sel ? cfg.color : "var(--t-surface, #f3f4f6)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                                        <div style={{ width: 28, height: 28, borderRadius: 8, background: sel ? cfg.color : "var(--t-surface, var(--t-surface))", display: "flex", alignItems: "center", justifyContent: "center" }}>
                                                             <cfg.icon size={13} style={{ color: sel ? "#fff" : cfg.color }} />
                                                         </div>
                                                         {cfg.label}
@@ -355,8 +355,8 @@ export function AssignmentsTab(_props: AssignmentsTabProps) {
                                 <div style={{ flex: 1 }}><label style={{ ...labelSt, display: "flex", alignItems: "center", gap: 4 }}><Calendar size={11} /> فعال من</label><input type="datetime-local" value={formEffFrom} onChange={e => setFormEffFrom(e.target.value)} style={inputSt} /></div>
                                 <div style={{ flex: 1 }}><label style={{ ...labelSt, display: "flex", alignItems: "center", gap: 4 }}><Calendar size={11} /> فعال حتى</label><input type="datetime-local" value={formEffUntil} onChange={e => setFormEffUntil(e.target.value)} style={inputSt} /></div>
                             </div>
-                            <div style={{ padding: 14, borderRadius: 12, background: "var(--t-surface, #f9fafb)", border: "1px solid var(--t-border-light, #f0f0f0)", display: "flex", flexDirection: "column", gap: 10 }}>
-                                <p style={{ fontSize: 12, fontWeight: 700, color: "#004786", margin: 0, display: "flex", alignItems: "center", gap: 6 }}>📋 تخصيصات العرض (اختياري)</p>
+                            <div style={{ padding: 14, borderRadius: 12, background: "var(--t-surface, var(--t-page))", border: "1px solid var(--t-border-light, #f0f0f0)", display: "flex", flexDirection: "column", gap: 10 }}>
+                                <p style={{ fontSize: 12, fontWeight: 700, color: "var(--t-accent)", margin: 0, display: "flex", alignItems: "center", gap: 6 }}>📋 تخصيصات العرض (اختياري)</p>
                                 <div><label style={{ ...labelSt, fontSize: 11 }}>عنوان مخصص (Header)</label><input value={formCustHeader} onChange={e => setFormCustHeader(e.target.value)} placeholder="ترحيب مخصص" style={inputSt} /></div>
                                 <div><label style={{ ...labelSt, fontSize: 11 }}>تذييل مخصص (Footer)</label><input value={formCustFooter} onChange={e => setFormCustFooter(e.target.value)} placeholder="تذييل مخصص" style={inputSt} /></div>
                                 <div><label style={{ ...labelSt, fontSize: 11 }}>زر مخصص (Button)</label><input value={formCustButton} onChange={e => setFormCustButton(e.target.value)} placeholder="زر مخصص" style={inputSt} /></div>
@@ -365,7 +365,7 @@ export function AssignmentsTab(_props: AssignmentsTabProps) {
                                 <label style={{ ...labelSt, margin: 0 }}>نشط</label>
                                 <button onClick={() => setFormActive(!formActive)} style={{
                                     width: 42, height: 24, borderRadius: 12, border: "none", cursor: "pointer",
-                                    background: formActive ? "#004786" : "#d1d5db", position: "relative", transition: "all 0.2s",
+                                    background: formActive ? "var(--t-accent)" : "var(--t-border-medium)", position: "relative", transition: "all 0.2s",
                                 }}>
                                     <div style={{
                                         width: 18, height: 18, borderRadius: "50%", background: "#fff",
@@ -381,11 +381,11 @@ export function AssignmentsTab(_props: AssignmentsTabProps) {
                             <button onClick={resetForm} style={{ padding: "9px 20px", borderRadius: 10, border: "1px solid var(--t-border-light)", background: "transparent", color: "var(--t-text-secondary)", fontSize: 13, cursor: "pointer" }}>إلغاء</button>
                             <button onClick={handleSubmit} disabled={submitting || (!editingAssignment && (!formTargetId.trim() || !formTemplateId))} style={{
                                 padding: "9px 22px", borderRadius: 10, border: "none",
-                                background: "linear-gradient(135deg, #004786, #0098d6)",
+                                background: "var(--t-gradient-accent)",
                                 color: "#fff", fontSize: 13, fontWeight: 600, cursor: "pointer",
                                 display: "flex", alignItems: "center", gap: 6,
                                 opacity: submitting || (!editingAssignment && (!formTargetId.trim() || !formTemplateId)) ? 0.6 : 1,
-                                boxShadow: "0 3px 12px rgba(0,71,134,0.2)", transition: "all 0.2s",
+                                boxShadow: "0 3px 12px var(--t-accent-muted)", transition: "all 0.2s",
                             }}>
                                 {submitting && <Loader2 size={13} className="animate-spin" />}
                                 {editingAssignment ? <><Save size={13} /> حفظ</> : <><Plus size={13} /> إنشاء</>}

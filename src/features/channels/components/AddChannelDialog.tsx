@@ -11,10 +11,10 @@ import { toast } from "sonner"
 /* ──────────── CSS ──────────── */
 const CSS = `
 @keyframes dlgIn{from{opacity:0;transform:scale(.96) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
-.dlg-field { width:100%; padding:9px 12px; border-radius:9px; border:1.5px solid #e0e3e7; background:#fafafa; font-size:13px; color:var(--t-text,#111827); outline:none; transition:border-color .15s,box-shadow .15s; box-sizing:border-box; font-family:inherit; }
-.dlg-field:focus { border-color:#004786; box-shadow:0 0 0 3px rgba(0,71,134,.06); }
+.dlg-field { width:100%; padding:9px 12px; border-radius:9px; border:1.5px solid var(--t-border); background:var(--t-card-hover); font-size:13px; color:var(--t-text,var(--t-text)); outline:none; transition:border-color .15s,box-shadow .15s; box-sizing:border-box; font-family:inherit; }
+.dlg-field:focus { border-color:var(--t-accent); box-shadow:0 0 0 3px rgba(27,80,145,.06); }
 .dlg-field[dir=ltr],.dlg-field.mono { font-family:monospace; }
-.dlg-label { font-size:10px; font-weight:800; letter-spacing:.07em; text-transform:uppercase; color:#6b7280; display:block; margin-bottom:5px; }
+.dlg-label { font-size:10px; font-weight:800; letter-spacing:.07em; text-transform:uppercase; color:var(--t-text-muted); display:block; margin-bottom:5px; }
 `
 
 interface FormState {
@@ -45,7 +45,7 @@ function PlatformPicker({ value, onChange, platforms }: { value: Platform; onCha
                 return (
                     <button key={p} type="button" onClick={() => onChange(p)} style={{
                         padding: "12px 6px", borderRadius: 11, border: `2px solid ${active ? m.color : "#eaedf0"}`,
-                        background: active ? `${m.color}0d` : "#fafafa",
+                        background: active ? `${m.color}0d` : "var(--t-card-hover)",
                         cursor: "pointer", textAlign: "center", transition: "all .15s",
                         fontFamily: "inherit",
                     }}>
@@ -56,7 +56,7 @@ function PlatformPicker({ value, onChange, platforms }: { value: Platform; onCha
                             fontSize: 15, filter: active ? "none" : "grayscale(.3)",
                             boxShadow: active ? `0 2px 6px ${m.color}30` : "none", transition: "all .15s",
                         }}>{m.icon}</div>
-                        <div style={{ fontSize: 10, fontWeight: 700, color: active ? m.color : "#9ca3af" }}>{m.labelAr}</div>
+                        <div style={{ fontSize: 10, fontWeight: 700, color: active ? m.color : "var(--t-text-faint)" }}>{m.labelAr}</div>
                     </button>
                 )
             })}
@@ -72,12 +72,12 @@ function SecretInput({ value, onChange, placeholder }: { value: string; onChange
             <input type={show ? "text" : "password"} value={value} onChange={e => onChange(e.target.value)}
                 placeholder={placeholder} dir="ltr" className="dlg-field mono" style={{ flex: 1 }} />
             <button type="button" onClick={() => setShow(!show)} style={{
-                width: 38, height: 38, borderRadius: 9, border: "1.5px solid #e0e3e7", flexShrink: 0,
-                background: "#fafafa", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
-                color: "#9ca3af", transition: "all .12s",
+                width: 38, height: 38, borderRadius: 9, border: "1.5px solid var(--t-border)", flexShrink: 0,
+                background: "var(--t-card-hover)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+                color: "var(--t-text-faint)", transition: "all .12s",
             }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = "#004786"; e.currentTarget.style.color = "#004786" }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = "#e0e3e7"; e.currentTarget.style.color = "#9ca3af" }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--t-accent)"; e.currentTarget.style.color = "var(--t-accent)" }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--t-border)"; e.currentTarget.style.color = "var(--t-text-faint)" }}
             >
                 {show ? <EyeOff size={14} /> : <Eye size={14} />}
             </button>
@@ -103,7 +103,7 @@ function OriginsEditor({ value, onChange }: { value: string; onChange: (v: strin
                     onKeyDown={e => e.key === "Enter" && (e.preventDefault(), add())} />
                 <button type="button" onClick={add} style={{
                     padding: "0 14px", borderRadius: 9, border: "none",
-                    background: "#004786", color: "#fff",
+                    background: "var(--t-brand-orange)", color: "#fff",
                     fontSize: 12, fontWeight: 700, cursor: "pointer", flexShrink: 0,
                 }}>
                     <Plus size={14} />
@@ -114,11 +114,11 @@ function OriginsEditor({ value, onChange }: { value: string; onChange: (v: strin
                     <span key={i} style={{
                         display: "inline-flex", alignItems: "center", gap: 5,
                         padding: "3px 10px", borderRadius: 20,
-                        background: "rgba(0,71,134,.04)", border: "1px solid rgba(0,71,134,.1)",
-                        fontSize: 11, fontFamily: "monospace", color: "#004786",
+                        background: "rgba(27,80,145,.04)", border: "1px solid rgba(27,80,145,.1)",
+                        fontSize: 11, fontFamily: "monospace", color: "var(--t-accent)",
                     }}>
                         {o}
-                        <button type="button" onClick={() => remove(i)} style={{ background: "none", border: "none", cursor: "pointer", color: "#dc2626", display: "flex", padding: 0, lineHeight: 1 }}>
+                        <button type="button" onClick={() => remove(i)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--t-danger)", display: "flex", padding: 0, lineHeight: 1 }}>
                             <X size={10} />
                         </button>
                     </span>
@@ -174,22 +174,22 @@ function IconUpload({ value, onChange }: { value: string; onChange: (v: string) 
             {preview ? (
                 <div style={{
                     display: "flex", alignItems: "center", gap: 10,
-                    padding: "6px 10px", borderRadius: 9, border: "1.5px solid #e0e3e7", background: "#fafafa",
+                    padding: "6px 10px", borderRadius: 9, border: "1.5px solid var(--t-border)", background: "var(--t-card-hover)",
                 }}>
                     <img src={preview} alt="icon" style={{
                         width: 32, height: 32, borderRadius: 7, objectFit: "cover",
-                        border: "1px solid #e0e3e7",
+                        border: "1px solid var(--t-border)",
                     }} />
-                    <span style={{ flex: 1, fontSize: 11, color: "#6b7280", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", direction: "ltr" }}>
+                    <span style={{ flex: 1, fontSize: 11, color: "var(--t-text-muted)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", direction: "ltr" }}>
                         {uploading ? "جاري الرفع..." : value || "uploaded"}
                     </span>
                     {uploading ? (
-                        <Loader2 size={14} style={{ color: "#004786", animation: "spin 1s linear infinite", flexShrink: 0 }} />
+                        <Loader2 size={14} style={{ color: "var(--t-accent)", animation: "spin 1s linear infinite", flexShrink: 0 }} />
                     ) : (
                         <button type="button" onClick={remove} style={{
                             display: "flex", alignItems: "center", justifyContent: "center",
                             width: 26, height: 26, borderRadius: 6, border: "none",
-                            background: "rgba(220,38,38,0.06)", cursor: "pointer", color: "#dc2626",
+                            background: "rgba(220,38,38,0.06)", cursor: "pointer", color: "var(--t-danger)",
                             flexShrink: 0, transition: "all .12s",
                         }}
                             onMouseEnter={e => { e.currentTarget.style.background = "rgba(220,38,38,0.12)" }}
@@ -203,12 +203,12 @@ function IconUpload({ value, onChange }: { value: string; onChange: (v: string) 
                 <button type="button" onClick={() => fileRef.current?.click()} style={{
                     display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
                     width: "100%", padding: "10px 12px", borderRadius: 9,
-                    border: "1.5px dashed #d1d5db", background: "#fafafa",
-                    cursor: "pointer", transition: "all .15s", color: "#9ca3af",
+                    border: "1.5px dashed var(--t-border-medium)", background: "var(--t-card-hover)",
+                    cursor: "pointer", transition: "all .15s", color: "var(--t-text-faint)",
                     fontSize: 12, fontWeight: 600, fontFamily: "inherit",
                 }}
-                    onMouseEnter={e => { e.currentTarget.style.borderColor = "#004786"; e.currentTarget.style.color = "#004786" }}
-                    onMouseLeave={e => { e.currentTarget.style.borderColor = "#d1d5db"; e.currentTarget.style.color = "#9ca3af" }}
+                    onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--t-accent)"; e.currentTarget.style.color = "var(--t-accent)" }}
+                    onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--t-border-medium)"; e.currentTarget.style.color = "var(--t-text-faint)" }}
                 >
                     <ImageIcon size={16} />
                     اختر صورة الأيقونة
@@ -311,7 +311,7 @@ export function AddChannelDialog({ defaultPlatform, onClose }: { defaultPlatform
                     <div>
                         <FieldLabel>لون الويدجت</FieldLabel>
                         <input type="color" value={form.color} onChange={e => set("color", e.target.value)}
-                            style={{ width: 38, height: 38, borderRadius: 9, border: "1.5px solid #e0e3e7", padding: 2, cursor: "pointer", background: "#fafafa" }} />
+                            style={{ width: 38, height: 38, borderRadius: 9, border: "1.5px solid var(--t-border)", padding: 2, cursor: "pointer", background: "var(--t-card-hover)" }} />
                     </div>
                 </div>
                 {textField("الاسم (اختياري)", "name", "Site Chat", "rtl")}
@@ -331,7 +331,7 @@ export function AddChannelDialog({ defaultPlatform, onClose }: { defaultPlatform
             }} dir="rtl">
                 {/* Gradient Header */}
                 <div style={{
-                    background: "linear-gradient(135deg, #004786, #0072b5)",
+                    background: "var(--t-brand-orange)",
                     padding: "18px 24px",
                     display: "flex", alignItems: "center", justifyContent: "space-between",
                 }}>
@@ -364,8 +364,8 @@ export function AddChannelDialog({ defaultPlatform, onClose }: { defaultPlatform
                                 boxShadow: `0 1px 4px ${PLATFORM_META[platform].color}25`,
                             }}>{PLATFORM_META[platform].icon}</div>
                             <div>
-                                <div style={{ fontSize: 12, fontWeight: 800, color: "#111827" }}>{PLATFORM_META[platform].labelAr}</div>
-                                <div style={{ fontSize: 9.5, color: "#9ca3af" }}>{PLATFORM_META[platform].label}</div>
+                                <div style={{ fontSize: 12, fontWeight: 800, color: "var(--t-text)" }}>{PLATFORM_META[platform].labelAr}</div>
+                                <div style={{ fontSize: 9.5, color: "var(--t-text-faint)" }}>{PLATFORM_META[platform].label}</div>
                             </div>
                         </div>
                     ) : (
@@ -391,17 +391,17 @@ export function AddChannelDialog({ defaultPlatform, onClose }: { defaultPlatform
                     {/* Submit */}
                     <div style={{ display: "flex", gap: 8, marginTop: 20, justifyContent: "flex-end" }}>
                         <button type="button" onClick={onClose} style={{
-                            padding: "9px 18px", borderRadius: 9, border: "1.5px solid #e0e3e7",
-                            background: "transparent", color: "var(--t-text, #374151)", fontSize: 13, fontWeight: 600,
+                            padding: "9px 18px", borderRadius: 9, border: "1.5px solid var(--t-border)",
+                            background: "transparent", color: "var(--t-text, var(--t-text-secondary))", fontSize: 13, fontWeight: 600,
                             cursor: "pointer", fontFamily: "inherit",
                         }}>
                             إلغاء
                         </button>
                         <button type="submit" disabled={createMut.isPending} style={{
                             display: "inline-flex", alignItems: "center", gap: 7, padding: "9px 22px", borderRadius: 9,
-                            border: "none", background: "#004786", color: "#fff",
+                            border: "none", background: "var(--t-brand-orange)", color: "#fff",
                             fontSize: 13, fontWeight: 700, cursor: "pointer", opacity: createMut.isPending ? 0.7 : 1,
-                            fontFamily: "inherit", boxShadow: "0 1px 3px rgba(0,71,134,.15)",
+                            fontFamily: "inherit", boxShadow: "0 1px 3px rgba(27,80,145,.15)",
                         }}>
                             {createMut.isPending ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
                             إنشاء القناة

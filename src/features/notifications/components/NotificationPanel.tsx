@@ -14,18 +14,18 @@ const TYPE_CONFIG: Record<string, { icon: typeof Bell; color: string; bg: string
     message: { icon: MessageSquare, color: "#2563eb", bg: "#eff6ff", label: "رسالة" },
     order_created: { icon: ShoppingCart, color: "#059669", bg: "#ecfdf5", label: "طلب جديد" },
     order_updated: { icon: Package, color: "#d97706", bg: "#fffbeb", label: "تحديث طلب" },
-    security_alert: { icon: ShieldAlert, color: "#dc2626", bg: "#fef2f2", label: "تنبيه أمني" },
+    security_alert: { icon: ShieldAlert, color: "var(--t-danger)", bg: "#fef2f2", label: "تنبيه أمني" },
     system_update: { icon: Zap, color: "#7c3aed", bg: "#f5f3ff", label: "تحديث النظام" },
     announcement: { icon: Megaphone, color: "#0891b2", bg: "#ecfeff", label: "إعلان" },
     reminder: { icon: Clock, color: "#ea580c", bg: "#fff7ed", label: "تذكير" },
     assignment: { icon: ClipboardList, color: "#4f46e5", bg: "#eef2ff", label: "تعيين" },
     team_assignment: { icon: ClipboardList, color: "#7c3aed", bg: "#f5f3ff", label: "تعيين فريق" },
-    conversation_closed: { icon: MessageSquare, color: "#6b7280", bg: "#f3f4f6", label: "إغلاق محادثة" },
+    conversation_closed: { icon: MessageSquare, color: "var(--t-text-muted)", bg: "var(--t-surface)", label: "إغلاق محادثة" },
     conversation_reopened: { icon: MessageSquare, color: "#059669", bg: "#ecfdf5", label: "إعادة فتح" },
     payment: { icon: ShoppingCart, color: "#0891b2", bg: "#ecfeff", label: "دفع" },
     welcome: { icon: Bell, color: "#059669", bg: "#ecfdf5", label: "ترحيب" },
     account_status: { icon: ShieldAlert, color: "#d97706", bg: "#fffbeb", label: "حالة الحساب" },
-    test: { icon: Bell, color: "#6b7280", bg: "#f3f4f6", label: "اختبار" },
+    test: { icon: Bell, color: "var(--t-text-muted)", bg: "var(--t-surface)", label: "اختبار" },
     handover: { icon: ArrowRightLeft, color: "#d97706", bg: "#fffbeb", label: "تحويل محادثة" },
     login: { icon: LogIn, color: "#059669", bg: "#ecfdf5", label: "تسجيل دخول" },
     mention: { icon: AtSign, color: "#e11d48", bg: "#fff1f2", label: "منشن" },
@@ -33,7 +33,7 @@ const TYPE_CONFIG: Record<string, { icon: typeof Bell; color: string; bg: string
 
 function getTypeConfig(type?: string | null) {
     if (type && TYPE_CONFIG[type]) return TYPE_CONFIG[type]
-    return { icon: Bell, color: "#6b7280", bg: "#f3f4f6", label: "إشعار" }
+    return { icon: Bell, color: "var(--t-text-muted)", bg: "var(--t-surface)", label: "إشعار" }
 }
 
 /* ── Human-readable data key labels ── */
@@ -288,15 +288,15 @@ export default function NotificationPanel({
                     {loading ? (
                         <div className="np-empty-state">
                             <div className="np-spinner" />
-                            <span style={{ fontSize: 12, color: "var(--t-text-faint, #9ca3af)" }}>جاري التحميل...</span>
+                            <span style={{ fontSize: 12, color: "var(--t-text-faint, var(--t-text-faint))" }}>جاري التحميل...</span>
                         </div>
                     ) : notifications.length === 0 ? (
                         <div className="np-empty-state">
                             <div className="np-empty-icon">
-                                <BellOff size={22} style={{ color: "var(--t-text-faint, #d1d5db)" }} />
+                                <BellOff size={22} style={{ color: "var(--t-text-faint, var(--t-border-medium))" }} />
                             </div>
-                            <span style={{ fontSize: 13, fontWeight: 600, color: "var(--t-text-secondary, #6b7280)" }}>لا توجد إشعارات</span>
-                            <span style={{ fontSize: 11, color: "var(--t-text-faint, #9ca3af)" }}>ستظهر إشعاراتك هنا</span>
+                            <span style={{ fontSize: 13, fontWeight: 600, color: "var(--t-text-secondary, var(--t-text-muted))" }}>لا توجد إشعارات</span>
+                            <span style={{ fontSize: 11, color: "var(--t-text-faint, var(--t-text-faint))" }}>ستظهر إشعاراتك هنا</span>
                         </div>
                     ) : (
                         <>
@@ -386,7 +386,7 @@ export default function NotificationPanel({
                     max-height: min(560px, calc(100vh - 72px));
                     border-radius: 16px;
                     background: var(--t-card, #fff);
-                    border: 1px solid var(--t-border-light, #e5e7eb);
+                    border: 1px solid var(--t-border-light, var(--t-border));
                     box-shadow: 0 20px 56px -8px rgba(0,0,0,0.2), 0 6px 20px -6px rgba(0,0,0,0.1);
                     z-index: 9998; overflow: hidden;
                     display: flex; flex-direction: column;
@@ -400,33 +400,33 @@ export default function NotificationPanel({
                     border-bottom: 1px solid var(--t-border-light, #f0f0f0);
                     flex-shrink: 0;
                 }
-                .np-header-title { font-size: 13.5px; font-weight: 800; color: var(--t-text, #111827); }
+                .np-header-title { font-size: 13.5px; font-weight: 800; color: var(--t-text, var(--t-text)); }
                 .np-unread-badge {
                     font-size: 10px; font-weight: 800; color: #fff;
-                    background: linear-gradient(135deg, #ef4444, #dc2626);
+                    background: linear-gradient(135deg, var(--t-danger), var(--t-danger));
                     border-radius: 8px; padding: 0px 6px; min-width: 16px;
                     text-align: center; line-height: 17px;
                 }
                 .np-total-label {
-                    font-size: 10px; color: var(--t-text-faint, #9ca3af);
+                    font-size: 10px; color: var(--t-text-faint, var(--t-text-faint));
                     font-weight: 500;
                 }
                 .np-mark-all-btn {
                     display: flex; align-items: center; gap: 3;
                     background: none; border: none; cursor: pointer;
-                    color: var(--t-primary, #0072b5); font-size: 11px; font-weight: 600;
+                    color: var(--t-primary, var(--t-accent-secondary)); font-size: 11px; font-weight: 600;
                     padding: 4px 8px; border-radius: 7px; transition: background 0.15s;
                     font-family: inherit;
                 }
-                .np-mark-all-btn:hover { background: var(--t-surface, #f3f4f6); }
+                .np-mark-all-btn:hover { background: var(--t-surface, var(--t-surface)); }
                 .np-close-btn {
                     width: 28px; height: 28px; border-radius: 8px;
                     background: none; border: none; cursor: pointer;
-                    color: var(--t-text-faint, #9ca3af);
+                    color: var(--t-text-faint, var(--t-text-faint));
                     display: flex; align-items: center; justify-content: center;
                     transition: all 0.15s;
                 }
-                .np-close-btn:hover { background: var(--t-surface, #f3f4f6); color: var(--t-text, #111); }
+                .np-close-btn:hover { background: var(--t-surface, var(--t-surface)); color: var(--t-text, #111); }
 
                 /* ── List items ── */
                 .np-item {
@@ -437,7 +437,7 @@ export default function NotificationPanel({
                     font-family: inherit;
                 }
                 .np-item[data-unread="true"] { background: rgba(0,114,181,0.035); }
-                .np-item:hover { background: var(--t-surface, rgba(0,114,181,0.06)); }
+                .np-item:hover { background: var(--t-surface, var(--t-accent-muted)); }
                 .np-item[data-unread="true"]:hover { background: rgba(0,114,181,0.07); }
 
                 .np-item-icon {
@@ -446,15 +446,15 @@ export default function NotificationPanel({
                 }
                 .np-item-title {
                     font-size: 11.5px; font-weight: 500;
-                    color: var(--t-text, #111827);
+                    color: var(--t-text, var(--t-text));
                     overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;
                 }
                 .np-item-title[data-unread="true"] { font-weight: 700; }
                 .np-item-time {
-                    font-size: 10px; color: var(--t-text-faint, #9ca3af); flex-shrink: 0;
+                    font-size: 10px; color: var(--t-text-faint, var(--t-text-faint)); flex-shrink: 0;
                 }
                 .np-item-body {
-                    font-size: 11px; color: var(--t-text-faint, #6b7280);
+                    font-size: 11px; color: var(--t-text-faint, var(--t-text-muted));
                     overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
                 }
                 .np-item-type-tag {
@@ -462,13 +462,13 @@ export default function NotificationPanel({
                     border-radius: 5px; white-space: nowrap;
                 }
                 .np-item-nav-hint {
-                    font-size: 9px; color: var(--t-primary, #0072b5);
+                    font-size: 9px; color: var(--t-primary, var(--t-accent-secondary));
                     display: inline-flex; align-items: center; gap: 2;
                     font-weight: 600; opacity: 0.7;
                 }
                 .np-unread-dot {
                     width: 7px; height: 7px; border-radius: 50%;
-                    background: linear-gradient(135deg, #0072b5, #004786);
+                    background: var(--t-gradient-accent);
                     box-shadow: 0 0 6px rgba(0,114,181,0.4);
                 }
 
@@ -479,16 +479,16 @@ export default function NotificationPanel({
                 .np-load-more-btn {
                     display: flex; align-items: center; gap: 5;
                     padding: 7px 18px; border-radius: 8px;
-                    border: 1px solid var(--t-border, #e5e7eb);
-                    background: var(--t-surface, #f9fafb);
+                    border: 1px solid var(--t-border, var(--t-border));
+                    background: var(--t-surface, var(--t-page));
                     color: var(--t-text-secondary, #4b5563);
                     font-size: 11.5px; font-weight: 600; cursor: pointer;
                     transition: all 0.15s; font-family: inherit;
                 }
                 .np-load-more-btn:hover:not(:disabled) {
                     background: var(--t-card, #fff);
-                    border-color: var(--t-primary, #0072b5);
-                    color: var(--t-primary, #0072b5);
+                    border-color: var(--t-primary, var(--t-accent-secondary));
+                    color: var(--t-primary, var(--t-accent-secondary));
                     box-shadow: 0 2px 8px rgba(0,114,181,0.1);
                 }
                 .np-load-more-btn:disabled { opacity: 0.6; cursor: not-allowed; }
@@ -498,11 +498,11 @@ export default function NotificationPanel({
                     display: flex; align-items: center; gap: 6;
                     padding: 10px 14px; background: none; border: none;
                     border-bottom: 1px solid var(--t-border-light, #f0f0f0);
-                    cursor: pointer; color: var(--t-primary, #0072b5);
+                    cursor: pointer; color: var(--t-primary, var(--t-accent-secondary));
                     font-size: 12px; font-weight: 600; transition: all 0.15s;
                     font-family: inherit; flex-shrink: 0;
                 }
-                .np-back-btn:hover { background: var(--t-surface, #f9fafb); }
+                .np-back-btn:hover { background: var(--t-surface, var(--t-page)); }
 
                 .np-detail-icon {
                     width: 40px; height: 40px; border-radius: 12px;
@@ -519,36 +519,36 @@ export default function NotificationPanel({
                     border-radius: 6px;
                 }
                 .np-read-badge[data-read="true"] {
-                    background: var(--t-surface, #f3f4f6);
-                    color: var(--t-text-faint, #9ca3af);
+                    background: var(--t-surface, var(--t-surface));
+                    color: var(--t-text-faint, var(--t-text-faint));
                 }
                 .np-read-badge[data-read="false"] {
                     background: rgba(0,114,181,0.1);
-                    color: #0072b5;
+                    color: var(--t-accent-secondary);
                 }
 
                 .np-detail-title {
-                    font-size: 14.5px; font-weight: 800; color: var(--t-text, #111827);
+                    font-size: 14.5px; font-weight: 800; color: var(--t-text, var(--t-text));
                     margin: 0 0 8px; line-height: 1.5; letter-spacing: -0.01em;
                 }
                 .np-detail-body {
-                    font-size: 13px; color: var(--t-text-secondary, #374151);
+                    font-size: 13px; color: var(--t-text-secondary, var(--t-text-secondary));
                     line-height: 1.8; margin: 0 0 16px; white-space: pre-wrap;
                 }
 
                 /* ── Data section ── */
                 .np-data-section {
-                    background: var(--t-surface, #f9fafb);
+                    background: var(--t-surface, var(--t-page));
                     border: 1px solid var(--t-border-light, #f0f0f0);
                     border-radius: 10px; padding: 10px 12px;
                     margin-bottom: 14px;
                 }
                 .np-data-header {
                     display: flex; align-items: center; gap: 5;
-                    font-size: 10px; font-weight: 700; color: var(--t-text-faint, #9ca3af);
+                    font-size: 10px; font-weight: 700; color: var(--t-text-faint, var(--t-text-faint));
                     text-transform: uppercase; letter-spacing: 0.04em;
                     margin-bottom: 8px; padding-bottom: 6px;
-                    border-bottom: 1px solid var(--t-border-light, #e5e7eb);
+                    border-bottom: 1px solid var(--t-border-light, var(--t-border));
                 }
                 .np-data-row {
                     display: flex; align-items: center; justify-content: space-between;
@@ -559,11 +559,11 @@ export default function NotificationPanel({
                     padding-top: 5px;
                 }
                 .np-data-label {
-                    font-size: 11px; font-weight: 600; color: var(--t-text-muted, #6b7280);
+                    font-size: 11px; font-weight: 600; color: var(--t-text-muted, var(--t-text-muted));
                     flex-shrink: 0;
                 }
                 .np-data-value {
-                    font-size: 11px; font-weight: 500; color: var(--t-text, #111827);
+                    font-size: 11px; font-weight: 500; color: var(--t-text, var(--t-text));
                     text-align: left; overflow: hidden; text-overflow: ellipsis;
                     white-space: nowrap; max-width: 180px;
                     font-family: 'SF Mono', 'Fira Code', monospace;
@@ -571,7 +571,7 @@ export default function NotificationPanel({
 
                 .np-detail-time {
                     display: flex; align-items: center; gap: 5;
-                    font-size: 11px; color: var(--t-text-faint, #9ca3af);
+                    font-size: 11px; color: var(--t-text-faint, var(--t-text-faint));
                     margin-bottom: 16px;
                 }
 
@@ -579,14 +579,14 @@ export default function NotificationPanel({
                 .np-nav-btn {
                     display: flex; align-items: center; justify-content: center; gap: 7;
                     width: 100%; padding: 10px; border-radius: 10px; border: none;
-                    background: linear-gradient(135deg, #0072b5, #004786);
+                    background: var(--t-gradient-accent);
                     color: #fff; font-size: 12.5px; font-weight: 700;
                     cursor: pointer; transition: all 0.2s; font-family: inherit;
-                    box-shadow: 0 4px 14px rgba(0,71,134,0.25);
+                    box-shadow: 0 4px 14px rgba(27,80,145,0.25);
                 }
                 .np-nav-btn:hover {
                     transform: translateY(-1px);
-                    box-shadow: 0 6px 20px rgba(0,71,134,0.35);
+                    box-shadow: 0 6px 20px rgba(27,80,145,0.35);
                 }
                 .np-nav-btn:active { transform: translateY(0); }
 
@@ -597,13 +597,13 @@ export default function NotificationPanel({
                 }
                 .np-empty-icon {
                     width: 48px; height: 48px; border-radius: 14px;
-                    background: var(--t-surface, #f3f4f6);
+                    background: var(--t-surface, var(--t-surface));
                     display: flex; align-items: center; justify-content: center;
                 }
                 .np-spinner {
                     width: 22px; height: 22px;
-                    border: 2.5px solid var(--t-border-light, #e5e7eb);
-                    border-top-color: var(--t-primary, #0072b5);
+                    border: 2.5px solid var(--t-border-light, var(--t-border));
+                    border-top-color: var(--t-primary, var(--t-accent-secondary));
                     border-radius: 50%; animation: npSpin .6s linear infinite;
                 }
 

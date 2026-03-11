@@ -74,7 +74,7 @@ export function ConversationHeader({ customer: c }: Props) {
                 .ch-bottom-border {
                     position:absolute; bottom:0; left:0; right:0;
                     height:2px;
-                    background:linear-gradient(90deg, transparent, rgba(0,114,181,0.15), rgba(0,71,134,0.2), rgba(0,114,181,0.15), transparent);
+                    background:linear-gradient(90deg, transparent, rgba(0,114,181,0.15), var(--t-accent-muted), rgba(0,114,181,0.15), transparent);
                 }
 
                 .ch-identity {
@@ -89,7 +89,7 @@ export function ConversationHeader({ customer: c }: Props) {
                     border:1px solid transparent;
                 }
                 .ch-avatar-click:hover {
-                    background:rgba(0,114,181,0.06);
+                    background:var(--t-accent-muted);
                     border-color:rgba(0,114,181,0.1);
                 }
                 .ch-avatar {
@@ -112,18 +112,18 @@ export function ConversationHeader({ customer: c }: Props) {
                     padding:2px 9px; border-radius:6px;
                     font-size:11px; font-weight:600;
                     white-space:nowrap; flex-shrink:0;
-                    background:rgba(0,71,134,0.06);
-                    color:#004786;
-                    border:1px solid rgba(0,71,134,0.1);
+                    background:rgba(27,80,145,0.06);
+                    color:var(--t-accent);
+                    border:1px solid rgba(27,80,145,0.1);
                 }
                 .ch-account-name {
                     font-size:10.5px; font-weight:600;
-                    color:var(--t-text-muted, #6b7280);
+                    color:var(--t-text-muted, var(--t-text-muted));
                     white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
                     max-width:140px; flex-shrink:1;
                     padding:2px 8px; border-radius:5px;
-                    background:var(--t-surface, #f3f4f6);
-                    border:1px solid var(--t-border-light, #e5e7eb);
+                    background:var(--t-surface, var(--t-surface));
+                    border:1px solid var(--t-border-light, var(--t-border));
                 }
                 .ch-platform {
                     display:inline-flex; align-items:center; gap:3px;
@@ -148,9 +148,9 @@ export function ConversationHeader({ customer: c }: Props) {
                     color:var(--t-text);
                 }
                 .ch-icon-active {
-                    background:rgba(0,114,181,0.06) !important;
-                    border-color:#0072b5 !important;
-                    color:#0072b5 !important;
+                    background:var(--t-accent-muted) !important;
+                    border-color:var(--t-accent-secondary) !important;
+                    color:var(--t-accent-secondary) !important;
                 }
             `}</style>
         </div>

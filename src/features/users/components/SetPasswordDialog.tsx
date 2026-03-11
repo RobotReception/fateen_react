@@ -19,9 +19,9 @@ interface SetPasswordDialogProps {
 
 const CSS = `@keyframes dlgSlide{from{opacity:0;transform:translateY(16px) scale(0.97)}to{opacity:1;transform:none}}`
 
-const inputCls = `w-full rounded-lg border border-gray-200 bg-[var(--t-surface,#fafafa)] px-3.5 py-2.5 text-sm text-[var(--t-text,#111827)]
+const inputCls = `w-full rounded-lg border border-gray-200 bg-[var(--t-surface,var(--t-card-hover))] px-3.5 py-2.5 text-sm text-[var(--t-text,var(--t-text))]
     outline-none transition-all placeholder:text-gray-400
-    focus:border-[#004786] focus:bg-white focus:ring-2 focus:ring-[#004786]/10`
+    focus:border-[var(--t-accent)] focus:bg-white focus:ring-2 focus:ring-[var(--t-accent)]/10`
 
 export function SetPasswordDialog({ open, targetUser, onClose }: SetPasswordDialogProps) {
     const [loading, setLoading] = useState(false)
@@ -77,7 +77,7 @@ export function SetPasswordDialog({ open, targetUser, onClose }: SetPasswordDial
             >
                 {/* ── Gradient header ── */}
                 <div style={{
-                    background: "linear-gradient(135deg, #004786, #0072b5)",
+                    background: "var(--t-brand-orange)",
                     padding: "16px 20px",
                     display: "flex", alignItems: "center", justifyContent: "space-between",
                 }}>
@@ -167,16 +167,16 @@ export function SetPasswordDialog({ open, targetUser, onClose }: SetPasswordDial
                         }}>
                             <button type="button" onClick={onClose} style={{
                                 padding: "8px 18px", borderRadius: 9, border: "1px solid var(--t-border, #dcdfe3)",
-                                background: "var(--t-card, #fff)", color: "var(--t-text-secondary, #6b7280)",
+                                background: "var(--t-card, #fff)", color: "var(--t-text-secondary, var(--t-text-muted))",
                                 fontSize: 12, fontWeight: 500, cursor: "pointer", fontFamily: "inherit",
                             }}>إلغاء</button>
                             <button type="submit" disabled={loading} style={{
                                 padding: "8px 20px", borderRadius: 9, border: "none",
-                                background: "#004786", color: "#fff",
+                                background: "var(--t-brand-orange)", color: "#fff",
                                 fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
                                 display: "flex", alignItems: "center", gap: 5,
                                 opacity: loading ? 0.5 : 1,
-                                boxShadow: "0 1px 3px rgba(0,71,134,0.15)",
+                                boxShadow: "0 1px 3px rgba(27,80,145,0.15)",
                             }}>
                                 {loading ? <Loader2 size={14} className="animate-spin" /> : <KeyRound size={14} />}
                                 تعيين كلمة المرور

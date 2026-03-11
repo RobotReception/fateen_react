@@ -16,11 +16,10 @@ import type { TenantAnalyticsParams } from "../types"
 import { ActionGuard } from "@/components/guards/ActionGuard"
 import { PAGE_BITS, ACTION_BITS } from "@/lib/permissions"
 
-/* ══════════ COLORS — Fateen palette ══════════ */
+/* ══════════ COLORS — DarAI palette ══════════ */
 const CHART_COLORS = [
-    "#004786", "#0072b5", "#0098d6", "#2ab5e8",
-    "#005a9e", "#003b6f", "#00acc1", "#4fc3f7",
-    "#1565c0", "#0288d1",
+    "var(--t-accent)", "var(--t-brand-orange)", "var(--t-accent-secondary)", "var(--t-brand-orange-hover)", "var(--t-accent-light)",
+    "var(--t-brand-orange-hover)", "#005a9e", "#003b6f", "#00acc1", "#4fc3f7",
 ]
 
 /* ══════════ CUSTOM TOOLTIP ══════════ */
@@ -29,15 +28,15 @@ function ChartTooltip({ active, payload, label }: { active?: boolean; payload?: 
     return (
         <div dir="rtl" style={{
             background: "#fff",
-            border: "1px solid var(--t-border-light, #e5e7eb)",
+            border: "1px solid var(--t-border-light, var(--t-border))",
             borderRadius: 10,
             padding: "10px 14px",
             boxShadow: "0 8px 24px -6px rgba(0,0,0,0.1)",
         }}>
-            {label && <p style={{ fontSize: 12, fontWeight: 600, color: "var(--t-text, #374151)", marginBottom: 4 }}>{label}</p>}
+            {label && <p style={{ fontSize: 12, fontWeight: 600, color: "var(--t-text, var(--t-text-secondary))", marginBottom: 4 }}>{label}</p>}
             {payload.map((entry, i) => (
-                <p key={i} style={{ fontSize: 11, color: "var(--t-text-secondary, #6b7280)" }}>
-                    <span style={{ fontWeight: 700, color: "#004786" }}>{entry.value.toLocaleString()}</span> {entry.name}
+                <p key={i} style={{ fontSize: 11, color: "var(--t-text-secondary, var(--t-text-muted))" }}>
+                    <span style={{ fontWeight: 700, color: "var(--t-accent)" }}>{entry.value.toLocaleString()}</span> {entry.name}
                 </p>
             ))}
         </div>
@@ -59,33 +58,33 @@ function StatCard({ title, value, icon: Icon, loading }: {
     return (
         <div style={{
             background: "var(--t-card, #fff)",
-            border: "1px solid var(--t-border-light, #e5e7eb)",
+            border: "1px solid var(--t-border-light, var(--t-border))",
             borderRadius: 12,
             padding: "18px 20px",
             transition: "box-shadow 0.2s, border-color 0.2s",
         }}
             onMouseEnter={e => {
-                e.currentTarget.style.boxShadow = "0 4px 16px -4px rgba(0,71,134,0.08)"
-                e.currentTarget.style.borderColor = "rgba(0,71,134,0.15)"
+                e.currentTarget.style.boxShadow = "0 4px 16px -4px rgba(27,80,145,0.08)"
+                e.currentTarget.style.borderColor = "rgba(27,80,145,0.15)"
             }}
             onMouseLeave={e => {
                 e.currentTarget.style.boxShadow = "none"
-                e.currentTarget.style.borderColor = "var(--t-border-light, #e5e7eb)"
+                e.currentTarget.style.borderColor = "var(--t-border-light, var(--t-border))"
             }}
         >
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <div>
-                    <p style={{ fontSize: 11, fontWeight: 500, color: "var(--t-text-faint, #9ca3af)", letterSpacing: "0.3px" }}>{title}</p>
+                    <p style={{ fontSize: 11, fontWeight: 500, color: "var(--t-text-faint, var(--t-text-faint))", letterSpacing: "0.3px" }}>{title}</p>
                     <p style={{ fontSize: 24, fontWeight: 700, color: "var(--t-text, #1f2937)", marginTop: 6 }}>
                         {loading ? "—" : value}
                     </p>
                 </div>
                 <div style={{
                     width: 42, height: 42, borderRadius: 10,
-                    background: "rgba(0,71,134,0.06)",
+                    background: "var(--t-brand-orange-muted)",
                     display: "flex", alignItems: "center", justifyContent: "center",
                 }}>
-                    <Icon size={20} strokeWidth={1.6} style={{ color: "#004786" }} />
+                    <Icon size={20} strokeWidth={1.6} style={{ color: "var(--t-brand-orange)" }} />
                 </div>
             </div>
         </div>
@@ -99,13 +98,13 @@ function ChartSection({ title, subtitle, children }: {
     return (
         <div style={{
             background: "var(--t-card, #fff)",
-            border: "1px solid var(--t-border-light, #e5e7eb)",
+            border: "1px solid var(--t-border-light, var(--t-border))",
             borderRadius: 12,
             padding: "20px 24px",
         }}>
             <div style={{ marginBottom: 16 }}>
                 <h3 style={{ fontSize: 14, fontWeight: 600, color: "var(--t-text, #1f2937)" }}>{title}</h3>
-                <p style={{ fontSize: 11, color: "var(--t-text-faint, #9ca3af)", marginTop: 2 }}>{subtitle}</p>
+                <p style={{ fontSize: 11, color: "var(--t-text-faint, var(--t-text-faint))", marginTop: 2 }}>{subtitle}</p>
             </div>
             {children}
         </div>
@@ -204,14 +203,14 @@ export function DocumentAnalyticsTab() {
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                     <div style={{
                         width: 40, height: 40, borderRadius: 10,
-                        background: "linear-gradient(135deg, #004786, #0098d6)",
+                        background: "var(--t-gradient-accent)",
                         display: "flex", alignItems: "center", justifyContent: "center",
                     }}>
                         <TrendingUp size={20} style={{ color: "#fff" }} />
                     </div>
                     <div>
                         <h2 style={{ fontSize: 18, fontWeight: 700, color: "var(--t-text, #1f2937)", margin: 0 }}>تحليلات المستندات</h2>
-                        <p style={{ fontSize: 12, color: "var(--t-text-faint, #9ca3af)", marginTop: 2 }}>
+                        <p style={{ fontSize: 12, color: "var(--t-text-faint, var(--t-text-faint))", marginTop: 2 }}>
                             إحصائيات شاملة عن المستندات والملفات
                         </p>
                     </div>
@@ -223,15 +222,15 @@ export function DocumentAnalyticsTab() {
                         style={{
                             display: "flex", alignItems: "center", gap: 6,
                             padding: "8px 16px", borderRadius: 8,
-                            border: "1px solid var(--t-border-light, #e5e7eb)",
+                            border: "1px solid var(--t-border-light, var(--t-border))",
                             background: "var(--t-card, #fff)",
-                            fontSize: 13, fontWeight: 500, color: "var(--t-text-secondary, #6b7280)",
+                            fontSize: 13, fontWeight: 500, color: "var(--t-text-secondary, var(--t-text-muted))",
                             cursor: "pointer",
                             transition: "all 0.15s",
                             opacity: isFetching ? 0.5 : 1,
                         }}
-                        onMouseEnter={e => { e.currentTarget.style.borderColor = "#004786"; e.currentTarget.style.color = "#004786" }}
-                        onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--t-border-light, #e5e7eb)"; e.currentTarget.style.color = "var(--t-text-secondary, #6b7280)" }}
+                        onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--t-accent)"; e.currentTarget.style.color = "var(--t-accent)" }}
+                        onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--t-border-light, var(--t-border))"; e.currentTarget.style.color = "var(--t-text-secondary, var(--t-text-muted))" }}
                     >
                         <RefreshCw size={14} className={isFetching ? "animate-spin" : ""} />
                         تحديث
@@ -244,25 +243,25 @@ export function DocumentAnalyticsTab() {
                 display: "flex", flexWrap: "wrap", alignItems: "center", gap: 10,
                 padding: "12px 16px",
                 background: "var(--t-card, #fff)",
-                border: "1px solid var(--t-border-light, #e5e7eb)",
+                border: "1px solid var(--t-border-light, var(--t-border))",
                 borderRadius: 10,
             }}>
-                <Filter size={14} style={{ color: "var(--t-text-faint, #9ca3af)" }} />
-                <span style={{ fontSize: 11, fontWeight: 600, color: "var(--t-text-faint, #9ca3af)", marginLeft: 4 }}>فلترة:</span>
+                <Filter size={14} style={{ color: "var(--t-text-faint, var(--t-text-faint))" }} />
+                <span style={{ fontSize: 11, fontWeight: 600, color: "var(--t-text-faint, var(--t-text-faint))", marginLeft: 4 }}>فلترة:</span>
 
                 {/* Department filter */}
                 <div className="relative shrink-0">
-                    <Building2 size={13} className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: "var(--t-text-faint, #9ca3af)" }} />
+                    <Building2 size={13} className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: "var(--t-text-faint, var(--t-text-faint))" }} />
                     <select
                         value={selectedDept}
                         onChange={(e) => { setSelectedDept(e.target.value); }}
                         style={{
                             appearance: "none", borderRadius: 7,
-                            border: selectedDept ? "1px solid #004786" : "1px solid var(--t-border-light, #e5e7eb)",
-                            background: selectedDept ? "rgba(0,71,134,0.04)" : "var(--t-card, #fff)",
+                            border: selectedDept ? "1px solid var(--t-accent)" : "1px solid var(--t-border-light, var(--t-border))",
+                            background: selectedDept ? "rgba(27,80,145,0.04)" : "var(--t-card, #fff)",
                             padding: "6px 30px 6px 12px",
                             fontSize: 12, fontWeight: 500,
-                            color: selectedDept ? "#004786" : "var(--t-text-secondary, #6b7280)",
+                            color: selectedDept ? "var(--t-accent)" : "var(--t-text-secondary, var(--t-text-muted))",
                             cursor: "pointer", outline: "none",
                             minWidth: 130,
                         }}
@@ -278,17 +277,17 @@ export function DocumentAnalyticsTab() {
 
                 {/* Category filter */}
                 <div className="relative shrink-0">
-                    <FolderTree size={13} className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: "var(--t-text-faint, #9ca3af)" }} />
+                    <FolderTree size={13} className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: "var(--t-text-faint, var(--t-text-faint))" }} />
                     <select
                         value={selectedCat}
                         onChange={(e) => setSelectedCat(e.target.value)}
                         style={{
                             appearance: "none", borderRadius: 7,
-                            border: selectedCat ? "1px solid #004786" : "1px solid var(--t-border-light, #e5e7eb)",
-                            background: selectedCat ? "rgba(0,71,134,0.04)" : "var(--t-card, #fff)",
+                            border: selectedCat ? "1px solid var(--t-accent)" : "1px solid var(--t-border-light, var(--t-border))",
+                            background: selectedCat ? "rgba(27,80,145,0.04)" : "var(--t-card, #fff)",
                             padding: "6px 30px 6px 12px",
                             fontSize: 12, fontWeight: 500,
-                            color: selectedCat ? "#004786" : "var(--t-text-secondary, #6b7280)",
+                            color: selectedCat ? "var(--t-accent)" : "var(--t-text-secondary, var(--t-text-muted))",
                             cursor: "pointer", outline: "none",
                             minWidth: 130,
                         }}
@@ -304,17 +303,17 @@ export function DocumentAnalyticsTab() {
 
                 {/* User filter */}
                 <div className="relative shrink-0">
-                    <Users size={13} className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: "var(--t-text-faint, #9ca3af)" }} />
+                    <Users size={13} className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: "var(--t-text-faint, var(--t-text-faint))" }} />
                     <select
                         value={selectedUser}
                         onChange={(e) => setSelectedUser(e.target.value)}
                         style={{
                             appearance: "none", borderRadius: 7,
-                            border: selectedUser ? "1px solid #004786" : "1px solid var(--t-border-light, #e5e7eb)",
-                            background: selectedUser ? "rgba(0,71,134,0.04)" : "var(--t-card, #fff)",
+                            border: selectedUser ? "1px solid var(--t-accent)" : "1px solid var(--t-border-light, var(--t-border))",
+                            background: selectedUser ? "rgba(27,80,145,0.04)" : "var(--t-card, #fff)",
                             padding: "6px 30px 6px 12px",
                             fontSize: 12, fontWeight: 500,
-                            color: selectedUser ? "#004786" : "var(--t-text-secondary, #6b7280)",
+                            color: selectedUser ? "var(--t-accent)" : "var(--t-text-secondary, var(--t-text-muted))",
                             cursor: "pointer", outline: "none",
                             minWidth: 150,
                         }}
@@ -334,7 +333,7 @@ export function DocumentAnalyticsTab() {
                             padding: "5px 10px", borderRadius: 6,
                             border: "1px solid rgba(220,38,38,0.2)",
                             background: "rgba(220,38,38,0.04)",
-                            fontSize: 11, fontWeight: 500, color: "#dc2626",
+                            fontSize: 11, fontWeight: 500, color: "var(--t-danger)",
                             cursor: "pointer", transition: "all 0.12s",
                         }}
                         onMouseEnter={e => { e.currentTarget.style.background = "rgba(220,38,38,0.08)" }}
@@ -345,7 +344,7 @@ export function DocumentAnalyticsTab() {
                     </button>
                 )}
 
-                {loading && <Loader2 size={16} className="animate-spin" style={{ color: "#004786" }} />}
+                {loading && <Loader2 size={16} className="animate-spin" style={{ color: "var(--t-accent)" }} />}
             </div>
 
             {/* Active filters info */}
@@ -353,15 +352,15 @@ export function DocumentAnalyticsTab() {
                 <div style={{
                     display: "flex", alignItems: "center", gap: 8,
                     padding: "10px 14px", borderRadius: 8,
-                    background: "rgba(0,71,134,0.03)",
-                    border: "1px solid rgba(0,71,134,0.08)",
+                    background: "rgba(27,80,145,0.03)",
+                    border: "1px solid rgba(27,80,145,0.08)",
                 }}>
-                    <Filter size={13} style={{ color: "#004786", flexShrink: 0 }} />
-                    <p style={{ fontSize: 12, color: "#004786" }}>
+                    <Filter size={13} style={{ color: "var(--t-accent)", flexShrink: 0 }} />
+                    <p style={{ fontSize: 12, color: "var(--t-accent)" }}>
                         يتم عرض النتائج المفلترة
-                        {selectedDept && <span style={{ margin: "0 4px", background: "rgba(0,71,134,0.08)", padding: "2px 8px", borderRadius: 12, fontWeight: 600, fontSize: 11 }}>{selectedDept}</span>}
-                        {selectedCat && <span style={{ margin: "0 4px", background: "rgba(0,71,134,0.08)", padding: "2px 8px", borderRadius: 12, fontWeight: 600, fontSize: 11 }}>{selectedCat}</span>}
-                        {selectedUser && <span style={{ margin: "0 4px", background: "rgba(0,71,134,0.08)", padding: "2px 8px", borderRadius: 12, fontWeight: 600, fontSize: 11 }}>{selectedUser}</span>}
+                        {selectedDept && <span style={{ margin: "0 4px", background: "rgba(27,80,145,0.08)", padding: "2px 8px", borderRadius: 12, fontWeight: 600, fontSize: 11 }}>{selectedDept}</span>}
+                        {selectedCat && <span style={{ margin: "0 4px", background: "rgba(27,80,145,0.08)", padding: "2px 8px", borderRadius: 12, fontWeight: 600, fontSize: 11 }}>{selectedCat}</span>}
+                        {selectedUser && <span style={{ margin: "0 4px", background: "rgba(27,80,145,0.08)", padding: "2px 8px", borderRadius: 12, fontWeight: 600, fontSize: 11 }}>{selectedUser}</span>}
                     </p>
                 </div>
             )}
@@ -382,12 +381,12 @@ export function DocumentAnalyticsTab() {
                 }}>
                     <div style={{
                         width: 40, height: 40,
-                        border: "3px solid var(--t-border-light, #e5e7eb)",
-                        borderTop: "3px solid #004786",
+                        border: "3px solid var(--t-border-light, var(--t-border))",
+                        borderTop: "3px solid var(--t-accent)",
                         borderRadius: "50%",
                         animation: "spin 0.8s linear infinite",
                     }} />
-                    <p style={{ fontSize: 13, color: "var(--t-text-faint, #9ca3af)", marginTop: 16 }}>جاري تحميل التحليلات...</p>
+                    <p style={{ fontSize: 13, color: "var(--t-text-faint, var(--t-text-faint))", marginTop: 16 }}>جاري تحميل التحليلات...</p>
                 </div>
             )}
 
@@ -403,13 +402,13 @@ export function DocumentAnalyticsTab() {
                                         <CartesianGrid strokeDasharray="3 3" stroke="var(--t-border-light, #f0f0f0)" />
                                         <XAxis
                                             dataKey="name"
-                                            tick={{ fontSize: 11, fill: "var(--t-text-faint, #9ca3af)" }}
+                                            tick={{ fontSize: 11, fill: "var(--t-text-faint, var(--t-text-faint))" }}
                                             angle={-35}
                                             textAnchor="end"
                                             interval={0}
                                             height={80}
                                         />
-                                        <YAxis tick={{ fontSize: 11, fill: "var(--t-text-faint, #9ca3af)" }} />
+                                        <YAxis tick={{ fontSize: 11, fill: "var(--t-text-faint, var(--t-text-faint))" }} />
                                         <Tooltip content={<ChartTooltip />} />
                                         <Bar dataKey="المستندات" radius={[5, 5, 0, 0]} maxBarSize={44}>
                                             {barChartData.map((_, idx) => (
@@ -449,7 +448,7 @@ export function DocumentAnalyticsTab() {
                                             </Pie>
                                             <Tooltip
                                                 formatter={(value: number | undefined) => [String(value ?? 0), "مستندات"]}
-                                                contentStyle={{ borderRadius: 8, border: "1px solid var(--t-border-light, #e5e7eb)", fontSize: 12 }}
+                                                contentStyle={{ borderRadius: 8, border: "1px solid var(--t-border-light, var(--t-border))", fontSize: 12 }}
                                             />
                                             <Legend wrapperStyle={{ fontSize: 11 }} />
                                         </PieChart>
@@ -483,7 +482,7 @@ export function DocumentAnalyticsTab() {
                                             </Pie>
                                             <Tooltip
                                                 formatter={(value: number | undefined) => [String(value ?? 0), "مستندات"]}
-                                                contentStyle={{ borderRadius: 8, border: "1px solid var(--t-border-light, #e5e7eb)", fontSize: 12 }}
+                                                contentStyle={{ borderRadius: 8, border: "1px solid var(--t-border-light, var(--t-border))", fontSize: 12 }}
                                             />
                                             <Legend wrapperStyle={{ fontSize: 11 }} />
                                         </PieChart>
@@ -500,10 +499,10 @@ export function DocumentAnalyticsTab() {
                                 <table style={{ width: "100%", borderCollapse: "collapse" }}>
                                     <thead>
                                         <tr style={{ borderBottom: "1px solid var(--t-border-light, #f0f0f0)" }}>
-                                            <th style={{ padding: "10px 14px", fontSize: 11, fontWeight: 600, color: "var(--t-text-faint, #9ca3af)", textAlign: "right", letterSpacing: "0.3px" }}>المستخدم</th>
-                                            <th style={{ padding: "10px 14px", fontSize: 11, fontWeight: 600, color: "var(--t-text-faint, #9ca3af)", textAlign: "right", letterSpacing: "0.3px" }}>الملفات</th>
-                                            <th style={{ padding: "10px 14px", fontSize: 11, fontWeight: 600, color: "var(--t-text-faint, #9ca3af)", textAlign: "right", letterSpacing: "0.3px" }}>المستندات</th>
-                                            <th style={{ padding: "10px 14px", fontSize: 11, fontWeight: 600, color: "var(--t-text-faint, #9ca3af)", textAlign: "right", letterSpacing: "0.3px" }}>النسبة</th>
+                                            <th style={{ padding: "10px 14px", fontSize: 11, fontWeight: 600, color: "var(--t-text-faint, var(--t-text-faint))", textAlign: "right", letterSpacing: "0.3px" }}>المستخدم</th>
+                                            <th style={{ padding: "10px 14px", fontSize: 11, fontWeight: 600, color: "var(--t-text-faint, var(--t-text-faint))", textAlign: "right", letterSpacing: "0.3px" }}>الملفات</th>
+                                            <th style={{ padding: "10px 14px", fontSize: 11, fontWeight: 600, color: "var(--t-text-faint, var(--t-text-faint))", textAlign: "right", letterSpacing: "0.3px" }}>المستندات</th>
+                                            <th style={{ padding: "10px 14px", fontSize: 11, fontWeight: 600, color: "var(--t-text-faint, var(--t-text-faint))", textAlign: "right", letterSpacing: "0.3px" }}>النسبة</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -521,7 +520,7 @@ export function DocumentAnalyticsTab() {
                                                         transition: "background 0.12s",
                                                         animation: `daRowFade 0.3s ease-out ${idx * 0.04}s both`,
                                                     }}
-                                                    onMouseEnter={e => { e.currentTarget.style.background = "var(--t-card-hover, #f9fafb)" }}
+                                                    onMouseEnter={e => { e.currentTarget.style.background = "var(--t-card-hover, var(--t-page))" }}
                                                     onMouseLeave={e => { e.currentTarget.style.background = "transparent" }}
                                                 >
                                                     <td style={{ padding: "12px 14px" }}>
@@ -534,14 +533,14 @@ export function DocumentAnalyticsTab() {
                                                             }}>
                                                                 {u.username.charAt(0).toUpperCase()}
                                                             </div>
-                                                            <span style={{ fontSize: 13, fontWeight: 500, color: "var(--t-text, #374151)" }} dir="ltr">{u.username}</span>
+                                                            <span style={{ fontSize: 13, fontWeight: 500, color: "var(--t-text, var(--t-text-secondary))" }} dir="ltr">{u.username}</span>
                                                         </div>
                                                     </td>
                                                     <td style={{ padding: "12px 14px" }}>
                                                         <span style={{
                                                             display: "inline-flex", alignItems: "center", gap: 4,
-                                                            background: "rgba(0,71,134,0.05)", padding: "3px 10px", borderRadius: 6,
-                                                            fontSize: 12, fontWeight: 600, color: "#004786",
+                                                            background: "rgba(27,80,145,0.05)", padding: "3px 10px", borderRadius: 6,
+                                                            fontSize: 12, fontWeight: 600, color: "var(--t-accent)",
                                                         }}>
                                                             <FileText size={11} />{u.file_count}
                                                         </span>
@@ -549,23 +548,23 @@ export function DocumentAnalyticsTab() {
                                                     <td style={{ padding: "12px 14px" }}>
                                                         <span style={{
                                                             display: "inline-flex", alignItems: "center", gap: 4,
-                                                            background: "rgba(0,152,214,0.06)", padding: "3px 10px", borderRadius: 6,
-                                                            fontSize: 12, fontWeight: 600, color: "#0072b5",
+                                                            background: "rgba(77,166,232,0.06)", padding: "3px 10px", borderRadius: 6,
+                                                            fontSize: 12, fontWeight: 600, color: "var(--t-accent-secondary)",
                                                         }}>
                                                             <Database size={11} />{u.total_ids.toLocaleString()}
                                                         </span>
                                                     </td>
                                                     <td style={{ padding: "12px 14px" }}>
                                                         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                                                            <div style={{ height: 6, width: 64, borderRadius: 3, background: "var(--t-border-light, #e5e7eb)", overflow: "hidden" }}>
+                                                            <div style={{ height: 6, width: 64, borderRadius: 3, background: "var(--t-border-light, var(--t-border))", overflow: "hidden" }}>
                                                                 <div style={{
                                                                     height: "100%", borderRadius: 3,
-                                                                    background: "linear-gradient(90deg, #004786, #0098d6)",
+                                                                    background: "linear-gradient(90deg, var(--t-brand-orange), var(--t-brand-orange-hover))",
                                                                     width: `${Math.min(Number(percentage), 100)}%`,
                                                                     transition: "width 0.6s ease-out",
                                                                 }} />
                                                             </div>
-                                                            <span style={{ fontSize: 11, fontWeight: 600, color: "var(--t-text-secondary, #6b7280)" }}>{percentage}%</span>
+                                                            <span style={{ fontSize: 11, fontWeight: 600, color: "var(--t-text-secondary, var(--t-text-muted))" }}>{percentage}%</span>
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -584,11 +583,11 @@ export function DocumentAnalyticsTab() {
                                 <table style={{ width: "100%", borderCollapse: "collapse" }}>
                                     <thead>
                                         <tr style={{ borderBottom: "1px solid var(--t-border-light, #f0f0f0)" }}>
-                                            <th style={{ padding: "10px 14px", fontSize: 11, fontWeight: 600, color: "var(--t-text-faint, #9ca3af)", textAlign: "right", letterSpacing: "0.3px" }}>اسم الملف</th>
-                                            <th style={{ padding: "10px 14px", fontSize: 11, fontWeight: 600, color: "var(--t-text-faint, #9ca3af)", textAlign: "right", letterSpacing: "0.3px" }}>المستخدم</th>
-                                            <th style={{ padding: "10px 14px", fontSize: 11, fontWeight: 600, color: "var(--t-text-faint, #9ca3af)", textAlign: "right", letterSpacing: "0.3px" }}>القسم</th>
-                                            <th style={{ padding: "10px 14px", fontSize: 11, fontWeight: 600, color: "var(--t-text-faint, #9ca3af)", textAlign: "right", letterSpacing: "0.3px" }}>الفئة</th>
-                                            <th style={{ padding: "10px 14px", fontSize: 11, fontWeight: 600, color: "var(--t-text-faint, #9ca3af)", textAlign: "right", letterSpacing: "0.3px" }}>المستندات</th>
+                                            <th style={{ padding: "10px 14px", fontSize: 11, fontWeight: 600, color: "var(--t-text-faint, var(--t-text-faint))", textAlign: "right", letterSpacing: "0.3px" }}>اسم الملف</th>
+                                            <th style={{ padding: "10px 14px", fontSize: 11, fontWeight: 600, color: "var(--t-text-faint, var(--t-text-faint))", textAlign: "right", letterSpacing: "0.3px" }}>المستخدم</th>
+                                            <th style={{ padding: "10px 14px", fontSize: 11, fontWeight: 600, color: "var(--t-text-faint, var(--t-text-faint))", textAlign: "right", letterSpacing: "0.3px" }}>القسم</th>
+                                            <th style={{ padding: "10px 14px", fontSize: 11, fontWeight: 600, color: "var(--t-text-faint, var(--t-text-faint))", textAlign: "right", letterSpacing: "0.3px" }}>الفئة</th>
+                                            <th style={{ padding: "10px 14px", fontSize: 11, fontWeight: 600, color: "var(--t-text-faint, var(--t-text-faint))", textAlign: "right", letterSpacing: "0.3px" }}>المستندات</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -600,49 +599,49 @@ export function DocumentAnalyticsTab() {
                                                     transition: "background 0.12s",
                                                     animation: `daRowFade 0.3s ease-out ${idx * 0.03}s both`,
                                                 }}
-                                                onMouseEnter={e => { e.currentTarget.style.background = "var(--t-card-hover, #f9fafb)" }}
+                                                onMouseEnter={e => { e.currentTarget.style.background = "var(--t-card-hover, var(--t-page))" }}
                                                 onMouseLeave={e => { e.currentTarget.style.background = "transparent" }}
                                             >
                                                 <td style={{ padding: "10px 14px" }}>
                                                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                                                        <FileText size={14} strokeWidth={1.5} style={{ color: "#004786", flexShrink: 0 }} />
-                                                        <span style={{ fontSize: 13, fontWeight: 500, color: "var(--t-text, #374151)", maxWidth: 200, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", display: "block" }} dir="ltr">{f.filename}</span>
+                                                        <FileText size={14} strokeWidth={1.5} style={{ color: "var(--t-accent)", flexShrink: 0 }} />
+                                                        <span style={{ fontSize: 13, fontWeight: 500, color: "var(--t-text, var(--t-text-secondary))", maxWidth: 200, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", display: "block" }} dir="ltr">{f.filename}</span>
                                                     </div>
                                                 </td>
                                                 <td style={{ padding: "10px 14px" }}>
-                                                    <span style={{ fontSize: 12, color: "var(--t-text-secondary, #6b7280)" }} dir="ltr">{f.username}</span>
+                                                    <span style={{ fontSize: 12, color: "var(--t-text-secondary, var(--t-text-muted))" }} dir="ltr">{f.username}</span>
                                                 </td>
                                                 <td style={{ padding: "10px 14px" }}>
                                                     {f.department_id ? (
                                                         <span style={{
                                                             display: "inline-flex", alignItems: "center", gap: 4,
-                                                            background: "rgba(0,71,134,0.05)", padding: "2px 8px", borderRadius: 5,
-                                                            fontSize: 11, fontWeight: 500, color: "#004786",
+                                                            background: "rgba(27,80,145,0.05)", padding: "2px 8px", borderRadius: 5,
+                                                            fontSize: 11, fontWeight: 500, color: "var(--t-accent)",
                                                         }}>
                                                             <Building2 size={10} />{f.department_id}
                                                         </span>
                                                     ) : (
-                                                        <span style={{ fontSize: 12, color: "var(--t-text-faint, #d1d5db)" }}>—</span>
+                                                        <span style={{ fontSize: 12, color: "var(--t-text-faint, var(--t-border-medium))" }}>—</span>
                                                     )}
                                                 </td>
                                                 <td style={{ padding: "10px 14px" }}>
                                                     {f.category_id ? (
                                                         <span style={{
                                                             display: "inline-flex", alignItems: "center", gap: 4,
-                                                            background: "rgba(0,152,214,0.06)", padding: "2px 8px", borderRadius: 5,
-                                                            fontSize: 11, fontWeight: 500, color: "#0072b5",
+                                                            background: "rgba(77,166,232,0.06)", padding: "2px 8px", borderRadius: 5,
+                                                            fontSize: 11, fontWeight: 500, color: "var(--t-accent-secondary)",
                                                         }}>
                                                             <FolderTree size={10} />{f.category_id}
                                                         </span>
                                                     ) : (
-                                                        <span style={{ fontSize: 12, color: "var(--t-text-faint, #d1d5db)" }}>—</span>
+                                                        <span style={{ fontSize: 12, color: "var(--t-text-faint, var(--t-border-medium))" }}>—</span>
                                                     )}
                                                 </td>
                                                 <td style={{ padding: "10px 14px" }}>
                                                     <span style={{
                                                         display: "inline-flex", alignItems: "center", gap: 4,
-                                                        background: "rgba(0,71,134,0.06)", padding: "3px 10px", borderRadius: 6,
-                                                        fontSize: 12, fontWeight: 600, color: "#004786",
+                                                        background: "rgba(27,80,145,0.06)", padding: "3px 10px", borderRadius: 6,
+                                                        fontSize: 12, fontWeight: 600, color: "var(--t-accent)",
                                                     }}>
                                                         <Database size={10} />{f.id_count.toLocaleString()}
                                                     </span>
@@ -663,13 +662,13 @@ export function DocumentAnalyticsTab() {
                         }}>
                             <div style={{
                                 width: 56, height: 56, borderRadius: 14,
-                                background: "rgba(0,71,134,0.05)",
+                                background: "rgba(27,80,145,0.05)",
                                 display: "flex", alignItems: "center", justifyContent: "center",
                             }}>
-                                <BarChart3 size={24} strokeWidth={1.5} style={{ color: "var(--t-text-faint, #d1d5db)" }} />
+                                <BarChart3 size={24} strokeWidth={1.5} style={{ color: "var(--t-text-faint, var(--t-border-medium))" }} />
                             </div>
-                            <p style={{ fontSize: 14, fontWeight: 500, color: "var(--t-text-secondary, #6b7280)", marginTop: 14 }}>لا توجد بيانات</p>
-                            <p style={{ fontSize: 12, color: "var(--t-text-faint, #9ca3af)", marginTop: 4 }}>جرب تغيير الفلاتر أو ارفع ملفات للبدء</p>
+                            <p style={{ fontSize: 14, fontWeight: 500, color: "var(--t-text-secondary, var(--t-text-muted))", marginTop: 14 }}>لا توجد بيانات</p>
+                            <p style={{ fontSize: 12, color: "var(--t-text-faint, var(--t-text-faint))", marginTop: 4 }}>جرب تغيير الفلاتر أو ارفع ملفات للبدء</p>
                         </div>
                     )}
                 </>

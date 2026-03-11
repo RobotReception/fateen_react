@@ -65,13 +65,13 @@ function formatDate(iso: string) {
 const OPERATION_MAP: Record<string, { label: string; color: string; bg: string; border: string }> = {
     train: { label: "🎓 تدريب ملف", color: "#2563eb", bg: "rgba(37,99,235,0.06)", border: "rgba(37,99,235,0.18)" },
     add: { label: "➕ إضافة نص", color: "#059669", bg: "rgba(5,150,105,0.06)", border: "rgba(5,150,105,0.18)" },
-    delete: { label: "🗑️ حذف مستند", color: "#dc2626", bg: "rgba(220,38,38,0.06)", border: "rgba(220,38,38,0.18)" },
+    delete: { label: "🗑️ حذف مستند", color: "var(--t-danger)", bg: "rgba(220,38,38,0.06)", border: "rgba(220,38,38,0.18)" },
     update: { label: "✏️ تحديث مستند", color: "#d97706", bg: "rgba(217,119,6,0.06)", border: "rgba(217,119,6,0.18)" },
     train_data_request: { label: "🎓 طلب تدريب بيانات", color: "#2563eb", bg: "rgba(37,99,235,0.06)", border: "rgba(37,99,235,0.18)" },
     document_upload: { label: "📄 رفع مستند", color: "#7c3aed", bg: "rgba(124,58,237,0.06)", border: "rgba(124,58,237,0.18)" },
     add_data_request: { label: "➕ طلب إضافة بيانات", color: "#059669", bg: "rgba(5,150,105,0.06)", border: "rgba(5,150,105,0.18)" },
     update_data_request: { label: "✏️ طلب تحديث بيانات", color: "#d97706", bg: "rgba(217,119,6,0.06)", border: "rgba(217,119,6,0.18)" },
-    delete_data_request: { label: "🗑️ طلب حذف بيانات", color: "#dc2626", bg: "rgba(220,38,38,0.06)", border: "rgba(220,38,38,0.18)" },
+    delete_data_request: { label: "🗑️ طلب حذف بيانات", color: "var(--t-danger)", bg: "rgba(220,38,38,0.06)", border: "rgba(220,38,38,0.18)" },
 }
 
 function operationLabel(op: string) {
@@ -79,7 +79,7 @@ function operationLabel(op: string) {
 }
 
 function operationStyle(op: string) {
-    return OPERATION_MAP[op] || { label: op, color: "#6b7280", bg: "rgba(107,114,128,0.06)", border: "rgba(107,114,128,0.18)" }
+    return OPERATION_MAP[op] || { label: op, color: "var(--t-text-muted)", bg: "rgba(107,114,128,0.06)", border: "rgba(107,114,128,0.18)" }
 }
 
 function statusBadge(status: string) {
@@ -147,20 +147,20 @@ const SkeletonRow = memo(function SkeletonRow({ delay = 0 }: { delay?: number })
 
 function InfoField({ icon: Icon, label, value, mono }: { icon: typeof Hash; label: string; value: string; mono?: boolean }) {
     return (
-        <div style={{ borderRadius: 10, background: "#f9fafb", border: "1px solid #f3f4f6", padding: "8px 12px" }}>
-            <p style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 10, fontWeight: 600, color: "#9ca3af", marginBottom: 3 }}><Icon size={10} />{label}</p>
-            <p style={{ fontSize: 13, color: "#374151", fontFamily: mono ? "monospace" : "inherit", wordBreak: "break-all" }}>{value || "—"}</p>
+        <div style={{ borderRadius: 10, background: "var(--t-page)", border: "1px solid var(--t-surface)", padding: "8px 12px" }}>
+            <p style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 10, fontWeight: 600, color: "var(--t-text-faint)", marginBottom: 3 }}><Icon size={10} />{label}</p>
+            <p style={{ fontSize: 13, color: "var(--t-text-secondary)", fontFamily: mono ? "monospace" : "inherit", wordBreak: "break-all" }}>{value || "—"}</p>
         </div>
     )
 }
 
 function SectionHeader({ icon: Icon, title }: { icon: typeof Hash; title: string }) {
     return (
-        <div style={{ display: "flex", alignItems: "center", gap: 7, paddingBottom: 6, borderBottom: "1px solid #f3f4f6", marginBottom: 10 }}>
-            <div style={{ width: 22, height: 22, borderRadius: 6, background: "linear-gradient(135deg, #004786, #0098d6)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 7, paddingBottom: 6, borderBottom: "1px solid var(--t-surface)", marginBottom: 10 }}>
+            <div style={{ width: 22, height: 22, borderRadius: 6, background: "var(--t-gradient-accent)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <Icon size={11} style={{ color: "#fff" }} />
             </div>
-            <span style={{ fontSize: 12, fontWeight: 700, color: "#374151" }}>{title}</span>
+            <span style={{ fontSize: 12, fontWeight: 700, color: "var(--t-text-secondary)" }}>{title}</span>
         </div>
     )
 }
@@ -181,19 +181,19 @@ const DetailsModal = memo(function DetailsModal({
 
     return (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={onClose}>
-            <div className="mx-4 w-full max-w-xl overflow-hidden bg-white" onClick={(e) => e.stopPropagation()} style={{ animation: "prModalIn .18s ease-out", borderRadius: 14, border: "1px solid #e5e7eb", boxShadow: "0 20px 60px rgba(0,0,0,0.12)" }}>
+            <div className="mx-4 w-full max-w-xl overflow-hidden bg-white" onClick={(e) => e.stopPropagation()} style={{ animation: "prModalIn .18s ease-out", borderRadius: 14, border: "1px solid var(--t-border)", boxShadow: "0 20px 60px rgba(0,0,0,0.12)" }}>
                 {/* Header */}
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 20px", borderBottom: "1px solid #f0f0f0", background: "linear-gradient(135deg, rgba(0,71,134,0.03), rgba(0,152,214,0.03))" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 20px", borderBottom: "1px solid #f0f0f0", background: "linear-gradient(135deg, rgba(27,80,145,0.03), rgba(77,166,232,0.03))" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                        <div style={{ width: 32, height: 32, borderRadius: 8, background: "linear-gradient(135deg, #004786, #0098d6)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <div style={{ width: 32, height: 32, borderRadius: 8, background: "var(--t-gradient-accent)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                             <ClipboardList size={15} style={{ color: "#fff" }} />
                         </div>
                         <div>
                             <h3 style={{ fontSize: 14, fontWeight: 700, color: "#1f2937", margin: 0 }}>تفاصيل الطلب</h3>
-                            {details && <p style={{ fontSize: 10, color: "#9ca3af", fontFamily: "monospace", marginTop: 2 }}>#{details.id}</p>}
+                            {details && <p style={{ fontSize: 10, color: "var(--t-text-faint)", fontFamily: "monospace", marginTop: 2 }}>#{details.id}</p>}
                         </div>
                     </div>
-                    <button onClick={onClose} style={{ borderRadius: 7, padding: 6, border: "1px solid #f3f4f6", background: "#fff", cursor: "pointer", color: "#9ca3af", display: "flex", alignItems: "center", justifyContent: "center" }}><X size={15} /></button>
+                    <button onClick={onClose} style={{ borderRadius: 7, padding: 6, border: "1px solid var(--t-surface)", background: "#fff", cursor: "pointer", color: "var(--t-text-faint)", display: "flex", alignItems: "center", justifyContent: "center" }}><X size={15} /></button>
                 </div>
 
                 {loading || !details ? (
@@ -224,7 +224,7 @@ const DetailsModal = memo(function DetailsModal({
                                 {details.approved_by && <InfoField icon={CheckCircle2} label="تمت الموافقة بواسطة" value={details.approved_by} />}
                                 {details.rejection_reason && (
                                     <div style={{ gridColumn: "1 / -1", borderRadius: 10, background: "rgba(220,38,38,0.04)", border: "1px solid rgba(220,38,38,0.12)", padding: "8px 12px" }}>
-                                        <p style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 10, fontWeight: 600, color: "#dc2626", marginBottom: 3 }}><AlertCircle size={10} />سبب الرفض</p>
+                                        <p style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 10, fontWeight: 600, color: "var(--t-danger)", marginBottom: 3 }}><AlertCircle size={10} />سبب الرفض</p>
                                         <p style={{ fontSize: 13, color: "#991b1b" }}>{details.rejection_reason}</p>
                                     </div>
                                 )}
@@ -262,9 +262,9 @@ const DetailsModal = memo(function DetailsModal({
                                     </div>
                                 )}
                                 {details.text && (
-                                    <div style={{ borderRadius: 10, background: "#f9fafb", border: "1px solid #f3f4f6", padding: 12 }}>
-                                        <p style={{ fontSize: 10, fontWeight: 600, color: "#9ca3af", marginBottom: 6 }}>محتوى الطلب</p>
-                                        <div dir="auto" style={{ fontSize: 13, color: "#374151", lineHeight: 1.7, whiteSpace: "pre-wrap", maxHeight: 200, overflowY: "auto" }}>{details.text}</div>
+                                    <div style={{ borderRadius: 10, background: "var(--t-page)", border: "1px solid var(--t-surface)", padding: 12 }}>
+                                        <p style={{ fontSize: 10, fontWeight: 600, color: "var(--t-text-faint)", marginBottom: 6 }}>محتوى الطلب</p>
+                                        <div dir="auto" style={{ fontSize: 13, color: "var(--t-text-secondary)", lineHeight: 1.7, whiteSpace: "pre-wrap", maxHeight: 200, overflowY: "auto" }}>{details.text}</div>
                                     </div>
                                 )}
                             </div>
@@ -287,14 +287,14 @@ const DetailsModal = memo(function DetailsModal({
 
                 {/* ── Footer with Download Button ── */}
                 {details && hasFile && (
-                    <div style={{ padding: "12px 20px", borderTop: "1px solid #f0f0f0", background: "#fafafa", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <div style={{ padding: "12px 20px", borderTop: "1px solid #f0f0f0", background: "var(--t-card-hover)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                         <ActionGuard pageBit={PAGE_BITS.PENDING_REQUESTS} actionBit={ACTION_BITS.DOWNLOAD_REQUEST_TRAIN_FILE}>
                             <button onClick={onDownloadFile} disabled={downloadingFile}
                                 style={{
                                     display: "flex", alignItems: "center", gap: 8, padding: "9px 28px", borderRadius: 9,
-                                    border: "none", background: "linear-gradient(135deg, #004786, #0098d6)", color: "#fff",
+                                    border: "none", background: "var(--t-brand-orange)", color: "#fff",
                                     fontSize: 13, fontWeight: 600, cursor: "pointer", opacity: downloadingFile ? 0.6 : 1,
-                                    transition: "all .2s", boxShadow: "0 2px 8px rgba(0,71,134,0.18)",
+                                    transition: "all .2s", boxShadow: "0 2px 8px rgba(27,80,145,0.18)",
                                 }}>
                                 {downloadingFile ? <Loader2 size={15} className="animate-spin" /> : <FileDown size={15} />}
                                 {downloadingFile ? "جارٍ التحميل..." : "تحميل الملف"}
@@ -311,17 +311,17 @@ const DetailsModal = memo(function DetailsModal({
 const ApproveModal = memo(function ApproveModal({ order, onClose, onConfirm, loading }: { order: PendingOrder; onClose: () => void; onConfirm: () => void; loading: boolean }) {
     return (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={onClose}>
-            <div className="mx-4 w-full max-w-md overflow-hidden bg-white" onClick={(e) => e.stopPropagation()} style={{ animation: "prModalIn .18s ease-out", borderRadius: 12, border: "1px solid var(--t-border-light, #e5e7eb)" }}>
+            <div className="mx-4 w-full max-w-md overflow-hidden bg-white" onClick={(e) => e.stopPropagation()} style={{ animation: "prModalIn .18s ease-out", borderRadius: 12, border: "1px solid var(--t-border-light, var(--t-border))" }}>
                 <div style={{ padding: "28px 24px 20px", textAlign: "center" }}>
                     <div style={{ width: 52, height: 52, borderRadius: 14, background: "rgba(16,185,129,0.06)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 14px" }}>
                         <CheckCircle2 size={24} style={{ color: "#059669" }} />
                     </div>
                     <h3 style={{ fontSize: 16, fontWeight: 700, color: "var(--t-text, #1f2937)" }}>الموافقة على الطلب</h3>
-                    <p style={{ fontSize: 13, color: "var(--t-text-secondary, #6b7280)", marginTop: 8 }}>هل أنت متأكد من الموافقة على طلب <span style={{ fontWeight: 600, color: "var(--t-text, #374151)" }}>{order.username}</span>؟</p>
-                    <p style={{ fontSize: 11, color: "var(--t-text-faint, #9ca3af)", marginTop: 4 }}>نوع العملية: {operationLabel(order.operation)}</p>
+                    <p style={{ fontSize: 13, color: "var(--t-text-secondary, var(--t-text-muted))", marginTop: 8 }}>هل أنت متأكد من الموافقة على طلب <span style={{ fontWeight: 600, color: "var(--t-text, var(--t-text-secondary))" }}>{order.username}</span>؟</p>
+                    <p style={{ fontSize: 11, color: "var(--t-text-faint, var(--t-text-faint))", marginTop: 4 }}>نوع العملية: {operationLabel(order.operation)}</p>
                     <div style={{ marginTop: 20, display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
-                        <button onClick={onClose} disabled={loading} style={{ padding: "8px 20px", borderRadius: 7, border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-card, #fff)", fontSize: 13, fontWeight: 500, color: "var(--t-text-secondary, #6b7280)", cursor: "pointer" }}>إلغاء</button>
-                        <button onClick={onConfirm} disabled={loading} style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 20px", borderRadius: 7, border: "none", background: "#004786", color: "#fff", fontSize: 13, fontWeight: 500, cursor: "pointer", opacity: loading ? 0.5 : 1 }}>
+                        <button onClick={onClose} disabled={loading} style={{ padding: "8px 20px", borderRadius: 7, border: "1px solid var(--t-border-light, var(--t-border))", background: "var(--t-card, #fff)", fontSize: 13, fontWeight: 500, color: "var(--t-text-secondary, var(--t-text-muted))", cursor: "pointer" }}>إلغاء</button>
+                        <button onClick={onConfirm} disabled={loading} style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 20px", borderRadius: 7, border: "none", background: "var(--t-brand-orange)", color: "#fff", fontSize: 13, fontWeight: 500, cursor: "pointer", opacity: loading ? 0.5 : 1 }}>
                             {loading && <Loader2 size={14} className="animate-spin" />}
                             موافقة
                         </button>
@@ -337,22 +337,22 @@ const RejectModal = memo(function RejectModal({ order, onClose, onConfirm, loadi
     const [reason, setReason] = useState("")
     return (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={onClose}>
-            <div className="mx-4 w-full max-w-md overflow-hidden bg-white" onClick={(e) => e.stopPropagation()} style={{ animation: "prModalIn .18s ease-out", borderRadius: 12, border: "1px solid var(--t-border-light, #e5e7eb)" }}>
+            <div className="mx-4 w-full max-w-md overflow-hidden bg-white" onClick={(e) => e.stopPropagation()} style={{ animation: "prModalIn .18s ease-out", borderRadius: 12, border: "1px solid var(--t-border-light, var(--t-border))" }}>
                 <div style={{ padding: 24 }}>
                     <div style={{ textAlign: "center" }}>
                         <div style={{ width: 52, height: 52, borderRadius: 14, background: "rgba(220,38,38,0.06)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 14px" }}>
-                            <XCircle size={24} style={{ color: "#dc2626" }} />
+                            <XCircle size={24} style={{ color: "var(--t-danger)" }} />
                         </div>
                         <h3 style={{ fontSize: 16, fontWeight: 700, color: "var(--t-text, #1f2937)" }}>رفض الطلب</h3>
-                        <p style={{ fontSize: 13, color: "var(--t-text-secondary, #6b7280)", marginTop: 8 }}>رفض طلب <span style={{ fontWeight: 600, color: "var(--t-text, #374151)" }}>{order.username}</span></p>
+                        <p style={{ fontSize: 13, color: "var(--t-text-secondary, var(--t-text-muted))", marginTop: 8 }}>رفض طلب <span style={{ fontWeight: 600, color: "var(--t-text, var(--t-text-secondary))" }}>{order.username}</span></p>
                     </div>
                     <div style={{ marginTop: 16 }}>
-                        <label style={{ display: "block", marginBottom: 6, fontSize: 13, fontWeight: 500, color: "var(--t-text, #374151)" }}>سبب الرفض <span style={{ color: "#dc2626" }}>*</span></label>
-                        <textarea value={reason} onChange={(e) => setReason(e.target.value)} rows={3} placeholder="اكتب سبب الرفض..." style={{ width: "100%", borderRadius: 8, border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-card, #fff)", padding: 12, fontSize: 13, color: "var(--t-text, #374151)", outline: "none", resize: "none" }} dir="rtl" />
+                        <label style={{ display: "block", marginBottom: 6, fontSize: 13, fontWeight: 500, color: "var(--t-text, var(--t-text-secondary))" }}>سبب الرفض <span style={{ color: "var(--t-danger)" }}>*</span></label>
+                        <textarea value={reason} onChange={(e) => setReason(e.target.value)} rows={3} placeholder="اكتب سبب الرفض..." style={{ width: "100%", borderRadius: 8, border: "1px solid var(--t-border-light, var(--t-border))", background: "var(--t-card, #fff)", padding: 12, fontSize: 13, color: "var(--t-text, var(--t-text-secondary))", outline: "none", resize: "none" }} dir="rtl" />
                     </div>
                     <div style={{ marginTop: 16, display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
-                        <button onClick={onClose} disabled={loading} style={{ padding: "8px 20px", borderRadius: 7, border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-card, #fff)", fontSize: 13, fontWeight: 500, color: "var(--t-text-secondary, #6b7280)", cursor: "pointer" }}>إلغاء</button>
-                        <button onClick={() => onConfirm(reason)} disabled={loading || !reason.trim()} style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 20px", borderRadius: 7, border: "none", background: "#dc2626", color: "#fff", fontSize: 13, fontWeight: 500, cursor: "pointer", opacity: (loading || !reason.trim()) ? 0.5 : 1 }}>
+                        <button onClick={onClose} disabled={loading} style={{ padding: "8px 20px", borderRadius: 7, border: "1px solid var(--t-border-light, var(--t-border))", background: "var(--t-card, #fff)", fontSize: 13, fontWeight: 500, color: "var(--t-text-secondary, var(--t-text-muted))", cursor: "pointer" }}>إلغاء</button>
+                        <button onClick={() => onConfirm(reason)} disabled={loading || !reason.trim()} style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 20px", borderRadius: 7, border: "none", background: "var(--t-danger)", color: "#fff", fontSize: 13, fontWeight: 500, cursor: "pointer", opacity: (loading || !reason.trim()) ? 0.5 : 1 }}>
                             {loading && <Loader2 size={14} className="animate-spin" />}
                             رفض
                         </button>
@@ -429,7 +429,7 @@ const OrderRow = memo(function OrderRow({
                     )}
                     {hasFile && (
                         <ActionGuard pageBit={PAGE_BITS.PENDING_REQUESTS} actionBit={ACTION_BITS.DOWNLOAD_REQUEST_TRAIN_FILE}>
-                            <button onClick={() => onDownload(order)} style={{ display: "flex", alignItems: "center", gap: 4, borderRadius: 7, padding: "4px 8px", border: "none", background: "linear-gradient(135deg, #004786, #0098d6)", color: "#fff", fontSize: 10, fontWeight: 600, cursor: "pointer" }} title="تحميل الملف">
+                            <button onClick={() => onDownload(order)} style={{ display: "flex", alignItems: "center", gap: 4, borderRadius: 7, padding: "4px 8px", border: "none", background: "var(--t-brand-orange)", color: "#fff", fontSize: 10, fontWeight: 600, cursor: "pointer" }} title="تحميل الملف">
                                 <Download size={11} />تحميل
                             </button>
                         </ActionGuard>
@@ -583,12 +583,12 @@ export function PendingRequestsPage() {
             {/* Header */}
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                    <div style={{ width: 40, height: 40, borderRadius: 10, background: "linear-gradient(135deg, #004786, #0098d6)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <div style={{ width: 40, height: 40, borderRadius: 10, background: "var(--t-gradient-accent)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                         <ClipboardList size={20} style={{ color: "#fff" }} />
                     </div>
                     <div>
                         <h2 style={{ fontSize: 18, fontWeight: 700, color: "var(--t-text, #1f2937)", margin: 0 }}>الطلبات المعلقة</h2>
-                        <p style={{ fontSize: 12, color: "var(--t-text-faint, #9ca3af)", marginTop: 2 }}>مراجعة الطلبات والموافقة أو الرفض</p>
+                        <p style={{ fontSize: 12, color: "var(--t-text-faint, var(--t-text-faint))", marginTop: 2 }}>مراجعة الطلبات والموافقة أو الرفض</p>
                     </div>
                 </div>
                 {pagination && (
@@ -629,21 +629,21 @@ export function PendingRequestsPage() {
 
             {/* Info bar */}
             {!loading && filtered.length > 0 && pagination && (
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderRadius: 8, background: "var(--t-card, #fff)", border: "1px solid var(--t-border-light, #e5e7eb)", padding: "8px 14px" }}>
-                    <p style={{ fontSize: 12, color: "var(--t-text-secondary, #6b7280)" }}><span style={{ fontWeight: 700, color: "#004786" }}>{pagination.totalCount}</span> طلب</p>
-                    <p style={{ fontSize: 11, color: "var(--t-text-faint, #9ca3af)" }}>صفحة {page} من {totalPages}</p>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderRadius: 8, background: "var(--t-card, #fff)", border: "1px solid var(--t-border-light, var(--t-border))", padding: "8px 14px" }}>
+                    <p style={{ fontSize: 12, color: "var(--t-text-secondary, var(--t-text-muted))" }}><span style={{ fontWeight: 700, color: "var(--t-brand-orange)" }}>{pagination.totalCount}</span> طلب</p>
+                    <p style={{ fontSize: 11, color: "var(--t-text-faint, var(--t-text-faint))" }}>صفحة {page} من {totalPages}</p>
                 </div>
             )}
 
             {/* Table */}
-            <div style={{ position: "relative", overflow: "hidden", borderRadius: 10, border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-card, #fff)" }}>
+            <div style={{ position: "relative", overflow: "hidden", borderRadius: 10, border: "1px solid var(--t-border-light, var(--t-border))", background: "var(--t-card, #fff)" }}>
                 <FetchingBar visible={backgroundFetching} />
                 <div className="overflow-x-auto" style={{ opacity: backgroundFetching ? 0.6 : 1, transition: 'opacity 0.2s ease' }}>
                     <table style={{ width: "100%", borderCollapse: "collapse" }}>
                         <thead>
-                            <tr style={{ borderBottom: "1px solid var(--t-border-light, #f0f0f0)", background: "var(--t-surface, #fafafa)", textAlign: "right" }}>
+                            <tr style={{ borderBottom: "1px solid var(--t-border-light, #f0f0f0)", background: "var(--t-surface, var(--t-card-hover))", textAlign: "right" }}>
                                 {["#", "المعرّف", "العملية", "المستخدم", "الحالة", "التاريخ", "المحتوى / الملف", "الإجراءات"].map(h => (
-                                    <th key={h} style={{ padding: "10px 16px", fontSize: 11, fontWeight: 600, color: "var(--t-text-faint, #9ca3af)", letterSpacing: "0.3px" }}>{h}</th>
+                                    <th key={h} style={{ padding: "10px 16px", fontSize: 11, fontWeight: 600, color: "var(--t-text-faint, var(--t-text-faint))", letterSpacing: "0.3px" }}>{h}</th>
                                 ))}
                             </tr>
                         </thead>
@@ -681,12 +681,12 @@ export function PendingRequestsPage() {
             {totalPages > 1 && (
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, paddingTop: 8 }}>
                     <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1}
-                        style={{ display: "flex", alignItems: "center", gap: 4, padding: "6px 12px", borderRadius: 7, border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-card, #fff)", fontSize: 12, fontWeight: 500, color: "var(--t-text-secondary, #6b7280)", cursor: "pointer", opacity: page <= 1 ? 0.4 : 1 }}>
+                        style={{ display: "flex", alignItems: "center", gap: 4, padding: "6px 12px", borderRadius: 7, border: "1px solid var(--t-border-light, var(--t-border))", background: "var(--t-card, #fff)", fontSize: 12, fontWeight: 500, color: "var(--t-text-secondary, var(--t-text-muted))", cursor: "pointer", opacity: page <= 1 ? 0.4 : 1 }}>
                         <ChevronRight size={13} /> السابق
                     </button>
-                    <span style={{ display: "flex", height: 30, alignItems: "center", borderRadius: 7, background: "#004786", padding: "0 12px", fontSize: 12, fontWeight: 700, color: "#fff" }}>{page}</span>
+                    <span style={{ display: "flex", height: 30, alignItems: "center", borderRadius: 7, background: "var(--t-brand-orange)", padding: "0 12px", fontSize: 12, fontWeight: 700, color: "#fff" }}>{page}</span>
                     <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} onMouseEnter={() => page < totalPages && prefetchNextPage()} disabled={page >= totalPages}
-                        style={{ display: "flex", alignItems: "center", gap: 4, padding: "6px 12px", borderRadius: 7, border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-card, #fff)", fontSize: 12, fontWeight: 500, color: "var(--t-text-secondary, #6b7280)", cursor: "pointer", opacity: page >= totalPages ? 0.4 : 1 }}>
+                        style={{ display: "flex", alignItems: "center", gap: 4, padding: "6px 12px", borderRadius: 7, border: "1px solid var(--t-border-light, var(--t-border))", background: "var(--t-card, #fff)", fontSize: 12, fontWeight: 500, color: "var(--t-text-secondary, var(--t-text-muted))", cursor: "pointer", opacity: page >= totalPages ? 0.4 : 1 }}>
                         التالي <ChevronLeft size={13} />
                     </button>
                 </div>
@@ -711,9 +711,9 @@ export function PendingRequestsPage() {
                 @keyframes prFadeIn{from{opacity:0}to{opacity:1}}
                 @keyframes prRowFade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
                 @keyframes prShimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
-                .pr-skeleton-bone{background:linear-gradient(90deg,#f3f4f6 25%,#e5e7eb 37%,#f3f4f6 63%);background-size:200% 100%;animation:prShimmer 1.5s ease-in-out infinite}
+                .pr-skeleton-bone{background:linear-gradient(90deg,var(--t-surface) 25%,var(--t-border) 37%,var(--t-surface) 63%);background-size:200% 100%;animation:prShimmer 1.5s ease-in-out infinite}
                 .pr-skeleton-shimmer{opacity:0;animation:prFadeIn .3s ease-out forwards}
-                .pr-loading-spinner{width:36px;height:36px;border:3px solid #e5e7eb;border-top-color:#3b82f6;border-radius:50%;animation:prSpin .7s linear infinite}
+                .pr-loading-spinner{width:36px;height:36px;border:3px solid var(--t-border);border-top-color:var(--t-info);border-radius:50%;animation:prSpin .7s linear infinite}
                 @keyframes prSpin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
             `}</style>
         </div>

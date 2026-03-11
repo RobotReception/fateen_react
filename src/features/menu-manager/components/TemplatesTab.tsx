@@ -13,12 +13,12 @@ import { PAGE_BITS, ACTION_BITS } from "@/lib/permissions"
 const STATUS_CONFIG: Record<TemplateStatus, { label: string; color: string; bg: string; icon: typeof CheckCircle2; gradient: string }> = {
     published: { label: "منشور", color: "#16a34a", bg: "rgba(22,163,74,0.08)", icon: CheckCircle2, gradient: "linear-gradient(135deg, #22c55e, #16a34a)" },
     draft: { label: "مسودة", color: "#d97706", bg: "rgba(217,119,6,0.08)", icon: Clock, gradient: "linear-gradient(135deg, #fbbf24, #d97706)" },
-    archived: { label: "مؤرشف", color: "#6b7280", bg: "rgba(107,114,128,0.08)", icon: Archive, gradient: "linear-gradient(135deg, #9ca3af, #6b7280)" },
+    archived: { label: "مؤرشف", color: "var(--t-text-muted)", bg: "rgba(107,114,128,0.08)", icon: Archive, gradient: "linear-gradient(135deg, var(--t-text-faint), var(--t-text-muted))" },
 }
 
 // ── Shared styles ──
-const labelSt: React.CSSProperties = { display: "block", fontSize: 12, fontWeight: 600, color: "var(--t-text-secondary, #6b7280)", marginBottom: 5 }
-const inputSt: React.CSSProperties = { width: "100%", padding: "10px 14px", borderRadius: 10, border: "1px solid var(--t-border-light, #e5e7eb)", background: "var(--t-surface, #f9fafb)", fontSize: 13, outline: "none", color: "var(--t-text, #1f2937)", transition: "border-color 0.15s, box-shadow 0.15s" }
+const labelSt: React.CSSProperties = { display: "block", fontSize: 12, fontWeight: 600, color: "var(--t-text-secondary, var(--t-text-muted))", marginBottom: 5 }
+const inputSt: React.CSSProperties = { width: "100%", padding: "10px 14px", borderRadius: 10, border: "1px solid var(--t-border-light, var(--t-border))", background: "var(--t-surface, var(--t-page))", fontSize: 13, outline: "none", color: "var(--t-text, #1f2937)", transition: "border-color 0.15s, box-shadow 0.15s" }
 
 interface TemplatesTabProps {
     onNavigateToTab?: (tab: string) => void
@@ -96,27 +96,27 @@ export function TemplatesTab({ onNavigateToTab, onSelectTemplate }: TemplatesTab
                 <div style={{
                     display: "flex", alignItems: "center", gap: 8,
                     padding: "8px 14px", borderRadius: 12,
-                    background: "var(--t-card, #fff)", border: "1px solid var(--t-border-light, #e5e7eb)",
+                    background: "var(--t-card, #fff)", border: "1px solid var(--t-border-light, var(--t-border))",
                     flex: "1 1 200px", maxWidth: 360, transition: "border-color 0.15s, box-shadow 0.15s",
                 }}>
-                    <Search size={15} style={{ color: "var(--t-text-muted, #9ca3af)", flexShrink: 0 }} />
+                    <Search size={15} style={{ color: "var(--t-text-muted, var(--t-text-faint))", flexShrink: 0 }} />
                     <input value={search} onChange={e => setSearch(e.target.value)} placeholder="بحث في القوالب..."
                         style={{ border: "none", background: "transparent", fontSize: 13, outline: "none", flex: 1, color: "var(--t-text, #1f2937)" }} />
-                    {search && <X size={13} style={{ cursor: "pointer", color: "#9ca3af" }} onClick={() => setSearch("")} />}
+                    {search && <X size={13} style={{ cursor: "pointer", color: "var(--t-text-faint)" }} onClick={() => setSearch("")} />}
                 </div>
 
-                <div style={{ display: "flex", gap: 4, padding: 3, borderRadius: 10, background: "var(--t-surface, #f3f4f6)" }}>
+                <div style={{ display: "flex", gap: 4, padding: 3, borderRadius: 10, background: "var(--t-surface, var(--t-surface))" }}>
                     {([["", "الكل", statusCounts.all], ["published", "منشور", statusCounts.published], ["draft", "مسودة", statusCounts.draft], ["archived", "مؤرشف", statusCounts.archived]] as const).map(([val, label, cnt]) => (
                         <button key={val} onClick={() => setStatusFilter(val as TemplateStatus | "")} style={{
                             padding: "5px 12px", borderRadius: 8, fontSize: 12, fontWeight: 500,
                             border: "none", cursor: "pointer", transition: "all 0.15s",
                             background: statusFilter === val ? "var(--t-card, #fff)" : "transparent",
-                            color: statusFilter === val ? "var(--t-text, #1f2937)" : "var(--t-text-muted, #9ca3af)",
+                            color: statusFilter === val ? "var(--t-text, #1f2937)" : "var(--t-text-muted, var(--t-text-faint))",
                             boxShadow: statusFilter === val ? "0 1px 3px rgba(0,0,0,0.08)" : "none",
                             display: "flex", alignItems: "center", gap: 4,
                         }}>
                             {label}
-                            <span style={{ fontSize: 10, padding: "1px 5px", borderRadius: 6, background: statusFilter === val ? "rgba(0,71,134,0.08)" : "transparent", color: statusFilter === val ? "#004786" : "#9ca3af", fontWeight: 700 }}>{cnt}</span>
+                            <span style={{ fontSize: 10, padding: "1px 5px", borderRadius: 6, background: statusFilter === val ? "rgba(27,80,145,0.08)" : "transparent", color: statusFilter === val ? "var(--t-accent)" : "var(--t-text-faint)", fontWeight: 700 }}>{cnt}</span>
                         </button>
                     ))}
                 </div>
@@ -124,9 +124,9 @@ export function TemplatesTab({ onNavigateToTab, onSelectTemplate }: TemplatesTab
                 {canCreate && <button onClick={() => { resetForm(); setShowCreate(true) }} style={{
                     display: "flex", alignItems: "center", gap: 6,
                     padding: "9px 18px", borderRadius: 10, border: "none", cursor: "pointer",
-                    background: "linear-gradient(135deg, #004786, #0098d6)", color: "#fff",
+                    background: "var(--t-gradient-accent)", color: "#fff",
                     fontSize: 13, fontWeight: 600, transition: "all 0.2s",
-                    boxShadow: "0 3px 12px rgba(0,71,134,0.25)",
+                    boxShadow: "0 3px 12px rgba(27,80,145,0.25)",
                     marginRight: "auto",
                 }}>
                     <Plus size={15} /> إنشاء قالب
@@ -136,12 +136,12 @@ export function TemplatesTab({ onNavigateToTab, onSelectTemplate }: TemplatesTab
             {/* ── Loading / Error ── */}
             {loading && (
                 <div style={{ textAlign: "center", padding: 60 }}>
-                    <Loader2 size={30} className="animate-spin" style={{ color: "#004786", margin: "0 auto 12px" }} />
-                    <p style={{ fontSize: 13, color: "#6b7280" }}>جاري تحميل القوالب...</p>
+                    <Loader2 size={30} className="animate-spin" style={{ color: "var(--t-accent)", margin: "0 auto 12px" }} />
+                    <p style={{ fontSize: 13, color: "var(--t-text-muted)" }}>جاري تحميل القوالب...</p>
                 </div>
             )}
             {error && (
-                <div style={{ display: "flex", alignItems: "center", gap: 10, padding: 16, borderRadius: 14, background: "rgba(239,68,68,0.05)", color: "#ef4444", fontSize: 13, border: "1px solid rgba(239,68,68,0.12)" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10, padding: 16, borderRadius: 14, background: "rgba(239,68,68,0.05)", color: "var(--t-danger)", fontSize: 13, border: "1px solid rgba(239,68,68,0.12)" }}>
                     <AlertCircle size={18} /> {error}
                 </div>
             )}
@@ -155,7 +155,7 @@ export function TemplatesTab({ onNavigateToTab, onSelectTemplate }: TemplatesTab
                         const isMenuOpen = activeMenu === t.template_id
                         return (
                             <div key={t.template_id} style={{
-                                borderRadius: 16, border: "1px solid var(--t-border-light, #e5e7eb)",
+                                borderRadius: 16, border: "1px solid var(--t-border-light, var(--t-border))",
                                 background: "var(--t-card, #fff)", overflow: "hidden",
                                 transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
                                 boxShadow: "0 1px 3px rgba(0,0,0,0.03)",
@@ -179,13 +179,13 @@ export function TemplatesTab({ onNavigateToTab, onSelectTemplate }: TemplatesTab
                                             </div>
                                             <div style={{ flex: 1, minWidth: 0 }}>
                                                 <h3 style={{ fontSize: 15, fontWeight: 700, color: "var(--t-text, #1f2937)", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{t.name}</h3>
-                                                {t.description && <p style={{ fontSize: 12, color: "var(--t-text-secondary, #6b7280)", margin: "2px 0 0", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{t.description}</p>}
+                                                {t.description && <p style={{ fontSize: 12, color: "var(--t-text-secondary, var(--t-text-muted))", margin: "2px 0 0", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{t.description}</p>}
                                             </div>
                                         </div>
                                         {canManage && <div style={{ position: "relative" }}>
                                             <button onClick={() => setActiveMenu(isMenuOpen ? null : t.template_id)} style={{
-                                                background: isMenuOpen ? "var(--t-surface, #f3f4f6)" : "transparent", border: "none",
-                                                cursor: "pointer", padding: 5, borderRadius: 8, color: "#9ca3af", transition: "all 0.15s",
+                                                background: isMenuOpen ? "var(--t-surface, var(--t-surface))" : "transparent", border: "none",
+                                                cursor: "pointer", padding: 5, borderRadius: 8, color: "var(--t-text-faint)", transition: "all 0.15s",
                                             }}>
                                                 <MoreVertical size={16} />
                                             </button>
@@ -193,16 +193,16 @@ export function TemplatesTab({ onNavigateToTab, onSelectTemplate }: TemplatesTab
                                                 <div style={{
                                                     position: "absolute", left: 0, top: "100%", zIndex: 50, marginTop: 4,
                                                     background: "var(--t-card, #fff)", borderRadius: 12,
-                                                    border: "1px solid var(--t-border-light, #e5e7eb)",
+                                                    border: "1px solid var(--t-border-light, var(--t-border))",
                                                     boxShadow: "0 12px 36px rgba(0,0,0,0.12)", width: 170,
                                                     padding: 5, overflow: "hidden",
                                                     animation: "menuPopIn 0.15s ease",
                                                 }}>
                                                     {canUpdate && t.status !== "published" && <MenuItem icon={CheckCircle2} color="#16a34a" label="نشر القالب" onClick={() => handleStatusChange(t, "published")} />}
-                                                    {canUpdate && t.status !== "archived" && <MenuItem icon={Archive} color="#6b7280" label="أرشفة" onClick={() => handleStatusChange(t, "archived")} />}
+                                                    {canUpdate && t.status !== "archived" && <MenuItem icon={Archive} color="var(--t-text-muted)" label="أرشفة" onClick={() => handleStatusChange(t, "archived")} />}
                                                     {canUpdate && t.status !== "draft" && <MenuItem icon={Clock} color="#d97706" label="مسودة" onClick={() => handleStatusChange(t, "draft")} />}
-                                                    {canDelete && <><div style={{ margin: "3px 8px", borderTop: "1px solid var(--t-border-light, #e5e7eb)" }} />
-                                                        <MenuItem icon={Trash2} color="#ef4444" label="حذف" onClick={() => handleDelete(t.template_id)} /></>}
+                                                    {canDelete && <><div style={{ margin: "3px 8px", borderTop: "1px solid var(--t-border-light, var(--t-border))" }} />
+                                                        <MenuItem icon={Trash2} color="var(--t-danger)" label="حذف" onClick={() => handleDelete(t.template_id)} /></>}
                                                 </div>
                                             )}
                                         </div>}
@@ -217,12 +217,12 @@ export function TemplatesTab({ onNavigateToTab, onSelectTemplate }: TemplatesTab
                                         }}>
                                             <StIcon size={11} /> {st.label}
                                         </span>
-                                        <span style={{ display: "inline-flex", alignItems: "center", gap: 3, fontSize: 11, color: "var(--t-text-muted, #9ca3af)" }}>
+                                        <span style={{ display: "inline-flex", alignItems: "center", gap: 3, fontSize: 11, color: "var(--t-text-muted, var(--t-text-faint))" }}>
                                             <CalendarDays size={11} />
                                             {new Date(t.created_at).toLocaleDateString("ar", { year: "numeric", month: "short", day: "numeric" })}
                                         </span>
                                         {t.root_menu_id && (
-                                            <span style={{ display: "inline-flex", alignItems: "center", gap: 3, fontSize: 10, color: "#9ca3af" }}>
+                                            <span style={{ display: "inline-flex", alignItems: "center", gap: 3, fontSize: 10, color: "var(--t-text-faint)" }}>
                                                 <Hash size={10} /> {t.root_menu_id.substring(0, 8)}
                                             </span>
                                         )}
@@ -232,8 +232,8 @@ export function TemplatesTab({ onNavigateToTab, onSelectTemplate }: TemplatesTab
                                     {t.metadata && (t.metadata.header || t.metadata.footer || t.metadata.button) && (
                                         <div style={{
                                             padding: "8px 12px", borderRadius: 10,
-                                            background: "var(--t-surface, #f9fafb)", marginBottom: 14,
-                                            fontSize: 11, color: "var(--t-text-secondary, #6b7280)",
+                                            background: "var(--t-surface, var(--t-page))", marginBottom: 14,
+                                            fontSize: 11, color: "var(--t-text-secondary, var(--t-text-muted))",
                                             display: "flex", flexDirection: "column", gap: 3,
                                             border: "1px solid var(--t-border-light, #f0f0f0)",
                                         }}>
@@ -249,16 +249,16 @@ export function TemplatesTab({ onNavigateToTab, onSelectTemplate }: TemplatesTab
                                             flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
                                             padding: "8px 12px", borderRadius: 10, fontSize: 12, fontWeight: 600,
                                             border: "none", cursor: "pointer", transition: "all 0.2s",
-                                            background: "linear-gradient(135deg, #004786, #0098d6)", color: "#fff",
-                                            boxShadow: "0 2px 8px rgba(0,71,134,0.2)",
+                                            background: "var(--t-gradient-accent)", color: "#fff",
+                                            boxShadow: "0 2px 8px var(--t-accent-muted)",
                                         }}>
                                             <FolderTree size={13} /> عرض الشجرة
                                         </button>
                                         {canUpdate && <button onClick={() => openEdit(t)} style={{
                                             display: "flex", alignItems: "center", justifyContent: "center", gap: 5,
                                             padding: "8px 14px", borderRadius: 10, fontSize: 12, fontWeight: 500,
-                                            border: "1px solid var(--t-border-light, #e5e7eb)", cursor: "pointer",
-                                            background: "var(--t-card, #fff)", color: "var(--t-text-secondary, #6b7280)",
+                                            border: "1px solid var(--t-border-light, var(--t-border))", cursor: "pointer",
+                                            background: "var(--t-card, #fff)", color: "var(--t-text-secondary, var(--t-text-muted))",
                                             transition: "all 0.15s",
                                         }}>
                                             <Edit3 size={13} /> تعديل
@@ -266,8 +266,8 @@ export function TemplatesTab({ onNavigateToTab, onSelectTemplate }: TemplatesTab
                                         <button onClick={() => { onSelectTemplate?.(t.template_id); onNavigateToTab?.("preview") }} style={{
                                             display: "flex", alignItems: "center", justifyContent: "center",
                                             padding: "8px 10px", borderRadius: 10,
-                                            border: "1px solid var(--t-border-light, #e5e7eb)", cursor: "pointer",
-                                            background: "var(--t-card, #fff)", color: "var(--t-text-secondary, #6b7280)",
+                                            border: "1px solid var(--t-border-light, var(--t-border))", cursor: "pointer",
+                                            background: "var(--t-card, #fff)", color: "var(--t-text-secondary, var(--t-text-muted))",
                                             transition: "all 0.15s",
                                         }}>
                                             <Eye size={13} />
@@ -279,8 +279,8 @@ export function TemplatesTab({ onNavigateToTab, onSelectTemplate }: TemplatesTab
                     })}
 
                     {filtered.length === 0 && !loading && (
-                        <div style={{ gridColumn: "1 / -1", textAlign: "center", padding: 80, color: "var(--t-text-muted, #9ca3af)" }}>
-                            <div style={{ width: 64, height: 64, borderRadius: 20, background: "var(--t-surface, #f3f4f6)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
+                        <div style={{ gridColumn: "1 / -1", textAlign: "center", padding: 80, color: "var(--t-text-muted, var(--t-text-faint))" }}>
+                            <div style={{ width: 64, height: 64, borderRadius: 20, background: "var(--t-surface, var(--t-surface))", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
                                 <FileText size={28} style={{ opacity: 0.4 }} />
                             </div>
                             <p style={{ fontSize: 15, fontWeight: 600, marginBottom: 4 }}>لا توجد قوالب</p>
@@ -288,8 +288,8 @@ export function TemplatesTab({ onNavigateToTab, onSelectTemplate }: TemplatesTab
                             <button onClick={() => { resetForm(); setShowCreate(true) }} style={{
                                 display: "inline-flex", alignItems: "center", gap: 6,
                                 padding: "9px 20px", borderRadius: 10, border: "none", cursor: "pointer",
-                                background: "linear-gradient(135deg, #004786, #0098d6)", color: "#fff",
-                                fontSize: 13, fontWeight: 600, boxShadow: "0 3px 12px rgba(0,71,134,0.25)",
+                                background: "var(--t-gradient-accent)", color: "#fff",
+                                fontSize: 13, fontWeight: 600, boxShadow: "0 3px 12px rgba(27,80,145,0.25)",
                             }}>
                                 <Sparkles size={14} /> إنشاء أول قالب
                             </button>
@@ -308,7 +308,7 @@ export function TemplatesTab({ onNavigateToTab, onSelectTemplate }: TemplatesTab
                     }}>
                         {/* Modal Header */}
                         <div style={{
-                            background: "linear-gradient(160deg, #004786 0%, #0072b5 50%, #0098d6 100%)",
+                            background: "var(--t-gradient-accent-wide)",
                             padding: "20px 22px", position: "relative", overflow: "hidden",
                         }}>
                             <div style={{ position: "absolute", top: -25, left: -25, width: 90, height: 90, borderRadius: "50%", background: "rgba(255,255,255,0.06)" }} />
@@ -337,8 +337,8 @@ export function TemplatesTab({ onNavigateToTab, onSelectTemplate }: TemplatesTab
                             <div><label style={labelSt}>اسم القالب *</label><input value={formName} onChange={e => setFormName(e.target.value)} placeholder="مثال: القائمة الرئيسية" style={inputSt} /></div>
                             <div><label style={labelSt}>الوصف</label><textarea value={formDesc} onChange={e => setFormDesc(e.target.value)} placeholder="وصف مختصر للقالب..." rows={2} style={{ ...inputSt, resize: "vertical" }} /></div>
                             {editingTemplate && (
-                                <div style={{ padding: 14, borderRadius: 12, background: "var(--t-surface, #f9fafb)", border: "1px solid var(--t-border-light, #f0f0f0)", display: "flex", flexDirection: "column", gap: 12 }}>
-                                    <p style={{ fontSize: 12, fontWeight: 700, color: "#004786", margin: 0, display: "flex", alignItems: "center", gap: 6 }}>📋 بيانات العرض (Metadata)</p>
+                                <div style={{ padding: 14, borderRadius: 12, background: "var(--t-surface, var(--t-page))", border: "1px solid var(--t-border-light, #f0f0f0)", display: "flex", flexDirection: "column", gap: 12 }}>
+                                    <p style={{ fontSize: 12, fontWeight: 700, color: "var(--t-accent)", margin: 0, display: "flex", alignItems: "center", gap: 6 }}>📋 بيانات العرض (Metadata)</p>
                                     <div><label style={{ ...labelSt, fontSize: 11 }}>العنوان (Header)</label><input value={formHeader} onChange={e => setFormHeader(e.target.value)} placeholder="عنوان القائمة" style={inputSt} /></div>
                                     <div><label style={{ ...labelSt, fontSize: 11 }}>التذييل (Footer)</label><input value={formFooter} onChange={e => setFormFooter(e.target.value)} placeholder="تذييل القائمة" style={inputSt} /></div>
                                     <div><label style={{ ...labelSt, fontSize: 11 }}>الزر (Button)</label><input value={formButton} onChange={e => setFormButton(e.target.value)} placeholder="نص الزر" style={inputSt} /></div>
@@ -347,15 +347,15 @@ export function TemplatesTab({ onNavigateToTab, onSelectTemplate }: TemplatesTab
                         </div>
 
                         {/* Modal Footer */}
-                        <div style={{ padding: "14px 22px", borderTop: "1px solid var(--t-border-light, #e5e7eb)", display: "flex", justifyContent: "flex-end", gap: 8 }}>
+                        <div style={{ padding: "14px 22px", borderTop: "1px solid var(--t-border-light, var(--t-border))", display: "flex", justifyContent: "flex-end", gap: 8 }}>
                             <button onClick={resetForm} style={{ padding: "9px 20px", borderRadius: 10, border: "1px solid var(--t-border-light)", background: "transparent", color: "var(--t-text-secondary)", fontSize: 13, fontWeight: 500, cursor: "pointer" }}>إلغاء</button>
                             <button onClick={handleSubmit} disabled={formSubmitting || !formName.trim()} style={{
                                 padding: "9px 22px", borderRadius: 10, border: "none",
-                                background: formName.trim() ? "linear-gradient(135deg, #004786, #0098d6)" : "#e5e7eb",
-                                color: formName.trim() ? "#fff" : "#9ca3af",
+                                background: formName.trim() ? "var(--t-gradient-accent)" : "var(--t-border)",
+                                color: formName.trim() ? "#fff" : "var(--t-text-faint)",
                                 fontSize: 13, fontWeight: 600, cursor: formName.trim() ? "pointer" : "default",
                                 display: "flex", alignItems: "center", gap: 6,
-                                boxShadow: formName.trim() ? "0 3px 12px rgba(0,71,134,0.2)" : "none",
+                                boxShadow: formName.trim() ? "0 3px 12px var(--t-accent-muted)" : "none",
                                 transition: "all 0.2s",
                             }}>
                                 {formSubmitting && <Loader2 size={13} className="animate-spin" />}
@@ -381,10 +381,10 @@ function MenuItem({ icon: Icon, color, label, onClick }: { icon: typeof Edit3; c
             display: "flex", alignItems: "center", gap: 8, width: "100%",
             padding: "7px 10px", borderRadius: 8, border: "none", background: "transparent",
             cursor: "pointer", fontSize: 12, fontWeight: 500, textAlign: "right",
-            color: color === "#ef4444" ? "#ef4444" : "var(--t-text, #374151)",
+            color: color === "var(--t-danger)" ? "var(--t-danger)" : "var(--t-text, var(--t-text-secondary))",
             transition: "background 0.12s",
         }}
-            onMouseEnter={e => e.currentTarget.style.background = "var(--t-surface, #f3f4f6)"}
+            onMouseEnter={e => e.currentTarget.style.background = "var(--t-surface, var(--t-surface))"}
             onMouseLeave={e => e.currentTarget.style.background = "transparent"}
         >
             <Icon size={13} style={{ color }} /> {label}

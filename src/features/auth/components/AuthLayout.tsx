@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom"
 import type { ReactNode } from "react"
 
 interface AuthLayoutProps {
@@ -11,103 +10,123 @@ export function AuthLayout({ children }: AuthLayoutProps) {
 
             {/* ═══════════════════════════════════════════════════════════
                  BRANDING PANEL
-                 - Mobile:  Hidden (replaced by mobile-only background)
-                 - Tablet:  Compact top strip with logo + tagline
-                 - Desktop: Full 52% side panel with animations
                ═══════════════════════════════════════════════════════════ */}
 
             {/* ── Tablet branding strip (md-lg only) ── */}
             <div
                 className="hidden md:flex lg:hidden items-center justify-center gap-4 py-4 px-6"
                 style={{
-                    background: "linear-gradient(135deg, #004786, #0072b5, #0098d6)",
+                    background: "linear-gradient(135deg, #1A6BCC, #2E8FE8, #5AB3FF)",
                 }}
             >
-                <img src="/Fateen_02_short_logo.png" alt="فطين" className="h-10 w-10 rounded-lg object-contain" />
+                <img src="/darai_logo.png" alt="Dar AI" className="h-10 w-10 rounded-lg object-contain" />
                 <div className="text-right">
-                    <h2 className="text-white font-bold text-lg leading-tight">أهلاً بك في فطين</h2>
+                    <h2 className="text-white font-bold text-lg leading-tight">أهلاً بك في داري</h2>
                     <p className="text-white/60 text-xs">نظام إدارة المحادثات الذكية</p>
                 </div>
             </div>
 
             {/* ── Desktop branding panel (lg+) ── */}
             <div
-                className="hidden lg:flex lg:w-[52%] xl:w-[55%] relative overflow-hidden flex-col"
+                className="hidden lg:flex lg:w-[52%] xl:w-[55%] relative overflow-hidden flex-col items-center justify-center"
                 style={{
-                    backgroundImage: "url('/Fateen_with_background.jpeg')",
-                    backgroundSize: "cover",
-                    backgroundPosition: "center",
+                    background: "#F5F7FA",
                 }}
             >
-                {/* ── Creative animated overlays ── */}
+                {/* ── Professional animated overlays ── */}
                 <div className="pointer-events-none absolute inset-0 overflow-hidden">
 
-                    {/* ▸ Aurora wave — flowing gradient that undulates */}
+                    {/* ▸ Aurora wave — flowing gradient */}
                     <div
                         className="absolute inset-0"
                         style={{
-                            background: "linear-gradient(120deg, transparent 20%, rgba(0,180,255,0.08) 35%, rgba(0,220,255,0.12) 50%, rgba(0,180,255,0.08) 65%, transparent 80%)",
+                            background: "linear-gradient(120deg, transparent 20%, rgba(1,69,178,0.06) 35%, rgba(255,107,26,0.04) 50%, rgba(1,69,178,0.06) 65%, transparent 80%)",
                             backgroundSize: "300% 300%",
                             animation: "aurora-wave 8s ease-in-out infinite",
                         }}
                     />
 
-                    {/* ▸ Second aurora layer — slower, offset */}
+                    {/* ▸ Blue blob - top right */}
                     <div
-                        className="absolute inset-0"
+                        className="absolute"
                         style={{
-                            background: "linear-gradient(240deg, transparent 25%, rgba(100,200,255,0.06) 40%, rgba(0,150,220,0.1) 55%, rgba(100,200,255,0.06) 70%, transparent 85%)",
-                            backgroundSize: "200% 200%",
-                            animation: "aurora-wave-2 12s ease-in-out infinite",
+                            width: "500px",
+                            height: "500px",
+                            top: "-100px",
+                            right: "-80px",
+                            background: "radial-gradient(circle, rgba(1,69,178,0.14), transparent 70%)",
+                            borderRadius: "50%",
+                            filter: "blur(50px)",
+                            animation: "blob-drift-1 20s ease-in-out infinite",
                         }}
                     />
 
-                    {/* ▸ Pulsing rings — emanate from logo center */}
-                    {[0, 1.3, 2.6].map((delay, i) => (
+                    {/* ▸ Orange blob - bottom left */}
+                    <div
+                        className="absolute"
+                        style={{
+                            width: "400px",
+                            height: "400px",
+                            bottom: "-60px",
+                            left: "40px",
+                            background: "radial-gradient(circle, var(--t-brand-orange-soft), transparent 70%)",
+                            borderRadius: "50%",
+                            filter: "blur(50px)",
+                            animation: "blob-drift-2 15s 5s ease-in-out infinite",
+                        }}
+                    />
+
+                    {/* ▸ Orbiting rings around center */}
+                    {[0, 1, 2].map((i) => (
                         <div
-                            key={i}
+                            key={`ring-${i}`}
                             className="absolute"
                             style={{
-                                width: "300px",
-                                height: "300px",
+                                width: `${200 + i * 60}px`,
+                                height: `${200 + i * 60}px`,
                                 top: "50%",
                                 left: "50%",
-                                transform: "translate(-50%, -60%)",
-                                border: `1px solid rgba(255,255,255,${0.15 - i * 0.035})`,
+                                transform: "translate(-50%, -50%)",
+                                border: `1px solid rgba(1,69,178,${0.12 - i * 0.03})`,
                                 borderRadius: "50%",
-                                animation: `pulse-ring 4s ease-out ${delay}s infinite`,
+                                animation: `orbit-spin ${12 + i * 4}s linear infinite${i === 1 ? ' reverse' : ''}`,
                             }}
-                        />
+                        >
+                            {/* Orbiting dot */}
+                            <div
+                                style={{
+                                    position: "absolute",
+                                    top: "-4px",
+                                    left: "50%",
+                                    width: "8px",
+                                    height: "8px",
+                                    marginLeft: "-4px",
+                                    borderRadius: "50%",
+                                    background: i === 1 ? "var(--t-brand-orange)" : "#1A6BCC",
+                                    boxShadow: i === 1
+                                        ? "0 0 12px var(--t-brand-orange-soft)"
+                                        : "0 0 12px rgba(1,69,178,0.5)",
+                                }}
+                            />
+                        </div>
                     ))}
 
-                    {/* ▸ Floating particles — 8 particles drifting upward */}
-                    {[
-                        { size: 4, left: "15%", delay: "0s", dur: "7s", opacity: 0.4 },
-                        { size: 3, left: "30%", delay: "1.2s", dur: "9s", opacity: 0.3 },
-                        { size: 5, left: "50%", delay: "0.5s", dur: "8s", opacity: 0.35 },
-                        { size: 3, left: "65%", delay: "2s", dur: "10s", opacity: 0.25 },
-                        { size: 4, left: "80%", delay: "0.8s", dur: "7.5s", opacity: 0.3 },
-                        { size: 2, left: "25%", delay: "3s", dur: "11s", opacity: 0.2 },
-                        { size: 3, left: "70%", delay: "1.5s", dur: "8.5s", opacity: 0.35 },
-                        { size: 5, left: "40%", delay: "2.5s", dur: "9.5s", opacity: 0.25 },
-                    ].map((p, i) => (
-                        <div
-                            key={i}
-                            className="absolute"
-                            style={{
-                                width: p.size,
-                                height: p.size,
-                                left: p.left,
-                                bottom: "-5%",
-                                borderRadius: "50%",
-                                background: `rgba(255,255,255,${p.opacity})`,
-                                animation: `particle-float ${p.dur} ease-in-out ${p.delay} infinite`,
-                                boxShadow: `0 0 ${p.size * 2}px rgba(100,200,255,${p.opacity * 0.5})`,
-                            }}
-                        />
-                    ))}
+                    {/* ▸ Pulsing glow aura - center */}
+                    <div
+                        className="absolute"
+                        style={{
+                            width: "300px",
+                            height: "300px",
+                            top: "50%",
+                            left: "50%",
+                            transform: "translate(-50%, -50%)",
+                            background: "radial-gradient(circle, rgba(1,69,178,0.08) 0%, rgba(255,107,26,0.03) 50%, transparent 70%)",
+                            borderRadius: "50%",
+                            animation: "logo-pulse 4s ease-in-out infinite",
+                        }}
+                    />
 
-                    {/* ▸ Diagonal light beam sweep */}
+                    {/* ▸ Diagonal light sweep */}
                     <div
                         className="absolute"
                         style={{
@@ -115,99 +134,111 @@ export function AuthLayout({ children }: AuthLayoutProps) {
                             height: "200px",
                             top: "-20%",
                             left: "-50%",
-                            background: "linear-gradient(180deg, transparent, rgba(255,255,255,0.04), transparent)",
+                            background: "linear-gradient(180deg, transparent, rgba(1,69,178,0.03), transparent)",
                             transform: "rotate(-35deg)",
                             animation: "light-sweep 6s ease-in-out infinite",
-                            filter: "blur(20px)",
+                            filter: "blur(15px)",
                         }}
                     />
+
+                    {/* ▸ Floating particles */}
+                    {[
+                        { size: 5, left: "15%", delay: "0s", dur: "8s", color: "rgba(1,69,178,0.35)" },
+                        { size: 4, left: "35%", delay: "1.5s", dur: "10s", color: "var(--t-brand-orange-soft)" },
+                        { size: 6, left: "55%", delay: "0.8s", dur: "9s", color: "rgba(1,69,178,0.25)" },
+                        { size: 3, left: "75%", delay: "2.5s", dur: "11s", color: "rgba(90,179,255,0.35)" },
+                        { size: 5, left: "45%", delay: "3s", dur: "7.5s", color: "var(--t-brand-orange-soft)" },
+                        { size: 4, left: "85%", delay: "1s", dur: "12s", color: "rgba(1,69,178,0.3)" },
+                    ].map((p, i) => (
+                        <div
+                            key={`p-${i}`}
+                            className="absolute"
+                            style={{
+                                width: p.size,
+                                height: p.size,
+                                left: p.left,
+                                bottom: "-5%",
+                                borderRadius: "50%",
+                                background: p.color,
+                                animation: `particle-float ${p.dur} ease-in-out ${p.delay} infinite`,
+                                boxShadow: `0 0 ${p.size * 3}px ${p.color}`,
+                            }}
+                        />
+                    ))}
 
                     {/* ▸ Dot grid */}
                     <div
-                        className="absolute inset-0 opacity-[0.03]"
+                        className="absolute inset-0 opacity-[0.025]"
                         style={{
-                            backgroundImage: "radial-gradient(rgba(255,255,255,0.9) 1px, transparent 1px)",
+                            backgroundImage: "radial-gradient(rgba(1,69,178,0.8) 1px, transparent 1px)",
                             backgroundSize: "32px 32px",
                         }}
                     />
+                </div>
 
-                    {/* ▸ Top edge glow */}
-                    <div
-                        className="absolute left-0 right-0 top-0 h-px"
+                {/* ── Logo + Text ── */}
+                <div
+                    className="relative z-10 flex flex-col items-center justify-center gap-8"
+                    style={{ animation: "auth-fade-in 0.8s ease-out" }}
+                >
+                    <img
+                        src="/logo_verticaloginl.png"
+                        alt="Dar AI"
                         style={{
-                            background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent)",
+                            height: 600,
+                            objectFit: "contain",
+                            filter: "drop-shadow(0 12px 40px rgba(0,0,0,0.08))",
                         }}
                     />
-                </div>
 
-                {/* ── Bottom content overlay ── */}
-                <div className="relative z-10 mt-auto">
-                    <div
-                        style={{
-                            background: "linear-gradient(to top, rgba(0,30,60,0.85) 0%, rgba(0,40,80,0.5) 50%, transparent 100%)",
-                            padding: "60px 40px 36px",
-                        }}
-                    >
-                        <div
-                            className="text-center"
-                            style={{ animation: "auth-fade-in 0.8s ease-out" }}
+                    <div className="text-center" style={{ maxWidth: 380 }}>
+                        <h2
+                            className="font-bold mb-3"
+                            style={{
+                                fontSize: "clamp(1.4rem, 2.2vw, 1.8rem)",
+                                lineHeight: 1.4,
+                                color: "#0D1526",
+                            }}
                         >
-                            <h2
-                                className="text-white font-bold mb-3"
+                            أهلاً بك في داري
+                        </h2>
+                        <p className="text-sm leading-relaxed" style={{ color: "#5A708A" }}>
+                            نظام إدارة المحادثات الذكية — اتصل، أدر، وطوّر أعمالك
+                        </p>
+                    </div>
+
+                    {/* Feature pills */}
+                    <div className="flex flex-wrap justify-center gap-2.5">
+                        {["ذكاء اصطناعي", "محادثات موحدة", "تحليلات متقدمة"].map((text, i) => (
+                            <span
+                                key={text}
                                 style={{
-                                    fontSize: "clamp(1.5rem, 2.5vw, 2rem)",
-                                    lineHeight: 1.3,
-                                    textShadow: "0 2px 20px rgba(0,0,0,0.3)",
+                                    padding: "6px 16px",
+                                    borderRadius: 20,
+                                    fontSize: 12,
+                                    fontWeight: 600,
+                                    color: i === 0 ? "var(--t-brand-orange)" : "#1A6BCC",
+                                    background: i === 0 ? "#FFF3EC" : "#EBF4FF",
+                                    border: i === 0 ? "1px solid var(--t-brand-orange-soft)" : "1px solid rgba(1,69,178,0.15)",
                                 }}
                             >
-                                أهلاً بك في فطين
-                            </h2>
-                            <p
-                                className="text-white/65 leading-relaxed"
-                                style={{
-                                    fontSize: "clamp(0.85rem, 1.2vw, 1rem)",
-                                    maxWidth: 400,
-                                    margin: "0 auto",
-                                }}
-                            >
-                                نظام إدارة المحادثات الذكية — اتصل، أدر، وطوّر أعمالك
-                            </p>
-
-                            {/* Feature pills */}
-                            <div className="mt-6 flex flex-wrap justify-center gap-3">
-                                {["ذكاء اصطناعي", "محادثات موحدة", "تحليلات متقدمة"].map((text) => (
-                                    <span
-                                        key={text}
-                                        style={{
-                                            padding: "6px 16px",
-                                            borderRadius: 20,
-                                            fontSize: 12,
-                                            fontWeight: 500,
-                                            color: "rgba(255,255,255,0.8)",
-                                            background: "rgba(255,255,255,0.1)",
-                                            border: "1px solid rgba(255,255,255,0.15)",
-                                            backdropFilter: "blur(8px)",
-                                        }}
-                                    >
-                                        {text}
-                                    </span>
-                                ))}
-                            </div>
-
-                            {/* Footer */}
-                            <p className="mt-6 text-xs text-white/30">
-                                © {new Date().getFullYear()} فطين — برايد آيديا
-                            </p>
-                        </div>
+                                {text}
+                            </span>
+                        ))}
                     </div>
                 </div>
+
+                {/* ── Footer ── */}
+                <p
+                    className="absolute bottom-5 left-0 right-0 text-center text-xs"
+                    style={{ color: "#94A8C0", animation: "auth-fade-in 1.2s ease-out" }}
+                >
+                    © {new Date().getFullYear()} داري — Dar AI
+                </p>
             </div>
 
             {/* ═══════════════════════════════════════════════════════════
                  FORM PANEL
-                 - Mobile:   Full-screen with dark gradient bg
-                 - Tablet:   Clean white bg, centered card, no split
-                 - Desktop:  48%/45% side panel, white bg, card
                ═══════════════════════════════════════════════════════════ */}
             <div className="flex w-full flex-col lg:w-[48%] xl:w-[45%]">
 
@@ -227,7 +258,7 @@ export function AuthLayout({ children }: AuthLayoutProps) {
                             height: "min(400px, 80vw)",
                             top: "-10%",
                             right: "-15%",
-                            background: "radial-gradient(circle, rgba(0,152,214,0.2) 0%, transparent 70%)",
+                            background: "radial-gradient(circle, rgba(1,69,178,0.2) 0%, transparent 70%)",
                             borderRadius: "50%",
                             animation: "blob-drift-1 18s ease-in-out infinite",
                             filter: "blur(40px)",
@@ -240,7 +271,7 @@ export function AuthLayout({ children }: AuthLayoutProps) {
                             height: "min(350px, 70vw)",
                             bottom: "-10%",
                             left: "-10%",
-                            background: "radial-gradient(circle, rgba(0,71,134,0.25) 0%, transparent 70%)",
+                            background: "radial-gradient(circle, rgba(1,69,178,0.25) 0%, transparent 70%)",
                             borderRadius: "50%",
                             animation: "blob-drift-2 22s ease-in-out infinite",
                             filter: "blur(40px)",
@@ -256,27 +287,10 @@ export function AuthLayout({ children }: AuthLayoutProps) {
                 </div>
 
                 {/* ── Tablet/desktop clean bg (md+) ── */}
-                <div className="hidden md:block fixed inset-0 lg:relative lg:hidden" style={{ background: "#f8fafc" }} />
+                <div className="hidden md:block fixed inset-0 lg:relative lg:hidden" style={{ background: "#F5F7FA" }} />
 
                 {/* ── Form container ── */}
                 <div className="relative z-10 flex flex-1 flex-col items-center justify-center auth-form-container">
-
-                    {/* Logo — mobile only (< md) */}
-                    <div
-                        className="mb-6 sm:mb-8 md:hidden"
-                        style={{ animation: "auth-fade-down 0.6s ease-out" }}
-                    >
-                        <Link to="/" className="transition-transform duration-300 hover:scale-105 block">
-                            <img
-                                src="/logo.png"
-                                alt="فطين"
-                                className="h-10 sm:h-12 object-contain"
-                                style={{
-                                    filter: "drop-shadow(0 4px 12px rgba(0,0,0,0.15))",
-                                }}
-                            />
-                        </Link>
-                    </div>
 
                     {/* Card */}
                     <div
@@ -293,7 +307,7 @@ export function AuthLayout({ children }: AuthLayoutProps) {
                         className="mt-4 sm:mt-6 text-center text-[10px] sm:text-xs text-white/40 md:hidden"
                         style={{ animation: "auth-fade-in 1s ease-out 0.3s both" }}
                     >
-                        © {new Date().getFullYear()} فطين — برايد آيديا
+                        © {new Date().getFullYear()} داري — Dar AI
                     </p>
 
                     {/* Footer — tablet & desktop */}
@@ -301,7 +315,7 @@ export function AuthLayout({ children }: AuthLayoutProps) {
                         className="mt-6 hidden text-center text-xs text-gray-400 md:block"
                         style={{ animation: "auth-fade-in 1s ease-out 0.3s both" }}
                     >
-                        © {new Date().getFullYear()} فطين — برايد آيديا
+                        © {new Date().getFullYear()} داري — Dar AI
                     </p>
                 </div>
             </div>
@@ -345,7 +359,6 @@ export function AuthLayout({ children }: AuthLayoutProps) {
                     padding: 24px 20px;
                 }
 
-                /* Small phones (< 400px) — extra compact */
                 @media (max-width: 399px) {
                     .auth-card {
                         border-radius: 14px;
@@ -353,7 +366,6 @@ export function AuthLayout({ children }: AuthLayoutProps) {
                     }
                 }
 
-                /* Phones (400-639px) */
                 @media (min-width: 400px) and (max-width: 639px) {
                     .auth-card {
                         border-radius: 16px;
@@ -361,7 +373,6 @@ export function AuthLayout({ children }: AuthLayoutProps) {
                     }
                 }
 
-                /* Small tablets+ (640px) */
                 @media (min-width: 640px) {
                     .auth-card {
                         max-width: 440px;
@@ -370,19 +381,17 @@ export function AuthLayout({ children }: AuthLayoutProps) {
                     }
                 }
 
-                /* Tablets (768px+) - clean white card look */
                 @media (min-width: 768px) {
                     .auth-card {
                         max-width: 460px;
                         border-radius: 24px;
                         padding: 36px 32px;
                         background: #ffffff;
-                        border: 1px solid #e5e7eb;
+                        border: 1px solid var(--t-border);
                         box-shadow: 0 20px 50px -12px rgba(0,0,0,0.08), 0 4px 20px -4px rgba(0,0,0,0.04);
                     }
                 }
 
-                /* Desktop (1024px+) */
                 @media (min-width: 1024px) {
                     .auth-card {
                         max-width: 440px;
@@ -394,7 +403,6 @@ export function AuthLayout({ children }: AuthLayoutProps) {
                     }
                 }
 
-                /* Large desktop (1280px+) */
                 @media (min-width: 1280px) {
                     .auth-card {
                         max-width: 460px;
@@ -402,12 +410,11 @@ export function AuthLayout({ children }: AuthLayoutProps) {
                     }
                 }
 
-                /* Mobile card (< 768px): glassmorphism on dark bg */
                 @media (max-width: 767px) {
                     .auth-card {
                         background: rgba(255,255,255,0.95);
                         border: 1px solid rgba(255,255,255,0.15);
-                        box-shadow: 0 25px 60px rgba(0,0,0,0.3), 0 0 40px rgba(0,152,214,0.08);
+                        box-shadow: 0 25px 60px rgba(0,0,0,0.3), 0 0 40px rgba(1,69,178,0.08);
                         backdrop-filter: blur(12px);
                         -webkit-backdrop-filter: blur(12px);
                     }
@@ -461,7 +468,7 @@ export function AuthLayout({ children }: AuthLayoutProps) {
                     }
                 }
 
-                /* ── Landscape phone — reduce vertical space ── */
+                /* ── Landscape phone ── */
                 @media (max-height: 600px) and (orientation: landscape) {
                     .auth-form-container {
                         padding-top: 12px;
@@ -475,53 +482,28 @@ export function AuthLayout({ children }: AuthLayoutProps) {
 
                 /* ═══ Keyframe animations ═══ */
 
-                /* ── Aurora waves ── */
                 @keyframes aurora-wave {
                     0%   { background-position: 0% 50%; }
                     50%  { background-position: 100% 50%; }
                     100% { background-position: 0% 50%; }
                 }
-                @keyframes aurora-wave-2 {
-                    0%   { background-position: 100% 0%; }
-                    50%  { background-position: 0% 100%; }
-                    100% { background-position: 100% 0%; }
+
+                @keyframes orbit-spin {
+                    from { transform: translate(-50%, -50%) rotate(0deg); }
+                    to { transform: translate(-50%, -50%) rotate(360deg); }
                 }
 
-                /* ── Pulsing rings from center ── */
-                @keyframes pulse-ring {
-                    0% {
-                        transform: translate(-50%, -60%) scale(1);
+                @keyframes logo-pulse {
+                    0%, 100% {
+                        transform: translate(-50%, -50%) scale(1);
                         opacity: 0.6;
                     }
-                    100% {
-                        transform: translate(-50%, -60%) scale(3.5);
-                        opacity: 0;
-                    }
-                }
-
-                /* ── Particles drifting upward ── */
-                @keyframes particle-float {
-                    0% {
-                        transform: translateY(0) translateX(0) scale(1);
-                        opacity: 0;
-                    }
-                    10% {
-                        opacity: 1;
-                    }
                     50% {
-                        transform: translateY(-50vh) translateX(20px) scale(1.2);
-                        opacity: 0.8;
-                    }
-                    90% {
-                        opacity: 0;
-                    }
-                    100% {
-                        transform: translateY(-105vh) translateX(-10px) scale(0.8);
-                        opacity: 0;
+                        transform: translate(-50%, -50%) scale(1.5);
+                        opacity: 0.15;
                     }
                 }
 
-                /* ── Diagonal light beam sweep ── */
                 @keyframes light-sweep {
                     0%, 100% {
                         transform: rotate(-35deg) translateX(-100%);
@@ -539,7 +521,23 @@ export function AuthLayout({ children }: AuthLayoutProps) {
                     }
                 }
 
-                /* ── Blob drifts (mobile) ── */
+                @keyframes particle-float {
+                    0% {
+                        transform: translateY(0) translateX(0) scale(1);
+                        opacity: 0;
+                    }
+                    10% { opacity: 1; }
+                    50% {
+                        transform: translateY(-50vh) translateX(20px) scale(1.2);
+                        opacity: 0.8;
+                    }
+                    90% { opacity: 0; }
+                    100% {
+                        transform: translateY(-105vh) translateX(-10px) scale(0.8);
+                        opacity: 0;
+                    }
+                }
+
                 @keyframes blob-drift-1 {
                     0%, 100% { transform: translate(0, 0) scale(1); }
                     25% { transform: translate(-40px, 30px) scale(1.1); }
@@ -552,7 +550,6 @@ export function AuthLayout({ children }: AuthLayoutProps) {
                     66% { transform: translate(-30px, 40px) scale(0.85); }
                 }
 
-                /* ── UI transitions ── */
                 @keyframes auth-fade-up {
                     from { opacity: 0; transform: translateY(24px); }
                     to { opacity: 1; transform: translateY(0); }

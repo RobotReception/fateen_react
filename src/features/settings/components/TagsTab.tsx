@@ -16,41 +16,41 @@ const CSS = `
 @keyframes tgFade{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}
 
 .tg-table{width:100%;border-collapse:separate;border-spacing:0}
-.tg-table thead th{padding:9px 14px;font-size:10.5px;font-weight:700;color:#9ca3af;text-align:right;border-bottom:1.5px solid #ebeef2;white-space:nowrap;background:#fafbfc;text-transform:uppercase;letter-spacing:.03em}
-.tg-table tbody td{padding:10px 14px;font-size:12px;color:#111827;border-bottom:1px solid #f0f1f3;vertical-align:middle}
+.tg-table thead th{padding:9px 14px;font-size:10.5px;font-weight:700;color:var(--t-text-faint);text-align:right;border-bottom:1.5px solid var(--t-border);white-space:nowrap;background:#fafbfc;text-transform:uppercase;letter-spacing:.03em}
+.tg-table tbody td{padding:10px 14px;font-size:12px;color:var(--t-text);border-bottom:1px solid #f0f1f3;vertical-align:middle}
 .tg-table tbody tr{transition:background .1s}
-.tg-table tbody tr:hover{background:rgba(0,71,134,.015)}
+.tg-table tbody tr:hover{background:rgba(27,80,145,.015)}
 .tg-table tbody tr:last-child td{border-bottom:none}
 .tg-th-sort{display:inline-flex;align-items:center;gap:3px;cursor:pointer;user-select:none;transition:color .12s}
-.tg-th-sort:hover{color:#004786}
+.tg-th-sort:hover{color:var(--t-accent)}
 
-.tg-field{width:100%;padding:8px 11px;border-radius:8px;border:1.5px solid #ebeef2;background:#fafbfc;font-size:12px;color:#111827;outline:none;transition:border-color .15s,box-shadow .15s;box-sizing:border-box;font-family:inherit}
-.tg-field:focus{border-color:#004786;box-shadow:0 0 0 3px rgba(0,71,134,.06);background:#fff}
+.tg-field{width:100%;padding:8px 11px;border-radius:8px;border:1.5px solid var(--t-border);background:#fafbfc;font-size:12px;color:var(--t-text);outline:none;transition:border-color .15s,box-shadow .15s;box-sizing:border-box;font-family:inherit}
+.tg-field:focus{border-color:var(--t-accent);box-shadow:0 0 0 3px rgba(27,80,145,.06);background:#fff}
 .tg-field::placeholder{color:#b0b7c3}
-.tg-label{font-size:10px;font-weight:700;color:#6b7280;display:flex;align-items:center;gap:3px;margin-bottom:4px}
+.tg-label{font-size:10px;font-weight:700;color:var(--t-text-muted);display:flex;align-items:center;gap:3px;margin-bottom:4px}
 .tg-label-hint{font-size:9px;font-weight:500;color:#b0b7c3;margin-right:auto}
 
-.tg-btn-primary{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:8px;border:none;background:linear-gradient(135deg,#004786,#0072b5);color:#fff;font-size:12px;font-weight:700;cursor:pointer;transition:all .12s;font-family:inherit;box-shadow:0 2px 8px rgba(0,71,134,.15)}
-.tg-btn-primary:hover:not(:disabled){opacity:.9;box-shadow:0 4px 12px rgba(0,71,134,.2)}
+.tg-btn-primary{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:8px;border:none;background:var(--t-brand-orange);color:#fff;font-size:12px;font-weight:700;cursor:pointer;transition:all .12s;font-family:inherit;box-shadow:0 2px 8px rgba(27,80,145,.15)}
+.tg-btn-primary:hover:not(:disabled){opacity:.9;box-shadow:0 4px 12px rgba(27,80,145,.2)}
 .tg-btn-primary:disabled{opacity:.5;cursor:not-allowed}
 
-.tg-btn-ghost{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:8px;border:1.5px solid #ebeef2;background:#fff;color:#111827;font-size:11px;font-weight:600;cursor:pointer;transition:all .12s;font-family:inherit}
-.tg-btn-ghost:hover{border-color:#004786;color:#004786}
+.tg-btn-ghost{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:8px;border:1.5px solid var(--t-border);background:#fff;color:var(--t-text);font-size:11px;font-weight:600;cursor:pointer;transition:all .12s;font-family:inherit}
+.tg-btn-ghost:hover{border-color:var(--t-accent);color:var(--t-accent)}
 
 .tg-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 
-.tg-actions-btn{width:28px;height:28px;border-radius:7px;border:1px solid #ebeef2;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#9ca3af;transition:all .1s}
-.tg-actions-btn:hover{background:#f5f6f8;color:#6b7280;border-color:#d1d5db}
-.tg-actions-menu{position:absolute;left:0;top:100%;margin-top:2px;z-index:20;background:#fff;border:1px solid #ebeef2;border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,.1);min-width:130px;padding:4px;animation:tgMenuIn .1s ease-out}
-.tg-actions-menu button{width:100%;padding:7px 10px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;gap:6px;border-radius:7px;font-size:11px;font-weight:600;color:#111827;transition:background .08s;font-family:inherit;text-align:right}
-.tg-actions-menu button:hover{background:#f5f6f8}
-.tg-actions-menu button.danger{color:#ef4444}
+.tg-actions-btn{width:28px;height:28px;border-radius:7px;border:1px solid var(--t-border);background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t-text-faint);transition:all .1s}
+.tg-actions-btn:hover{background:var(--t-surface);color:var(--t-text-muted);border-color:var(--t-border-medium)}
+.tg-actions-menu{position:absolute;left:0;top:100%;margin-top:2px;z-index:20;background:#fff;border:1px solid var(--t-border);border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,.1);min-width:130px;padding:4px;animation:tgMenuIn .1s ease-out}
+.tg-actions-menu button{width:100%;padding:7px 10px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;gap:6px;border-radius:7px;font-size:11px;font-weight:600;color:var(--t-text);transition:background .08s;font-family:inherit;text-align:right}
+.tg-actions-menu button:hover{background:var(--t-surface)}
+.tg-actions-menu button.danger{color:var(--t-danger)}
 .tg-actions-menu button.danger:hover{background:rgba(239,68,68,.05)}
 
-.tg-name-badge{display:inline-flex;align-items:center;gap:6px;padding:3px 10px 3px 5px;border-radius:8px;background:#fafbfc;border:1px solid #ebeef2}
+.tg-name-badge{display:inline-flex;align-items:center;gap:6px;padding:3px 10px 3px 5px;border-radius:8px;background:#fafbfc;border:1px solid var(--t-border)}
 .tg-color-swatch{width:22px;height:22px;border-radius:50%;cursor:pointer;border:2.5px solid transparent;transition:all .12s;position:relative}
 .tg-color-swatch:hover{transform:scale(1.08)}
-.tg-color-swatch.active{border-color:#111827;box-shadow:0 0 0 2px #fff}
+.tg-color-swatch.active{border-color:var(--t-text);box-shadow:0 0 0 2px #fff}
 .tg-color-swatch.active::after{content:'✓';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:9px;font-weight:800;text-shadow:0 1px 2px rgba(0,0,0,.3)}
 .tg-preview-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 12px 4px 6px;border-radius:18px;font-size:12px;font-weight:700;transition:all .15s}
 .tg-section{display:flex;align-items:center;gap:6px;margin:4px 0 2px}
@@ -58,27 +58,27 @@ const CSS = `
 .tg-section-line{flex:1;height:1px;background:#f0f1f3}
 
 .tg-tab-bar{display:flex;gap:2px;background:#f0f1f3;border-radius:10px;padding:3px}
-.tg-tab{padding:6px 16px;border-radius:8px;border:none;background:transparent;font-size:11px;font-weight:700;color:#6b7280;cursor:pointer;transition:all .12s;font-family:inherit;display:inline-flex;align-items:center;gap:5px}
-.tg-tab:hover{color:#004786}
-.tg-tab.active{background:#fff;color:#004786;box-shadow:0 1px 3px rgba(0,0,0,.06)}
-.tg-tab .tg-tab-count{font-size:9px;font-weight:800;padding:1px 6px;border-radius:10px;background:rgba(0,71,134,.08);color:#004786}
+.tg-tab{padding:6px 16px;border-radius:8px;border:none;background:transparent;font-size:11px;font-weight:700;color:var(--t-text-muted);cursor:pointer;transition:all .12s;font-family:inherit;display:inline-flex;align-items:center;gap:5px}
+.tg-tab:hover{color:var(--t-accent)}
+.tg-tab.active{background:#fff;color:var(--t-accent);box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.tg-tab .tg-tab-count{font-size:9px;font-weight:800;padding:1px 6px;border-radius:10px;background:rgba(27,80,145,.08);color:var(--t-accent)}
 
-.tg-restore-btn{display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:8px;border:1.5px solid rgba(0,71,134,.15);background:rgba(0,71,134,.03);color:#004786;font-size:11px;font-weight:700;cursor:pointer;transition:all .12s;font-family:inherit}
-.tg-restore-btn:hover{background:rgba(0,71,134,.08);border-color:#004786}
+.tg-restore-btn{display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:8px;border:1.5px solid rgba(27,80,145,.15);background:rgba(27,80,145,.03);color:var(--t-accent);font-size:11px;font-weight:700;cursor:pointer;transition:all .12s;font-family:inherit}
+.tg-restore-btn:hover{background:rgba(27,80,145,.08);border-color:var(--t-accent)}
 .tg-restore-btn:disabled{opacity:.5;cursor:not-allowed}
 
-.tg-pagination{display:flex;align-items:center;justify-content:center;gap:12px;padding:12px 14px;border-top:1px solid #ebeef2}
-.tg-pagination button{padding:5px 12px;border-radius:7px;border:1.5px solid #ebeef2;background:#fff;font-size:11px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:4px;color:#004786;transition:all .12s;font-family:inherit}
-.tg-pagination button:hover:not(:disabled){border-color:#004786;background:rgba(0,71,134,.03)}
+.tg-pagination{display:flex;align-items:center;justify-content:center;gap:12px;padding:12px 14px;border-top:1px solid var(--t-border)}
+.tg-pagination button{padding:5px 12px;border-radius:7px;border:1.5px solid var(--t-border);background:#fff;font-size:11px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:4px;color:var(--t-accent);transition:all .12s;font-family:inherit}
+.tg-pagination button:hover:not(:disabled){border-color:var(--t-accent);background:rgba(27,80,145,.03)}
 .tg-pagination button:disabled{opacity:.4;cursor:not-allowed}
-.tg-pagination span{font-size:11px;font-weight:700;color:#6b7280}
+.tg-pagination span{font-size:11px;font-weight:700;color:var(--t-text-muted)}
 `
 
 const TAG_COLORS = [
     { name: "نيلي", hex: "#6366f1" }, { name: "وردي", hex: "#ec4899" },
-    { name: "أحمر", hex: "#ef4444" }, { name: "برتقالي", hex: "#f97316" },
-    { name: "أصفر", hex: "#eab308" }, { name: "أخضر", hex: "#10b981" },
-    { name: "سماوي", hex: "#06b6d4" }, { name: "أزرق", hex: "#3b82f6" },
+    { name: "أحمر", hex: "var(--t-danger)" }, { name: "برتقالي", hex: "#f97316" },
+    { name: "أصفر", hex: "#eab308" }, { name: "أخضر", hex: "var(--t-success)" },
+    { name: "سماوي", hex: "#06b6d4" }, { name: "أزرق", hex: "var(--t-info)" },
     { name: "بنفسجي", hex: "#8b5cf6" }, { name: "زهري", hex: "#f472b6" },
 ] as const
 
@@ -95,16 +95,16 @@ function fmtDate(d?: string) {
 function Modal({ title, width = 440, onClose, children }: { title: string; width?: number; onClose: () => void; children: React.ReactNode }) {
     return (
         <div onClick={onClose} style={{ position: "fixed", inset: 0, zIndex: 90, background: "rgba(0,0,0,.35)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <div onClick={e => e.stopPropagation()} dir="rtl" style={{ borderRadius: 16, background: "#fff", border: "1px solid #ebeef2", width: "100%", maxWidth: width, margin: 16, animation: "tgIn .15s ease-out", maxHeight: "88vh", display: "flex", flexDirection: "column", boxShadow: "0 20px 60px rgba(0,0,0,.12)" }}>
-                <div style={{ height: 3, background: "linear-gradient(90deg, #004786, #0072b5)", borderRadius: "16px 16px 0 0" }} />
+            <div onClick={e => e.stopPropagation()} dir="rtl" style={{ borderRadius: 16, background: "#fff", border: "1px solid var(--t-border)", width: "100%", maxWidth: width, margin: 16, animation: "tgIn .15s ease-out", maxHeight: "88vh", display: "flex", flexDirection: "column", boxShadow: "0 20px 60px rgba(0,0,0,.12)" }}>
+                <div style={{ height: 3, background: "linear-gradient(90deg, var(--t-accent), var(--t-accent-secondary))", borderRadius: "16px 16px 0 0" }} />
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", borderBottom: "1px solid #f0f1f3", flexShrink: 0 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        <div style={{ width: 28, height: 28, borderRadius: 8, background: "linear-gradient(135deg, #004786, #0072b5)", display: "flex", alignItems: "center", justifyContent: "center" }}><TagIcon size={12} style={{ color: "#fff" }} /></div>
-                        <span style={{ fontSize: 14, fontWeight: 700, color: "#111827" }}>{title}</span>
+                        <div style={{ width: 28, height: 28, borderRadius: 8, background: "var(--t-brand-orange)", display: "flex", alignItems: "center", justifyContent: "center" }}><TagIcon size={12} style={{ color: "#fff" }} /></div>
+                        <span style={{ fontSize: 14, fontWeight: 700, color: "var(--t-text)" }}>{title}</span>
                     </div>
-                    <button onClick={onClose} style={{ width: 26, height: 26, borderRadius: 7, background: "#f5f6f8", border: "none", cursor: "pointer", color: "#9ca3af", display: "flex", alignItems: "center", justifyContent: "center" }}
-                        onMouseEnter={e => { e.currentTarget.style.background = "#ebeef2" }}
-                        onMouseLeave={e => { e.currentTarget.style.background = "#f5f6f8" }}>
+                    <button onClick={onClose} style={{ width: 26, height: 26, borderRadius: 7, background: "var(--t-surface)", border: "none", cursor: "pointer", color: "var(--t-text-faint)", display: "flex", alignItems: "center", justifyContent: "center" }}
+                        onMouseEnter={e => { e.currentTarget.style.background = "var(--t-border)" }}
+                        onMouseLeave={e => { e.currentTarget.style.background = "var(--t-surface)" }}>
                         <X size={12} />
                     </button>
                 </div>
@@ -143,7 +143,7 @@ function TagForm({ tag, tenantId, onClose }: { tag?: Tag; tenantId: string; onCl
     return (
         <form onSubmit={submit} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {/* Preview */}
-            <div style={{ padding: "10px 14px", borderRadius: 10, background: "#fafbfc", border: "1px solid #ebeef2", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <div style={{ padding: "10px 14px", borderRadius: 10, background: "#fafbfc", border: "1px solid var(--t-border)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 6 }}><Sparkles size={10} style={{ color: "#b0b7c3" }} /><span style={{ fontSize: 10, fontWeight: 600, color: "#b0b7c3" }}>معاينة</span></div>
                 <div className="tg-preview-badge" style={{ color: selectedColor, background: `${selectedColor}10`, border: `1.5px solid ${selectedColor}20` }}>
                     {emoji && <span style={{ fontSize: 13 }}>{emoji}</span>}<span>{name || "اسم التاج"}</span>
@@ -152,7 +152,7 @@ function TagForm({ tag, tenantId, onClose }: { tag?: Tag; tenantId: string; onCl
 
             <div style={{ display: "grid", gridTemplateColumns: "56px 1fr", gap: 10 }}>
                 <div><label className="tg-label">إيموجي</label><input className="tg-field" value={emoji} onChange={e => setEmoji(e.target.value)} placeholder="🏷️" maxLength={8} style={{ textAlign: "center", fontSize: 18, padding: "6px 0" }} /></div>
-                <div><label className="tg-label">الاسم <span style={{ color: "#ef4444" }}>*</span></label><input className="tg-field" value={name} onChange={e => setName(e.target.value)} placeholder="عميل VIP" required /></div>
+                <div><label className="tg-label">الاسم <span style={{ color: "var(--t-danger)" }}>*</span></label><input className="tg-field" value={name} onChange={e => setName(e.target.value)} placeholder="عميل VIP" required /></div>
             </div>
 
             <div>
@@ -235,12 +235,12 @@ export function TagsTab() {
             <style>{CSS}</style>
 
             {/* Status strip */}
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14, padding: "10px 14px", borderRadius: 10, background: "#fafbfc", border: "1px solid #ebeef2" }}>
-                <div style={{ width: 28, height: 28, borderRadius: 8, background: "linear-gradient(135deg, #004786, #0072b5)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14, padding: "10px 14px", borderRadius: 10, background: "#fafbfc", border: "1px solid var(--t-border)" }}>
+                <div style={{ width: 28, height: 28, borderRadius: 8, background: "var(--t-brand-orange)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                     <TagIcon size={12} style={{ color: "#fff" }} />
                 </div>
-                <span style={{ fontSize: 11, color: "#6b7280", flex: 1 }}>إنشاء وإدارة الوسوم (Tags) لتصنيف جهات الاتصال والمحادثات.</span>
-                <div style={{ textAlign: "center", flexShrink: 0 }}><div style={{ fontSize: 16, fontWeight: 800, color: "#004786" }}>{tags.length}</div><div style={{ fontSize: 9, color: "#9ca3af", fontWeight: 600 }}>الإجمالي</div></div>
+                <span style={{ fontSize: 11, color: "var(--t-text-muted)", flex: 1 }}>إنشاء وإدارة الوسوم (Tags) لتصنيف جهات الاتصال والمحادثات.</span>
+                <div style={{ textAlign: "center", flexShrink: 0 }}><div style={{ fontSize: 16, fontWeight: 800, color: "var(--t-accent)" }}>{tags.length}</div><div style={{ fontSize: 9, color: "var(--t-text-faint)", fontWeight: 600 }}>الإجمالي</div></div>
             </div>
 
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
@@ -266,16 +266,16 @@ export function TagsTab() {
             </div>
 
             {activeTab === "active" ? (
-                <div style={{ borderRadius: 12, border: "1px solid #ebeef2", background: "#fff", overflow: "visible" }}>
+                <div style={{ borderRadius: 12, border: "1px solid var(--t-border)", background: "#fff", overflow: "visible" }}>
                     {isLoading ? (
-                        <div style={{ textAlign: "center", padding: "48px 0", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, color: "#9ca3af", fontSize: 12 }}>
-                            <div style={{ width: 24, height: 24, borderRadius: "50%", border: "2.5px solid #ebeef2", borderTopColor: "#004786", animation: "spin .7s linear infinite" }} /> جاري التحميل...
+                        <div style={{ textAlign: "center", padding: "48px 0", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, color: "var(--t-text-faint)", fontSize: 12 }}>
+                            <div style={{ width: 24, height: 24, borderRadius: "50%", border: "2.5px solid var(--t-border)", borderTopColor: "var(--t-accent)", animation: "spin .7s linear infinite" }} /> جاري التحميل...
                         </div>
                     ) : filtered.length === 0 ? (
                         <div style={{ textAlign: "center", padding: "48px 0" }}>
-                            <div style={{ width: 52, height: 52, borderRadius: 14, background: "#f5f6f8", margin: "0 auto 10px", display: "flex", alignItems: "center", justifyContent: "center" }}><TagIcon size={22} style={{ color: "#d1d5db" }} /></div>
-                            <div style={{ fontSize: 14, color: "#111827", fontWeight: 700, marginBottom: 3 }}>{search ? "لا توجد نتائج" : "لا توجد وسوم بعد"}</div>
-                            <div style={{ fontSize: 11, color: "#9ca3af", marginBottom: 14 }}>{search ? "حاول تغيير كلمات البحث" : "أنشئ وسوماً لتصنيف جهات الاتصال"}</div>
+                            <div style={{ width: 52, height: 52, borderRadius: 14, background: "var(--t-surface)", margin: "0 auto 10px", display: "flex", alignItems: "center", justifyContent: "center" }}><TagIcon size={22} style={{ color: "var(--t-border-medium)" }} /></div>
+                            <div style={{ fontSize: 14, color: "var(--t-text)", fontWeight: 700, marginBottom: 3 }}>{search ? "لا توجد نتائج" : "لا توجد وسوم بعد"}</div>
+                            <div style={{ fontSize: 11, color: "var(--t-text-faint)", marginBottom: 14 }}>{search ? "حاول تغيير كلمات البحث" : "أنشئ وسوماً لتصنيف جهات الاتصال"}</div>
                             {!search && <button className="tg-btn-primary" onClick={openCreate}><Plus size={13} /> أضف أول وسم</button>}
                         </div>
                     ) : (
@@ -302,15 +302,15 @@ export function TagsTab() {
                                                     <div style={{ width: 24, height: 24, borderRadius: 7, flexShrink: 0, background: `${color}10`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: tag.emoji ? 12 : 10, border: `1px solid ${color}18` }}>
                                                         {tag.emoji || <Hash size={10} style={{ color }} />}
                                                     </div>
-                                                    <span style={{ fontWeight: 700, fontSize: 12.5, color: "#111827" }}>{tag.name}</span>
+                                                    <span style={{ fontWeight: 700, fontSize: 12.5, color: "var(--t-text)" }}>{tag.name}</span>
                                                 </div>
                                             </td>
-                                            <td><span style={{ color: "#9ca3af", fontSize: 11 }}>{tag.description || "—"}</span></td>
-                                            <td><span style={{ fontSize: 11, color: "#6b7280" }}>{tag.created_by || "—"}</span></td>
-                                            <td><span style={{ fontSize: 11, color: "#9ca3af" }}>{tag.source || "—"}</span></td>
-                                            <td><span style={{ fontSize: 11, color: "#9ca3af", whiteSpace: "nowrap" }}>{fmtDate(tag.created_at)}</span></td>
-                                            <td><span style={{ fontSize: 11, color: "#6b7280" }}>{tag.last_edited_by || "—"}</span></td>
-                                            <td><span style={{ fontSize: 11, color: "#9ca3af", whiteSpace: "nowrap" }}>{fmtDate(tag.last_edited_at || tag.updated_at)}</span></td>
+                                            <td><span style={{ color: "var(--t-text-faint)", fontSize: 11 }}>{tag.description || "—"}</span></td>
+                                            <td><span style={{ fontSize: 11, color: "var(--t-text-muted)" }}>{tag.created_by || "—"}</span></td>
+                                            <td><span style={{ fontSize: 11, color: "var(--t-text-faint)" }}>{tag.source || "—"}</span></td>
+                                            <td><span style={{ fontSize: 11, color: "var(--t-text-faint)", whiteSpace: "nowrap" }}>{fmtDate(tag.created_at)}</span></td>
+                                            <td><span style={{ fontSize: 11, color: "var(--t-text-muted)" }}>{tag.last_edited_by || "—"}</span></td>
+                                            <td><span style={{ fontSize: 11, color: "var(--t-text-faint)", whiteSpace: "nowrap" }}>{fmtDate(tag.last_edited_at || tag.updated_at)}</span></td>
                                             <td><ActionsDropdown onEdit={() => openEdit(tag)} onDelete={() => setDeleteTarget(tag)} /></td>
                                         </tr>
                                     )
@@ -321,15 +321,15 @@ export function TagsTab() {
                 </div>
             ) : (
                 /* ─── Deleted Tags ─── */
-                <div style={{ borderRadius: 12, border: "1px solid #ebeef2", background: "#fff", overflow: "visible" }}>
+                <div style={{ borderRadius: 12, border: "1px solid var(--t-border)", background: "#fff", overflow: "visible" }}>
                     {isLoadingDeleted ? (
-                        <div style={{ textAlign: "center", padding: "48px 0", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, color: "#004786", fontSize: 12 }}>
+                        <div style={{ textAlign: "center", padding: "48px 0", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, color: "var(--t-accent)", fontSize: 12 }}>
                             <Loader2 size={16} className="animate-spin" /> جاري التحميل...
                         </div>
                     ) : !deletedData?.items?.length ? (
                         <div style={{ textAlign: "center", padding: "48px 0" }}>
-                            <div style={{ width: 52, height: 52, borderRadius: 14, background: "#f5f6f8", margin: "0 auto 10px", display: "flex", alignItems: "center", justifyContent: "center" }}><Trash2 size={22} style={{ color: "#d1d5db" }} /></div>
-                            <div style={{ fontSize: 13, color: "#9ca3af", fontWeight: 600 }}>لا توجد وسوم معطلة</div>
+                            <div style={{ width: 52, height: 52, borderRadius: 14, background: "var(--t-surface)", margin: "0 auto 10px", display: "flex", alignItems: "center", justifyContent: "center" }}><Trash2 size={22} style={{ color: "var(--t-border-medium)" }} /></div>
+                            <div style={{ fontSize: 13, color: "var(--t-text-faint)", fontWeight: 600 }}>لا توجد وسوم معطلة</div>
                         </div>
                     ) : (
                         <>
@@ -341,14 +341,14 @@ export function TagsTab() {
                                             <tr key={tag.id ?? tag.tag_id} style={{ opacity: .7 }}>
                                                 <td>
                                                     <div className="tg-name-badge">
-                                                        <div style={{ width: 24, height: 24, borderRadius: 7, flexShrink: 0, background: "#f5f6f8", display: "flex", alignItems: "center", justifyContent: "center", fontSize: tag.emoji ? 12 : 10, border: "1px solid #ebeef2" }}>
-                                                            {tag.emoji || <Hash size={10} style={{ color: "#9ca3af" }} />}
+                                                        <div style={{ width: 24, height: 24, borderRadius: 7, flexShrink: 0, background: "var(--t-surface)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: tag.emoji ? 12 : 10, border: "1px solid var(--t-border)" }}>
+                                                            {tag.emoji || <Hash size={10} style={{ color: "var(--t-text-faint)" }} />}
                                                         </div>
-                                                        <span style={{ fontWeight: 700, fontSize: 12.5, color: "#111827" }}>{tag.name}</span>
+                                                        <span style={{ fontWeight: 700, fontSize: 12.5, color: "var(--t-text)" }}>{tag.name}</span>
                                                     </div>
                                                 </td>
-                                                <td><span style={{ color: "#9ca3af", fontSize: 11 }}>{tag.description || "—"}</span></td>
-                                                <td><span style={{ fontSize: 11, color: "#9ca3af" }}>{tag.source || "—"}</span></td>
+                                                <td><span style={{ color: "var(--t-text-faint)", fontSize: 11 }}>{tag.description || "—"}</span></td>
+                                                <td><span style={{ fontSize: 11, color: "var(--t-text-faint)" }}>{tag.source || "—"}</span></td>
                                                 <td>
                                                     <ActionGuard pageBit={PAGE_BITS.TAGS} actionBit={ACTION_BITS.UPDATE_TAG}>
                                                         <button className="tg-restore-btn" disabled={restoreMut.isPending} onClick={() => restoreMut.mutate(tag.id ?? tag.tag_id ?? "")}>
@@ -382,14 +382,14 @@ export function TagsTab() {
             {deleteTarget && (
                 <Modal title="تأكيد التعطيل" width={360} onClose={() => setDeleteTarget(null)}>
                     <div style={{ textAlign: "center", padding: "4px 0" }}>
-                        <div style={{ width: 48, height: 48, borderRadius: 14, background: "rgba(239,68,68,.06)", margin: "0 auto 12px", display: "flex", alignItems: "center", justifyContent: "center" }}><AlertTriangle size={22} style={{ color: "#ef4444" }} /></div>
+                        <div style={{ width: 48, height: 48, borderRadius: 14, background: "rgba(239,68,68,.06)", margin: "0 auto 12px", display: "flex", alignItems: "center", justifyContent: "center" }}><AlertTriangle size={22} style={{ color: "var(--t-danger)" }} /></div>
                         {deleteTarget.emoji && <div style={{ fontSize: 18, marginBottom: 4 }}>{deleteTarget.emoji}</div>}
-                        <div style={{ fontSize: 14, fontWeight: 700, color: "#111827", marginBottom: 4 }}>تعطيل وسم «{deleteTarget.name}»؟</div>
-                        <div style={{ fontSize: 11, color: "#9ca3af", marginBottom: 16 }}>سيتم تعطيل الوسم ويمكنك استعادته لاحقاً</div>
+                        <div style={{ fontSize: 14, fontWeight: 700, color: "var(--t-text)", marginBottom: 4 }}>تعطيل وسم «{deleteTarget.name}»؟</div>
+                        <div style={{ fontSize: 11, color: "var(--t-text-faint)", marginBottom: 16 }}>سيتم تعطيل الوسم ويمكنك استعادته لاحقاً</div>
                         <div style={{ display: "flex", gap: 8, justifyContent: "center" }}>
                             <button className="tg-btn-ghost" onClick={() => setDeleteTarget(null)}>إلغاء</button>
                             <button disabled={deleteMut.isPending} onClick={() => { const tagId = deleteTarget.id ?? deleteTarget.tag_id ?? ""; deleteMut.mutate(tagId, { onSuccess: r => { if (r.success) setDeleteTarget(null) } }) }}
-                                style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "7px 18px", borderRadius: 8, border: "none", background: "#ef4444", color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", boxShadow: "0 2px 8px rgba(239,68,68,.2)" }}>
+                                style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "7px 18px", borderRadius: 8, border: "none", background: "var(--t-danger)", color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", boxShadow: "0 2px 8px rgba(239,68,68,.2)" }}>
                                 {deleteMut.isPending ? <Loader2 size={12} className="animate-spin" /> : <Trash2 size={12} />} تعطيل
                             </button>
                         </div>

@@ -31,55 +31,55 @@ function formatDate(str?: string | null): string {
 
 const CSS = `
 @keyframes cdFade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
-.cd-root{width:340px;min-width:340px;height:100%;display:flex;flex-direction:column;background:#fff;border-right:1px solid #ebeef2;overflow:hidden}
-.cd-empty{width:340px;min-width:340px;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#fff;border-right:1px solid #ebeef2;gap:8px;padding:24px}
-.cd-header{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid #ebeef2;flex-shrink:0;background:#fff}
-.cd-hdr-title{font-size:13px;font-weight:700;color:#111827}
+.cd-root{width:340px;min-width:340px;height:100%;display:flex;flex-direction:column;background:#fff;border-right:1px solid var(--t-border);overflow:hidden}
+.cd-empty{width:340px;min-width:340px;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#fff;border-right:1px solid var(--t-border);gap:8px;padding:24px}
+.cd-header{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid var(--t-border);flex-shrink:0;background:#fff}
+.cd-hdr-title{font-size:13px;font-weight:700;color:var(--t-text)}
 .cd-hdr-actions{display:flex;gap:3px}
-.cd-icon-btn{width:26px;height:26px;border-radius:6px;border:1px solid #ebeef2;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#9ca3af;transition:all .12s}
-.cd-icon-btn:hover{background:#f5f6f8;color:#6b7280}
-.cd-icon-btn-danger:hover{background:rgba(239,68,68,.06);color:#ef4444;border-color:rgba(239,68,68,.2)}
+.cd-icon-btn{width:26px;height:26px;border-radius:6px;border:1px solid var(--t-border);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t-text-faint);transition:all .12s}
+.cd-icon-btn:hover{background:var(--t-surface);color:var(--t-text-muted)}
+.cd-icon-btn-danger:hover{background:rgba(239,68,68,.06);color:var(--t-danger);border-color:rgba(239,68,68,.2)}
 .cd-icon-btn-save{border-color:#16a34a;color:#16a34a}
 .cd-icon-btn-save:hover{background:rgba(22,163,74,.06);color:#16a34a}
 .cd-scroll{flex:1;overflow-y:auto;padding:0}
 .cd-scroll::-webkit-scrollbar{width:3px}
 .cd-scroll::-webkit-scrollbar-thumb{background:rgba(0,0,0,.08);border-radius:3px}
 .cd-profile{display:flex;align-items:center;gap:10px;padding:14px 14px 12px}
-.cd-avatar{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#004786,#0072b5);color:#fff;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex-shrink:0}
+.cd-avatar{width:42px;height:42px;border-radius:50%;background:var(--t-brand-orange);color:#fff;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex-shrink:0}
 .cd-avatar-img{width:42px;height:42px;border-radius:50%;object-fit:cover;flex-shrink:0}
-.cd-name{font-size:15px;font-weight:700;color:#111827;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cd-name{font-size:15px;font-weight:700;color:var(--t-text);margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .cd-id{font-size:10px;color:#b0b7c3;font-family:monospace}
 .cd-badges{display:flex;gap:5px;padding:0 14px 10px;flex-wrap:wrap}
 .cd-badge{font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:6px;display:inline-flex;align-items:center;gap:3px;text-transform:capitalize}
 .cd-badge-open{background:rgba(22,163,74,.06);color:#16a34a}
-.cd-badge-closed{background:rgba(239,68,68,.06);color:#ef4444}
-.cd-badge-session{background:#f5f6f8;color:#9ca3af}
-.cd-badge-pending{background:rgba(245,158,11,.06);color:#f59e0b}
-.cd-badge-ai{background:rgba(0,71,134,.06);color:#004786}
+.cd-badge-closed{background:rgba(239,68,68,.06);color:var(--t-danger)}
+.cd-badge-session{background:var(--t-surface);color:var(--t-text-faint)}
+.cd-badge-pending{background:rgba(245,158,11,.06);color:var(--t-warning)}
+.cd-badge-ai{background:rgba(27,80,145,.06);color:var(--t-accent)}
 .cd-section{padding:10px 14px;border-top:1px solid #f0f1f3}
 .cd-sec-title{font-size:10px;font-weight:700;color:#b0b7c3;text-transform:uppercase;letter-spacing:.05em;margin-bottom:7px;display:flex;align-items:center;gap:4px}
 .cd-info-row{display:flex;align-items:center;gap:7px;padding:3px 0;font-size:12px}
-.cd-info-label{font-weight:500;color:#9ca3af;min-width:65px;flex-shrink:0;font-size:11px}
-.cd-info-value{color:#111827;font-weight:400;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px}
+.cd-info-label{font-weight:500;color:var(--t-text-faint);min-width:65px;flex-shrink:0;font-size:11px}
+.cd-info-value{color:var(--t-text);font-weight:400;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px}
 .cd-tags{display:flex;gap:4px;flex-wrap:wrap}
-.cd-tag{font-size:9.5px;font-weight:600;padding:2px 7px;border-radius:6px;background:#f5f6f8;color:#6b7280;display:inline-flex;align-items:center;gap:2px}
-.cd-notes{font-size:12px;color:#6b7280;margin:0;line-height:1.6;background:#f9fafb;padding:8px 10px;border-radius:8px;border:1px solid #f0f1f3}
-.cd-notes-edit{font-size:12px;color:#111827;margin:0;line-height:1.6;background:#fff;padding:8px 10px;border-radius:8px;border:1px solid #d1d5db;width:100%;resize:vertical;min-height:50px;font-family:inherit;outline:none;transition:border-color .15s}
-.cd-notes-edit:focus{border-color:#004786}
-.cd-last-msg{font-size:12px;color:#111827;margin:0 0 3px;line-height:1.5}
+.cd-tag{font-size:9.5px;font-weight:600;padding:2px 7px;border-radius:6px;background:var(--t-surface);color:var(--t-text-muted);display:inline-flex;align-items:center;gap:2px}
+.cd-notes{font-size:12px;color:var(--t-text-muted);margin:0;line-height:1.6;background:var(--t-page);padding:8px 10px;border-radius:8px;border:1px solid #f0f1f3}
+.cd-notes-edit{font-size:12px;color:var(--t-text);margin:0;line-height:1.6;background:#fff;padding:8px 10px;border-radius:8px;border:1px solid var(--t-border-medium);width:100%;resize:vertical;min-height:50px;font-family:inherit;outline:none;transition:border-color .15s}
+.cd-notes-edit:focus{border-color:var(--t-accent)}
+.cd-last-msg{font-size:12px;color:var(--t-text);margin:0 0 3px;line-height:1.5}
 .cd-msg-dir{font-size:10px;color:#b0b7c3}
-.cd-spinner{width:24px;height:24px;border-radius:50%;border:2.5px solid #ebeef2;border-top-color:#004786;animation:spin .7s linear infinite}
-.cd-field-input{width:100%;padding:5px 8px;border:1px solid #e5e7eb;border-radius:7px;font-size:12px;font-family:inherit;background:#fff;color:#111827;outline:none;transition:border-color .15s}
-.cd-field-input:focus{border-color:#004786}
-.cd-name-input{font-size:15px;font-weight:700;color:#111827;border:none;border-bottom:2px solid #004786;outline:none;width:100%;background:transparent;font-family:inherit;padding:2px 0}
-.cd-action-bar{display:flex;gap:6px;padding:10px 14px;border-top:1px solid #ebeef2;background:#fff;flex-shrink:0}
+.cd-spinner{width:24px;height:24px;border-radius:50%;border:2.5px solid var(--t-border);border-top-color:var(--t-accent);animation:spin .7s linear infinite}
+.cd-field-input{width:100%;padding:5px 8px;border:1px solid var(--t-border);border-radius:7px;font-size:12px;font-family:inherit;background:#fff;color:var(--t-text);outline:none;transition:border-color .15s}
+.cd-field-input:focus{border-color:var(--t-accent)}
+.cd-name-input{font-size:15px;font-weight:700;color:var(--t-text);border:none;border-bottom:2px solid var(--t-accent);outline:none;width:100%;background:transparent;font-family:inherit;padding:2px 0}
+.cd-action-bar{display:flex;gap:6px;padding:10px 14px;border-top:1px solid var(--t-border);background:#fff;flex-shrink:0}
 .cd-btn{flex:1;padding:7px 0;border:none;border-radius:8px;font-size:11.5px;font-weight:700;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;transition:all .15s}
-.cd-btn-primary{background:linear-gradient(135deg,#004786,#0072b5);color:#fff;box-shadow:0 2px 8px rgba(0,71,134,.18)}
-.cd-btn-primary:hover{box-shadow:0 4px 12px rgba(0,71,134,.25)}
-.cd-btn-primary:disabled{background:#94a3b8;box-shadow:none;cursor:not-allowed}
-.cd-btn-outline{background:#fff;color:#6b7280;border:1px solid #e5e7eb}
-.cd-btn-outline:hover{background:#f5f6f8}
-.cd-btn-danger{background:rgba(239,68,68,.06);color:#ef4444;border:1px solid rgba(239,68,68,.15)}
+.cd-btn-primary{background:var(--t-brand-orange);color:#fff;box-shadow:0 2px 8px rgba(27,80,145,.18)}
+.cd-btn-primary:hover{box-shadow:0 4px 12px rgba(27,80,145,.25)}
+.cd-btn-primary:disabled{background:var(--t-text-muted);box-shadow:none;cursor:not-allowed}
+.cd-btn-outline{background:#fff;color:var(--t-text-muted);border:1px solid var(--t-border)}
+.cd-btn-outline:hover{background:var(--t-surface)}
+.cd-btn-danger{background:rgba(239,68,68,.06);color:var(--t-danger);border:1px solid rgba(239,68,68,.15)}
 .cd-btn-danger:hover{background:rgba(239,68,68,.1)}
 .cd-btn-danger:disabled{opacity:.5;cursor:not-allowed}
 .cd-confirm-overlay{position:absolute;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:10;animation:cdFade .15s}
@@ -148,7 +148,7 @@ export function ContactDetailPanel() {
     )
 
     if (!contact) return (
-        <div className="cd-empty"><style>{CSS}</style><div style={{ fontSize: 13, fontWeight: 600, color: "#9ca3af" }}>لم يتم العثور على جهة الاتصال</div></div>
+        <div className="cd-empty"><style>{CSS}</style><div style={{ fontSize: 13, fontWeight: 600, color: "var(--t-text-faint)" }}>لم يتم العثور على جهة الاتصال</div></div>
     )
 
     const customName = [contact.custom_fields?.first_name, contact.custom_fields?.last_name].filter(Boolean).join(" ").trim()
@@ -232,10 +232,10 @@ export function ContactDetailPanel() {
                 <div className="cd-confirm-overlay">
                     <div className="cd-confirm-box">
                         <div style={{ width: 42, height: 42, borderRadius: 12, background: "rgba(239,68,68,.08)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 10px" }}>
-                            <Trash2 size={18} style={{ color: "#ef4444" }} />
+                            <Trash2 size={18} style={{ color: "var(--t-danger)" }} />
                         </div>
-                        <h4 style={{ margin: "0 0 4px", fontSize: 14, fontWeight: 700, color: "#111827" }}>حذف جهة الاتصال</h4>
-                        <p style={{ margin: "0 0 14px", fontSize: 11.5, color: "#6b7280", lineHeight: 1.5 }}>
+                        <h4 style={{ margin: "0 0 4px", fontSize: 14, fontWeight: 700, color: "var(--t-text)" }}>حذف جهة الاتصال</h4>
+                        <p style={{ margin: "0 0 14px", fontSize: 11.5, color: "var(--t-text-muted)", lineHeight: 1.5 }}>
                             سيتم إلغاء تحويل هذا العميل من جهة اتصال. هل أنت متأكد؟
                         </p>
                         <div style={{ display: "flex", gap: 8 }}>
@@ -316,8 +316,8 @@ export function ContactDetailPanel() {
                     {contact.enable_ai && <span className="cd-badge cd-badge-ai"><Bot size={9} /> AI</span>}
                     {lc && (
                         <span className="cd-badge" style={{
-                            background: lc.color ? `${lc.color}14` : "#f5f6f8",
-                            color: lc.color || "#9ca3af",
+                            background: lc.color ? `${lc.color}14` : "var(--t-surface)",
+                            color: lc.color || "var(--t-text-faint)",
                         }}>{lc.icon && <span>{lc.icon}</span>} {lc.name}</span>
                     )}
                 </div>
@@ -355,10 +355,10 @@ export function ContactDetailPanel() {
                                 <div key={field.field_name} style={{ marginBottom: 8 }}>
                                     <label style={{
                                         display: "flex", alignItems: "center", gap: 4,
-                                        fontSize: 10.5, fontWeight: 600, color: "#6b7280",
+                                        fontSize: 10.5, fontWeight: 600, color: "var(--t-text-muted)",
                                         marginBottom: 3,
                                     }}>
-                                        <span style={{ display: "flex", color: "#9ca3af" }}>{typeIcon(field.field_type)}</span>
+                                        <span style={{ display: "flex", color: "var(--t-text-faint)" }}>{typeIcon(field.field_type)}</span>
                                         {label}
                                     </label>
                                     {field.field_type === "boolean" ? (

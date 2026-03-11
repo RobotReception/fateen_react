@@ -17,42 +17,42 @@ const CSS = `
 @keyframes snIn{from{opacity:0;transform:scale(.97) translateY(6px)}to{opacity:1;transform:scale(1) translateY(0)}}
 @keyframes snFade{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}
 
-.sn-card{border-radius:12px;border:1px solid #ebeef2;background:#fff;padding:12px 14px;transition:all .15s;cursor:pointer}
-.sn-card:hover{border-color:#004786;box-shadow:0 4px 16px rgba(0,71,134,.06)}
-.sn-field{width:100%;padding:8px 11px;border-radius:8px;border:1.5px solid #ebeef2;background:#fafbfc;font-size:12px;color:#111827;outline:none;transition:border-color .15s,box-shadow .15s;box-sizing:border-box;font-family:inherit}
-.sn-field:focus{border-color:#004786;box-shadow:0 0 0 3px rgba(0,71,134,.06);background:#fff}
+.sn-card{border-radius:12px;border:1px solid var(--t-border);background:#fff;padding:12px 14px;transition:all .15s;cursor:pointer}
+.sn-card:hover{border-color:var(--t-accent);box-shadow:0 4px 16px rgba(27,80,145,.06)}
+.sn-field{width:100%;padding:8px 11px;border-radius:8px;border:1.5px solid var(--t-border);background:#fafbfc;font-size:12px;color:var(--t-text);outline:none;transition:border-color .15s,box-shadow .15s;box-sizing:border-box;font-family:inherit}
+.sn-field:focus{border-color:var(--t-accent);box-shadow:0 0 0 3px rgba(27,80,145,.06);background:#fff}
 .sn-field::placeholder{color:#b0b7c3}
-.sn-label{font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#9ca3af;display:block;margin-bottom:4px}
-.sn-btn-primary{display:inline-flex;align-items:center;gap:5px;padding:8px 16px;border-radius:8px;border:none;background:linear-gradient(135deg,#004786,#0072b5);color:#fff;font-size:12px;font-weight:700;cursor:pointer;transition:all .12s;font-family:inherit;box-shadow:0 2px 8px rgba(0,71,134,.15)}
-.sn-btn-primary:hover:not(:disabled){opacity:.9;box-shadow:0 4px 12px rgba(0,71,134,.2)}
+.sn-label{font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--t-text-faint);display:block;margin-bottom:4px}
+.sn-btn-primary{display:inline-flex;align-items:center;gap:5px;padding:8px 16px;border-radius:8px;border:none;background:var(--t-brand-orange);color:#fff;font-size:12px;font-weight:700;cursor:pointer;transition:all .12s;font-family:inherit;box-shadow:0 2px 8px rgba(27,80,145,.15)}
+.sn-btn-primary:hover:not(:disabled){opacity:.9;box-shadow:0 4px 12px rgba(27,80,145,.2)}
 .sn-btn-primary:disabled{opacity:.5;cursor:not-allowed}
-.sn-btn-ghost{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:8px;border:1.5px solid #ebeef2;background:#fff;color:#111827;font-size:11px;font-weight:600;cursor:pointer;transition:all .12s;font-family:inherit}
-.sn-btn-ghost:hover{border-color:#004786;color:#004786}
+.sn-btn-ghost{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:8px;border:1.5px solid var(--t-border);background:#fff;color:var(--t-text);font-size:11px;font-weight:600;cursor:pointer;transition:all .12s;font-family:inherit}
+.sn-btn-ghost:hover{border-color:var(--t-accent);color:var(--t-accent)}
 .sn-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .sn-type-btn{display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:7px;font-size:10.5px;font-weight:700;cursor:pointer;transition:all .15s}
 `
 
 const TYPE_META: Record<SnippetMessageType, { icon: React.ElementType; label: string; color: string }> = {
     text: { icon: FileText, label: "نص", color: "#6366f1" },
-    image: { icon: Image, label: "صورة", color: "#10b981" },
-    audio: { icon: Mic, label: "صوت", color: "#f59e0b" },
-    video: { icon: Video, label: "فيديو", color: "#ef4444" },
+    image: { icon: Image, label: "صورة", color: "var(--t-success)" },
+    audio: { icon: Mic, label: "صوت", color: "var(--t-warning)" },
+    video: { icon: Video, label: "فيديو", color: "var(--t-danger)" },
     file: { icon: File, label: "ملف", color: "#8b5cf6" },
-    document: { icon: BookOpen, label: "مستند", color: "#3b82f6" },
+    document: { icon: BookOpen, label: "مستند", color: "var(--t-info)" },
 }
 
 function Modal({ title, width = 560, onClose, children }: { title: string; width?: number; onClose: () => void; children: React.ReactNode }) {
     return (
         <div onClick={onClose} style={{ position: "fixed", inset: 0, zIndex: 90, background: "rgba(0,0,0,.35)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <div onClick={e => e.stopPropagation()} dir="rtl" style={{ borderRadius: 16, background: "#fff", border: "1px solid #ebeef2", width: "100%", maxWidth: width, margin: 16, maxHeight: "90vh", display: "flex", flexDirection: "column", animation: "snIn .15s ease-out", boxShadow: "0 20px 60px rgba(0,0,0,.12)" }}>
-                <div style={{ height: 3, background: "linear-gradient(90deg, #004786, #0072b5)", borderRadius: "16px 16px 0 0" }} />
+            <div onClick={e => e.stopPropagation()} dir="rtl" style={{ borderRadius: 16, background: "#fff", border: "1px solid var(--t-border)", width: "100%", maxWidth: width, margin: 16, maxHeight: "90vh", display: "flex", flexDirection: "column", animation: "snIn .15s ease-out", boxShadow: "0 20px 60px rgba(0,0,0,.12)" }}>
+                <div style={{ height: 3, background: "linear-gradient(90deg, var(--t-accent), var(--t-accent-secondary))", borderRadius: "16px 16px 0 0" }} />
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", borderBottom: "1px solid #f0f1f3", flexShrink: 0 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        <div style={{ width: 28, height: 28, borderRadius: 8, background: "linear-gradient(135deg, #004786, #0072b5)", display: "flex", alignItems: "center", justifyContent: "center" }}><MessageSquare size={12} style={{ color: "#fff" }} /></div>
-                        <span style={{ fontSize: 14, fontWeight: 700, color: "#111827" }}>{title}</span>
+                        <div style={{ width: 28, height: 28, borderRadius: 8, background: "var(--t-brand-orange)", display: "flex", alignItems: "center", justifyContent: "center" }}><MessageSquare size={12} style={{ color: "#fff" }} /></div>
+                        <span style={{ fontSize: 14, fontWeight: 700, color: "var(--t-text)" }}>{title}</span>
                     </div>
-                    <button onClick={onClose} style={{ width: 26, height: 26, borderRadius: 7, background: "#f5f6f8", border: "none", cursor: "pointer", color: "#9ca3af", display: "flex", alignItems: "center", justifyContent: "center" }}
-                        onMouseEnter={e => { e.currentTarget.style.background = "#ebeef2" }} onMouseLeave={e => { e.currentTarget.style.background = "#f5f6f8" }}><X size={12} /></button>
+                    <button onClick={onClose} style={{ width: 26, height: 26, borderRadius: 7, background: "var(--t-surface)", border: "none", cursor: "pointer", color: "var(--t-text-faint)", display: "flex", alignItems: "center", justifyContent: "center" }}
+                        onMouseEnter={e => { e.currentTarget.style.background = "var(--t-border)" }} onMouseLeave={e => { e.currentTarget.style.background = "var(--t-surface)" }}><X size={12} /></button>
                 </div>
                 <div style={{ padding: "14px 16px", overflowY: "auto", flex: 1 }}>{children}</div>
             </div>
@@ -69,47 +69,47 @@ function PreviewModal({ s, onClose }: { s: Snippet; onClose: () => void }) {
                 <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
                     <div style={{ width: 38, height: 38, borderRadius: 10, background: `${tm.color}10`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, border: `1px solid ${tm.color}18` }}><tm.icon size={16} style={{ color: tm.color }} /></div>
                     <div>
-                        <div style={{ fontSize: 13, fontWeight: 700, color: "#111827" }}>{s.title || s.title_ar || s.name}</div>
+                        <div style={{ fontSize: 13, fontWeight: 700, color: "var(--t-text)" }}>{s.title || s.title_ar || s.name}</div>
                         {(s.title_ar || s.title_en) && <div style={{ fontSize: 10, color: "#b0b7c3" }}>{[s.title_ar, s.title_en].filter(Boolean).join(" · ")}</div>}
                         <div style={{ display: "flex", gap: 5, marginTop: 3 }}>
                             <span style={{ fontSize: 9, fontWeight: 700, padding: "2px 7px", borderRadius: 6, background: `${tm.color}10`, color: tm.color }}>{tm.label}</span>
-                            {s.topic && <span style={{ fontSize: 9, fontWeight: 700, padding: "2px 7px", borderRadius: 6, background: "#f5f6f8", color: "#9ca3af", border: "1px solid #ebeef2" }}>{s.topic}</span>}
+                            {s.topic && <span style={{ fontSize: 9, fontWeight: 700, padding: "2px 7px", borderRadius: 6, background: "var(--t-surface)", color: "var(--t-text-faint)", border: "1px solid var(--t-border)" }}>{s.topic}</span>}
                         </div>
                     </div>
                 </div>
 
-                {s.message_type === "text" && <div style={{ padding: "12px 14px", borderRadius: 10, background: "#fafbfc", border: "1px solid #ebeef2", fontSize: 13, lineHeight: 1.8, color: "#111827", whiteSpace: "pre-wrap", direction: "rtl" }}>{s.content?.text || s.message || "—"}</div>}
+                {s.message_type === "text" && <div style={{ padding: "12px 14px", borderRadius: 10, background: "#fafbfc", border: "1px solid var(--t-border)", fontSize: 13, lineHeight: 1.8, color: "var(--t-text)", whiteSpace: "pre-wrap", direction: "rtl" }}>{s.content?.text || s.message || "—"}</div>}
                 {s.message_type === "image" && url && (
-                    <div style={{ borderRadius: 10, overflow: "hidden", border: "1px solid #ebeef2", background: "#fafbfc", textAlign: "center" }}>
+                    <div style={{ borderRadius: 10, overflow: "hidden", border: "1px solid var(--t-border)", background: "#fafbfc", textAlign: "center" }}>
                         <img src={url} alt={s.name} style={{ maxWidth: "100%", maxHeight: 380, objectFit: "contain", display: "block", margin: "0 auto" }} onError={e => { (e.target as HTMLImageElement).style.display = "none" }} />
-                        {s.content?.caption && <div style={{ padding: "7px 14px", fontSize: 11, color: "#9ca3af" }}>{s.content.caption as string}</div>}
+                        {s.content?.caption && <div style={{ padding: "7px 14px", fontSize: 11, color: "var(--t-text-faint)" }}>{s.content.caption as string}</div>}
                     </div>
                 )}
                 {s.message_type === "audio" && url && (
-                    <div style={{ padding: 14, borderRadius: 10, background: "#fafbfc", border: "1px solid #ebeef2" }}>
+                    <div style={{ padding: 14, borderRadius: 10, background: "#fafbfc", border: "1px solid var(--t-border)" }}>
                         <audio controls src={url} style={{ width: "100%" }} />
-                        {s.content?.transcript && <div style={{ marginTop: 8, padding: "8px 12px", borderRadius: 8, background: "#fff", border: "1px solid #ebeef2", fontSize: 11, color: "#9ca3af", lineHeight: 1.6 }}><span style={{ fontSize: 9, fontWeight: 800, display: "block", marginBottom: 3, textTransform: "uppercase" }}>النص المكتوب</span>{s.content.transcript as string}</div>}
+                        {s.content?.transcript && <div style={{ marginTop: 8, padding: "8px 12px", borderRadius: 8, background: "#fff", border: "1px solid var(--t-border)", fontSize: 11, color: "var(--t-text-faint)", lineHeight: 1.6 }}><span style={{ fontSize: 9, fontWeight: 800, display: "block", marginBottom: 3, textTransform: "uppercase" }}>النص المكتوب</span>{s.content.transcript as string}</div>}
                     </div>
                 )}
                 {s.message_type === "video" && url && (
-                    <div style={{ borderRadius: 10, overflow: "hidden", border: "1px solid #ebeef2", background: "#000" }}>
+                    <div style={{ borderRadius: 10, overflow: "hidden", border: "1px solid var(--t-border)", background: "#000" }}>
                         <video controls src={url} style={{ width: "100%", maxHeight: 320, display: "block" }} />
-                        {s.content?.caption && <div style={{ padding: "6px 14px", fontSize: 11, color: "#9ca3af", background: "#fafbfc" }}>{s.content.caption as string}</div>}
+                        {s.content?.caption && <div style={{ padding: "6px 14px", fontSize: 11, color: "var(--t-text-faint)", background: "#fafbfc" }}>{s.content.caption as string}</div>}
                     </div>
                 )}
                 {(s.message_type === "file" || s.message_type === "document") && url && (
-                    <div style={{ padding: "14px 16px", borderRadius: 10, background: "#fafbfc", border: "1px solid #ebeef2", display: "flex", alignItems: "center", gap: 12 }}>
+                    <div style={{ padding: "14px 16px", borderRadius: 10, background: "#fafbfc", border: "1px solid var(--t-border)", display: "flex", alignItems: "center", gap: 12 }}>
                         <div style={{ width: 44, height: 44, borderRadius: 11, background: `${tm.color}10`, display: "flex", alignItems: "center", justifyContent: "center" }}><tm.icon size={20} style={{ color: tm.color }} /></div>
-                        <div style={{ flex: 1, minWidth: 0 }}><div style={{ fontSize: 12, fontWeight: 700, color: "#111827", wordBreak: "break-all" }}>{s.content?.filename as string || s.name}</div><div style={{ fontSize: 10, color: "#b0b7c3", marginTop: 2, wordBreak: "break-all", direction: "ltr" }}>{url}</div></div>
+                        <div style={{ flex: 1, minWidth: 0 }}><div style={{ fontSize: 12, fontWeight: 700, color: "var(--t-text)", wordBreak: "break-all" }}>{s.content?.filename as string || s.name}</div><div style={{ fontSize: 10, color: "#b0b7c3", marginTop: 2, wordBreak: "break-all", direction: "ltr" }}>{url}</div></div>
                         <a href={url} target="_blank" rel="noreferrer" className="sn-btn-primary" style={{ textDecoration: "none", flexShrink: 0 }}><Play size={11} /> فتح</a>
                     </div>
                 )}
-                {(s.content_ar || s.content_en) && <div className="sn-grid-2">{s.content_ar && <div style={{ padding: "8px 12px", borderRadius: 8, background: "#fafbfc", border: "1px solid #ebeef2", fontSize: 11, color: "#9ca3af", direction: "rtl" }}><span style={{ fontSize: 9, fontWeight: 800, display: "block", marginBottom: 3, textTransform: "uppercase" }}>العربية</span>{s.content_ar}</div>}{s.content_en && <div style={{ padding: "8px 12px", borderRadius: 8, background: "#fafbfc", border: "1px solid #ebeef2", fontSize: 11, color: "#9ca3af", direction: "ltr" }}><span style={{ fontSize: 9, fontWeight: 800, display: "block", marginBottom: 3, textTransform: "uppercase" }}>English</span>{s.content_en}</div>}</div>}
+                {(s.content_ar || s.content_en) && <div className="sn-grid-2">{s.content_ar && <div style={{ padding: "8px 12px", borderRadius: 8, background: "#fafbfc", border: "1px solid var(--t-border)", fontSize: 11, color: "var(--t-text-faint)", direction: "rtl" }}><span style={{ fontSize: 9, fontWeight: 800, display: "block", marginBottom: 3, textTransform: "uppercase" }}>العربية</span>{s.content_ar}</div>}{s.content_en && <div style={{ padding: "8px 12px", borderRadius: 8, background: "#fafbfc", border: "1px solid var(--t-border)", fontSize: 11, color: "var(--t-text-faint)", direction: "ltr" }}><span style={{ fontSize: 9, fontWeight: 800, display: "block", marginBottom: 3, textTransform: "uppercase" }}>English</span>{s.content_en}</div>}</div>}
                 <div style={{ display: "flex", gap: 10, fontSize: 10, color: "#b0b7c3", padding: "6px 0", borderTop: "1px solid #f0f1f3", alignItems: "center" }}>
                     <span style={{ fontFamily: "monospace", flex: 1 }}>{s.field_id}</span>
                     {s.created_by && <span>· {s.created_by}</span>}
                     {s.created_at && <span>· {new Date(s.created_at).toLocaleDateString("ar-SA", { timeZone: "Asia/Aden" })}</span>}
-                    {url && <a href={url} download={s.content?.filename as string || s.name} style={{ display: "inline-flex", alignItems: "center", gap: 4, padding: "4px 10px", borderRadius: 7, border: "1.5px solid #ebeef2", background: "#fff", color: "#111827", textDecoration: "none", fontSize: 10, fontWeight: 700 }} onClick={e => e.stopPropagation()}><Download size={10} /> تنزيل</a>}
+                    {url && <a href={url} download={s.content?.filename as string || s.name} style={{ display: "inline-flex", alignItems: "center", gap: 4, padding: "4px 10px", borderRadius: 7, border: "1.5px solid var(--t-border)", background: "#fff", color: "var(--t-text)", textDecoration: "none", fontSize: 10, fontWeight: 700 }} onClick={e => e.stopPropagation()}><Download size={10} /> تنزيل</a>}
                 </div>
             </div>
         </Modal>
@@ -123,7 +123,7 @@ function FileUploadField({ onUploaded, tenantId, accept, uploaded }: { onUploade
         <div>
             <input ref={inputRef} type="file" accept={accept} style={{ display: "none" }} onChange={e => { const f = e.target.files?.[0]; if (f) uploadMut.mutate(f) }} />
             <button type="button" onClick={() => inputRef.current?.click()} className="sn-btn-ghost"
-                style={{ width: "100%", justifyContent: "center", padding: "12px 0", border: `1.5px dashed ${uploaded ? "#16a34a" : "#ebeef2"}`, background: uploaded ? "rgba(22,163,74,.04)" : undefined }}>
+                style={{ width: "100%", justifyContent: "center", padding: "12px 0", border: `1.5px dashed ${uploaded ? "#16a34a" : "var(--t-border)"}`, background: uploaded ? "rgba(22,163,74,.04)" : undefined }}>
                 {uploadMut.isPending ? <><Loader2 size={13} className="animate-spin" /> جاري الرفع...</> : uploaded ? <><Check size={13} style={{ color: "#16a34a" }} /> <span style={{ color: "#16a34a" }}>تم الرفع — انقر لاستبدال</span></> : <><Upload size={13} /> رفع ملف (حتى 100 MB)</>}
             </button>
         </div>
@@ -188,7 +188,7 @@ function SnippetForm({ snippet, tenantId, onClose }: { snippet?: Snippet; tenant
                 <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
                     {(Object.keys(TYPE_META) as SnippetMessageType[]).map(t => {
                         const m = TYPE_META[t]; const active = msgType === t
-                        return <button key={t} type="button" onClick={() => setMsgType(t)} className="sn-type-btn" style={{ border: `1.5px solid ${active ? m.color : "#ebeef2"}`, background: active ? `${m.color}10` : "#fafbfc", color: active ? m.color : "#9ca3af" }}><m.icon size={10} /> {m.label}</button>
+                        return <button key={t} type="button" onClick={() => setMsgType(t)} className="sn-type-btn" style={{ border: `1.5px solid ${active ? m.color : "var(--t-border)"}`, background: active ? `${m.color}10` : "#fafbfc", color: active ? m.color : "var(--t-text-faint)" }}><m.icon size={10} /> {m.label}</button>
                     })}
                 </div>
             </div>
@@ -225,7 +225,7 @@ function SnippetCard({ s, onPreview, onEdit, onDelete }: { s: Snippet; onPreview
     return (
         <div className="sn-card" onClick={onPreview} style={{ display: "flex", alignItems: "flex-start", gap: 10, position: "relative", animation: "snFade .2s ease-out" }}>
             {hasImage ? (
-                <div style={{ width: 48, height: 48, borderRadius: 10, overflow: "hidden", flexShrink: 0, border: "1px solid #ebeef2", background: "#fafbfc", position: "relative" }}>
+                <div style={{ width: 48, height: 48, borderRadius: 10, overflow: "hidden", flexShrink: 0, border: "1px solid var(--t-border)", background: "#fafbfc", position: "relative" }}>
                     <img src={s.content!.url as string} alt={s.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} onError={e => { (e.target as HTMLImageElement).src = "" }} />
                     <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,.12)", display: "flex", alignItems: "center", justifyContent: "center" }}><Eye size={12} style={{ color: "#fff" }} /></div>
                 </div>
@@ -236,20 +236,20 @@ function SnippetCard({ s, onPreview, onEdit, onDelete }: { s: Snippet; onPreview
             )}
             <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 5, flexWrap: "wrap" }}>
-                    <span style={{ fontSize: 12.5, fontWeight: 700, color: "#111827" }}>{s.name}</span>
+                    <span style={{ fontSize: 12.5, fontWeight: 700, color: "var(--t-text)" }}>{s.name}</span>
                     {(s.title || s.title_ar) && <span style={{ fontSize: 10, color: "#b0b7c3" }}>({s.title || s.title_ar})</span>}
                     <span style={{ fontSize: 9, fontWeight: 700, padding: "2px 7px", borderRadius: 6, background: `${tm.color}10`, color: tm.color }}>{tm.label}</span>
-                    {s.topic && <span style={{ fontSize: 9, fontWeight: 700, padding: "2px 7px", borderRadius: 6, background: "#f5f6f8", color: "#9ca3af", border: "1px solid #ebeef2" }}>{s.topic}</span>}
+                    {s.topic && <span style={{ fontSize: 9, fontWeight: 700, padding: "2px 7px", borderRadius: 6, background: "var(--t-surface)", color: "var(--t-text-faint)", border: "1px solid var(--t-border)" }}>{s.topic}</span>}
                 </div>
-                <div style={{ fontSize: 11, color: "#9ca3af", marginTop: 3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{preview}</div>
-                <div style={{ fontSize: 9, fontFamily: "monospace", color: "#d1d5db", marginTop: 2 }}>{s.field_id}</div>
+                <div style={{ fontSize: 11, color: "var(--t-text-faint)", marginTop: 3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{preview}</div>
+                <div style={{ fontSize: 9, fontFamily: "monospace", color: "var(--t-border-medium)", marginTop: 2 }}>{s.field_id}</div>
             </div>
             <div onClick={e => e.stopPropagation()} style={{ display: "flex", gap: 4, flexShrink: 0, alignItems: "center" }}>
                 <ActionGuard pageBit={PAGE_BITS.SNIPPETS} actionBit={ACTION_BITS.UPDATE_SNIPPET}>
                     <button className="sn-btn-ghost" onClick={onEdit} style={{ padding: "5px 7px" }}><Pencil size={11} /></button>
                 </ActionGuard>
                 <ActionGuard pageBit={PAGE_BITS.SNIPPETS} actionBit={ACTION_BITS.DELETE_SNIPPET}>
-                    <button onClick={onDelete} style={{ display: "inline-flex", alignItems: "center", padding: "5px 7px", borderRadius: 7, border: "1px solid rgba(239,68,68,.15)", background: "rgba(239,68,68,.04)", color: "#ef4444", cursor: "pointer" }}><Trash2 size={11} /></button>
+                    <button onClick={onDelete} style={{ display: "inline-flex", alignItems: "center", padding: "5px 7px", borderRadius: 7, border: "1px solid rgba(239,68,68,.15)", background: "rgba(239,68,68,.04)", color: "var(--t-danger)", cursor: "pointer" }}><Trash2 size={11} /></button>
                 </ActionGuard>
             </div>
         </div>
@@ -275,12 +275,12 @@ export function SnippetsTab() {
             <style>{CSS}</style>
 
             {/* Status strip */}
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14, padding: "10px 14px", borderRadius: 10, background: "#fafbfc", border: "1px solid #ebeef2" }}>
-                <div style={{ width: 28, height: 28, borderRadius: 8, background: "linear-gradient(135deg, #004786, #0072b5)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14, padding: "10px 14px", borderRadius: 10, background: "#fafbfc", border: "1px solid var(--t-border)" }}>
+                <div style={{ width: 28, height: 28, borderRadius: 8, background: "var(--t-brand-orange)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                     <MessageSquare size={12} style={{ color: "#fff" }} />
                 </div>
-                <span style={{ fontSize: 11, color: "#6b7280", flex: 1 }}>قوالب رسائل جاهزة يمكن استخدامها بسرعة أثناء المحادثات مع العملاء.</span>
-                <div style={{ textAlign: "center", flexShrink: 0 }}><div style={{ fontSize: 16, fontWeight: 800, color: "#004786" }}>{snippets.length}</div><div style={{ fontSize: 9, color: "#9ca3af", fontWeight: 600 }}>قالب</div></div>
+                <span style={{ fontSize: 11, color: "var(--t-text-muted)", flex: 1 }}>قوالب رسائل جاهزة يمكن استخدامها بسرعة أثناء المحادثات مع العملاء.</span>
+                <div style={{ textAlign: "center", flexShrink: 0 }}><div style={{ fontSize: 16, fontWeight: 800, color: "var(--t-accent)" }}>{snippets.length}</div><div style={{ fontSize: 9, color: "var(--t-text-faint)", fontWeight: 600 }}>قالب</div></div>
             </div>
 
             <div style={{ display: "flex", gap: 8, marginBottom: 14, alignItems: "center", flexWrap: "wrap" }}>
@@ -290,8 +290,8 @@ export function SnippetsTab() {
                 </div>
                 {topics.length > 0 && (
                     <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
-                        <button className="sn-btn-ghost" onClick={() => setTopicFilter(undefined)} style={{ padding: "4px 10px", background: !topicFilter ? "linear-gradient(135deg,#004786,#0072b5)" : undefined, color: !topicFilter ? "#fff" : undefined, borderColor: !topicFilter ? "#004786" : undefined, fontSize: 10 }}>الكل</button>
-                        {topics.map(t => <button key={t} className="sn-btn-ghost" onClick={() => setTopicFilter(topicFilter === t ? undefined : t)} style={{ padding: "4px 10px", background: topicFilter === t ? "linear-gradient(135deg,#004786,#0072b5)" : undefined, color: topicFilter === t ? "#fff" : undefined, borderColor: topicFilter === t ? "#004786" : undefined, fontSize: 10 }}>{t}</button>)}
+                        <button className="sn-btn-ghost" onClick={() => setTopicFilter(undefined)} style={{ padding: "4px 10px", background: !topicFilter ? "var(--t-brand-orange)" : undefined, color: !topicFilter ? "#fff" : undefined, borderColor: !topicFilter ? "var(--t-accent)" : undefined, fontSize: 10 }}>الكل</button>
+                        {topics.map(t => <button key={t} className="sn-btn-ghost" onClick={() => setTopicFilter(topicFilter === t ? undefined : t)} style={{ padding: "4px 10px", background: topicFilter === t ? "var(--t-brand-orange)" : undefined, color: topicFilter === t ? "#fff" : undefined, borderColor: topicFilter === t ? "var(--t-accent)" : undefined, fontSize: 10 }}>{t}</button>)}
                     </div>
                 )}
                 <ActionGuard pageBit={PAGE_BITS.SNIPPETS} actionBit={ACTION_BITS.CREATE_SNIPPET}>
@@ -311,14 +311,14 @@ export function SnippetsTab() {
             )}
 
             {isLoading ? (
-                <div style={{ textAlign: "center", padding: "48px 0", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, color: "#9ca3af", fontSize: 12 }}>
-                    <div style={{ width: 24, height: 24, borderRadius: "50%", border: "2.5px solid #ebeef2", borderTopColor: "#004786", animation: "spin .7s linear infinite" }} /> جاري التحميل...
+                <div style={{ textAlign: "center", padding: "48px 0", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, color: "var(--t-text-faint)", fontSize: 12 }}>
+                    <div style={{ width: 24, height: 24, borderRadius: "50%", border: "2.5px solid var(--t-border)", borderTopColor: "var(--t-accent)", animation: "spin .7s linear infinite" }} /> جاري التحميل...
                 </div>
             ) : filtered.length === 0 ? (
                 <div style={{ textAlign: "center", padding: "48px 0" }}>
-                    <div style={{ width: 52, height: 52, borderRadius: 14, background: "#f5f6f8", margin: "0 auto 10px", display: "flex", alignItems: "center", justifyContent: "center" }}><MessageSquare size={22} style={{ color: "#d1d5db" }} /></div>
-                    <div style={{ fontSize: 14, color: "#111827", fontWeight: 700, marginBottom: 3 }}>{search || topicFilter ? "لا توجد نتائج" : "لا توجد قوالب بعد"}</div>
-                    <div style={{ fontSize: 11, color: "#9ca3af", marginBottom: 14 }}>{search ? "حاول تغيير كلمات البحث" : "أنشئ قوالب رسائل لاستخدامها أثناء المحادثات"}</div>
+                    <div style={{ width: 52, height: 52, borderRadius: 14, background: "var(--t-surface)", margin: "0 auto 10px", display: "flex", alignItems: "center", justifyContent: "center" }}><MessageSquare size={22} style={{ color: "var(--t-border-medium)" }} /></div>
+                    <div style={{ fontSize: 14, color: "var(--t-text)", fontWeight: 700, marginBottom: 3 }}>{search || topicFilter ? "لا توجد نتائج" : "لا توجد قوالب بعد"}</div>
+                    <div style={{ fontSize: 11, color: "var(--t-text-faint)", marginBottom: 14 }}>{search ? "حاول تغيير كلمات البحث" : "أنشئ قوالب رسائل لاستخدامها أثناء المحادثات"}</div>
                     {!search && !topicFilter && <button className="sn-btn-primary" onClick={() => { setEditSnippet(undefined); setShowForm(true) }}><Plus size={13} /> أضف أول قالب</button>}
                 </div>
             ) : (
@@ -332,13 +332,13 @@ export function SnippetsTab() {
             {deleteTarget && (
                 <Modal title="تأكيد الحذف" width={400} onClose={() => setDeleteTarget(null)}>
                     <div style={{ textAlign: "center", padding: "4px 0" }}>
-                        <div style={{ width: 48, height: 48, borderRadius: 14, background: "rgba(239,68,68,.06)", margin: "0 auto 12px", display: "flex", alignItems: "center", justifyContent: "center" }}><AlertTriangle size={22} style={{ color: "#ef4444" }} /></div>
-                        <div style={{ fontSize: 14, fontWeight: 700, color: "#111827", marginBottom: 4 }}>حذف «{deleteTarget.name}»؟</div>
-                        <div style={{ fontSize: 11, color: "#9ca3af", marginBottom: 16 }}>لا يمكن التراجع عن هذا الإجراء</div>
+                        <div style={{ width: 48, height: 48, borderRadius: 14, background: "rgba(239,68,68,.06)", margin: "0 auto 12px", display: "flex", alignItems: "center", justifyContent: "center" }}><AlertTriangle size={22} style={{ color: "var(--t-danger)" }} /></div>
+                        <div style={{ fontSize: 14, fontWeight: 700, color: "var(--t-text)", marginBottom: 4 }}>حذف «{deleteTarget.name}»؟</div>
+                        <div style={{ fontSize: 11, color: "var(--t-text-faint)", marginBottom: 16 }}>لا يمكن التراجع عن هذا الإجراء</div>
                         <div style={{ display: "flex", gap: 8, justifyContent: "center" }}>
                             <button className="sn-btn-ghost" onClick={() => setDeleteTarget(null)}>إلغاء</button>
                             <button disabled={deleteMut.isPending} onClick={() => deleteMut.mutate(deleteTarget.field_id, { onSuccess: r => { if (r.success) setDeleteTarget(null) } })}
-                                style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "7px 18px", borderRadius: 8, border: "none", background: "#ef4444", color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", boxShadow: "0 2px 8px rgba(239,68,68,.2)" }}>
+                                style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "7px 18px", borderRadius: 8, border: "none", background: "var(--t-danger)", color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", boxShadow: "0 2px 8px rgba(239,68,68,.2)" }}>
                                 {deleteMut.isPending ? <Loader2 size={12} className="animate-spin" /> : <Trash2 size={12} />} حذف
                             </button>
                         </div>

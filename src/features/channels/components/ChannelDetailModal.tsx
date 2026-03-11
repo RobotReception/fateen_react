@@ -15,19 +15,19 @@ import { uploadMedia } from "@/features/inbox/services/inbox-service"
 const CSS = `
 @keyframes mdlIn{from{opacity:0;transform:scale(.96) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
 @keyframes mdlFade{from{opacity:0}to{opacity:1}}
-.mdl-field{width:100%;padding:9px 12px;border-radius:9px;border:1.5px solid #e0e3e7;background:#fafafa;font-size:13px;color:var(--t-text,#111827);outline:none;transition:border-color .15s,box-shadow .15s;box-sizing:border-box;font-family:inherit;}
-.mdl-field:focus{border-color:#004786;box-shadow:0 0 0 3px rgba(0,71,134,.06);}
-.mdl-label{font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:#6b7280;display:block;margin-bottom:5px;}
+.mdl-field{width:100%;padding:9px 12px;border-radius:9px;border:1.5px solid var(--t-border);background:var(--t-card-hover);font-size:13px;color:var(--t-text,var(--t-text));outline:none;transition:border-color .15s,box-shadow .15s;box-sizing:border-box;font-family:inherit;}
+.mdl-field:focus{border-color:var(--t-accent);box-shadow:0 0 0 3px rgba(27,80,145,.06);}
+.mdl-label{font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--t-text-muted);display:block;margin-bottom:5px;}
 .mdl-tab{padding:9px 18px;border-radius:8px;border:1.5px solid transparent;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;background:transparent;font-family:inherit;}
-.mdl-tab.active{background:#004786;color:#fff;border-color:#004786;box-shadow:0 1px 3px rgba(0,71,134,.15);}
-.mdl-tab:not(.active){color:#9ca3af;}
-.mdl-tab:not(.active):hover{border-color:#e0e3e7;background:#f5f6f8;}
+.mdl-tab.active{background:var(--t-accent);color:#fff;border-color:var(--t-accent);box-shadow:0 1px 3px rgba(27,80,145,.15);}
+.mdl-tab:not(.active){color:var(--t-text-faint);}
+.mdl-tab:not(.active):hover{border-color:var(--t-border);background:var(--t-surface);}
 `
 
 function Toggle({ on, onToggle, loading }: { on: boolean; onToggle: () => void; loading?: boolean }) {
-    if (loading) return <Loader2 size={18} style={{ color: "#004786", animation: "spin 1s linear infinite" }} />
+    if (loading) return <Loader2 size={18} style={{ color: "var(--t-accent)", animation: "spin 1s linear infinite" }} />
     return (
-        <button onClick={onToggle} style={{ background: "none", border: "none", cursor: "pointer", color: on ? "#16a34a" : "#9ca3af", display: "flex", padding: 0 }}>
+        <button onClick={onToggle} style={{ background: "none", border: "none", cursor: "pointer", color: on ? "#16a34a" : "var(--t-text-faint)", display: "flex", padding: 0 }}>
             {on ? <ToggleRight size={24} /> : <ToggleLeft size={24} />}
         </button>
     )
@@ -42,12 +42,12 @@ function SecretField({ label, value, onChange }: { label: string; value: string;
                 <input type={show ? "text" : "password"} className="mdl-field" dir="ltr" style={{ flex: 1, fontFamily: "monospace" }}
                     value={value} onChange={e => onChange(e.target.value)} />
                 <button type="button" onClick={() => setShow(!show)} style={{
-                    width: 38, height: 38, borderRadius: 9, border: "1.5px solid #e0e3e7", flexShrink: 0,
-                    background: "#fafafa", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
-                    color: "#9ca3af", transition: "all .12s",
+                    width: 38, height: 38, borderRadius: 9, border: "1.5px solid var(--t-border)", flexShrink: 0,
+                    background: "var(--t-card-hover)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+                    color: "var(--t-text-faint)", transition: "all .12s",
                 }}
-                    onMouseEnter={e => { e.currentTarget.style.borderColor = "#004786"; e.currentTarget.style.color = "#004786" }}
-                    onMouseLeave={e => { e.currentTarget.style.borderColor = "#e0e3e7"; e.currentTarget.style.color = "#9ca3af" }}
+                    onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--t-accent)"; e.currentTarget.style.color = "var(--t-accent)" }}
+                    onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--t-border)"; e.currentTarget.style.color = "var(--t-text-faint)" }}
                 >
                     {show ? <EyeOff size={14} /> : <Eye size={14} />}
                 </button>
@@ -97,27 +97,27 @@ function IconUploadEdit({ value, onChange }: { value: string; onChange: (v: stri
             {preview ? (
                 <div style={{
                     display: "flex", alignItems: "center", gap: 10,
-                    padding: "6px 10px", borderRadius: 9, border: "1.5px solid #e0e3e7", background: "#fafafa",
+                    padding: "6px 10px", borderRadius: 9, border: "1.5px solid var(--t-border)", background: "var(--t-card-hover)",
                 }}>
-                    <img src={preview} alt="icon" style={{ width: 32, height: 32, borderRadius: 7, objectFit: "cover", border: "1px solid #e0e3e7" }} />
-                    <span style={{ flex: 1, fontSize: 11, color: "#6b7280", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", direction: "ltr" }}>
+                    <img src={preview} alt="icon" style={{ width: 32, height: 32, borderRadius: 7, objectFit: "cover", border: "1px solid var(--t-border)" }} />
+                    <span style={{ flex: 1, fontSize: 11, color: "var(--t-text-muted)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", direction: "ltr" }}>
                         {uploading ? "جاري الرفع..." : "✓"}
                     </span>
                     {uploading ? (
-                        <Loader2 size={14} style={{ color: "#004786", animation: "spin 1s linear infinite", flexShrink: 0 }} />
+                        <Loader2 size={14} style={{ color: "var(--t-accent)", animation: "spin 1s linear infinite", flexShrink: 0 }} />
                     ) : (
                         <>
                             <button type="button" onClick={() => fileRef.current?.click()} style={{
                                 display: "flex", alignItems: "center", justifyContent: "center",
                                 width: 26, height: 26, borderRadius: 6, border: "none",
-                                background: "rgba(0,71,134,0.06)", cursor: "pointer", color: "#004786", flexShrink: 0,
+                                background: "rgba(27,80,145,0.06)", cursor: "pointer", color: "var(--t-accent)", flexShrink: 0,
                             }}>
                                 <ImageIcon size={12} />
                             </button>
                             <button type="button" onClick={remove} style={{
                                 display: "flex", alignItems: "center", justifyContent: "center",
                                 width: 26, height: 26, borderRadius: 6, border: "none",
-                                background: "rgba(220,38,38,0.06)", cursor: "pointer", color: "#dc2626", flexShrink: 0,
+                                background: "rgba(220,38,38,0.06)", cursor: "pointer", color: "var(--t-danger)", flexShrink: 0,
                             }}>
                                 <Trash2 size={12} />
                             </button>
@@ -128,12 +128,12 @@ function IconUploadEdit({ value, onChange }: { value: string; onChange: (v: stri
                 <button type="button" onClick={() => fileRef.current?.click()} style={{
                     display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
                     width: "100%", padding: "10px 12px", borderRadius: 9,
-                    border: "1.5px dashed #d1d5db", background: "#fafafa",
-                    cursor: "pointer", color: "#9ca3af", fontSize: 12, fontWeight: 600, fontFamily: "inherit",
+                    border: "1.5px dashed var(--t-border-medium)", background: "var(--t-card-hover)",
+                    cursor: "pointer", color: "var(--t-text-faint)", fontSize: 12, fontWeight: 600, fontFamily: "inherit",
                     transition: "all .15s",
                 }}
-                    onMouseEnter={e => { e.currentTarget.style.borderColor = "#004786"; e.currentTarget.style.color = "#004786" }}
-                    onMouseLeave={e => { e.currentTarget.style.borderColor = "#d1d5db"; e.currentTarget.style.color = "#9ca3af" }}
+                    onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--t-accent)"; e.currentTarget.style.color = "var(--t-accent)" }}
+                    onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--t-border-medium)"; e.currentTarget.style.color = "var(--t-text-faint)" }}
                 >
                     <ImageIcon size={16} />
                     اختر صورة الأيقونة
@@ -208,12 +208,12 @@ function SettingsTab({ channel, tenantId }: { channel: Channel; tenantId: string
                         <div style={{ display: "flex", gap: 6 }}>
                             <input className="mdl-field" dir="ltr" value={phoneNumberId} onChange={e => setPhoneNumberId(e.target.value)} style={{ fontFamily: "monospace" }} />
                             <button type="button" onClick={() => { navigator.clipboard.writeText(phoneNumberId); toast.success("تم النسخ") }} style={{
-                                width: 38, height: 38, borderRadius: 9, border: "1.5px solid #e0e3e7", flexShrink: 0,
-                                background: "#fafafa", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
-                                color: "#9ca3af", transition: "all .12s",
+                                width: 38, height: 38, borderRadius: 9, border: "1.5px solid var(--t-border)", flexShrink: 0,
+                                background: "var(--t-card-hover)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+                                color: "var(--t-text-faint)", transition: "all .12s",
                             }}
-                                onMouseEnter={e => { e.currentTarget.style.borderColor = "#004786"; e.currentTarget.style.color = "#004786" }}
-                                onMouseLeave={e => { e.currentTarget.style.borderColor = "#e0e3e7"; e.currentTarget.style.color = "#9ca3af" }}
+                                onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--t-accent)"; e.currentTarget.style.color = "var(--t-accent)" }}
+                                onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--t-border)"; e.currentTarget.style.color = "var(--t-text-faint)" }}
                             >
                                 <Copy size={14} />
                             </button>
@@ -224,12 +224,12 @@ function SettingsTab({ channel, tenantId }: { channel: Channel; tenantId: string
                         <div style={{ display: "flex", gap: 6 }}>
                             <input className="mdl-field" dir="ltr" value={wabaId} onChange={e => setWabaId(e.target.value)} style={{ fontFamily: "monospace" }} />
                             <button type="button" onClick={() => { navigator.clipboard.writeText(wabaId); toast.success("تم النسخ") }} style={{
-                                width: 38, height: 38, borderRadius: 9, border: "1.5px solid #e0e3e7", flexShrink: 0,
-                                background: "#fafafa", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
-                                color: "#9ca3af", transition: "all .12s",
+                                width: 38, height: 38, borderRadius: 9, border: "1.5px solid var(--t-border)", flexShrink: 0,
+                                background: "var(--t-card-hover)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+                                color: "var(--t-text-faint)", transition: "all .12s",
                             }}
-                                onMouseEnter={e => { e.currentTarget.style.borderColor = "#004786"; e.currentTarget.style.color = "#004786" }}
-                                onMouseLeave={e => { e.currentTarget.style.borderColor = "#e0e3e7"; e.currentTarget.style.color = "#9ca3af" }}
+                                onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--t-accent)"; e.currentTarget.style.color = "var(--t-accent)" }}
+                                onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--t-border)"; e.currentTarget.style.color = "var(--t-text-faint)" }}
                             >
                                 <Copy size={14} />
                             </button>
@@ -245,12 +245,12 @@ function SettingsTab({ channel, tenantId }: { channel: Channel; tenantId: string
                         <div style={{ display: "flex", gap: 6 }}>
                             <input className="mdl-field" dir="ltr" value={pageId} onChange={e => setPageId(e.target.value)} style={{ fontFamily: "monospace" }} />
                             <button type="button" onClick={() => { navigator.clipboard.writeText(pageId); toast.success("تم النسخ") }} style={{
-                                width: 38, height: 38, borderRadius: 9, border: "1.5px solid #e0e3e7", flexShrink: 0,
-                                background: "#fafafa", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
-                                color: "#9ca3af", transition: "all .12s",
+                                width: 38, height: 38, borderRadius: 9, border: "1.5px solid var(--t-border)", flexShrink: 0,
+                                background: "var(--t-card-hover)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+                                color: "var(--t-text-faint)", transition: "all .12s",
                             }}
-                                onMouseEnter={e => { e.currentTarget.style.borderColor = "#004786"; e.currentTarget.style.color = "#004786" }}
-                                onMouseLeave={e => { e.currentTarget.style.borderColor = "#e0e3e7"; e.currentTarget.style.color = "#9ca3af" }}
+                                onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--t-accent)"; e.currentTarget.style.color = "var(--t-accent)" }}
+                                onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--t-border)"; e.currentTarget.style.color = "var(--t-text-faint)" }}
                             >
                                 <Copy size={14} />
                             </button>
@@ -262,12 +262,12 @@ function SettingsTab({ channel, tenantId }: { channel: Channel; tenantId: string
                             <div style={{ display: "flex", gap: 6 }}>
                                 <input className="mdl-field" dir="ltr" value={igAccountId} onChange={e => setIgAccountId(e.target.value)} style={{ fontFamily: "monospace" }} />
                                 <button type="button" onClick={() => { navigator.clipboard.writeText(igAccountId); toast.success("تم النسخ") }} style={{
-                                    width: 38, height: 38, borderRadius: 9, border: "1.5px solid #e0e3e7", flexShrink: 0,
-                                    background: "#fafafa", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
-                                    color: "#9ca3af", transition: "all .12s",
+                                    width: 38, height: 38, borderRadius: 9, border: "1.5px solid var(--t-border)", flexShrink: 0,
+                                    background: "var(--t-card-hover)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+                                    color: "var(--t-text-faint)", transition: "all .12s",
                                 }}
-                                    onMouseEnter={e => { e.currentTarget.style.borderColor = "#004786"; e.currentTarget.style.color = "#004786" }}
-                                    onMouseLeave={e => { e.currentTarget.style.borderColor = "#e0e3e7"; e.currentTarget.style.color = "#9ca3af" }}
+                                    onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--t-accent)"; e.currentTarget.style.color = "var(--t-accent)" }}
+                                    onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--t-border)"; e.currentTarget.style.color = "var(--t-text-faint)" }}
                                 >
                                     <Copy size={14} />
                                 </button>
@@ -283,12 +283,12 @@ function SettingsTab({ channel, tenantId }: { channel: Channel; tenantId: string
                     <div style={{ display: "flex", gap: 6 }}>
                         <input className="mdl-field" dir="ltr" value={appId} onChange={e => setAppId(e.target.value)} style={{ fontFamily: "monospace" }} />
                         <button type="button" onClick={() => { navigator.clipboard.writeText(appId); toast.success("تم النسخ") }} style={{
-                            width: 38, height: 38, borderRadius: 9, border: "1.5px solid #e0e3e7", flexShrink: 0,
-                            background: "#fafafa", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
-                            color: "#9ca3af", transition: "all .12s",
+                            width: 38, height: 38, borderRadius: 9, border: "1.5px solid var(--t-border)", flexShrink: 0,
+                            background: "var(--t-card-hover)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+                            color: "var(--t-text-faint)", transition: "all .12s",
                         }}
-                            onMouseEnter={e => { e.currentTarget.style.borderColor = "#004786"; e.currentTarget.style.color = "#004786" }}
-                            onMouseLeave={e => { e.currentTarget.style.borderColor = "#e0e3e7"; e.currentTarget.style.color = "#9ca3af" }}
+                            onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--t-accent)"; e.currentTarget.style.color = "var(--t-accent)" }}
+                            onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--t-border)"; e.currentTarget.style.color = "var(--t-text-faint)" }}
                         >
                             <Copy size={14} />
                         </button>
@@ -310,22 +310,22 @@ function SettingsTab({ channel, tenantId }: { channel: Channel; tenantId: string
                         <label className="mdl-label" style={{ display: "flex", alignItems: "center", gap: 5 }}><Globe size={10} /> كود التضمين (Embed Code)</label>
                         <div style={{
                             position: "relative", borderRadius: 10, overflow: "hidden",
-                            border: "1.5px solid #e0e3e7", background: "#1e293b",
+                            border: "1.5px solid var(--t-border)", background: "#1e293b",
                         }}>
                             <div style={{
                                 display: "flex", alignItems: "center", justifyContent: "space-between",
                                 padding: "6px 12px", background: "#334155", borderBottom: "1px solid #475569",
                             }}>
-                                <span style={{ fontSize: 10, fontWeight: 700, color: "#94a3b8", letterSpacing: ".03em" }}>HTML</span>
+                                <span style={{ fontSize: 10, fontWeight: 700, color: "var(--t-text-muted)", letterSpacing: ".03em" }}>HTML</span>
                                 <button type="button" onClick={() => { navigator.clipboard.writeText(embedCode); toast.success("تم نسخ كود التضمين") }} style={{
                                     display: "flex", alignItems: "center", gap: 5,
                                     padding: "3px 10px", borderRadius: 6, border: "1px solid #475569",
                                     background: "transparent", cursor: "pointer",
-                                    fontSize: 10, fontWeight: 700, color: "#94a3b8", transition: "all .12s",
+                                    fontSize: 10, fontWeight: 700, color: "var(--t-text-muted)", transition: "all .12s",
                                     fontFamily: "inherit",
                                 }}
                                     onMouseEnter={e => { e.currentTarget.style.background = "#475569"; e.currentTarget.style.color = "#e2e8f0" }}
-                                    onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#94a3b8" }}
+                                    onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--t-text-muted)" }}
                                 >
                                     <Copy size={10} /> نسخ
                                 </button>
@@ -335,18 +335,18 @@ function SettingsTab({ channel, tenantId }: { channel: Channel; tenantId: string
                                 fontFamily: "'Fira Code', 'Cascadia Code', 'JetBrains Mono', monospace",
                                 color: "#e2e8f0", overflowX: "auto", whiteSpace: "pre-wrap", wordBreak: "break-all",
                             }}>
-                                <span style={{ color: "#94a3b8" }}>&lt;</span>
+                                <span style={{ color: "var(--t-text-muted)" }}>&lt;</span>
                                 <span style={{ color: "#f472b6" }}>script</span>
                                 {" "}<span style={{ color: "#7dd3fc" }}>src</span>
-                                <span style={{ color: "#94a3b8" }}>=</span>
+                                <span style={{ color: "var(--t-text-muted)" }}>=</span>
                                 <span style={{ color: "#a5f3fc" }}>"{channel.script_url}"</span>
                                 {" "}<span style={{ color: "#7dd3fc" }}>async</span>
-                                <span style={{ color: "#94a3b8" }}>&gt;&lt;/</span>
+                                <span style={{ color: "var(--t-text-muted)" }}>&gt;&lt;/</span>
                                 <span style={{ color: "#f472b6" }}>script</span>
-                                <span style={{ color: "#94a3b8" }}>&gt;</span>
+                                <span style={{ color: "var(--t-text-muted)" }}>&gt;</span>
                             </pre>
                         </div>
-                        <p style={{ marginTop: 6, fontSize: 10, color: "#9ca3af" }}>الصق هذا الكود في صفحة HTML الخاصة بك قبل إغلاق &lt;/body&gt;</p>
+                        <p style={{ marginTop: 6, fontSize: 10, color: "var(--t-text-faint)" }}>الصق هذا الكود في صفحة HTML الخاصة بك قبل إغلاق &lt;/body&gt;</p>
                     </div>
                 )
             })()}
@@ -356,7 +356,7 @@ function SettingsTab({ channel, tenantId }: { channel: Channel; tenantId: string
                     <IconUploadEdit value={icon} onChange={setIcon} />
                     <div>
                         <label className="mdl-label">اللون</label>
-                        <input type="color" value={color} onChange={e => setColor(e.target.value)} style={{ width: 38, height: 38, borderRadius: 9, border: "1.5px solid #e0e3e7", padding: 2, cursor: "pointer" }} />
+                        <input type="color" value={color} onChange={e => setColor(e.target.value)} style={{ width: 38, height: 38, borderRadius: 9, border: "1.5px solid var(--t-border)", padding: 2, cursor: "pointer" }} />
                     </div>
                 </div>
             )}
@@ -376,10 +376,10 @@ function SettingsTab({ channel, tenantId }: { channel: Channel; tenantId: string
             {isDirty && (
                 <button type="button" onClick={save} disabled={updateMut.isPending} style={{
                     display: "inline-flex", alignItems: "center", gap: 7, padding: "9px 18px", borderRadius: 9,
-                    border: "none", background: "#004786", color: "#fff",
+                    border: "none", background: "var(--t-brand-orange)", color: "#fff",
                     fontSize: 13, fontWeight: 700, cursor: "pointer", opacity: updateMut.isPending ? 0.7 : 1,
                     alignSelf: "flex-start", fontFamily: "inherit",
-                    boxShadow: "0 1px 3px rgba(0,71,134,.15)",
+                    boxShadow: "0 1px 3px rgba(27,80,145,.15)",
                 }}>
                     {updateMut.isPending ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
                     حفظ التغييرات
@@ -394,8 +394,8 @@ function FlagRow({ label, effective, override, onToggle }: { label: string; effe
     return (
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "9px 0", borderBottom: "1px solid #f0f1f3" }}>
             <div>
-                <div style={{ fontSize: 12, fontWeight: 700, color: "var(--t-text, #111827)" }}>{label}</div>
-                <div style={{ fontSize: 10, color: override !== null ? "#f59e0b" : "#9ca3af" }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: "var(--t-text, var(--t-text))" }}>{label}</div>
+                <div style={{ fontSize: 10, color: override !== null ? "var(--t-warning)" : "var(--t-text-faint)" }}>
                     {override !== null ? `مخصص: ${override ? "مفعّل" : "معطّل"}` : "يرث من الإعدادات العامة"}
                 </div>
             </div>
@@ -404,18 +404,18 @@ function FlagRow({ label, effective, override, onToggle }: { label: string; effe
                     display: "inline-flex", alignItems: "center", gap: 3,
                     fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 12,
                     background: effective ? "rgba(22,163,74,.06)" : "rgba(220,38,38,.06)",
-                    color: effective ? "#16a34a" : "#dc2626",
+                    color: effective ? "#16a34a" : "var(--t-danger)",
                 }}>
-                    <span style={{ width: 4, height: 4, borderRadius: "50%", background: effective ? "#16a34a" : "#dc2626" }} />
+                    <span style={{ width: 4, height: 4, borderRadius: "50%", background: effective ? "#16a34a" : "var(--t-danger)" }} />
                     {effective ? "مفعّل" : "معطّل"}
                 </span>
                 <button type="button" onClick={onToggle} style={{
-                    padding: "4px 10px", borderRadius: 7, border: "1px solid #e0e3e7",
-                    background: "#fafafa", fontSize: 11, fontWeight: 700, cursor: "pointer",
-                    color: "#6b7280", fontFamily: "inherit", transition: "all .12s",
+                    padding: "4px 10px", borderRadius: 7, border: "1px solid var(--t-border)",
+                    background: "var(--t-card-hover)", fontSize: 11, fontWeight: 700, cursor: "pointer",
+                    color: "var(--t-text-muted)", fontFamily: "inherit", transition: "all .12s",
                 }}
-                    onMouseEnter={e => { e.currentTarget.style.borderColor = "#004786"; e.currentTarget.style.color = "#004786" }}
-                    onMouseLeave={e => { e.currentTarget.style.borderColor = "#e0e3e7"; e.currentTarget.style.color = "#6b7280" }}
+                    onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--t-accent)"; e.currentTarget.style.color = "var(--t-accent)" }}
+                    onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--t-border)"; e.currentTarget.style.color = "var(--t-text-muted)" }}
                 >
                     {override !== null ? "إعادة" : "تخصيص"}
                 </button>
@@ -429,7 +429,7 @@ function FlagsTab({ channel, tenantId }: { channel: Channel; tenantId: string })
     const updateFlags = useUpdateChannelFlags(tenantId)
 
     if (isLoading) return (
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 0", gap: 10, color: "#004786" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 0", gap: 10, color: "var(--t-accent)" }}>
             <Loader2 size={18} className="animate-spin" /> جاري التحميل...
         </div>
     )
@@ -439,13 +439,13 @@ function FlagsTab({ channel, tenantId }: { channel: Channel; tenantId: string })
         <div style={{ textAlign: "center", padding: "40px 0" }}>
             <div style={{
                 width: 44, height: 44, borderRadius: 12,
-                background: "rgba(0,71,134,.06)",
+                background: "rgba(27,80,145,.06)",
                 display: "flex", alignItems: "center", justifyContent: "center",
                 margin: "0 auto 10px",
             }}>
-                <Flag size={20} style={{ color: "#004786" }} />
+                <Flag size={20} style={{ color: "var(--t-accent)" }} />
             </div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: "#9ca3af" }}>لا تتوفر بيانات Flags</div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "var(--t-text-faint)" }}>لا تتوفر بيانات Flags</div>
         </div>
     )
 
@@ -482,11 +482,11 @@ function FlagsTab({ channel, tenantId }: { channel: Channel; tenantId: string })
             <div style={{
                 display: "flex", alignItems: "center", justifyContent: "space-between",
                 padding: "12px 14px", borderRadius: 10,
-                background: "rgba(0,71,134,.03)", border: "1px solid rgba(0,71,134,.08)",
+                background: "rgba(27,80,145,.03)", border: "1px solid rgba(27,80,145,.08)",
             }}>
                 <div>
-                    <div style={{ fontSize: 13, fontWeight: 800, color: "var(--t-text, #111827)" }}>وراثة الإعدادات العامة</div>
-                    <div style={{ fontSize: 11, color: "#9ca3af", marginTop: 2 }}>
+                    <div style={{ fontSize: 13, fontWeight: 800, color: "var(--t-text, var(--t-text))" }}>وراثة الإعدادات العامة</div>
+                    <div style={{ fontSize: 11, color: "var(--t-text-faint)", marginTop: 2 }}>
                         {communication_flags.inherit ? "الإعدادات تُدمج مع الـ global flags" : "الإعدادات المخصصة فقط"}
                     </div>
                 </div>
@@ -497,7 +497,7 @@ function FlagsTab({ channel, tenantId }: { channel: Channel; tenantId: string })
             {/* Message types */}
             {Object.keys(allMsgTypes).length > 0 && (
                 <div>
-                    <div style={{ fontSize: 11, fontWeight: 800, color: "#004786", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 8 }}>أنواع الرسائل</div>
+                    <div style={{ fontSize: 11, fontWeight: 800, color: "var(--t-accent)", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 8 }}>أنواع الرسائل</div>
                     {Object.entries(allMsgTypes).map(([key]) => (
                         <FlagRow key={key} label={key}
                             effective={!!effective_flags.message_types?.[key]}
@@ -510,7 +510,7 @@ function FlagsTab({ channel, tenantId }: { channel: Channel; tenantId: string })
             {/* Response types */}
             {Object.keys(allResTypes).length > 0 && (
                 <div>
-                    <div style={{ fontSize: 11, fontWeight: 800, color: "#004786", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 8 }}>أنواع الردود</div>
+                    <div style={{ fontSize: 11, fontWeight: 800, color: "var(--t-accent)", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 8 }}>أنواع الردود</div>
                     {Object.entries(allResTypes).map(([key]) => (
                         <FlagRow key={key} label={key}
                             effective={!!effective_flags.response_types?.[key]}
@@ -523,7 +523,7 @@ function FlagsTab({ channel, tenantId }: { channel: Channel; tenantId: string })
             {/* Response capabilities */}
             {Object.keys(allResCaps).length > 0 && (
                 <div>
-                    <div style={{ fontSize: 11, fontWeight: 800, color: "#004786", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 8 }}>القدرات</div>
+                    <div style={{ fontSize: 11, fontWeight: 800, color: "var(--t-accent)", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 8 }}>القدرات</div>
                     {Object.entries(allResCaps).map(([key]) => {
                         const effEnabled = !!effective_flags.response_capabilities?.[key]?.enabled
                         const overrideVal = (overrides.response_capabilities as Record<string, { enabled: boolean }> | undefined)?.[key]?.enabled
@@ -561,7 +561,7 @@ export function ChannelDetailModal({ channel, onClose }: { channel: Channel; onC
             }}>
                 {/* Gradient Header */}
                 <div style={{
-                    background: "linear-gradient(135deg, #004786, #0072b5)",
+                    background: "var(--t-brand-orange)",
                     padding: "18px 24px 0",
                 }}>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>

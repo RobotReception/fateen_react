@@ -34,7 +34,7 @@ export function RegisterPage() {
         (submitted || touched[field]) && fieldErrors[field]
 
     const fieldClass = (field: keyof typeof fieldErrors, extra = "") =>
-        `w-full rounded-xl border ${showFieldError(field) ? "border-red-400 bg-red-50/30" : "border-gray-200 bg-gray-50/50"} px-4 py-3 text-sm text-gray-900 outline-none transition-all duration-300 placeholder:text-gray-400 focus:border-[#0098d6]/50 focus:bg-white focus:ring-2 focus:ring-[#0098d6]/10 ${extra}`
+        `w-full rounded-xl border ${showFieldError(field) ? "border-red-400 bg-red-50/30" : "border-gray-200 bg-gray-50/50"} px-4 py-3 text-sm text-gray-900 outline-none transition-all duration-300 placeholder:text-gray-400 focus:border-[var(--t-accent-light)]/50 focus:bg-white focus:ring-2 focus:ring-[var(--t-accent-light)]/10 ${extra}`
 
     const handleBlur = (field: string) => setTouched(p => ({ ...p, [field]: true }))
 
@@ -77,7 +77,7 @@ export function RegisterPage() {
         <AuthLayout>
             <div className="mb-8 text-center">
                 <h1 className="mb-2 text-2xl font-bold text-gray-900">إنشاء حساب جديد</h1>
-                <p className="text-sm text-gray-500">ابدأ رحلتك مع فطين في دقائق</p>
+                <p className="text-sm text-gray-500">ابدأ رحلتك مع داري في دقائق</p>
             </div>
 
             {error && (
@@ -188,7 +188,7 @@ export function RegisterPage() {
                 <button
                     type="submit"
                     disabled={loading}
-                    className="group relative mt-2 w-full overflow-hidden rounded-xl bg-gradient-to-l from-[#0098d6] to-[#004786] px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-[#0098d6]/20 transition-all duration-300 hover:shadow-xl hover:shadow-[#0098d6]/30 hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+                    className="group relative mt-2 w-full overflow-hidden rounded-xl bg-gradient-to-l from-[var(--t-accent-light)] to-[var(--t-accent)] px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-[var(--t-accent-light)]/20 transition-all duration-300 hover:shadow-xl hover:shadow-[var(--t-accent-light)]/30 hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:translate-y-0"
                 >
                     <span className="relative z-10 flex items-center justify-center gap-2">
                         {loading ? (
@@ -212,7 +212,7 @@ export function RegisterPage() {
             {/* Login link */}
             <p className="text-center text-sm text-gray-500">
                 لديك حساب بالفعل؟{" "}
-                <Link to="/login" className="font-semibold text-[#0098d6] transition-colors hover:text-[#004786]">
+                <Link to="/login" className="font-semibold text-[var(--t-accent-light)] transition-colors hover:text-[var(--t-accent)]">
                     سجّل الدخول
                 </Link>
             </p>

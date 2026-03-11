@@ -6,14 +6,14 @@
  *
  * Supports:
  * - Multiple tone presets (selectable by user)
- * - Muting via localStorage key "fateen_notif_sound_enabled"
- * - Volume control via localStorage key "fateen_notif_volume" (0-100)
- * - Tone selection via localStorage key "fateen_notif_tone"
+ * - Muting via localStorage key "darai_notif_sound_enabled"
+ * - Volume control via localStorage key "darai_notif_volume" (0-100)
+ * - Tone selection via localStorage key "darai_notif_tone"
  */
 
-const STORAGE_KEY_ENABLED = "fateen_notif_sound_enabled"
-const STORAGE_KEY_VOLUME = "fateen_notif_volume"
-const STORAGE_KEY_TONE = "fateen_notif_tone"
+const STORAGE_KEY_ENABLED = "darai_notif_sound_enabled"
+const STORAGE_KEY_VOLUME = "darai_notif_volume"
+const STORAGE_KEY_TONE = "darai_notif_tone"
 
 /* ── Tone Presets ── */
 export interface TonePreset {

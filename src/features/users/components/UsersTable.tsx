@@ -30,22 +30,22 @@ interface UsersTableProps {
 
 const ROLE_COLORS: Record<string, { bg: string; color: string; label: string }> = {
     owner: { bg: "rgba(139,92,246,0.08)", color: "#7c3aed", label: "مالك" },
-    admin: { bg: "rgba(0,71,134,0.08)", color: "#004786", label: "مدير" },
+    admin: { bg: "rgba(27,80,145,0.08)", color: "var(--t-accent)", label: "مدير" },
     manager: { bg: "rgba(6,182,212,0.08)", color: "#0891b2", label: "مشرف" },
     analyst: { bg: "rgba(217,119,6,0.08)", color: "#d97706", label: "محلل" },
-    user: { bg: "var(--t-surface, #f5f5f5)", color: "var(--t-text-secondary, #6b7280)", label: "مستخدم" },
+    user: { bg: "var(--t-surface, #f5f5f5)", color: "var(--t-text-secondary, var(--t-text-muted))", label: "مستخدم" },
 }
 
 const AVATAR_GRADIENTS = [
-    "linear-gradient(135deg, #004786, #0072b5)",
+    "var(--t-gradient-accent)",
     "linear-gradient(135deg, #0891b2, #06b6d4)",
     "linear-gradient(135deg, #7c3aed, #a855f7)",
-    "linear-gradient(135deg, #0072b5, #0098d6)",
-    "linear-gradient(135deg, #004786, #0098d6)",
+    "var(--t-gradient-accent)",
+    "var(--t-gradient-accent)",
 ]
 
 function getRoleStyle(role: string) {
-    return ROLE_COLORS[role] || { bg: "var(--t-surface, #f5f5f5)", color: "var(--t-text-secondary, #6b7280)", label: role }
+    return ROLE_COLORS[role] || { bg: "var(--t-surface, #f5f5f5)", color: "var(--t-text-secondary, var(--t-text-muted))", label: role }
 }
 
 function getDisplayName(u: AdminUser): string {
@@ -187,14 +187,14 @@ export function UsersTable({ users, loading, onEdit, onSetPassword, onRefresh }:
             <div style={{ textAlign: "center", padding: "48px 20px" }}>
                 <div style={{
                     width: 56, height: 56, borderRadius: 14,
-                    background: "rgba(0,71,134,0.06)",
+                    background: "rgba(27,80,145,0.06)",
                     display: "inline-flex", alignItems: "center", justifyContent: "center",
                     marginBottom: 12,
                 }}>
-                    <Users size={24} style={{ color: "#004786" }} />
+                    <Users size={24} style={{ color: "var(--t-accent)" }} />
                 </div>
-                <h3 style={{ fontSize: 15, fontWeight: 700, color: "var(--t-text, #111827)", margin: "0 0 4px" }}>لا يوجد مستخدمين</h3>
-                <p style={{ fontSize: 12, color: "var(--t-text-faint, #9ca3af)", margin: 0 }}>أضف مستخدمين جدد للبدء</p>
+                <h3 style={{ fontSize: 15, fontWeight: 700, color: "var(--t-text, var(--t-text))", margin: "0 0 4px" }}>لا يوجد مستخدمين</h3>
+                <p style={{ fontSize: 12, color: "var(--t-text-faint, var(--t-text-faint))", margin: 0 }}>أضف مستخدمين جدد للبدء</p>
             </div>
         )
     }
@@ -203,7 +203,7 @@ export function UsersTable({ users, loading, onEdit, onSetPassword, onRefresh }:
     const thStyle: React.CSSProperties = {
         padding: "10px 16px",
         fontSize: 10.5, fontWeight: 600, letterSpacing: "0.04em",
-        color: "var(--t-text-faint, #9ca3af)",
+        color: "var(--t-text-faint, var(--t-text-faint))",
         textAlign: "right", whiteSpace: "nowrap",
         textTransform: "uppercase",
     }
@@ -248,19 +248,19 @@ export function UsersTable({ users, loading, onEdit, onSetPassword, onRefresh }:
                                         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                                             <div style={{
                                                 width: 38, height: 38, borderRadius: 10,
-                                                background: u.is_active ? gradient : "var(--t-surface, #e5e7eb)",
+                                                background: u.is_active ? gradient : "var(--t-surface, var(--t-border))",
                                                 display: "flex", alignItems: "center", justifyContent: "center",
                                                 flexShrink: 0,
                                             }}>
-                                                <span style={{ fontSize: 13, fontWeight: 700, color: u.is_active ? "#fff" : "var(--t-text-faint, #9ca3af)" }}>
+                                                <span style={{ fontSize: 13, fontWeight: 700, color: u.is_active ? "#fff" : "var(--t-text-faint, var(--t-text-faint))" }}>
                                                     {initials}
                                                 </span>
                                             </div>
                                             <div>
-                                                <div style={{ fontSize: 13, fontWeight: 600, color: "var(--t-text, #111827)", lineHeight: 1.3 }}>
+                                                <div style={{ fontSize: 13, fontWeight: 600, color: "var(--t-text, var(--t-text))", lineHeight: 1.3 }}>
                                                     {displayName}
                                                 </div>
-                                                <div style={{ fontSize: 11, color: "var(--t-text-faint, #9ca3af)", marginTop: 1 }}>
+                                                <div style={{ fontSize: 11, color: "var(--t-text-faint, var(--t-text-faint))", marginTop: 1 }}>
                                                     {u.username || u.email}
                                                 </div>
                                             </div>
@@ -269,7 +269,7 @@ export function UsersTable({ users, loading, onEdit, onSetPassword, onRefresh }:
 
                                     {/* Email */}
                                     <td style={{ padding: "10px 16px" }}>
-                                        <div style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 12, color: "var(--t-text-secondary, #6b7280)", fontFamily: "monospace" }} dir="ltr">
+                                        <div style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 12, color: "var(--t-text-secondary, var(--t-text-muted))", fontFamily: "monospace" }} dir="ltr">
                                             <Mail size={12} style={{ color: "var(--t-text-faint, #c4c9d0)" }} />
                                             {u.email}
                                         </div>
@@ -278,12 +278,12 @@ export function UsersTable({ users, loading, onEdit, onSetPassword, onRefresh }:
                                     {/* Phone */}
                                     <td style={{ padding: "10px 16px" }}>
                                         {u.phone ? (
-                                            <div style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 12, color: "var(--t-text-secondary, #6b7280)", fontFamily: "monospace" }} dir="ltr">
+                                            <div style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 12, color: "var(--t-text-secondary, var(--t-text-muted))", fontFamily: "monospace" }} dir="ltr">
                                                 <Phone size={12} style={{ color: "var(--t-text-faint, #c4c9d0)" }} />
                                                 {u.phone}
                                             </div>
                                         ) : (
-                                            <span style={{ fontSize: 11, color: "var(--t-text-faint, #d1d5db)" }}>—</span>
+                                            <span style={{ fontSize: 11, color: "var(--t-text-faint, var(--t-border-medium))" }}>—</span>
                                         )}
                                     </td>
 
@@ -306,7 +306,7 @@ export function UsersTable({ users, loading, onEdit, onSetPassword, onRefresh }:
                                             display: "inline-flex", alignItems: "center", gap: 4,
                                             padding: "3px 10px", borderRadius: 6,
                                             background: u.is_active ? "rgba(22,163,74,0.06)" : "rgba(239,68,68,0.06)",
-                                            color: u.is_active ? "#16a34a" : "#dc2626",
+                                            color: u.is_active ? "#16a34a" : "var(--t-danger)",
                                             fontSize: 11, fontWeight: 600,
                                         }}>
                                             {u.is_active ? <CheckCircle size={10} /> : <XCircle size={10} />}
@@ -321,27 +321,27 @@ export function UsersTable({ users, loading, onEdit, onSetPassword, onRefresh }:
                                             opacity: isHovered ? 1 : 0.5, transition: "opacity .15s",
                                         }}>
                                             <ActionBtn onClick={() => onEdit(u)} title="تعديل البيانات"
-                                                color="var(--t-text-faint, #9ca3af)" hoverBg="rgba(217,119,6,0.08)">
+                                                color="var(--t-text-faint, var(--t-text-faint))" hoverBg="rgba(217,119,6,0.08)">
                                                 <Pencil size={14} />
                                             </ActionBtn>
                                             <ActionBtn onClick={() => onSetPassword(u)} title="تعيين كلمة المرور"
-                                                color="var(--t-text-faint, #9ca3af)" hoverBg="rgba(0,71,134,0.06)">
+                                                color="var(--t-text-faint, var(--t-text-faint))" hoverBg="rgba(27,80,145,0.06)">
                                                 <KeyRound size={14} />
                                             </ActionBtn>
                                             <ActionBtn onClick={() => handleToggleStatus(u)} disabled={userLoading === "status"}
                                                 title={u.is_active ? "تعطيل المستخدم" : "تفعيل المستخدم"}
-                                                color={u.is_active ? "var(--t-text-faint, #9ca3af)" : "#16a34a"}
+                                                color={u.is_active ? "var(--t-text-faint, var(--t-text-faint))" : "#16a34a"}
                                                 hoverBg={u.is_active ? "rgba(234,179,8,0.06)" : "rgba(22,163,74,0.06)"}>
                                                 {userLoading === "status" ? <Loader2 size={14} className="animate-spin" /> :
                                                     u.is_active ? <ToggleLeft size={14} /> : <ToggleRight size={14} />}
                                             </ActionBtn>
                                             <ActionBtn onClick={() => setSessionsUser(u)} title="عرض الجلسات"
-                                                color="var(--t-text-faint, #9ca3af)" hoverBg="rgba(139,92,246,0.06)">
+                                                color="var(--t-text-faint, var(--t-text-faint))" hoverBg="rgba(139,92,246,0.06)">
                                                 <Monitor size={14} />
                                             </ActionBtn>
                                             <ActionBtn onClick={() => handleDelete(u)} disabled={userLoading === "delete"}
                                                 title={confirmDelete === u.user_id ? "اضغط مرة أخرى للتأكيد" : "حذف المستخدم"}
-                                                color={confirmDelete === u.user_id ? "#dc2626" : "var(--t-text-faint, #9ca3af)"}
+                                                color={confirmDelete === u.user_id ? "var(--t-danger)" : "var(--t-text-faint, var(--t-text-faint))"}
                                                 hoverBg="rgba(239,68,68,0.06)">
                                                 {userLoading === "delete" ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
                                             </ActionBtn>

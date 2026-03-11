@@ -5,10 +5,14 @@ type Theme = "light" | "dark"
 
 /* ── Default color tokens (light mode) ── */
 const DEFAULT_COLORS = {
-    accent: "#111827",
-    "accent-hover": "#1f2937",
-    "accent-muted": "rgba(17, 24, 39, 0.08)",
+    accent: "#0145b2",
+    "accent-hover": "#013a96",
+    "accent-muted": "rgba(1, 69, 178, 0.08)",
     "text-on-accent": "#ffffff",
+    "brand-orange": "#f39200",
+    "brand-orange-hover": "#f3a630",
+    "brand-orange-soft": "rgba(243, 146, 0, 0.10)",
+    "brand-orange-muted": "rgba(243, 146, 0, 0.06)",
     success: "#10b981",
     "success-soft": "rgba(16, 185, 129, 0.08)",
     warning: "#f59e0b",
@@ -21,10 +25,14 @@ const DEFAULT_COLORS = {
 
 /* ── Default color tokens (dark mode) ── */
 const DEFAULT_COLORS_DARK = {
-    accent: "#e2e8f0",
-    "accent-hover": "#cbd5e1",
-    "accent-muted": "rgba(226, 232, 240, 0.08)",
+    accent: "#65caf4",
+    "accent-hover": "#8dd8f7",
+    "accent-muted": "rgba(101, 202, 244, 0.12)",
     "text-on-accent": "#0f172a",
+    "brand-orange": "#f39200",
+    "brand-orange-hover": "#f3a630",
+    "brand-orange-soft": "rgba(243, 146, 0, 0.15)",
+    "brand-orange-muted": "rgba(243, 146, 0, 0.08)",
     success: "#34d399",
     "success-soft": "rgba(52, 211, 153, 0.12)",
     warning: "#fbbf24",
@@ -116,13 +124,13 @@ export const useThemeStore = create<ThemeState>()(
                 }
             },
         }),
-        { name: "fateen-theme" }
+        { name: "darai-theme" }
     )
 )
 
 // Initialize theme + custom colors on import
 if (typeof window !== "undefined") {
-    const stored = localStorage.getItem("fateen-theme")
+    const stored = localStorage.getItem("darai-theme")
     if (stored) {
         try {
             const parsed = JSON.parse(stored)

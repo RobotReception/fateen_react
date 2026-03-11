@@ -56,7 +56,7 @@ function DashboardError({ onRetry }: { onRetry: () => void }) {
                 marginBottom: 14,
                 border: "1px solid rgba(245,158,11,0.2)",
             }}>
-                <AlertTriangle size={26} style={{ color: "#F59E0B" }} />
+                <AlertTriangle size={26} style={{ color: "var(--t-warning)" }} />
             </div>
             <h3 style={{ fontSize: 16, fontWeight: 700, color: "var(--t-text)", marginBottom: 6 }}>
                 تعذّر تحميل البيانات
@@ -70,7 +70,7 @@ function DashboardError({ onRetry }: { onRetry: () => void }) {
                     display: "flex", alignItems: "center", gap: 7,
                     padding: "9px 22px", borderRadius: 10,
                     border: "none", cursor: loading ? "default" : "pointer",
-                    background: "linear-gradient(135deg, #3B82F6, #1D4ED8)",
+                    background: "linear-gradient(135deg, var(--t-info), #1D4ED8)",
                     color: "#fff", fontSize: 13, fontWeight: 600,
                     opacity: loading ? 0.7 : 1,
                     boxShadow: "0 4px 14px -4px rgba(59,130,246,0.5)",
@@ -101,7 +101,7 @@ export function DashboardPage() {
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                     <div style={{
                         width: 38, height: 38, borderRadius: 11,
-                        background: "linear-gradient(135deg, #3B82F6, #6366F1)",
+                        background: "linear-gradient(135deg, var(--t-info), #6366F1)",
                         display: "flex", alignItems: "center", justifyContent: "center",
                         boxShadow: "0 6px 16px -4px rgba(59,130,246,0.45)",
                         flexShrink: 0,
@@ -128,11 +128,11 @@ export function DashboardPage() {
                         }}>
                             <div style={{
                                 width: 6, height: 6, borderRadius: "50%",
-                                background: "#10B981",
+                                background: "var(--t-success)",
                                 animation: "pulse-dot 2s ease-in-out infinite",
                             }} />
-                            <TrendingUp size={11} color="#10B981" strokeWidth={2.5} />
-                            <span style={{ fontSize: 10, fontWeight: 600, color: "#10B981" }}>
+                            <TrendingUp size={11} color="var(--t-success)" strokeWidth={2.5} />
+                            <span style={{ fontSize: 10, fontWeight: 600, color: "var(--t-success)" }}>
                                 آخر تحديث {lastUpdated}
                             </span>
                         </div>

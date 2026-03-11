@@ -34,13 +34,13 @@ export function RoleDetail({ role }: Props) {
                 background: "var(--t-card, #fff)", overflow: "hidden",
             }}>
                 {/* Gradient accent */}
-                <div style={{ height: 3, background: "linear-gradient(90deg, #004786, #0072b5, #0098d6)" }} />
+                <div style={{ height: 3, background: "linear-gradient(90deg, var(--t-accent), var(--t-accent-secondary), var(--t-accent-light))" }} />
 
                 <div style={{ padding: "16px 20px" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                         <div style={{
                             width: 44, height: 44, borderRadius: 12,
-                            background: "linear-gradient(135deg, #004786, #0072b5)",
+                            background: "var(--t-brand-orange)",
                             display: "flex", alignItems: "center", justifyContent: "center",
                             flexShrink: 0,
                         }}>
@@ -48,18 +48,18 @@ export function RoleDetail({ role }: Props) {
                         </div>
                         <div style={{ flex: 1, minWidth: 0 }}>
                             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                                <h2 style={{ fontSize: 17, fontWeight: 700, color: "var(--t-text, #111827)", margin: 0 }}>
+                                <h2 style={{ fontSize: 17, fontWeight: 700, color: "var(--t-text, var(--t-text))", margin: 0 }}>
                                     {role.name_ar}
                                 </h2>
                                 <span dir="ltr" style={{
-                                    fontSize: 10.5, color: "#004786", fontFamily: "monospace",
-                                    background: "rgba(0,71,134,0.06)", padding: "2px 8px", borderRadius: 6,
+                                    fontSize: 10.5, color: "var(--t-accent)", fontFamily: "monospace",
+                                    background: "rgba(27,80,145,0.06)", padding: "2px 8px", borderRadius: 6,
                                     fontWeight: 600,
                                 }}>
                                     {role.role}
                                 </span>
                             </div>
-                            <p style={{ fontSize: 12, color: "var(--t-text-faint, #9ca3af)", margin: "3px 0 0" }}>
+                            <p style={{ fontSize: 12, color: "var(--t-text-faint, var(--t-text-faint))", margin: "3px 0 0" }}>
                                 {role.name_en}
                                 {role.description_ar && <> · {role.description_ar}</>}
                             </p>
@@ -75,11 +75,11 @@ export function RoleDetail({ role }: Props) {
                         <div style={{
                             display: "flex", alignItems: "center", gap: 5,
                             padding: "4px 10px", borderRadius: 6,
-                            background: "rgba(0,71,134,0.04)",
+                            background: "rgba(27,80,145,0.04)",
                         }}>
-                            <Key size={12} style={{ color: "#004786" }} />
-                            <span style={{ fontSize: 12, fontWeight: 700, color: "#004786" }}>{totalPerms}</span>
-                            <span style={{ fontSize: 11, color: "var(--t-text-faint, #9ca3af)" }}>صلاحية</span>
+                            <Key size={12} style={{ color: "var(--t-accent)" }} />
+                            <span style={{ fontSize: 12, fontWeight: 700, color: "var(--t-accent)" }}>{totalPerms}</span>
+                            <span style={{ fontSize: 11, color: "var(--t-text-faint, var(--t-text-faint))" }}>صلاحية</span>
                         </div>
                     </div>
                 </div>
@@ -89,7 +89,7 @@ export function RoleDetail({ role }: Props) {
             <div style={{
                 display: "flex", gap: 2, padding: 3,
                 borderRadius: 10,
-                background: "var(--t-surface, #f3f4f6)",
+                background: "var(--t-surface, var(--t-surface))",
             }}>
                 {tabs.map(tab => {
                     const isActive = activeTab === tab.key
@@ -105,7 +105,7 @@ export function RoleDetail({ role }: Props) {
                                 border: "none",
                                 background: isActive ? "var(--t-card, #fff)" : "transparent",
                                 boxShadow: isActive ? "0 1px 3px rgba(0,0,0,0.06)" : "none",
-                                color: isActive ? "#004786" : "var(--t-text-faint, #9ca3af)",
+                                color: isActive ? "var(--t-accent)" : "var(--t-text-faint, var(--t-text-faint))",
                                 fontSize: 12, fontWeight: isActive ? 600 : 500,
                                 cursor: "pointer", fontFamily: "inherit",
                                 transition: "all 0.15s",

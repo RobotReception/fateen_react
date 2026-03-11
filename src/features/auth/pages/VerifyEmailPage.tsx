@@ -127,8 +127,8 @@ export function VerifyEmailPage() {
     return (
         <AuthLayout>
             {/* Icon */}
-            <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[#0098d6]/10 to-[#004786]/10">
-                <ShieldCheck className="h-8 w-8 text-[#0098d6]" />
+            <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--t-accent-light)]/10 to-[var(--t-accent)]/10">
+                <ShieldCheck className="h-8 w-8 text-[var(--t-accent-light)]" />
             </div>
 
             <div className="mb-8 text-center">
@@ -136,7 +136,7 @@ export function VerifyEmailPage() {
                 <p className="text-sm text-gray-500">
                     أدخل رمز التحقق المرسل إلى
                 </p>
-                <p className="mt-1 text-sm font-medium text-[#0098d6]" dir="ltr">{maskedEmail}</p>
+                <p className="mt-1 text-sm font-medium text-[var(--t-accent-light)]" dir="ltr">{maskedEmail}</p>
             </div>
 
             {error && (
@@ -163,7 +163,7 @@ export function VerifyEmailPage() {
                         value={digit}
                         onChange={(e) => handleChange(i, e.target.value)}
                         onKeyDown={(e) => handleKeyDown(i, e)}
-                        className="h-14 w-12 rounded-xl border border-gray-200 bg-gray-50/50 text-center text-xl font-bold text-gray-900 outline-none transition-all duration-300 focus:border-[#0098d6]/50 focus:bg-white focus:ring-2 focus:ring-[#0098d6]/10"
+                        className="h-14 w-12 rounded-xl border border-gray-200 bg-gray-50/50 text-center text-xl font-bold text-gray-900 outline-none transition-all duration-300 focus:border-[var(--t-accent-light)]/50 focus:bg-white focus:ring-2 focus:ring-[var(--t-accent-light)]/10"
                     />
                 ))}
             </div>
@@ -172,7 +172,7 @@ export function VerifyEmailPage() {
             <button
                 onClick={handleSubmit}
                 disabled={loading || otp.some((d) => !d)}
-                className="group relative w-full overflow-hidden rounded-xl bg-gradient-to-l from-[#0098d6] to-[#004786] px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-[#0098d6]/20 transition-all duration-300 hover:shadow-xl hover:shadow-[#0098d6]/30 hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+                className="group relative w-full overflow-hidden rounded-xl bg-gradient-to-l from-[var(--t-accent-light)] to-[var(--t-accent)] px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-[var(--t-accent-light)]/20 transition-all duration-300 hover:shadow-xl hover:shadow-[var(--t-accent-light)]/30 hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:translate-y-0"
             >
                 <span className="relative z-10 flex items-center justify-center gap-2">
                     {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldCheck className="h-4 w-4" />}
@@ -192,7 +192,7 @@ export function VerifyEmailPage() {
                     <button
                         onClick={handleResend}
                         disabled={resending}
-                        className="inline-flex items-center gap-1.5 text-sm font-medium text-[#0098d6] transition-colors hover:text-[#004786] disabled:opacity-50"
+                        className="inline-flex items-center gap-1.5 text-sm font-medium text-[var(--t-accent-light)] transition-colors hover:text-[var(--t-accent)] disabled:opacity-50"
                     >
                         {resending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RotateCcw className="h-3.5 w-3.5" />}
                         إعادة إرسال الرمز

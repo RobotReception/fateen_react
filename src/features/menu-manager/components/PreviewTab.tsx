@@ -59,17 +59,17 @@ function getTime() {
     return new Date().toLocaleTimeString("ar-SA", { hour: "2-digit", minute: "2-digit", hour12: true })
 }
 
-// ── Fateen-themed WhatsApp palette ──
+// ── DarAI-themed WhatsApp palette ──
 const WA = {
-    header: "#004786",
-    headerDark: "#003a6e",
+    header: "var(--t-accent)",
+    headerDark: "var(--t-accent-hover)",
     bg: "#efeae2",
     botBubble: "#ffffff",
     userBubble: "#dcf8c6",
     tick: "#53bdeb",
     border: "#e9e9e9",
     footer: "#8696a0",
-    listBtn: "#004786",
+    listBtn: "var(--t-accent)",
     divider: "#e9e9e9",
 }
 
@@ -304,7 +304,7 @@ export function PreviewTab({ selectedTemplateId, embedded }: PreviewTabProps) {
             {!currentTemplateId && <EmptyState />}
             {loading && (
                 <div style={{ textAlign: "center", padding: 60 }}>
-                    <Loader2 size={28} className="animate-spin" style={{ color: "#004786", margin: "0 auto 12px" }} />
+                    <Loader2 size={28} className="animate-spin" style={{ color: "var(--t-accent)", margin: "0 auto 12px" }} />
                     <p style={{ fontSize: 13, color: "var(--t-text-muted)" }}>جاري تحميل المعاينة...</p>
                 </div>
             )}
@@ -312,7 +312,7 @@ export function PreviewTab({ selectedTemplateId, embedded }: PreviewTabProps) {
                 <div style={{
                     display: "flex", alignItems: "center", gap: 8, padding: 16,
                     borderRadius: 12, background: "rgba(239,68,68,0.06)",
-                    color: "#ef4444", fontSize: 13,
+                    color: "var(--t-danger)", fontSize: 13,
                 }}>
                     <AlertCircle size={16} /> {error}
                 </div>
@@ -331,7 +331,7 @@ export function PreviewTab({ selectedTemplateId, embedded }: PreviewTabProps) {
                         {/* Ambient glow */}
                         <div style={{
                             position: "absolute", inset: -30,
-                            background: "radial-gradient(ellipse at center, rgba(0,71,134,0.10) 0%, transparent 70%)",
+                            background: "radial-gradient(ellipse at center, rgba(27,80,145,0.10) 0%, transparent 70%)",
                             borderRadius: "50%", pointerEvents: "none", zIndex: 0,
                         }} />
 
@@ -423,13 +423,13 @@ export function PreviewTab({ selectedTemplateId, embedded }: PreviewTabProps) {
                                     {/* Avatar */}
                                     <div style={{
                                         width: 36, height: 36, borderRadius: "50%",
-                                        background: "linear-gradient(135deg, #004786, #0072b5)",
+                                        background: "var(--t-gradient-accent)",
                                         display: "flex", alignItems: "center", justifyContent: "center",
                                         flexShrink: 0, fontSize: 14, fontWeight: 700, color: "#fff",
                                         boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
                                     }}>ف</div>
                                     <div style={{ flex: 1, minWidth: 0 }}>
-                                        <p style={{ fontSize: 13.5, fontWeight: 700, color: "#fff", margin: 0 }}>فطين</p>
+                                        <p style={{ fontSize: 13.5, fontWeight: 700, color: "#fff", margin: 0 }}>داري</p>
                                         <p style={{ fontSize: 10, color: "rgba(255,255,255,0.82)", margin: 0 }}>متصل الآن</p>
                                     </div>
                                     <div style={{ display: "flex", gap: 14, color: "rgba(255,255,255,0.9)" }}>
@@ -451,7 +451,7 @@ export function PreviewTab({ selectedTemplateId, embedded }: PreviewTabProps) {
                                                 <button
                                                     onClick={() => { /* breadcrumb navigation already handled via goBack */ }}
                                                     style={{
-                                                        background: i === breadcrumb.length - 1 ? "rgba(0,71,134,0.10)" : "transparent",
+                                                        background: i === breadcrumb.length - 1 ? "rgba(27,80,145,0.10)" : "transparent",
                                                         border: "none", fontSize: 10,
                                                         color: i === breadcrumb.length - 1 ? WA.header : "#8696a0",
                                                         fontWeight: i === breadcrumb.length - 1 ? 700 : 400,
@@ -519,7 +519,7 @@ export function PreviewTab({ selectedTemplateId, embedded }: PreviewTabProps) {
                                             <div key={msg.id} style={{ display: "flex", justifyContent: "flex-start", marginBottom: 8 }}>
                                                 <div style={{
                                                     width: 22, height: 22, borderRadius: "50%",
-                                                    background: "linear-gradient(135deg, #004786, #0072b5)",
+                                                    background: "var(--t-gradient-accent)",
                                                     display: "flex", alignItems: "center", justifyContent: "center",
                                                     fontSize: 9, color: "#fff", fontWeight: 700,
                                                     flexShrink: 0, marginTop: "auto", marginLeft: 4,
@@ -611,7 +611,7 @@ export function PreviewTab({ selectedTemplateId, embedded }: PreviewTabProps) {
                                                                 >
                                                                     <div style={{
                                                                         width: 34, height: 34, borderRadius: 8,
-                                                                        background: "linear-gradient(135deg,#004786,#0072b5)",
+                                                                        background: "var(--t-gradient-accent)",
                                                                         display: "flex", alignItems: "center", justifyContent: "center",
                                                                         flexShrink: 0, fontSize: 14, color: "#fff",
                                                                     }}>📄</div>
@@ -690,7 +690,7 @@ export function PreviewTab({ selectedTemplateId, embedded }: PreviewTabProps) {
                                                                 boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
                                                                 transition: "background 0.15s",
                                                             }}
-                                                            onMouseEnter={e => { e.currentTarget.style.background = "rgba(0,71,134,0.04)" }}
+                                                            onMouseEnter={e => { e.currentTarget.style.background = "rgba(27,80,145,0.04)" }}
                                                             onMouseLeave={e => { e.currentTarget.style.background = WA.botBubble }}
                                                         >
                                                             <LayoutList size={13} />
@@ -720,15 +720,15 @@ export function PreviewTab({ selectedTemplateId, embedded }: PreviewTabProps) {
                                                                         justifyContent: "center", gap: 5,
                                                                         cursor: "pointer",
                                                                         fontSize: 11.5, fontWeight: 700,
-                                                                        color: "#374151",
+                                                                        color: "var(--t-text-secondary)",
                                                                         fontFamily: "inherit",
                                                                         boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
                                                                         transition: "all 0.15s",
                                                                         whiteSpace: "nowrap",
                                                                     }}
                                                                     onMouseEnter={e => {
-                                                                        e.currentTarget.style.background = "#f3f4f6"
-                                                                        e.currentTarget.style.borderColor = "#9ca3af"
+                                                                        e.currentTarget.style.background = "var(--t-surface)"
+                                                                        e.currentTarget.style.borderColor = "var(--t-text-faint)"
                                                                     }}
                                                                     onMouseLeave={e => {
                                                                         e.currentTarget.style.background = "#fff"
@@ -745,7 +745,7 @@ export function PreviewTab({ selectedTemplateId, embedded }: PreviewTabProps) {
                                                                     flex: 1,
                                                                     padding: "8px 10px",
                                                                     borderRadius: 20,
-                                                                    background: "linear-gradient(135deg, #004786, #0072b5)",
+                                                                    background: "var(--t-gradient-accent)",
                                                                     border: "none",
                                                                     display: "flex", alignItems: "center",
                                                                     justifyContent: "center", gap: 5,
@@ -753,17 +753,17 @@ export function PreviewTab({ selectedTemplateId, embedded }: PreviewTabProps) {
                                                                     fontSize: 11.5, fontWeight: 700,
                                                                     color: "#fff",
                                                                     fontFamily: "inherit",
-                                                                    boxShadow: "0 2px 8px rgba(0,71,134,0.35)",
+                                                                    boxShadow: "0 2px 8px rgba(27,80,145,0.35)",
                                                                     transition: "all 0.15s",
                                                                     whiteSpace: "nowrap",
                                                                 }}
                                                                 onMouseEnter={e => {
                                                                     e.currentTarget.style.transform = "scale(1.02)"
-                                                                    e.currentTarget.style.boxShadow = "0 3px 12px rgba(0,71,134,0.45)"
+                                                                    e.currentTarget.style.boxShadow = "0 3px 12px rgba(27,80,145,0.45)"
                                                                 }}
                                                                 onMouseLeave={e => {
                                                                     e.currentTarget.style.transform = "scale(1)"
-                                                                    e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,71,134,0.35)"
+                                                                    e.currentTarget.style.boxShadow = "0 2px 8px rgba(27,80,145,0.35)"
                                                                 }}
                                                             >
                                                                 🏠 القائمة الرئيسية
@@ -800,9 +800,9 @@ export function PreviewTab({ selectedTemplateId, embedded }: PreviewTabProps) {
                                     </div>
                                     <div style={{
                                         width: 34, height: 34, borderRadius: "50%",
-                                        background: "linear-gradient(135deg, #004786, #0072b5)",
+                                        background: "var(--t-gradient-accent)",
                                         display: "flex", alignItems: "center", justifyContent: "center",
-                                        flexShrink: 0, boxShadow: "0 2px 6px rgba(0,71,134,0.4)",
+                                        flexShrink: 0, boxShadow: "0 2px 6px rgba(27,80,145,0.4)",
                                     }}>
                                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
                                             <path d="M12 19V5M5 12l7-7 7 7" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -909,7 +909,7 @@ export function PreviewTab({ selectedTemplateId, embedded }: PreviewTabProps) {
                                                                         onError={(e) => {
                                                                             e.currentTarget.style.display = "none";
                                                                             (e.currentTarget.parentElement as HTMLElement).style.background = "#e8eaed";
-                                                                            (e.currentTarget.parentElement as HTMLElement).innerHTML = `<div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div>`
+                                                                            (e.currentTarget.parentElement as HTMLElement).innerHTML = `<div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--t-text-faint)" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div>`
                                                                         }}
                                                                     />
                                                                 </div>
@@ -917,11 +917,11 @@ export function PreviewTab({ selectedTemplateId, embedded }: PreviewTabProps) {
                                                                 <div style={{
                                                                     width: 36, height: 36, borderRadius: "50%",
                                                                     background: isSubmenu
-                                                                        ? "linear-gradient(135deg,#004786,#0072b5)"
-                                                                        : `${typeConfig?.color || "#6b7280"}18`,
+                                                                        ? "var(--t-gradient-accent)"
+                                                                        : `${typeConfig?.color || "var(--t-text-muted)"}18`,
                                                                     display: "flex", alignItems: "center", justifyContent: "center",
                                                                     flexShrink: 0, fontSize: 12, fontWeight: 700,
-                                                                    color: isSubmenu ? "#fff" : (typeConfig?.color || "#6b7280"),
+                                                                    color: isSubmenu ? "#fff" : (typeConfig?.color || "var(--t-text-muted)"),
                                                                 }}>
                                                                     {idx + 1}
                                                                 </div>
@@ -952,8 +952,8 @@ export function PreviewTab({ selectedTemplateId, embedded }: PreviewTabProps) {
                                                             ) : (
                                                                 <span style={{
                                                                     fontSize: 9, padding: "2px 6px", borderRadius: 8,
-                                                                    background: `${typeConfig?.color || "#6b7280"}14`,
-                                                                    color: typeConfig?.color || "#6b7280",
+                                                                    background: `${typeConfig?.color || "var(--t-text-muted)"}14`,
+                                                                    color: typeConfig?.color || "var(--t-text-muted)",
                                                                     fontWeight: 600, flexShrink: 0,
                                                                 }}>
                                                                     {typeConfig?.label || child.item.type}
@@ -983,21 +983,21 @@ function EmptyState() {
             <div style={{ position: "relative" }}>
                 <div style={{
                     width: 70, height: 120, borderRadius: 18,
-                    background: "linear-gradient(145deg,#e8eaed,#d1d5db)",
-                    border: "3px solid #9ca3af", display: "flex", flexDirection: "column",
+                    background: "linear-gradient(145deg,#e8eaed,var(--t-border-medium))",
+                    border: "3px solid var(--t-text-faint)", display: "flex", flexDirection: "column",
                     alignItems: "center", justifyContent: "center", gap: 6,
                     boxShadow: "0 8px 24px rgba(0,0,0,0.1)", overflow: "hidden",
                 }}>
-                    <div style={{ width: 22, height: 3, borderRadius: 4, background: "#9ca3af", marginTop: -20 }} />
+                    <div style={{ width: 22, height: 3, borderRadius: 4, background: "var(--t-text-faint)", marginTop: -20 }} />
                     {[0, 1, 2].map(i => (
                         <div key={i} style={{ width: 40 - i * 6, height: 3, borderRadius: 4, background: "#c4c9d4", opacity: 1 - i * 0.25 }} />
                     ))}
-                    <div style={{ width: 28, height: 3, borderRadius: 4, background: "#004786", opacity: 0.7 }} />
-                    <div style={{ width: 24, height: 24, borderRadius: "50%", background: "#6b7280", marginTop: 8 }} />
+                    <div style={{ width: 28, height: 3, borderRadius: 4, background: "var(--t-accent)", opacity: 0.7 }} />
+                    <div style={{ width: 24, height: 24, borderRadius: "50%", background: "var(--t-text-muted)", marginTop: 8 }} />
                 </div>
                 <div style={{
                     position: "absolute", inset: -15, borderRadius: "50%",
-                    border: "2px solid rgba(0,71,134,0.15)",
+                    border: "2px solid rgba(27,80,145,0.15)",
                     animation: "ping 2s ease-in-out infinite",
                 }} />
                 <style>{`@keyframes ping { 0%,100%{transform:scale(0.8);opacity:0} 50%{transform:scale(1.1);opacity:1} }`}</style>

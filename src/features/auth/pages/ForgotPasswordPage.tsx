@@ -142,8 +142,8 @@ export function ForgotPasswordPage() {
             {/* ─── Step 1: Enter Email ─── */}
             {step === 1 && (
                 <>
-                    <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[#0098d6]/10 to-[#004786]/10">
-                        <KeyRound className="h-8 w-8 text-[#0098d6]" />
+                    <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--t-accent-light)]/10 to-[var(--t-accent)]/10">
+                        <KeyRound className="h-8 w-8 text-[var(--t-accent-light)]" />
                     </div>
                     <div className="mb-8 text-center">
                         <h1 className="mb-2 text-2xl font-bold text-gray-900">نسيت كلمة المرور؟</h1>
@@ -163,14 +163,14 @@ export function ForgotPasswordPage() {
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 placeholder="example@company.com"
-                                className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-3 text-sm text-gray-900 outline-none transition-all duration-300 placeholder:text-gray-400 focus:border-[#0098d6]/50 focus:bg-white focus:ring-2 focus:ring-[#0098d6]/10"
+                                className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-3 text-sm text-gray-900 outline-none transition-all duration-300 placeholder:text-gray-400 focus:border-[var(--t-accent-light)]/50 focus:bg-white focus:ring-2 focus:ring-[var(--t-accent-light)]/10"
                                 dir="ltr"
                             />
                         </div>
                         <button
                             type="submit"
                             disabled={loading}
-                            className="group relative w-full overflow-hidden rounded-xl bg-gradient-to-l from-[#0098d6] to-[#004786] px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-[#0098d6]/20 transition-all duration-300 hover:shadow-xl hover:shadow-[#0098d6]/30 hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed"
+                            className="group relative w-full overflow-hidden rounded-xl bg-gradient-to-l from-[var(--t-accent-light)] to-[var(--t-accent)] px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-[var(--t-accent-light)]/20 transition-all duration-300 hover:shadow-xl hover:shadow-[var(--t-accent-light)]/30 hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed"
                         >
                             <span className="relative z-10 flex items-center justify-center gap-2">
                                 {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <KeyRound className="h-4 w-4" />}
@@ -185,13 +185,13 @@ export function ForgotPasswordPage() {
             {/* ─── Step 2: Enter OTP ─── */}
             {step === 2 && (
                 <>
-                    <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[#0098d6]/10 to-[#004786]/10">
-                        <ShieldCheck className="h-8 w-8 text-[#0098d6]" />
+                    <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--t-accent-light)]/10 to-[var(--t-accent)]/10">
+                        <ShieldCheck className="h-8 w-8 text-[var(--t-accent-light)]" />
                     </div>
                     <div className="mb-8 text-center">
                         <h1 className="mb-2 text-2xl font-bold text-gray-900">أدخل رمز التحقق</h1>
                         <p className="text-sm text-gray-500">تم إرسال رمز التحقق إلى</p>
-                        <p className="mt-1 text-sm font-medium text-[#0098d6]" dir="ltr">{email}</p>
+                        <p className="mt-1 text-sm font-medium text-[var(--t-accent-light)]" dir="ltr">{email}</p>
                     </div>
 
                     {error && (
@@ -209,7 +209,7 @@ export function ForgotPasswordPage() {
                                 value={digit}
                                 onChange={(e) => handleChange(i, e.target.value)}
                                 onKeyDown={(e) => handleKeyDown(i, e)}
-                                className="h-14 w-12 rounded-xl border border-gray-200 bg-gray-50/50 text-center text-xl font-bold text-gray-900 outline-none transition-all duration-300 focus:border-[#0098d6]/50 focus:bg-white focus:ring-2 focus:ring-[#0098d6]/10"
+                                className="h-14 w-12 rounded-xl border border-gray-200 bg-gray-50/50 text-center text-xl font-bold text-gray-900 outline-none transition-all duration-300 focus:border-[var(--t-accent-light)]/50 focus:bg-white focus:ring-2 focus:ring-[var(--t-accent-light)]/10"
                             />
                         ))}
                     </div>
@@ -217,7 +217,7 @@ export function ForgotPasswordPage() {
                     <button
                         onClick={handleVerifyOtp}
                         disabled={loading || otp.some((d) => !d)}
-                        className="group relative w-full overflow-hidden rounded-xl bg-gradient-to-l from-[#0098d6] to-[#004786] px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-[#0098d6]/20 transition-all duration-300 hover:shadow-xl hover:shadow-[#0098d6]/30 hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed"
+                        className="group relative w-full overflow-hidden rounded-xl bg-gradient-to-l from-[var(--t-accent-light)] to-[var(--t-accent)] px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-[var(--t-accent-light)]/20 transition-all duration-300 hover:shadow-xl hover:shadow-[var(--t-accent-light)]/30 hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed"
                     >
                         <span className="relative z-10 flex items-center justify-center gap-2">
                             {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldCheck className="h-4 w-4" />}
@@ -230,7 +230,7 @@ export function ForgotPasswordPage() {
                         {countdown > 0 ? (
                             <p className="text-sm text-gray-400">إعادة إرسال خلال <span className="font-semibold text-gray-600">{countdown}</span> ثانية</p>
                         ) : (
-                            <button onClick={handleResend} disabled={loading} className="inline-flex items-center gap-1.5 text-sm font-medium text-[#0098d6] hover:text-[#004786] disabled:opacity-50">
+                            <button onClick={handleResend} disabled={loading} className="inline-flex items-center gap-1.5 text-sm font-medium text-[var(--t-accent-light)] hover:text-[var(--t-accent)] disabled:opacity-50">
                                 <RotateCcw className="h-3.5 w-3.5" /> إعادة إرسال الرمز
                             </button>
                         )}
@@ -241,8 +241,8 @@ export function ForgotPasswordPage() {
             {/* ─── Step 3: New Password ─── */}
             {step === 3 && (
                 <>
-                    <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[#0098d6]/10 to-[#004786]/10">
-                        <KeyRound className="h-8 w-8 text-[#0098d6]" />
+                    <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--t-accent-light)]/10 to-[var(--t-accent)]/10">
+                        <KeyRound className="h-8 w-8 text-[var(--t-accent-light)]" />
                     </div>
                     <div className="mb-8 text-center">
                         <h1 className="mb-2 text-2xl font-bold text-gray-900">كلمة مرور جديدة</h1>
@@ -262,7 +262,7 @@ export function ForgotPasswordPage() {
                                     value={newPassword}
                                     onChange={(e) => setNewPassword(e.target.value)}
                                     placeholder="8 أحرف على الأقل"
-                                    className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-3 pl-12 text-sm text-gray-900 outline-none transition-all duration-300 placeholder:text-gray-400 focus:border-[#0098d6]/50 focus:bg-white focus:ring-2 focus:ring-[#0098d6]/10"
+                                    className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-3 pl-12 text-sm text-gray-900 outline-none transition-all duration-300 placeholder:text-gray-400 focus:border-[var(--t-accent-light)]/50 focus:bg-white focus:ring-2 focus:ring-[var(--t-accent-light)]/10"
                                     dir="ltr"
                                 />
                                 <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
@@ -277,14 +277,14 @@ export function ForgotPasswordPage() {
                                 value={confirmPassword}
                                 onChange={(e) => setConfirmPassword(e.target.value)}
                                 placeholder="أعد كتابة كلمة المرور"
-                                className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-3 text-sm text-gray-900 outline-none transition-all duration-300 placeholder:text-gray-400 focus:border-[#0098d6]/50 focus:bg-white focus:ring-2 focus:ring-[#0098d6]/10"
+                                className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-3 text-sm text-gray-900 outline-none transition-all duration-300 placeholder:text-gray-400 focus:border-[var(--t-accent-light)]/50 focus:bg-white focus:ring-2 focus:ring-[var(--t-accent-light)]/10"
                                 dir="ltr"
                             />
                         </div>
                         <button
                             type="submit"
                             disabled={loading}
-                            className="group relative mt-2 w-full overflow-hidden rounded-xl bg-gradient-to-l from-[#0098d6] to-[#004786] px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-[#0098d6]/20 transition-all duration-300 hover:shadow-xl hover:shadow-[#0098d6]/30 hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed"
+                            className="group relative mt-2 w-full overflow-hidden rounded-xl bg-gradient-to-l from-[var(--t-accent-light)] to-[var(--t-accent)] px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-[var(--t-accent-light)]/20 transition-all duration-300 hover:shadow-xl hover:shadow-[var(--t-accent-light)]/30 hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed"
                         >
                             <span className="relative z-10 flex items-center justify-center gap-2">
                                 {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <KeyRound className="h-4 w-4" />}
@@ -306,7 +306,7 @@ export function ForgotPasswordPage() {
                     <p className="mb-8 text-sm text-gray-500">تم تغيير كلمة المرور بنجاح. يمكنك تسجيل الدخول الآن</p>
                     <Link
                         to="/login"
-                        className="group relative inline-flex w-full items-center justify-center gap-2 overflow-hidden rounded-xl bg-gradient-to-l from-[#0098d6] to-[#004786] px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-[#0098d6]/20 transition-all duration-300 hover:shadow-xl hover:shadow-[#0098d6]/30 hover:-translate-y-0.5"
+                        className="group relative inline-flex w-full items-center justify-center gap-2 overflow-hidden rounded-xl bg-gradient-to-l from-[var(--t-accent-light)] to-[var(--t-accent)] px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-[var(--t-accent-light)]/20 transition-all duration-300 hover:shadow-xl hover:shadow-[var(--t-accent-light)]/30 hover:-translate-y-0.5"
                     >
                         <span className="relative z-10">تسجيل الدخول</span>
                         <div className="absolute inset-0 bg-gradient-to-l from-[#00b4ff] to-[#0066aa] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
@@ -317,7 +317,7 @@ export function ForgotPasswordPage() {
             {/* Back to login (steps 1-3) */}
             {step < 4 && (
                 <div className="mt-6 text-center">
-                    <Link to="/login" className="text-sm text-gray-500 transition-colors hover:text-[#0098d6]">
+                    <Link to="/login" className="text-sm text-gray-500 transition-colors hover:text-[var(--t-accent-light)]">
                         ← العودة لتسجيل الدخول
                     </Link>
                 </div>

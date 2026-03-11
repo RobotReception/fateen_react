@@ -28,18 +28,18 @@ const CSS = `
 
 /* Platform card */
 .pcard{
-    position:relative;border-radius:14px;border:2px solid #ebeef2;background:#fff;
+    position:relative;border-radius:14px;border:2px solid var(--t-border);background:#fff;
     padding:18px;cursor:pointer;transition:all .18s;overflow:hidden;
 }
 .pcard::before{
     content:'';position:absolute;top:0;right:0;left:0;height:3px;
-    background:var(--pc,#d1d5db);opacity:0;transition:opacity .18s;
+    background:var(--pc,var(--t-border-medium));opacity:0;transition:opacity .18s;
 }
-.pcard:hover{border-color:#d1d5db;box-shadow:0 2px 12px rgba(0,0,0,.04)}
+.pcard:hover{border-color:var(--t-border-medium);box-shadow:0 2px 12px rgba(0,0,0,.04)}
 .pcard.selected{border-color:var(--pc);box-shadow:0 4px 20px color-mix(in srgb,var(--pc) 12%,transparent)}
 .pcard.selected::before{opacity:1}
 .pcard.active .pcard-status{color:var(--pc)}
-.pcard.inactive .pcard-status{color:#d1d5db}
+.pcard.inactive .pcard-status{color:var(--t-border-medium)}
 
 /* Toggle switch */
 .ch-sw{
@@ -52,7 +52,7 @@ const CSS = `
 }
 .ch-sw.on{background:#16a34a}
 .ch-sw.on::after{right:2px}
-.ch-sw.off{background:#d1d5db}
+.ch-sw.off{background:var(--t-border-medium)}
 .ch-sw.off::after{right:20px}
 
 /* Small toggle for platform cards */
@@ -66,38 +66,38 @@ const CSS = `
 }
 .ch-sw-sm.on{background:#16a34a}
 .ch-sw-sm.on::after{right:2px}
-.ch-sw-sm.off{background:#d1d5db}
+.ch-sw-sm.off{background:var(--t-border-medium)}
 .ch-sw-sm.off::after{right:18px}
 
 /* Channel table */
 .ch-tbl{width:100%;border-collapse:separate;border-spacing:0}
 .ch-tbl thead th{
-    padding:0 14px;height:34px;font-size:10px;font-weight:800;color:#9ca3af;
+    padding:0 14px;height:34px;font-size:10px;font-weight:800;color:var(--t-text-faint);
     text-align:right;white-space:nowrap;text-transform:uppercase;letter-spacing:.05em;
-    border-bottom:1px solid #ebeef2;vertical-align:middle;
+    border-bottom:1px solid var(--t-border);vertical-align:middle;
 }
 .ch-tbl tbody tr{transition:background .08s;cursor:pointer}
-.ch-tbl tbody tr:hover{background:rgba(0,71,134,.015)}
+.ch-tbl tbody tr:hover{background:rgba(27,80,145,.015)}
 .ch-tbl tbody td{
-    padding:10px 14px;font-size:12.5px;color:#374151;border-bottom:1px solid #f3f4f6;vertical-align:middle;
+    padding:10px 14px;font-size:12.5px;color:var(--t-text-secondary);border-bottom:1px solid var(--t-surface);vertical-align:middle;
 }
 .ch-tbl tbody tr:last-child td{border-bottom:none}
 
 /* Actions dropdown */
 .ch-menu{
     position:absolute;left:0;top:100%;margin-top:4px;z-index:30;
-    background:#fff;border:1px solid #ebeef2;border-radius:10px;
+    background:#fff;border:1px solid var(--t-border);border-radius:10px;
     box-shadow:0 8px 28px rgba(0,0,0,.08);min-width:150px;padding:4px;
     animation:chIn .1s ease-out;
 }
 .ch-menu button{
     width:100%;padding:7px 10px;border:none;background:transparent;cursor:pointer;
     display:flex;align-items:center;gap:7px;border-radius:7px;
-    font-size:11.5px;font-weight:600;color:#374151;transition:background .08s;
+    font-size:11.5px;font-weight:600;color:var(--t-text-secondary);transition:background .08s;
     font-family:inherit;text-align:right;
 }
-.ch-menu button:hover{background:#f5f6f8}
-.ch-menu .danger{color:#dc2626}
+.ch-menu button:hover{background:var(--t-surface)}
+.ch-menu .danger{color:var(--t-danger)}
 .ch-menu .danger:hover{background:rgba(239,68,68,.04)}
 `
 
@@ -146,7 +146,7 @@ function PlatformCard({ platform, on, count, selected, toggling, onToggle, onSel
                 {/* Toggle */}
                 <div onClick={e => e.stopPropagation()}>
                     {toggling ? (
-                        <Loader2 size={14} style={{ color: "#004786", animation: "chPulse .8s infinite" }} />
+                        <Loader2 size={14} style={{ color: "var(--t-accent)", animation: "chPulse .8s infinite" }} />
                     ) : (
                         <ActionGuard pageBit={PAGE_BITS.CHANNELS} actionBit={ACTION_BITS.TOGGLE_PLATFORM}>
                             <button className={`ch-sw-sm ${on ? "on" : "off"}`}
@@ -156,8 +156,8 @@ function PlatformCard({ platform, on, count, selected, toggling, onToggle, onSel
                     )}
                 </div>
             </div>
-            <div style={{ fontSize: 13.5, fontWeight: 800, color: "#111827", marginBottom: 2 }}>{m.labelAr}</div>
-            <div style={{ fontSize: 10, color: "#9ca3af", marginBottom: 10, lineHeight: 1.5 }}>{m.description}</div>
+            <div style={{ fontSize: 13.5, fontWeight: 800, color: "var(--t-text)", marginBottom: 2 }}>{m.labelAr}</div>
+            <div style={{ fontSize: 10, color: "var(--t-text-faint)", marginBottom: 10, lineHeight: 1.5 }}>{m.description}</div>
             <div style={{
                 display: "flex", alignItems: "center", justifyContent: "space-between",
                 paddingTop: 10, borderTop: "1px solid #f1f3f5",
@@ -165,15 +165,15 @@ function PlatformCard({ platform, on, count, selected, toggling, onToggle, onSel
                 <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
                     <span style={{
                         width: 6, height: 6, borderRadius: "50%",
-                        background: on ? "#16a34a" : "#d1d5db",
+                        background: on ? "#16a34a" : "var(--t-border-medium)",
                     }} />
-                    <span style={{ fontSize: 10.5, fontWeight: 700, color: on ? "#16a34a" : "#9ca3af" }}>
+                    <span style={{ fontSize: 10.5, fontWeight: 700, color: on ? "#16a34a" : "var(--t-text-faint)" }}>
                         {on ? "مفعّلة" : "موقوفة"}
                     </span>
                 </div>
                 <span style={{
                     fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 6,
-                    background: count > 0 ? `${m.color}0a` : "#f5f6f8",
+                    background: count > 0 ? `${m.color}0a` : "var(--t-surface)",
                     color: count > 0 ? m.color : "#ccc",
                 }}>
                     {count} قناة
@@ -204,10 +204,10 @@ function RowActions({ onView, onDelete }: { onView: () => void; onDelete: () => 
             <button ref={btnRef} onClick={handleOpen} style={{
                 width: 28, height: 28, borderRadius: 7, border: "1px solid #eaedf0", background: "#fff",
                 cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
-                color: "#9ca3af", transition: "all .12s",
+                color: "var(--t-text-faint)", transition: "all .12s",
             }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = "#004786"; e.currentTarget.style.color = "#004786" }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = "#eaedf0"; e.currentTarget.style.color = "#9ca3af" }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--t-accent)"; e.currentTarget.style.color = "var(--t-accent)" }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = "#eaedf0"; e.currentTarget.style.color = "var(--t-text-faint)" }}
             >
                 <MoreHorizontal size={14} />
             </button>
@@ -216,7 +216,7 @@ function RowActions({ onView, onDelete }: { onView: () => void; onDelete: () => 
                     <div style={{ position: "fixed", inset: 0, zIndex: 9998 }} onClick={() => setOpen(false)} />
                     <div dir="rtl" style={{
                         position: "fixed", top: pos.top, left: pos.left, zIndex: 9999,
-                        background: "#fff", border: "1px solid #ebeef2", borderRadius: 10,
+                        background: "#fff", border: "1px solid var(--t-border)", borderRadius: 10,
                         boxShadow: "0 8px 28px rgba(0,0,0,.12)", minWidth: 150, padding: 4,
                         animation: "chIn .1s ease-out",
                     }}>
@@ -224,9 +224,9 @@ function RowActions({ onView, onDelete }: { onView: () => void; onDelete: () => 
                             <button onClick={() => { onView(); setOpen(false) }} style={{
                                 width: "100%", padding: "8px 12px", border: "none", background: "transparent", cursor: "pointer",
                                 display: "flex", alignItems: "center", gap: 8, borderRadius: 7,
-                                fontSize: 12, fontWeight: 600, color: "#374151", transition: "background .08s", fontFamily: "inherit", textAlign: "right",
+                                fontSize: 12, fontWeight: 600, color: "var(--t-text-secondary)", transition: "background .08s", fontFamily: "inherit", textAlign: "right",
                             }}
-                                onMouseEnter={e => { e.currentTarget.style.background = "#f5f6f8" }}
+                                onMouseEnter={e => { e.currentTarget.style.background = "var(--t-surface)" }}
                                 onMouseLeave={e => { e.currentTarget.style.background = "transparent" }}
                             ><Settings2 size={13} /> الإعدادات</button>
                         </ActionGuard>
@@ -234,7 +234,7 @@ function RowActions({ onView, onDelete }: { onView: () => void; onDelete: () => 
                             <button onClick={() => { onDelete(); setOpen(false) }} style={{
                                 width: "100%", padding: "8px 12px", border: "none", background: "transparent", cursor: "pointer",
                                 display: "flex", alignItems: "center", gap: 8, borderRadius: 7,
-                                fontSize: 12, fontWeight: 600, color: "#dc2626", transition: "background .08s", fontFamily: "inherit", textAlign: "right",
+                                fontSize: 12, fontWeight: 600, color: "var(--t-danger)", transition: "background .08s", fontFamily: "inherit", textAlign: "right",
                             }}
                                 onMouseEnter={e => { e.currentTarget.style.background = "rgba(239,68,68,.04)" }}
                                 onMouseLeave={e => { e.currentTarget.style.background = "transparent" }}
@@ -261,16 +261,16 @@ function DeleteModal({ channel, onClose, onConfirm, loading }: {
             }}>
                 <div style={{ padding: "24px 24px 18px", textAlign: "center" }}>
                     <div style={{ width: 44, height: 44, borderRadius: 12, margin: "0 auto 12px", background: "rgba(239,68,68,.06)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                        <Trash2 size={20} style={{ color: "#dc2626" }} />
+                        <Trash2 size={20} style={{ color: "var(--t-danger)" }} />
                     </div>
-                    <div style={{ fontSize: 15, fontWeight: 800, color: "#111827", marginBottom: 4 }}>حذف القناة</div>
-                    <div style={{ fontSize: 12.5, color: "#6b7280", lineHeight: 1.6 }}>
+                    <div style={{ fontSize: 15, fontWeight: 800, color: "var(--t-text)", marginBottom: 4 }}>حذف القناة</div>
+                    <div style={{ fontSize: 12.5, color: "var(--t-text-muted)", lineHeight: 1.6 }}>
                         حذف <strong style={{ color: m.color }}>{channel.name || m.labelAr}</strong>؟ لا يمكن التراجع.
                     </div>
                 </div>
                 <div style={{ display: "flex", gap: 8, padding: "12px 24px", borderTop: "1px solid #f1f3f5", justifyContent: "flex-end" }}>
-                    <button disabled={loading} onClick={onClose} style={{ padding: "7px 14px", borderRadius: 8, border: "1.5px solid #e0e3e7", background: "#fff", color: "#374151", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>إلغاء</button>
-                    <button disabled={loading} onClick={onConfirm} style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "7px 14px", borderRadius: 8, border: "none", background: "#dc2626", color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", opacity: loading ? .6 : 1 }}>
+                    <button disabled={loading} onClick={onClose} style={{ padding: "7px 14px", borderRadius: 8, border: "1.5px solid var(--t-border)", background: "#fff", color: "var(--t-text-secondary)", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>إلغاء</button>
+                    <button disabled={loading} onClick={onConfirm} style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "7px 14px", borderRadius: 8, border: "none", background: "var(--t-danger)", color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", opacity: loading ? .6 : 1 }}>
                         {loading ? <Loader2 size={12} className="animate-spin" /> : <Trash2 size={12} />} حذف
                     </button>
                 </div>
@@ -281,7 +281,7 @@ function DeleteModal({ channel, onClose, onConfirm, loading }: {
 
 /* ═══ Skeleton ═══ */
 function SkRow({ d }: { d: number }) {
-    const b = (w: string, h = 12) => ({ width: w, height: h, borderRadius: 5, background: "linear-gradient(110deg,#ebeef2 30%,#f7f8fa 50%,#ebeef2 70%)", backgroundSize: "200% 100%", animation: "chShim 1.4s ease-in-out infinite" } as React.CSSProperties)
+    const b = (w: string, h = 12) => ({ width: w, height: h, borderRadius: 5, background: "linear-gradient(110deg,var(--t-border) 30%,#f7f8fa 50%,var(--t-border) 70%)", backgroundSize: "200% 100%", animation: "chShim 1.4s ease-in-out infinite" } as React.CSSProperties)
     return (
         <tr style={{ animation: `chIn .3s ease-out ${d}ms both` }}>
             <td><div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={b("28px", 28)} /><div style={b("90px", 12)} /></div></td>
@@ -343,7 +343,7 @@ export function ChannelsPage() {
 
             {/* ══ Platforms Grid ══ */}
             <div style={{ marginBottom: activePlatform ? 0 : 20, paddingTop: 8 }}>
-                <div style={{ fontSize: 11, fontWeight: 800, color: "#9ca3af", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 10 }}>
+                <div style={{ fontSize: 11, fontWeight: 800, color: "var(--t-text-faint)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 10 }}>
                     المنصات المتاحة
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 10 }}>
@@ -385,12 +385,12 @@ export function ChannelsPage() {
                     }}>
                         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                             <button onClick={() => setActivePlatform(null)} style={{
-                                width: 28, height: 28, borderRadius: 7, border: "1px solid #ebeef2",
+                                width: 28, height: 28, borderRadius: 7, border: "1px solid var(--t-border)",
                                 background: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
-                                color: "#9ca3af", transition: "all .12s",
+                                color: "var(--t-text-faint)", transition: "all .12s",
                             }}
-                                onMouseEnter={e => { e.currentTarget.style.borderColor = "#004786"; e.currentTarget.style.color = "#004786" }}
-                                onMouseLeave={e => { e.currentTarget.style.borderColor = "#ebeef2"; e.currentTarget.style.color = "#9ca3af" }}
+                                onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--t-accent)"; e.currentTarget.style.color = "var(--t-accent)" }}
+                                onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--t-border)"; e.currentTarget.style.color = "var(--t-text-faint)" }}
                             >
                                 <ChevronLeft size={14} />
                             </button>
@@ -401,20 +401,20 @@ export function ChannelsPage() {
                                 boxShadow: `0 2px 6px ${am.color}25`,
                             }}><PlatformLogo platform={activePlatform} fill="#fff" size={15} /></div>
                             <div>
-                                <div style={{ fontSize: 14, fontWeight: 800, color: "#111827" }}>
+                                <div style={{ fontSize: 14, fontWeight: 800, color: "var(--t-text)" }}>
                                     قنوات {am.labelAr}
                                 </div>
                                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 1 }}>
                                     <span style={{
                                         display: "inline-flex", alignItems: "center", gap: 3,
                                         fontSize: 10, fontWeight: 700,
-                                        color: platOn ? "#16a34a" : "#9ca3af",
+                                        color: platOn ? "#16a34a" : "var(--t-text-faint)",
                                     }}>
-                                        <span style={{ width: 5, height: 5, borderRadius: "50%", background: platOn ? "#16a34a" : "#d1d5db" }} />
+                                        <span style={{ width: 5, height: 5, borderRadius: "50%", background: platOn ? "#16a34a" : "var(--t-border-medium)" }} />
                                         المنصة {platOn ? "مفعّلة" : "موقوفة"}
                                     </span>
-                                    <span style={{ fontSize: 10, color: "#d1d5db" }}>·</span>
-                                    <span style={{ fontSize: 10, color: "#9ca3af" }}>{platformChannels.length} قناة</span>
+                                    <span style={{ fontSize: 10, color: "var(--t-border-medium)" }}>·</span>
+                                    <span style={{ fontSize: 10, color: "var(--t-text-faint)" }}>{platformChannels.length} قناة</span>
                                 </div>
                             </div>
                         </div>
@@ -423,18 +423,18 @@ export function ChannelsPage() {
                             <div style={{ position: "relative", width: 180 }}>
                                 <Search size={12} style={{
                                     position: "absolute", right: 9, top: "50%", transform: "translateY(-50%)",
-                                    color: searchFocused ? "#004786" : "#c9cdd4", transition: "color .12s",
+                                    color: searchFocused ? "var(--t-accent)" : "#c9cdd4", transition: "color .12s",
                                 }} />
                                 <input value={search} onChange={e => setSearch(e.target.value)}
                                     onFocus={() => setSearchFocused(true)} onBlur={() => setSearchFocused(false)}
                                     placeholder="بحث..."
                                     style={{
                                         width: "100%", padding: "6px 28px 6px 24px", borderRadius: 7,
-                                        border: `1.5px solid ${searchFocused ? "#004786" : "#e0e3e7"}`,
-                                        background: "#fff", fontSize: 11, color: "#374151", outline: "none",
+                                        border: `1.5px solid ${searchFocused ? "var(--t-accent)" : "var(--t-border)"}`,
+                                        background: "#fff", fontSize: 11, color: "var(--t-text-secondary)", outline: "none",
                                         boxSizing: "border-box", fontFamily: "inherit",
                                         transition: "border-color .15s, box-shadow .15s",
-                                        boxShadow: searchFocused ? "0 0 0 3px rgba(0,71,134,.04)" : "none",
+                                        boxShadow: searchFocused ? "0 0 0 3px rgba(27,80,145,.04)" : "none",
                                     }} />
                                 {search && (
                                     <button onClick={() => setSearch("")} style={{ position: "absolute", left: 7, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "#c9cdd4", display: "flex", padding: 0 }}>
@@ -445,12 +445,12 @@ export function ChannelsPage() {
                             <ActionGuard pageBit={PAGE_BITS.CHANNELS} actionBit={ACTION_BITS.CREATE_CHANNEL}>
                                 <button onClick={() => setShowAdd(true)} style={{
                                     display: "inline-flex", alignItems: "center", gap: 5, padding: "6px 12px", borderRadius: 7,
-                                    background: "#004786", color: "#fff", border: "none",
+                                    background: "var(--t-brand-orange)", color: "#fff", border: "none",
                                     fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
                                     transition: "background .12s",
                                 }}
-                                    onMouseEnter={e => { e.currentTarget.style.background = "#003a6e" }}
-                                    onMouseLeave={e => { e.currentTarget.style.background = "#004786" }}
+                                    onMouseEnter={e => { e.currentTarget.style.background = "var(--t-accent-hover)" }}
+                                    onMouseLeave={e => { e.currentTarget.style.background = "var(--t-accent)" }}
                                 >
                                     <Plus size={12} /> إضافة
                                 </button>
@@ -474,17 +474,17 @@ export function ChannelsPage() {
                             }}>
                                 <PlatformLogo platform={activePlatform} fill="#fff" />
                             </div>
-                            <div style={{ fontSize: 13, fontWeight: 700, color: "#111827", marginBottom: 3 }}>
+                            <div style={{ fontSize: 13, fontWeight: 700, color: "var(--t-text)", marginBottom: 3 }}>
                                 {search ? "لا توجد نتائج" : `لا توجد قنوات ${am.labelAr}`}
                             </div>
-                            <div style={{ fontSize: 11, color: "#9ca3af", marginBottom: 14 }}>
+                            <div style={{ fontSize: 11, color: "var(--t-text-faint)", marginBottom: 14 }}>
                                 {search ? "جرّب كلمة بحث أخرى" : `أضف قناة ${am.labelAr} للبدء`}
                             </div>
                             {!search && (
                                 <ActionGuard pageBit={PAGE_BITS.CHANNELS} actionBit={ACTION_BITS.CREATE_CHANNEL}>
                                     <button onClick={() => setShowAdd(true)} style={{
                                         display: "inline-flex", alignItems: "center", gap: 5, padding: "7px 14px",
-                                        borderRadius: 7, background: "#004786", color: "#fff", border: "none",
+                                        borderRadius: 7, background: "var(--t-brand-orange)", color: "#fff", border: "none",
                                         fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
                                     }}>
                                         <Plus size={12} /> إضافة قناة
@@ -522,7 +522,7 @@ export function ChannelsPage() {
                                                     }}>
                                                         <PlatformLogo platform={ch.platform} fill="#fff" size={14} />
                                                     </div>
-                                                    <span style={{ fontSize: 12.5, fontWeight: 700, color: "#111827" }}>
+                                                    <span style={{ fontSize: 12.5, fontWeight: 700, color: "var(--t-text)" }}>
                                                         {ch.name || am.labelAr}
                                                     </span>
                                                 </div>
@@ -532,23 +532,23 @@ export function ChannelsPage() {
                                                 <div style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
                                                     <code style={{
                                                         fontSize: 10.5, fontFamily: "monospace",
-                                                        background: "#f5f6f8", padding: "2px 7px", borderRadius: 4,
-                                                        color: "#6b7280", maxWidth: 150, overflow: "hidden",
+                                                        background: "var(--t-surface)", padding: "2px 7px", borderRadius: 4,
+                                                        color: "var(--t-text-muted)", maxWidth: 150, overflow: "hidden",
                                                         textOverflow: "ellipsis", whiteSpace: "nowrap", display: "block",
                                                     }}>
                                                         {ch.identifier}
                                                     </code>
                                                     <button onClick={() => { navigator.clipboard.writeText(ch.identifier); toast.success("تم النسخ") }}
-                                                        style={{ background: "none", border: "none", cursor: "pointer", padding: 0, display: "flex", color: "#d1d5db", transition: "color .1s" }}
-                                                        onMouseEnter={e => { e.currentTarget.style.color = "#004786" }}
-                                                        onMouseLeave={e => { e.currentTarget.style.color = "#d1d5db" }}
+                                                        style={{ background: "none", border: "none", cursor: "pointer", padding: 0, display: "flex", color: "var(--t-border-medium)", transition: "color .1s" }}
+                                                        onMouseEnter={e => { e.currentTarget.style.color = "var(--t-accent)" }}
+                                                        onMouseLeave={e => { e.currentTarget.style.color = "var(--t-border-medium)" }}
                                                     >
                                                         <Copy size={10} />
                                                     </button>
                                                 </div>
                                                 {ch.platform === "webchat" && ch.script_url && (
                                                     <a href={ch.script_url} target="_blank" rel="noopener noreferrer"
-                                                        style={{ display: "flex", alignItems: "center", gap: 3, fontSize: 9, color: "#004786", textDecoration: "none", marginTop: 2 }}>
+                                                        style={{ display: "flex", alignItems: "center", gap: 3, fontSize: 9, color: "var(--t-accent)", textDecoration: "none", marginTop: 2 }}>
                                                         <Globe size={8} /> تضمين <ExternalLink size={7} />
                                                     </a>
                                                 )}
@@ -556,7 +556,7 @@ export function ChannelsPage() {
                                             {/* Status */}
                                             <td onClick={e => e.stopPropagation()}>
                                                 {isToggling ? (
-                                                    <Loader2 size={13} style={{ color: "#004786", animation: "chPulse .8s infinite" }} />
+                                                    <Loader2 size={13} style={{ color: "var(--t-accent)", animation: "chPulse .8s infinite" }} />
                                                 ) : (
                                                     <ActionGuard pageBit={PAGE_BITS.CHANNELS} actionBit={ACTION_BITS.TOGGLE_CHANNEL}>
                                                         <button className={`ch-sw ${ch.enabled ? "on" : "off"}`}
@@ -575,7 +575,7 @@ export function ChannelsPage() {
                                                             return (
                                                                 <div key={aid} title={name} style={{
                                                                     width: 24, height: 24, borderRadius: 7, flexShrink: 0,
-                                                                    background: "linear-gradient(135deg, #004786, #0072b5)",
+                                                                    background: "var(--t-brand-orange)",
                                                                     display: "flex", alignItems: "center", justifyContent: "center",
                                                                     fontSize: 9, fontWeight: 800, color: "#fff",
                                                                     marginRight: idx > 0 ? -4 : 0,
@@ -591,7 +591,7 @@ export function ChannelsPage() {
                                                                 width: 24, height: 24, borderRadius: 7,
                                                                 background: "#f0f1f3", border: "2px solid #fff",
                                                                 display: "flex", alignItems: "center", justifyContent: "center",
-                                                                fontSize: 8, fontWeight: 800, color: "#9ca3af",
+                                                                fontSize: 8, fontWeight: 800, color: "var(--t-text-faint)",
                                                                 marginRight: -4,
                                                             }}>
                                                                 +{ch.agent_ids.length - 3}
@@ -599,12 +599,12 @@ export function ChannelsPage() {
                                                         )}
                                                     </div>
                                                 ) : (
-                                                    <span style={{ fontSize: 11, color: "#d1d5db" }}>—</span>
+                                                    <span style={{ fontSize: 11, color: "var(--t-border-medium)" }}>—</span>
                                                 )}
                                             </td>
                                             {/* Created */}
                                             <td>
-                                                <span style={{ fontSize: 10.5, color: "#9ca3af", whiteSpace: "nowrap" }}>
+                                                <span style={{ fontSize: 10.5, color: "var(--t-text-faint)", whiteSpace: "nowrap" }}>
                                                     {fmtDate(ch.created_at)}
                                                 </span>
                                             </td>
@@ -625,19 +625,19 @@ export function ChannelsPage() {
             {!activePlatform && !isLoading && channels.length > 0 && (
                 <div style={{
                     textAlign: "center", padding: "32px 20px", marginTop: 16,
-                    borderRadius: 12, background: "#fafbfd", border: "1px solid #ebeef2",
+                    borderRadius: 12, background: "#fafbfd", border: "1px solid var(--t-border)",
                     animation: "chIn .3s ease-out",
                 }}>
                     <div style={{
                         width: 44, height: 44, borderRadius: 12,
-                        background: "linear-gradient(135deg, #004786, #0072b5)",
+                        background: "var(--t-brand-orange)",
                         display: "flex", alignItems: "center", justifyContent: "center",
                         margin: "0 auto 10px",
                     }}>
                         <Radio size={18} style={{ color: "#fff" }} />
                     </div>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: "#111827", marginBottom: 3 }}>اختر منصة للبدء</div>
-                    <div style={{ fontSize: 11, color: "#9ca3af" }}>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: "var(--t-text)", marginBottom: 3 }}>اختر منصة للبدء</div>
+                    <div style={{ fontSize: 11, color: "var(--t-text-faint)" }}>
                         اضغط على أي منصة أعلاه لعرض قنواتها المتصلة وإدارتها
                     </div>
                 </div>

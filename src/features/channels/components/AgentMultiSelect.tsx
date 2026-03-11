@@ -49,40 +49,40 @@ export function AgentMultiSelect({ value, onChange, placeholder = "اختر وك
                 onClick={() => setOpen(!open)}
                 style={{
                     width: "100%", minHeight: 38, padding: "6px 38px 6px 10px",
-                    borderRadius: 9, border: `1.5px solid ${open ? "#004786" : "#e0e3e7"}`,
-                    background: "#fafafa", cursor: "pointer", textAlign: "right",
+                    borderRadius: 9, border: `1.5px solid ${open ? "var(--t-accent)" : "var(--t-border)"}`,
+                    background: "var(--t-card-hover)", cursor: "pointer", textAlign: "right",
                     display: "flex", alignItems: "center", flexWrap: "wrap", gap: 5,
                     transition: "border-color .15s, box-shadow .15s", boxSizing: "border-box",
                     opacity: disabled ? 0.6 : 1,
-                    boxShadow: open ? "0 0 0 3px rgba(0,71,134,.06)" : "none",
+                    boxShadow: open ? "0 0 0 3px rgba(27,80,145,.06)" : "none",
                 }}
             >
                 {isLoading ? (
-                    <span style={{ fontSize: 12, color: "#9ca3af", display: "flex", alignItems: "center", gap: 5 }}>
-                        <Loader2 size={12} className="animate-spin" style={{ color: "#004786" }} /> جاري التحميل...
+                    <span style={{ fontSize: 12, color: "var(--t-text-faint)", display: "flex", alignItems: "center", gap: 5 }}>
+                        <Loader2 size={12} className="animate-spin" style={{ color: "var(--t-accent)" }} /> جاري التحميل...
                     </span>
                 ) : selectedAgents.length === 0 ? (
-                    <span style={{ fontSize: 12, color: "#9ca3af" }}>{placeholder}</span>
+                    <span style={{ fontSize: 12, color: "var(--t-text-faint)" }}>{placeholder}</span>
                 ) : (
                     selectedAgents.map(a => (
                         <span key={a.id} style={{
                             display: "inline-flex", alignItems: "center", gap: 5,
                             padding: "3px 10px 3px 6px", borderRadius: 20, fontSize: 11, fontWeight: 600,
-                            background: "linear-gradient(135deg, rgba(0,71,134,.06), rgba(0,71,134,.03))",
-                            color: "#004786", border: "1px solid rgba(0,71,134,.1)",
+                            background: "linear-gradient(135deg, rgba(27,80,145,.06), rgba(27,80,145,.03))",
+                            color: "var(--t-accent)", border: "1px solid rgba(27,80,145,.1)",
                         }}>
                             <span style={{
                                 width: 18, height: 18, borderRadius: "50%", flexShrink: 0,
-                                background: "linear-gradient(135deg, #004786, #0072b5)", color: "#fff",
+                                background: "var(--t-brand-orange)", color: "#fff",
                                 display: "flex", alignItems: "center", justifyContent: "center",
                                 fontSize: 8, fontWeight: 800,
                             }}>{a.name.charAt(0).toUpperCase()}</span>
                             {a.name}
                             <span
                                 onClick={e => { e.stopPropagation(); toggle(a.id) }}
-                                style={{ cursor: "pointer", display: "flex", color: "rgba(0,71,134,.3)", transition: "color .12s", marginRight: 2 }}
-                                onMouseEnter={e => { e.currentTarget.style.color = "#dc2626" }}
-                                onMouseLeave={e => { e.currentTarget.style.color = "rgba(0,71,134,.3)" }}
+                                style={{ cursor: "pointer", display: "flex", color: "rgba(27,80,145,.3)", transition: "color .12s", marginRight: 2 }}
+                                onMouseEnter={e => { e.currentTarget.style.color = "var(--t-danger)" }}
+                                onMouseLeave={e => { e.currentTarget.style.color = "rgba(27,80,145,.3)" }}
                             >
                                 <X size={10} />
                             </span>
@@ -92,7 +92,7 @@ export function AgentMultiSelect({ value, onChange, placeholder = "اختر وك
                 {/* Chevron */}
                 <ChevronDown size={14} style={{
                     position: "absolute", left: 10, top: "50%", transform: `translateY(-50%) rotate(${open ? 180 : 0}deg)`,
-                    color: open ? "#004786" : "#9ca3af", transition: "transform .2s, color .15s", pointerEvents: "none",
+                    color: open ? "var(--t-accent)" : "var(--t-text-faint)", transition: "transform .2s, color .15s", pointerEvents: "none",
                 }} />
             </button>
 
@@ -109,7 +109,7 @@ export function AgentMultiSelect({ value, onChange, placeholder = "اختر وك
                     {/* Search */}
                     {agents.length > 4 && (
                         <div style={{ padding: "8px 10px", borderBottom: "1px solid #f0f1f3", position: "relative" }}>
-                            <Search size={12} style={{ position: "absolute", right: 20, top: "50%", transform: "translateY(-50%)", color: "#9ca3af" }} />
+                            <Search size={12} style={{ position: "absolute", right: 20, top: "50%", transform: "translateY(-50%)", color: "var(--t-text-faint)" }} />
                             <input
                                 autoFocus
                                 value={search}
@@ -117,8 +117,8 @@ export function AgentMultiSelect({ value, onChange, placeholder = "اختر وك
                                 placeholder="بحث في الوكلاء..."
                                 style={{
                                     width: "100%", padding: "6px 28px 6px 8px", borderRadius: 7,
-                                    border: "1px solid #e0e3e7", background: "#fafafa",
-                                    fontSize: 12, color: "var(--t-text, #111827)", outline: "none", boxSizing: "border-box",
+                                    border: "1px solid var(--t-border)", background: "var(--t-card-hover)",
+                                    fontSize: 12, color: "var(--t-text, var(--t-text))", outline: "none", boxSizing: "border-box",
                                 }}
                             />
                         </div>
@@ -127,11 +127,11 @@ export function AgentMultiSelect({ value, onChange, placeholder = "اختر وك
                     {/* Agent list */}
                     <div style={{ maxHeight: 220, overflowY: "auto", padding: "4px 0" }}>
                         {isLoading ? (
-                            <div style={{ padding: "16px 14px", fontSize: 12, color: "#004786", display: "flex", alignItems: "center", gap: 7 }}>
+                            <div style={{ padding: "16px 14px", fontSize: 12, color: "var(--t-accent)", display: "flex", alignItems: "center", gap: 7 }}>
                                 <Loader2 size={14} className="animate-spin" /> جاري التحميل...
                             </div>
                         ) : filtered.length === 0 ? (
-                            <div style={{ padding: "16px 14px", fontSize: 12, color: "#9ca3af", textAlign: "center" }}>
+                            <div style={{ padding: "16px 14px", fontSize: 12, color: "var(--t-text-faint)", textAlign: "center" }}>
                                 {search ? "لا توجد نتائج" : "لا يوجد وكلاء"}
                             </div>
                         ) : (
@@ -147,29 +147,29 @@ export function AgentMultiSelect({ value, onChange, placeholder = "اختر وك
                                         style={{
                                             width: "100%", display: "flex", alignItems: "center", gap: 10,
                                             padding: "8px 14px", border: "none", cursor: "pointer",
-                                            background: selected ? "rgba(0,71,134,.04)" : "transparent",
+                                            background: selected ? "rgba(27,80,145,.04)" : "transparent",
                                             textAlign: "right", transition: "background .1s",
                                             fontFamily: "inherit",
                                         }}
                                         onMouseEnter={e => { if (!selected) e.currentTarget.style.background = "#fafbfc" }}
-                                        onMouseLeave={e => { if (!selected) e.currentTarget.style.background = selected ? "rgba(0,71,134,.04)" : "transparent" }}
+                                        onMouseLeave={e => { if (!selected) e.currentTarget.style.background = selected ? "rgba(27,80,145,.04)" : "transparent" }}
                                     >
                                         {/* Avatar initials */}
                                         <div style={{
                                             width: 30, height: 30, borderRadius: 8, flexShrink: 0,
-                                            background: selected ? "linear-gradient(135deg, #004786, #0072b5)" : "#f0f1f3",
+                                            background: selected ? "var(--t-gradient-accent)" : "#f0f1f3",
                                             display: "flex", alignItems: "center", justifyContent: "center",
-                                            fontSize: 12, fontWeight: 800, color: selected ? "#fff" : "#9ca3af",
+                                            fontSize: 12, fontWeight: 800, color: selected ? "#fff" : "var(--t-text-faint)",
                                             transition: "all .12s",
                                         }}>
                                             {initials}
                                         </div>
                                         {/* Info */}
                                         <div style={{ flex: 1, minWidth: 0 }}>
-                                            <div style={{ fontSize: 12.5, fontWeight: 700, color: "var(--t-text, #111827)", lineHeight: 1.2 }}>{agent.name}</div>
+                                            <div style={{ fontSize: 12.5, fontWeight: 700, color: "var(--t-text, var(--t-text))", lineHeight: 1.2 }}>{agent.name}</div>
                                             <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 2 }}>
-                                                <span style={{ display: "flex", alignItems: "center", gap: 3, fontSize: 10, color: isActive ? "#16a34a" : "#9ca3af" }}>
-                                                    <span style={{ width: 5, height: 5, borderRadius: "50%", background: isActive ? "#16a34a" : "#d1d5db" }} />
+                                                <span style={{ display: "flex", alignItems: "center", gap: 3, fontSize: 10, color: isActive ? "#16a34a" : "var(--t-text-faint)" }}>
+                                                    <span style={{ width: 5, height: 5, borderRadius: "50%", background: isActive ? "#16a34a" : "var(--t-border-medium)" }} />
                                                     {isActive ? "نشط" : "غير نشط"}
                                                 </span>
                                             </div>
@@ -177,8 +177,8 @@ export function AgentMultiSelect({ value, onChange, placeholder = "اختر وك
                                         {/* Checkbox */}
                                         <div style={{
                                             width: 18, height: 18, borderRadius: 5, flexShrink: 0,
-                                            border: `1.5px solid ${selected ? "#004786" : "#d1d5db"}`,
-                                            background: selected ? "#004786" : "#fff",
+                                            border: `1.5px solid ${selected ? "var(--t-accent)" : "var(--t-border-medium)"}`,
+                                            background: selected ? "var(--t-accent)" : "#fff",
                                             display: "flex", alignItems: "center", justifyContent: "center",
                                             transition: "all .1s",
                                         }}>
@@ -196,11 +196,11 @@ export function AgentMultiSelect({ value, onChange, placeholder = "اختر وك
                             padding: "7px 14px", borderTop: "1px solid #f0f1f3",
                             display: "flex", alignItems: "center", justifyContent: "space-between",
                         }}>
-                            <span style={{ fontSize: 11, color: "#9ca3af" }}>
+                            <span style={{ fontSize: 11, color: "var(--t-text-faint)" }}>
                                 {value.length} {value.length === 1 ? "وكيل محدد" : "وكلاء محددون"}
                             </span>
                             <button type="button" onClick={() => onChange([])} style={{
-                                fontSize: 11, fontWeight: 600, color: "#dc2626", background: "none",
+                                fontSize: 11, fontWeight: 600, color: "var(--t-danger)", background: "none",
                                 border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 4,
                                 fontFamily: "inherit",
                             }}>

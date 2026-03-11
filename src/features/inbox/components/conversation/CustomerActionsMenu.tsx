@@ -166,7 +166,7 @@ export function CustomerActionsMenu({ customer: c, open, onClose, anchorRef }: P
                     label={c.enable_ai ? "تعطيل AI" : "تفعيل AI"}
                     onClick={() => aiMut.mutate(!c.enable_ai, { onSuccess: done })}
                     loading={aiMut.isPending}
-                    iconColor={c.enable_ai ? "#ef4444" : "#8b5cf6"}
+                    iconColor={c.enable_ai ? "var(--t-danger)" : "#8b5cf6"}
                 />}
 
                 <div className="cam-sep" />
@@ -176,14 +176,14 @@ export function CustomerActionsMenu({ customer: c, open, onClose, anchorRef }: P
                     label={c.favorite ? "إزالة من المفضلة" : "إضافة للمفضلة"}
                     onClick={() => favMut.mutate(!c.favorite, { onSuccess: done })}
                     loading={favMut.isPending}
-                    iconColor={c.favorite ? "#f59e0b" : undefined}
+                    iconColor={c.favorite ? "var(--t-warning)" : undefined}
                 />}
                 {canMute && <MItem
                     icon={<BellOff size={14} />}
                     label={c.muted ? "إلغاء الكتم" : "كتم المحادثة"}
                     onClick={() => muteMut.mutate(!c.muted, { onSuccess: done })}
                     loading={muteMut.isPending}
-                    iconColor={c.muted ? "#6b7280" : undefined}
+                    iconColor={c.muted ? "var(--t-text-muted)" : undefined}
                 />}
             </div>
 

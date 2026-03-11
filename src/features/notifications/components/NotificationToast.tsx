@@ -36,7 +36,7 @@ export default function NotificationToast({
                 width: "calc(100vw - 40px)",
                 borderRadius: 14,
                 background: "var(--t-card, #fff)",
-                border: "1px solid var(--t-border-light, #e5e7eb)",
+                border: "1px solid var(--t-border-light, var(--t-border))",
                 boxShadow:
                     "0 12px 40px -8px rgba(0,0,0,0.15), 0 4px 12px -4px rgba(0,0,0,0.08)",
                 padding: "14px 16px",
@@ -56,7 +56,7 @@ export default function NotificationToast({
                         width: 36,
                         height: 36,
                         borderRadius: 10,
-                        background: "linear-gradient(135deg, #004786, #0098d6)",
+                        background: "var(--t-gradient-accent)",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
@@ -72,7 +72,7 @@ export default function NotificationToast({
                         style={{
                             fontSize: 13,
                             fontWeight: 700,
-                            color: "var(--t-text, #111827)",
+                            color: "var(--t-text, var(--t-text))",
                             marginBottom: 2,
                         }}
                     >
@@ -81,7 +81,7 @@ export default function NotificationToast({
                     <div
                         style={{
                             fontSize: 12,
-                            color: "var(--t-text-faint, #6b7280)",
+                            color: "var(--t-text-faint, var(--t-text-muted))",
                             overflow: "hidden",
                             textOverflow: "ellipsis",
                             whiteSpace: "nowrap",
@@ -104,12 +104,12 @@ export default function NotificationToast({
                         background: "none",
                         border: "none",
                         cursor: "pointer",
-                        color: "var(--t-text-faint, #9ca3af)",
+                        color: "var(--t-text-faint, var(--t-text-faint))",
                         flexShrink: 0,
                         transition: "all 0.15s",
                     }}
                     onMouseEnter={(e) => {
-                        e.currentTarget.style.background = "var(--t-surface, #f3f4f6)"
+                        e.currentTarget.style.background = "var(--t-surface, var(--t-surface))"
                     }}
                     onMouseLeave={(e) => {
                         e.currentTarget.style.background = "none"
@@ -127,7 +127,7 @@ export default function NotificationToast({
                     right: 0,
                     height: 3,
                     borderRadius: "0 0 14px 14px",
-                    background: "linear-gradient(90deg, #004786, #0098d6)",
+                    background: "var(--t-gradient-accent)",
                     animation: "toastProgress 5s linear forwards",
                 }}
             />

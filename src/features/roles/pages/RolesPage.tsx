@@ -34,10 +34,10 @@ export function RolesPage({ embedded = false }: { embedded?: boolean }) {
             {/* Header */}
             {!embedded && (
                 <header style={{ marginBottom: 20 }}>
-                    <h1 style={{ fontSize: 20, fontWeight: 700, color: "var(--t-text, #111827)", margin: 0, letterSpacing: "-0.01em" }}>
+                    <h1 style={{ fontSize: 20, fontWeight: 700, color: "var(--t-text, var(--t-text))", margin: 0, letterSpacing: "-0.01em" }}>
                         الأدوار والصلاحيات
                     </h1>
-                    <p style={{ fontSize: 12, color: "var(--t-text-faint, #9ca3af)", marginTop: 3 }}>
+                    <p style={{ fontSize: 12, color: "var(--t-text-faint, var(--t-text-faint))", marginTop: 3 }}>
                         إنشاء الأدوار وإدارة الصلاحيات وتعيين المستخدمين
                     </p>
                 </header>
@@ -53,16 +53,16 @@ export function RolesPage({ embedded = false }: { embedded?: boolean }) {
                 }}>
                     <div style={{
                         width: 44, height: 44, borderRadius: 10,
-                        background: "rgba(0,71,134,0.06)",
+                        background: "rgba(27,80,145,0.06)",
                         display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 10,
                     }}>
-                        <AlertCircle size={18} style={{ color: "#004786" }} />
+                        <AlertCircle size={18} style={{ color: "var(--t-accent)" }} />
                     </div>
-                    <p style={{ fontSize: 13, color: "var(--t-text-faint, #9ca3af)", margin: "0 0 10px" }}>فشل تحميل الأدوار</p>
+                    <p style={{ fontSize: 13, color: "var(--t-text-faint, var(--t-text-faint))", margin: "0 0 10px" }}>فشل تحميل الأدوار</p>
                     <button onClick={() => refetch()} style={{
                         display: "flex", alignItems: "center", gap: 5,
                         padding: "7px 16px", borderRadius: 8,
-                        border: "none", background: "#004786", color: "#fff",
+                        border: "none", background: "var(--t-brand-orange)", color: "#fff",
                         fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
                     }}>
                         <RefreshCw size={12} /> إعادة المحاولة
@@ -97,12 +97,12 @@ export function RolesPage({ embedded = false }: { embedded?: boolean }) {
                         }}>
                             <div style={{
                                 width: 52, height: 52, borderRadius: 14,
-                                background: "rgba(0,71,134,0.06)",
+                                background: "rgba(27,80,145,0.06)",
                                 display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 12,
                             }}>
-                                <Shield size={24} style={{ color: "#004786" }} />
+                                <Shield size={24} style={{ color: "var(--t-accent)" }} />
                             </div>
-                            <p style={{ fontSize: 14, fontWeight: 600, color: "var(--t-text, #111827)", margin: 0 }}>اختر دوراً من القائمة</p>
+                            <p style={{ fontSize: 14, fontWeight: 600, color: "var(--t-text, var(--t-text))", margin: 0 }}>اختر دوراً من القائمة</p>
                         </div>
                     )}
                 </div>

@@ -12,11 +12,11 @@ interface Props {
 }
 
 const ROLE_GRADIENTS = [
-    "linear-gradient(135deg, #004786, #0072b5)",
-    "linear-gradient(135deg, #0072b5, #0098d6)",
+    "var(--t-gradient-accent)",
+    "var(--t-gradient-accent)",
     "linear-gradient(135deg, #7c3aed, #a855f7)",
     "linear-gradient(135deg, #0891b2, #06b6d4)",
-    "linear-gradient(135deg, #004786, #0098d6)",
+    "var(--t-gradient-accent)",
 ]
 
 function hashCode(s: string): number {
@@ -40,17 +40,17 @@ export function RolesList({ roles, isLoading, isError, refetch, activeRole, onSe
                 display: "flex", alignItems: "center", justifyContent: "space-between",
             }}>
                 <div>
-                    <h3 style={{ fontSize: 14, fontWeight: 700, color: "var(--t-text, #111827)", margin: 0 }}>الأدوار</h3>
-                    <p style={{ fontSize: 11, color: "var(--t-text-faint, #9ca3af)", margin: "2px 0 0", fontWeight: 500 }}>
+                    <h3 style={{ fontSize: 14, fontWeight: 700, color: "var(--t-text, var(--t-text))", margin: 0 }}>الأدوار</h3>
+                    <p style={{ fontSize: 11, color: "var(--t-text-faint, var(--t-text-faint))", margin: "2px 0 0", fontWeight: 500 }}>
                         {roles?.length || 0} دور
                     </p>
                 </div>
                 <div style={{
                     width: 30, height: 30, borderRadius: 8,
-                    background: "rgba(0,71,134,0.06)",
+                    background: "rgba(27,80,145,0.06)",
                     display: "flex", alignItems: "center", justifyContent: "center",
                 }}>
-                    <Shield size={14} style={{ color: "#004786" }} />
+                    <Shield size={14} style={{ color: "var(--t-accent)" }} />
                 </div>
             </div>
 
@@ -58,16 +58,16 @@ export function RolesList({ roles, isLoading, isError, refetch, activeRole, onSe
             <div style={{ flex: 1, overflowY: "auto", padding: 6 }}>
                 {isLoading && (
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 0" }}>
-                        <Loader2 size={18} className="animate-spin" style={{ color: "#004786" }} />
+                        <Loader2 size={18} className="animate-spin" style={{ color: "var(--t-accent)" }} />
                     </div>
                 )}
 
                 {isError && (
                     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "40px 0", gap: 8 }}>
-                        <p style={{ fontSize: 12, color: "var(--t-text-faint, #9ca3af)", fontWeight: 500, margin: 0 }}>فشل التحميل</p>
+                        <p style={{ fontSize: 12, color: "var(--t-text-faint, var(--t-text-faint))", fontWeight: 500, margin: 0 }}>فشل التحميل</p>
                         <button onClick={refetch} style={{
                             display: "flex", alignItems: "center", gap: 4,
-                            fontSize: 11, fontWeight: 600, color: "#004786",
+                            fontSize: 11, fontWeight: 600, color: "var(--t-accent)",
                             background: "none", border: "none", cursor: "pointer", fontFamily: "inherit",
                         }}>
                             <RefreshCw size={11} /> إعادة
@@ -83,8 +83,8 @@ export function RolesList({ roles, isLoading, isError, refetch, activeRole, onSe
                             style={{
                                 display: "flex", width: "100%", alignItems: "center", gap: 10,
                                 borderRadius: 10, padding: "10px 12px",
-                                border: on ? "1px solid rgba(0,71,134,0.15)" : "1px solid transparent",
-                                background: on ? "rgba(0,71,134,0.04)" : "transparent",
+                                border: on ? "1px solid rgba(27,80,145,0.15)" : "1px solid transparent",
+                                background: on ? "rgba(27,80,145,0.04)" : "transparent",
                                 cursor: "pointer", textAlign: "right",
                                 transition: "all .12s", marginBottom: 3,
                                 animation: `rpFade .2s ease-out ${idx * 0.03}s both`,
@@ -99,20 +99,20 @@ export function RolesList({ roles, isLoading, isError, refetch, activeRole, onSe
                                 transition: "all .15s",
                             }}>
                                 <Shield size={14} strokeWidth={2} style={{
-                                    color: on ? "#fff" : "var(--t-text-faint, #9ca3af)",
+                                    color: on ? "#fff" : "var(--t-text-faint, var(--t-text-faint))",
                                 }} />
                             </div>
                             <div style={{ minWidth: 0, flex: 1 }}>
                                 <p style={{
                                     fontSize: 13, fontWeight: on ? 700 : 500,
-                                    color: on ? "#004786" : "var(--t-text, #374151)",
+                                    color: on ? "var(--t-accent)" : "var(--t-text, var(--t-text-secondary))",
                                     margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
                                 }}>
                                     {r.name_ar}
                                 </p>
                                 <p style={{
                                     fontSize: 10.5, fontFamily: "monospace",
-                                    color: on ? "rgba(0,71,134,0.5)" : "var(--t-text-faint, #9ca3af)",
+                                    color: on ? "rgba(27,80,145,0.5)" : "var(--t-text-faint, var(--t-text-faint))",
                                     margin: "1px 0 0", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
                                 }} dir="ltr">
                                     {r.role}
@@ -121,7 +121,7 @@ export function RolesList({ roles, isLoading, isError, refetch, activeRole, onSe
                             {on && (
                                 <div style={{
                                     width: 3, height: 20, borderRadius: 2,
-                                    background: "#004786", flexShrink: 0,
+                                    background: "var(--t-brand-orange)", flexShrink: 0,
                                 }} />
                             )}
                         </button>

@@ -56,7 +56,7 @@ function ErrorPanel({ error, onRetry, retrying }: { error: unknown; onRetry: () 
             {!status && <div style={{ height: 12 }} />}
             <button onClick={onRetry} style={{
                 padding: "9px 22px", borderRadius: 9, border: "none", cursor: "pointer",
-                background: "var(--t-accent)", color: "var(--t-text-on-accent)", fontSize: 12, fontWeight: 600,
+                background: "var(--t-brand-orange)", color: "var(--t-text-on-accent)", fontSize: 12, fontWeight: 600,
                 display: "inline-flex", alignItems: "center", gap: 6,
                 opacity: retrying ? 0.7 : 1, pointerEvents: retrying ? "none" : "auto",
             }}>
@@ -180,7 +180,7 @@ export function FeaturesTab({ agentId }: { agentId: string }) {
             {/* Refetch bar */}
             {isRefetching && (
                 <div style={{ height: 2, borderRadius: 1, marginBottom: 12, overflow: "hidden", background: "var(--t-border-light)" }}>
-                    <div style={{ height: "100%", width: "40%", borderRadius: 1, background: "var(--t-accent)", animation: "ftSlide 1s ease-in-out infinite" }} />
+                    <div style={{ height: "100%", width: "40%", borderRadius: 1, background: "var(--t-brand-orange)", animation: "ftSlide 1s ease-in-out infinite" }} />
                 </div>
             )}
 
@@ -203,7 +203,7 @@ export function FeaturesTab({ agentId }: { agentId: string }) {
                         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 18 }}>
                             <div style={{
                                 width: 42, height: 42, borderRadius: 11,
-                                background: "var(--t-accent)",
+                                background: "var(--t-brand-orange)",
                                 display: "flex", alignItems: "center", justifyContent: "center",
                             }}>
                                 <Settings2 size={20} style={{ color: "var(--t-text-on-accent)" }} />

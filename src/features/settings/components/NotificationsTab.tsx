@@ -57,15 +57,15 @@ export function NotificationsTab() {
                 <div style={sectionHeader}>
                     <div style={{
                         width: 28, height: 28, borderRadius: 8,
-                        background: soundOn ? "rgba(0,71,134,0.06)" : "rgba(107,114,128,0.06)",
+                        background: soundOn ? "rgba(27,80,145,0.06)" : "rgba(107,114,128,0.06)",
                         display: "flex", alignItems: "center", justifyContent: "center",
                     }}>
-                        {soundOn ? <Volume2 size={14} style={{ color: "#004786" }} /> : <VolumeX size={14} style={{ color: "#9ca3af" }} />}
+                        {soundOn ? <Volume2 size={14} style={{ color: "var(--t-accent)" }} /> : <VolumeX size={14} style={{ color: "var(--t-text-faint)" }} />}
                     </div>
-                    <span style={{ fontSize: 13, fontWeight: 700, color: "var(--t-text, #111827)" }}>إعدادات الصوت</span>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: "var(--t-text, var(--t-text))" }}>إعدادات الصوت</span>
                     <span style={{
                         fontSize: 9, fontWeight: 600,
-                        color: soundOn ? "#16a34a" : "#9ca3af",
+                        color: soundOn ? "#16a34a" : "var(--t-text-faint)",
                         background: soundOn ? "rgba(34,197,94,0.06)" : "rgba(107,114,128,0.06)",
                         padding: "2px 8px", borderRadius: 4,
                     }}>{soundOn ? "مفعّل" : "معطّل"}</span>
@@ -75,25 +75,25 @@ export function NotificationsTab() {
                     <div style={{
                         display: "flex", alignItems: "center", justifyContent: "space-between",
                         padding: "10px 14px", borderRadius: 10,
-                        background: "var(--t-surface, #f9fafb)",
+                        background: "var(--t-surface, var(--t-page))",
                         marginBottom: soundOn ? 14 : 0,
                     }}>
                         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                             <div style={{
                                 width: 32, height: 32, borderRadius: 8,
-                                background: soundOn ? "rgba(0,71,134,0.08)" : "rgba(107,114,128,0.06)",
+                                background: soundOn ? "rgba(27,80,145,0.08)" : "rgba(107,114,128,0.06)",
                                 display: "flex", alignItems: "center", justifyContent: "center",
                             }}>
-                                {soundOn ? <Volume2 size={15} style={{ color: "#004786" }} /> : <VolumeX size={15} style={{ color: "#9ca3af" }} />}
+                                {soundOn ? <Volume2 size={15} style={{ color: "var(--t-accent)" }} /> : <VolumeX size={15} style={{ color: "var(--t-text-faint)" }} />}
                             </div>
                             <div>
                                 <div style={{ fontSize: 12.5, fontWeight: 600, color: "var(--t-text, #1f2937)" }}>أصوات الإشعارات</div>
-                                <div style={{ fontSize: 10.5, color: "#9ca3af", marginTop: 1 }}>تشغيل صوت عند وصول رسالة أو إشعار جديد</div>
+                                <div style={{ fontSize: 10.5, color: "var(--t-text-faint)", marginTop: 1 }}>تشغيل صوت عند وصول رسالة أو إشعار جديد</div>
                             </div>
                         </div>
                         <button onClick={toggleSound} style={{
                             width: 42, height: 22, borderRadius: 22,
-                            background: soundOn ? "#004786" : "#d1d5db",
+                            background: soundOn ? "var(--t-accent)" : "var(--t-border-medium)",
                             border: "none", cursor: "pointer",
                             position: "relative", transition: "background .2s", flexShrink: 0,
                         }}>
@@ -111,22 +111,22 @@ export function NotificationsTab() {
                     {soundOn && (
                         <div style={{
                             padding: "10px 14px", borderRadius: 10,
-                            background: "var(--t-surface, #f9fafb)",
+                            background: "var(--t-surface, var(--t-page))",
                         }}>
                             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
                                 <span style={{ fontSize: 12, fontWeight: 600, color: "var(--t-text, #1f2937)" }}>مستوى الصوت</span>
                                 <span style={{
-                                    fontSize: 11, fontWeight: 700, color: "#004786",
-                                    background: "rgba(0,71,134,0.06)", padding: "2px 10px", borderRadius: 6,
+                                    fontSize: 11, fontWeight: 700, color: "var(--t-accent)",
+                                    background: "rgba(27,80,145,0.06)", padding: "2px 10px", borderRadius: 6,
                                 }}>{volume}%</span>
                             </div>
                             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                                <VolumeX size={13} style={{ color: "#9ca3af", flexShrink: 0 }} />
+                                <VolumeX size={13} style={{ color: "var(--t-text-faint)", flexShrink: 0 }} />
                                 <input type="range" min={0} max={100} step={5} value={volume}
                                     onChange={e => handleVolume(Number(e.target.value))}
-                                    style={{ flex: 1, height: 4, cursor: "pointer", accentColor: "#004786" }}
+                                    style={{ flex: 1, height: 4, cursor: "pointer", accentColor: "var(--t-accent)" }}
                                 />
-                                <Volume2 size={13} style={{ color: "#004786", flexShrink: 0 }} />
+                                <Volume2 size={13} style={{ color: "var(--t-accent)", flexShrink: 0 }} />
                             </div>
                         </div>
                     )}
@@ -139,23 +139,23 @@ export function NotificationsTab() {
                     <div style={sectionHeader}>
                         <div style={{
                             width: 28, height: 28, borderRadius: 8,
-                            background: "linear-gradient(135deg, rgba(0,71,134,0.08), rgba(0,152,214,0.06))",
+                            background: "linear-gradient(135deg, rgba(27,80,145,0.08), rgba(77,166,232,0.06))",
                             display: "flex", alignItems: "center", justifyContent: "center",
                         }}>
-                            <Music size={14} style={{ color: "#004786" }} />
+                            <Music size={14} style={{ color: "var(--t-accent)" }} />
                         </div>
-                        <span style={{ fontSize: 13, fontWeight: 700, color: "var(--t-text, #111827)" }}>نغمة الإشعار</span>
+                        <span style={{ fontSize: 13, fontWeight: 700, color: "var(--t-text, var(--t-text))" }}>نغمة الإشعار</span>
                         <span style={{ flex: 1 }} />
                         <button onClick={testSound} style={{
                             padding: "4px 12px", borderRadius: 6, cursor: "pointer",
-                            border: "1px solid rgba(0,71,134,0.12)",
-                            background: "rgba(0,71,134,0.03)",
-                            color: "#004786", fontSize: 10.5, fontWeight: 600,
+                            border: "1px solid rgba(27,80,145,0.12)",
+                            background: "rgba(27,80,145,0.03)",
+                            color: "var(--t-accent)", fontSize: 10.5, fontWeight: 600,
                             display: "flex", alignItems: "center", gap: 4,
                             transition: "all .12s",
                         }}
-                            onMouseEnter={e => { e.currentTarget.style.background = "rgba(0,71,134,0.07)" }}
-                            onMouseLeave={e => { e.currentTarget.style.background = "rgba(0,71,134,0.03)" }}
+                            onMouseEnter={e => { e.currentTarget.style.background = "rgba(27,80,145,0.07)" }}
+                            onMouseLeave={e => { e.currentTarget.style.background = "rgba(27,80,145,0.03)" }}
                         >
                             <Play size={10} /> تجربة
                         </button>
@@ -171,17 +171,17 @@ export function NotificationsTab() {
                                         style={{
                                             padding: "12px 10px", borderRadius: 10, cursor: "pointer",
                                             border: isSelected
-                                                ? "2px solid #004786"
+                                                ? "2px solid var(--t-accent)"
                                                 : "1.5px solid var(--t-border-light, #eaedf0)",
                                             background: isSelected
-                                                ? "rgba(0,71,134,0.03)"
+                                                ? "rgba(27,80,145,0.03)"
                                                 : "var(--t-surface, #fafbfc)",
                                             transition: "all .15s",
                                             position: "relative",
                                             textAlign: "center",
                                         }}
                                         onMouseEnter={e => {
-                                            if (!isSelected) e.currentTarget.style.borderColor = "rgba(0,71,134,0.3)"
+                                            if (!isSelected) e.currentTarget.style.borderColor = "rgba(27,80,145,0.3)"
                                         }}
                                         onMouseLeave={e => {
                                             if (!isSelected) e.currentTarget.style.borderColor = "var(--t-border-light, #eaedf0)"
@@ -192,7 +192,7 @@ export function NotificationsTab() {
                                             <div style={{
                                                 position: "absolute", top: 6, left: 6,
                                                 width: 16, height: 16, borderRadius: "50%",
-                                                background: "#004786",
+                                                background: "var(--t-brand-orange)",
                                                 display: "flex", alignItems: "center", justifyContent: "center",
                                             }}>
                                                 <Check size={10} style={{ color: "#fff" }} />
@@ -202,7 +202,7 @@ export function NotificationsTab() {
                                         <div style={{
                                             width: 32, height: 32, borderRadius: 8,
                                             background: isSelected
-                                                ? "rgba(0,71,134,0.08)"
+                                                ? "rgba(27,80,145,0.08)"
                                                 : "rgba(107,114,128,0.04)",
                                             display: "flex", alignItems: "center", justifyContent: "center",
                                             margin: "0 auto 6px",
@@ -211,10 +211,10 @@ export function NotificationsTab() {
                                         </div>
                                         <div style={{
                                             fontSize: 12, fontWeight: isSelected ? 700 : 600,
-                                            color: isSelected ? "#004786" : "var(--t-text, #1f2937)",
+                                            color: isSelected ? "var(--t-accent)" : "var(--t-text, #1f2937)",
                                         }}>{preset.name}</div>
                                         <div style={{
-                                            fontSize: 9.5, color: "#9ca3af", marginTop: 2,
+                                            fontSize: 9.5, color: "var(--t-text-faint)", marginTop: 2,
                                         }}>{preset.desc}</div>
                                     </button>
                                 )
@@ -228,25 +228,25 @@ export function NotificationsTab() {
             <div style={{ ...card, padding: "36px 24px", textAlign: "center" }}>
                 <div style={{
                     width: 44, height: 44, borderRadius: 12,
-                    background: "linear-gradient(135deg, rgba(0,71,134,0.06), rgba(0,152,214,0.06))",
+                    background: "linear-gradient(135deg, rgba(27,80,145,0.06), rgba(77,166,232,0.06))",
                     display: "inline-flex", alignItems: "center", justifyContent: "center",
                     marginBottom: 10,
                 }}>
-                    <Bell size={20} style={{ color: "#004786" }} />
+                    <Bell size={20} style={{ color: "var(--t-accent)" }} />
                 </div>
                 <h4 style={{ fontSize: 14, fontWeight: 700, color: "var(--t-text, #1f2937)", margin: "0 0 3px" }}>
                     تفضيلات الإشعارات المتقدمة
                 </h4>
-                <p style={{ fontSize: 12, color: "var(--t-text-faint, #9ca3af)", margin: 0, maxWidth: 280, marginInline: "auto" }}>
+                <p style={{ fontSize: 12, color: "var(--t-text-faint, var(--t-text-faint))", margin: 0, maxWidth: 280, marginInline: "auto" }}>
                     التحكم في أنواع الإشعارات عبر البريد والتطبيق
                 </p>
                 <div style={{
                     marginTop: 10, display: "inline-flex", alignItems: "center", gap: 4,
                     padding: "4px 14px", borderRadius: 6,
-                    background: "rgba(0,71,134,0.04)", border: "1px solid rgba(0,71,134,0.08)",
-                    fontSize: 11, fontWeight: 600, color: "#004786",
+                    background: "rgba(27,80,145,0.04)", border: "1px solid rgba(27,80,145,0.08)",
+                    fontSize: 11, fontWeight: 600, color: "var(--t-accent)",
                 }}>
-                    <Zap size={9} style={{ color: "#0098d6" }} />
+                    <Zap size={9} style={{ color: "var(--t-accent-light)" }} />
                     قريباً
                 </div>
             </div>
@@ -256,7 +256,7 @@ export function NotificationsTab() {
 
 /* ── Visual representation of tone notes ── */
 function ToneVisual({ notes, selected }: { notes: number; selected: boolean }) {
-    const color = selected ? "#004786" : "#9ca3af"
+    const color = selected ? "var(--t-accent)" : "var(--t-text-faint)"
     return (
         <div style={{ display: "flex", alignItems: "end", gap: 2, height: 16 }}>
             {Array.from({ length: notes }).map((_, i) => (

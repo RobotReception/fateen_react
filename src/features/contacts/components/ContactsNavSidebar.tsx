@@ -15,19 +15,19 @@ import type { ContactsSidebarLifecycle, ContactsSidebarTeam } from "../services/
 
 const CSS = `
 @keyframes cnFade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
-.cn-root{height:100%;display:flex;flex-direction:column;background:#fff;border-left:1px solid #ebeef2;overflow:hidden;transition:width .2s ease,min-width .2s ease}
+.cn-root{height:100%;display:flex;flex-direction:column;background:#fff;border-left:1px solid var(--t-border);overflow:hidden;transition:width .2s ease,min-width .2s ease}
 .cn-header{display:flex;align-items:center;padding:12px;flex-shrink:0;border-bottom:1px solid #f0f1f3}
-.cn-toggle{width:28px;height:28px;border-radius:7px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#9ca3af;transition:all .12s;flex-shrink:0}
-.cn-toggle:hover{background:#f5f6f8;color:#6b7280}
+.cn-toggle{width:28px;height:28px;border-radius:7px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t-text-faint);transition:all .12s;flex-shrink:0}
+.cn-toggle:hover{background:var(--t-surface);color:var(--t-text-muted)}
 .cn-nav{padding:4px;margin-bottom:2px;cursor:pointer;display:flex;align-items:center;border-radius:8px;font-size:12.5px;transition:all .12s;position:relative;gap:8px}
-.cn-nav:hover{background:#f5f6f8}
-.cn-nav.active{background:linear-gradient(135deg,#004786,#0072b5);color:#fff}
-.cn-nav.active:hover{background:linear-gradient(135deg,#004786,#0072b5)}
+.cn-nav:hover{background:var(--t-surface)}
+.cn-nav.active{background:var(--t-gradient-accent);color:#fff}
+.cn-nav.active:hover{background:var(--t-gradient-accent)}
 .cn-count{font-size:9px;font-weight:700;padding:1px 6px;border-radius:10px;min-width:18px;text-align:center}
 .cn-sec-hdr{display:flex;align-items:center;justify-content:space-between;padding:8px 12px 4px}
 .cn-sec-btn{display:flex;align-items:center;gap:3px;background:none;border:none;font-size:9.5px;font-weight:700;color:#b0b7c3;cursor:pointer;text-transform:uppercase;letter-spacing:.08em;padding:0}
 .cn-sec-add{width:18px;height:18px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#b0b7c3;border-radius:4px;transition:all .1s}
-.cn-sec-add:hover{background:#f5f6f8;color:#004786}
+.cn-sec-add:hover{background:var(--t-surface);color:var(--t-accent)}
 .cn-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
 `
 
@@ -56,10 +56,10 @@ export function ContactsNavSidebar() {
             <div className="cn-header" style={{ justifyContent: collapsed ? "center" : "space-between", padding: collapsed ? "12px 0" : "12px" }}>
                 {!collapsed && (
                     <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
-                        <div style={{ width: 26, height: 26, borderRadius: 7, background: "linear-gradient(135deg, #004786, #0072b5)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <div style={{ width: 26, height: 26, borderRadius: 7, background: "var(--t-gradient-accent)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                             <Users size={12} style={{ color: "#fff" }} />
                         </div>
-                        <span style={{ fontSize: 13, fontWeight: 700, color: "#111827" }}>جهات الاتصال</span>
+                        <span style={{ fontSize: 13, fontWeight: 700, color: "var(--t-text)" }}>جهات الاتصال</span>
                     </div>
                 )}
                 <button className="cn-toggle" onClick={toggleSidebar} title={collapsed ? "توسيع" : "طي"}>
@@ -79,7 +79,7 @@ export function ContactsNavSidebar() {
                             <span style={{
                                 position: "absolute", top: 1, right: 1, fontSize: 7, fontWeight: 700,
                                 width: 13, height: 13, borderRadius: "50%",
-                                background: isActive("all") ? "rgba(255,255,255,.3)" : "#004786",
+                                background: isActive("all") ? "rgba(255,255,255,.3)" : "var(--t-accent)",
                                 color: "#fff", display: "flex", alignItems: "center", justifyContent: "center",
                             }}>{totalCount > 9 ? "9+" : totalCount}</span>
                         )}
@@ -133,7 +133,7 @@ export function ContactsNavSidebar() {
                                     const key = `team_${team.team_id}`
                                     return (
                                         <NavItem key={key} active={isActive(key)} collapsed={false} onClick={() => setActiveSection(key as ContactsSection)}>
-                                            <span className="cn-dot" style={{ background: team.color ?? "#d1d5db" }} />
+                                            <span className="cn-dot" style={{ background: team.color ?? "var(--t-border-medium)" }} />
                                             <span style={{ flex: 1 }}>{team.name}</span>
                                             <CountBadge count={team.customers_count} active={isActive(key)} />
                                         </NavItem>
@@ -159,7 +159,7 @@ export function ContactsNavSidebar() {
                             const key = `team_${team.team_id}`
                             return (
                                 <NavItem key={key} active={isActive(key)} collapsed={true} onClick={() => setActiveSection(key as ContactsSection)} title={team.name}>
-                                    <span className="cn-dot" style={{ background: team.color ?? "#d1d5db", width: 9, height: 9 }} />
+                                    <span className="cn-dot" style={{ background: team.color ?? "var(--t-border-medium)", width: 9, height: 9 }} />
                                 </NavItem>
                             )
                         })}
@@ -182,7 +182,7 @@ function NavItem({ children, active, collapsed, onClick, title }: {
                 justifyContent: collapsed ? "center" : "flex-start",
                 gap: collapsed ? 0 : 8,
             }}
-            onMouseEnter={(e) => { if (!active) e.currentTarget.style.background = "#f5f6f8" }}
+            onMouseEnter={(e) => { if (!active) e.currentTarget.style.background = "var(--t-surface)" }}
             onMouseLeave={(e) => { if (!active) e.currentTarget.style.background = "transparent" }}>
             {children}
         </div>
@@ -192,8 +192,8 @@ function NavItem({ children, active, collapsed, onClick, title }: {
 function CountBadge({ count, active }: { count: number; active: boolean }) {
     return (
         <span className="cn-count" style={{
-            background: active ? "rgba(255,255,255,.2)" : "#f5f6f8",
-            color: active ? "#fff" : "#9ca3af",
+            background: active ? "rgba(255,255,255,.2)" : "var(--t-surface)",
+            color: active ? "#fff" : "var(--t-text-faint)",
         }}>{count}</span>
     )
 }

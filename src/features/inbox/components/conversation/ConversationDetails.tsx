@@ -206,7 +206,7 @@ export function ConversationDetails({ customer: c }: Props) {
                 }
                 .act-header-icon {
                     width:28px; height:28px; border-radius:8px;
-                    background:linear-gradient(135deg,#0072b5,#004786);
+                    background:var(--t-gradient-accent);
                     display:flex; align-items:center; justify-content:center;
                     color:#fff; flex-shrink:0;
                     box-shadow:0 2px 6px rgba(0,100,200,.25);
@@ -250,7 +250,7 @@ export function ConversationDetails({ customer: c }: Props) {
                 .act-row:hover .act-connector-dot { transform:scale(1.35); }
                 .act-connector-line {
                     flex:1; width:2px;
-                    background:linear-gradient(to bottom, var(--act-dot-color,#94a3b8) 0%, transparent 100%);
+                    background:linear-gradient(to bottom, var(--act-dot-color,var(--t-text-muted)) 0%, transparent 100%);
                     opacity:.25; min-height:12px;
                     margin-top:2px;
                 }
@@ -270,18 +270,18 @@ export function ConversationDetails({ customer: c }: Props) {
                     transition:border-color .15s, box-shadow .15s;
                 }
                 .act-card:hover {
-                    border-color:var(--act-dot-color, #94a3b8);
+                    border-color:var(--act-dot-color, var(--t-text-muted));
                     box-shadow:0 2px 12px rgba(0,0,0,.06);
                 }
                 .act-card[data-open="true"] {
-                    border-color:var(--act-dot-color, #94a3b8);
+                    border-color:var(--act-dot-color, var(--t-text-muted));
                     box-shadow:0 3px 16px rgba(0,0,0,.09);
                 }
 
                 /* Top accent bar */
                 .act-card-accent {
                     height:3px;
-                    background:linear-gradient(90deg, var(--act-dot-color,#94a3b8), transparent);
+                    background:linear-gradient(90deg, var(--act-dot-color,var(--t-text-muted)), transparent);
                     opacity:.6;
                     display:none;
                 }
@@ -332,7 +332,7 @@ export function ConversationDetails({ customer: c }: Props) {
                     color:var(--t-text-secondary);
                     max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
                 }
-                .act-pill-old { color:var(--t-danger,#dc2626); text-decoration:line-through; }
+                .act-pill-old { color:var(--t-danger,var(--t-danger)); text-decoration:line-through; }
                 .act-pill-new { color:#16a34a; font-weight:700; }
 
                 /* Expanded details panel */
@@ -363,7 +363,7 @@ export function ConversationDetails({ customer: c }: Props) {
                     display:flex; align-items:center; gap:5px; flex-wrap:wrap;
                 }
                 .act-old-val {
-                    color:var(--t-danger,#dc2626); text-decoration:line-through;
+                    color:var(--t-danger,var(--t-danger)); text-decoration:line-through;
                     font-weight:600;
                 }
                 .act-new-val { color:#16a34a; font-weight:700; }
@@ -596,9 +596,9 @@ function ContactTab({ customer: c }: { customer: Customer }) {
 
                         const sharedStyle: React.CSSProperties = {
                             width: "100%", padding: "6px 8px",
-                            border: "1px solid var(--t-border-light, #e5e7eb)",
+                            border: "1px solid var(--t-border-light, var(--t-border))",
                             borderRadius: 7, fontSize: 12, fontFamily: "inherit",
-                            background: "var(--t-surface, #fafbfc)", color: "var(--t-text, #111827)",
+                            background: "var(--t-surface, #fafbfc)", color: "var(--t-text, var(--t-text))",
                             outline: "none", transition: "border-color .15s",
                         }
 
@@ -606,10 +606,10 @@ function ContactTab({ customer: c }: { customer: Customer }) {
                             <div key={field.field_name} style={{ marginBottom: 10 }}>
                                 <label style={{
                                     display: "flex", alignItems: "center", gap: 4,
-                                    fontSize: 10.5, fontWeight: 600, color: "var(--t-text-muted, #6b7280)",
+                                    fontSize: 10.5, fontWeight: 600, color: "var(--t-text-muted, var(--t-text-muted))",
                                     marginBottom: 3, paddingRight: 2,
                                 }}>
-                                    <span style={{ display: "flex", color: "var(--t-text-faint, #9ca3af)" }}>{typeIcon(field.field_type)}</span>
+                                    <span style={{ display: "flex", color: "var(--t-text-faint, var(--t-text-faint))" }}>{typeIcon(field.field_type)}</span>
                                     {label}
                                 </label>
 
@@ -665,12 +665,12 @@ function ContactTab({ customer: c }: { customer: Customer }) {
                             style={{
                                 width: "100%", padding: "8px 0",
                                 border: "none", borderRadius: 8,
-                                background: saving ? "#94a3b8" : !canEditFields ? "#94a3b8" : "linear-gradient(135deg, #0072b5, #004786)",
+                                background: saving ? "var(--t-text-muted)" : !canEditFields ? "var(--t-text-muted)" : "var(--t-brand-orange)",
                                 color: "#fff", fontSize: 12.5, fontWeight: 700,
                                 fontFamily: "inherit", cursor: (saving || !canEditFields) ? "not-allowed" : "pointer",
                                 display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
                                 transition: "all .15s", marginTop: 4, marginBottom: 2,
-                                boxShadow: saving ? "none" : "0 2px 8px rgba(0,71,134,0.18)",
+                                boxShadow: saving ? "none" : "0 2px 8px rgba(27,80,145,0.18)",
                             }}
                         >
                             {saving && <Loader2 size={13} className="animate-spin" />}
@@ -907,7 +907,7 @@ function TagsSection({ customer }: { customer: Customer }) {
                                     >
                                         <span style={{
                                             width: 16, height: 16, borderRadius: 4,
-                                            background: "var(--t-accent)", border: "none",
+                                            background: "var(--t-gradient-accent)", border: "none",
                                             display: "flex", alignItems: "center", justifyContent: "center",
                                             flexShrink: 0, color: "var(--t-text-on-accent)", fontSize: 9,
                                         }}>✓</span>
@@ -1097,14 +1097,14 @@ const EVENT_META: Record<string, EventMeta> = {
     ai_status_changed: { label: "تغيير حالة AI", emoji: "🤖", color: "#059669", bg: "#ecfdf5", borderColor: "#a7f3d0" },
     customer_assigned: { label: "تعيين وكيل", emoji: "👤", color: "#0891b2", bg: "#ecfeff", borderColor: "#a5f3fc" },
     teams_assigned: { label: "تعيين فريق", emoji: "👥", color: "#0d9488", bg: "#f0fdfa", borderColor: "#99f6e4" },
-    session_auto_closed: { label: "إغلاق تلقائي", emoji: "🔒", color: "#dc2626", bg: "#fef2f2", borderColor: "#fecaca" },
-    session_closed: { label: "إغلاق الجلسة", emoji: "🔒", color: "#dc2626", bg: "#fef2f2", borderColor: "#fecaca" },
+    session_auto_closed: { label: "إغلاق تلقائي", emoji: "🔒", color: "var(--t-danger)", bg: "#fef2f2", borderColor: "#fecaca" },
+    session_closed: { label: "إغلاق الجلسة", emoji: "🔒", color: "var(--t-danger)", bg: "#fef2f2", borderColor: "#fecaca" },
     session_reopened: { label: "فتح الجلسة", emoji: "🔓", color: "#16a34a", bg: "#f0fdf4", borderColor: "#bbf7d0" },
     tag_added: { label: "إضافة تاج", emoji: "🏷️", color: "#7c3aed", bg: "#f5f3ff", borderColor: "#ddd6fe" },
     tag_removed: { label: "إزالة تاج", emoji: "🗑️", color: "#b91c1c", bg: "#fef2f2", borderColor: "#fecaca" },
 }
 
-const DEFAULT_META: EventMeta = { label: "حدث", emoji: "📋", color: "#6b7280", bg: "#f9fafb", borderColor: "#e5e7eb" }
+const DEFAULT_META: EventMeta = { label: "حدث", emoji: "📋", color: "var(--t-text-muted)", bg: "var(--t-page)", borderColor: "var(--t-border)" }
 
 function relativeTime(iso: string): string {
     const diff = Date.now() - new Date(iso).getTime()
@@ -1192,7 +1192,7 @@ function renderMetaVal(key: string, val: unknown): React.ReactNode {
     if (key === "added_teams" && Array.isArray(val)) return (val as string[]).join("، ")
     if (key === "enable_ai") return val
         ? <span style={{ color: "#059669", fontWeight: 700 }}>مفعّل ✓</span>
-        : <span style={{ color: "#dc2626", fontWeight: 700 }}>معطّل</span>
+        : <span style={{ color: "var(--t-danger)", fontWeight: 700 }}>معطّل</span>
     if (key === "is_assigned" || key === "is_assigned_team") return val ? "نعم" : "لا"
     if (key === "hours_idle") return `${val} ساعة`
     return String(val)
@@ -1210,9 +1210,9 @@ function ActivityEventCard({ event, isLast }: { event: ActivityEvent; isLast: bo
         ? {
             ...baseMeta,
             label: md.enable_ai ? "تفعيل AI" : "تعطيل AI",
-            color: md.enable_ai ? "#059669" : "#6b7280",
-            bg: md.enable_ai ? "#ecfdf5" : "#f9fafb",
-            borderColor: md.enable_ai ? "#a7f3d0" : "#e5e7eb",
+            color: md.enable_ai ? "#059669" : "var(--t-text-muted)",
+            bg: md.enable_ai ? "#ecfdf5" : "var(--t-page)",
+            borderColor: md.enable_ai ? "#a7f3d0" : "var(--t-border)",
         }
         : baseMeta
 

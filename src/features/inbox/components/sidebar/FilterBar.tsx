@@ -270,11 +270,11 @@ export function FilterBar({ availableFilters }: Props) {
                 }
                 .fb-pill:hover { border-color:var(--t-border); }
                 .fb-pill-active {
-                    background:linear-gradient(135deg, #004786, #0072b5) !important;
-                    border-color:rgba(0,71,134,0.3) !important;
+                    background:var(--t-gradient-accent) !important;
+                    border-color:rgba(27,80,145,0.3) !important;
                     color:#fff !important;
                     font-weight:700 !important;
-                    box-shadow:0 1px 4px rgba(0,71,134,0.2);
+                    box-shadow:0 1px 4px var(--t-accent-muted);
                 }
 
                 /* Filter toggle */
@@ -292,10 +292,10 @@ export function FilterBar({ availableFilters }: Props) {
                     border-color:var(--t-border);
                 }
                 .fb-filter-toggle-active {
-                    background:linear-gradient(135deg, #004786, #0072b5) !important;
-                    border-color:rgba(0,71,134,0.3) !important;
+                    background:var(--t-gradient-accent) !important;
+                    border-color:rgba(27,80,145,0.3) !important;
                     color:#fff !important;
-                    box-shadow:0 1px 4px rgba(0,71,134,0.2);
+                    box-shadow:0 1px 4px var(--t-accent-muted);
                 }
                 .fb-filter-count {
                     font-size:9px; font-weight:700;
@@ -313,8 +313,8 @@ export function FilterBar({ availableFilters }: Props) {
                     transition:border-color .18s, box-shadow .18s;
                 }
                 .fb-search-wrap:focus-within {
-                    border-color:#0072b5;
-                    box-shadow:0 0 0 3px rgba(0,114,181,0.08);
+                    border-color:var(--t-accent-secondary);
+                    box-shadow:0 0 0 3px var(--t-accent-muted);
                 }
                 .fb-search-input {
                     border:none; outline:none; background:transparent;
@@ -362,16 +362,16 @@ export function FilterBar({ availableFilters }: Props) {
                     transition:all .15s;
                 }
                 .fb-select-active {
-                    border:1.5px solid #0072b5 !important;
-                    background:rgba(0,114,181,0.06) !important;
+                    border:1.5px solid var(--t-accent-secondary) !important;
+                    background:var(--t-accent-muted) !important;
                     font-weight:600 !important;
                 }
                 .fb-select:not(.fb-select-active) {
                     border:1px solid var(--t-border-light);
                 }
                 .fb-select:focus {
-                    border-color:#0072b5;
-                    box-shadow:0 0 0 2px rgba(0,114,181,0.08);
+                    border-color:var(--t-accent-secondary);
+                    box-shadow:0 0 0 2px var(--t-accent-muted);
                 }
 
                 /* Date input */
@@ -383,16 +383,16 @@ export function FilterBar({ availableFilters }: Props) {
                     transition:all .15s;
                 }
                 .fb-date-active {
-                    border:1.5px solid #0072b5 !important;
-                    background:rgba(0,114,181,0.06) !important;
+                    border:1.5px solid var(--t-accent-secondary) !important;
+                    background:var(--t-accent-muted) !important;
                     font-weight:600 !important;
                 }
                 .fb-date-input:not(.fb-date-active) {
                     border:1px solid var(--t-border-light);
                 }
                 .fb-date-input:focus {
-                    border-color:#0072b5;
-                    box-shadow:0 0 0 2px rgba(0,114,181,0.08);
+                    border-color:var(--t-accent-secondary);
+                    box-shadow:0 0 0 2px var(--t-accent-muted);
                 }
 
                 /* Toggle chips */
@@ -407,11 +407,11 @@ export function FilterBar({ availableFilters }: Props) {
                 }
                 .fb-toggle-chip:hover { border-color:var(--t-border); }
                 .fb-toggle-active {
-                    background:linear-gradient(135deg, #004786, #0072b5) !important;
-                    border-color:rgba(0,71,134,0.3) !important;
+                    background:var(--t-gradient-accent) !important;
+                    border-color:rgba(27,80,145,0.3) !important;
                     color:#fff !important;
                     font-weight:700 !important;
-                    box-shadow:0 1px 3px rgba(0,71,134,0.15);
+                    box-shadow:0 1px 3px rgba(27,80,145,0.15);
                 }
 
                 /* Clear button */
@@ -426,7 +426,7 @@ export function FilterBar({ availableFilters }: Props) {
                 .fb-clear-btn:hover {
                     background:rgba(239,68,68,0.06);
                     border-color:rgba(239,68,68,0.2);
-                    color:#ef4444;
+                    color:var(--t-danger);
                 }
 
                 /* Active chips */
@@ -437,9 +437,9 @@ export function FilterBar({ availableFilters }: Props) {
                 .fb-active-chip {
                     display:inline-flex; align-items:center; gap:3px;
                     padding:2px 6px 2px 8px; border-radius:10px;
-                    background:rgba(0,114,181,0.08);
+                    background:var(--t-accent-muted);
                     border:1px solid rgba(0,114,181,0.15);
-                    font-size:10px; font-weight:600; color:#004786;
+                    font-size:10px; font-weight:600; color:var(--t-accent);
                 }
                 .fb-active-chip-x {
                     border:none; background:transparent;

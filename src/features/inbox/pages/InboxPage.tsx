@@ -94,17 +94,17 @@ function InboxEmptyState() {
                     border-radius:50%;
                     background:radial-gradient(circle,
                         rgba(0,114,181,.1) 0%,
-                        rgba(0,71,134,.04) 50%,
+                        rgba(27,80,145,.04) 50%,
                         transparent 70%
                     );
                     animation:iePulseGlow 3s ease-in-out infinite;
                 }
                 .ie-icon-circle {
                     width:80px; height:80px; border-radius:50%;
-                    background:linear-gradient(135deg, #004786, #0072b5);
+                    background:var(--t-gradient-accent);
                     display:flex; align-items:center; justify-content:center;
                     color:#fff;
-                    box-shadow:0 6px 24px rgba(0,71,134,0.2);
+                    box-shadow:0 6px 24px var(--t-accent-muted);
                     animation:ieFloat 4s ease-in-out infinite;
                     position:relative; z-index:1;
                 }
@@ -120,7 +120,7 @@ function InboxEmptyState() {
                 }
                 .ie-dot-2 {
                     width:7px; height:7px;
-                    background:rgba(0,71,134,0.12); bottom:14px; left:10px;
+                    background:rgba(27,80,145,0.12); bottom:14px; left:10px;
                     animation:ieDotFloat 4s ease-in-out infinite .5s;
                 }
                 .ie-dot-3 {
@@ -157,7 +157,7 @@ function InboxEmptyState() {
                     transition:all .18s;
                 }
                 .ie-tip:hover {
-                    background:rgba(0,114,181,0.06);
+                    background:var(--t-accent-muted);
                     border-color:rgba(0,114,181,0.15);
                     color:var(--t-text-muted);
                 }

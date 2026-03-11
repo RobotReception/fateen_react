@@ -56,10 +56,10 @@ export function UsersPage({ embedded = false }: { embedded?: boolean }) {
             {/* ── Header ── */}
             {!embedded && (
                 <div style={{ marginBottom: 16 }}>
-                    <h1 style={{ fontSize: 20, fontWeight: 700, color: "var(--t-text, #111827)", margin: 0, letterSpacing: "-0.01em" }}>
+                    <h1 style={{ fontSize: 20, fontWeight: 700, color: "var(--t-text, var(--t-text))", margin: 0, letterSpacing: "-0.01em" }}>
                         إدارة المستخدمين
                     </h1>
-                    <p style={{ fontSize: 12, color: "var(--t-text-faint, #9ca3af)", marginTop: 3 }}>
+                    <p style={{ fontSize: 12, color: "var(--t-text-faint, var(--t-text-faint))", marginTop: 3 }}>
                         إضافة وإدارة مستخدمي المؤسسة وصلاحياتهم
                     </p>
                 </div>
@@ -72,11 +72,11 @@ export function UsersPage({ embedded = false }: { embedded?: boolean }) {
                     padding: "12px 16px", borderRadius: 10, marginBottom: 12,
                     background: "#fef2f2", border: "1px solid #fecaca",
                 }}>
-                    <AlertTriangle size={15} style={{ color: "#dc2626", flexShrink: 0 }} />
+                    <AlertTriangle size={15} style={{ color: "var(--t-danger)", flexShrink: 0 }} />
                     <span style={{ flex: 1, fontSize: 12, fontWeight: 600, color: "#991b1b" }}>{error}</span>
                     <button onClick={() => refetch()} style={{
                         border: "none", background: "none", fontSize: 11, fontWeight: 700,
-                        color: "#dc2626", cursor: "pointer", fontFamily: "inherit",
+                        color: "var(--t-danger)", cursor: "pointer", fontFamily: "inherit",
                     }}>إعادة المحاولة</button>
                 </div>
             )}
@@ -104,7 +104,7 @@ export function UsersPage({ embedded = false }: { embedded?: boolean }) {
                     }}>
                         <Search size={14} style={{
                             position: "absolute", right: 11, top: "50%", transform: "translateY(-50%)",
-                            color: searchFocused ? "#004786" : "var(--t-text-faint, #9ca3af)",
+                            color: searchFocused ? "var(--t-accent)" : "var(--t-text-faint, var(--t-text-faint))",
                             transition: "color .15s", pointerEvents: "none",
                         }} />
                         <input
@@ -117,12 +117,12 @@ export function UsersPage({ embedded = false }: { embedded?: boolean }) {
                             style={{
                                 width: "100%", padding: "8px 34px 8px 12px",
                                 borderRadius: 9,
-                                border: `1.5px solid ${searchFocused ? "#004786" : "var(--t-border-light, #e0e3e7)"}`,
-                                background: "var(--t-surface, #fafafa)",
-                                fontSize: 12, color: "var(--t-text, #111827)",
+                                border: `1.5px solid ${searchFocused ? "var(--t-accent)" : "var(--t-border-light, var(--t-border))"}`,
+                                background: "var(--t-surface, var(--t-card-hover))",
+                                fontSize: 12, color: "var(--t-text, var(--t-text))",
                                 outline: "none", fontFamily: "inherit",
                                 transition: "border-color .15s, box-shadow .15s",
-                                boxShadow: searchFocused ? "0 0 0 3px rgba(0,71,134,0.06)" : "none",
+                                boxShadow: searchFocused ? "0 0 0 3px rgba(27,80,145,0.06)" : "none",
                             }}
                         />
                     </div>
@@ -132,10 +132,10 @@ export function UsersPage({ embedded = false }: { embedded?: boolean }) {
                         <div style={{
                             display: "flex", alignItems: "center", gap: 5,
                             padding: "5px 12px", borderRadius: 7,
-                            background: "rgba(0,71,134,0.05)",
+                            background: "rgba(27,80,145,0.05)",
                         }}>
-                            <Users size={12} style={{ color: "#004786" }} />
-                            <span style={{ fontSize: 11, fontWeight: 600, color: "#004786" }}>
+                            <Users size={12} style={{ color: "var(--t-accent)" }} />
+                            <span style={{ fontSize: 11, fontWeight: 600, color: "var(--t-accent)" }}>
                                 {users.length} مستخدم
                             </span>
                         </div>
@@ -149,7 +149,7 @@ export function UsersPage({ embedded = false }: { embedded?: boolean }) {
                                 border: "none", background: "transparent",
                                 cursor: "pointer", display: "flex",
                                 alignItems: "center", justifyContent: "center",
-                                color: "var(--t-text-faint, #9ca3af)", transition: "all .12s",
+                                color: "var(--t-text-faint, var(--t-text-faint))", transition: "all .12s",
                             }}
                             onMouseEnter={e => { e.currentTarget.style.background = "var(--t-surface, #f5f5f5)" }}
                             onMouseLeave={e => { e.currentTarget.style.background = "transparent" }}
@@ -163,14 +163,14 @@ export function UsersPage({ embedded = false }: { embedded?: boolean }) {
                                 style={{
                                     display: "flex", alignItems: "center", gap: 6,
                                     padding: "8px 16px", borderRadius: 9,
-                                    border: "none", background: "#004786",
+                                    border: "none", background: "var(--t-brand-orange)",
                                     color: "#fff", fontSize: 12, fontWeight: 600,
                                     cursor: "pointer", fontFamily: "inherit",
-                                    boxShadow: "0 1px 3px rgba(0,71,134,0.15)",
+                                    boxShadow: "0 1px 3px rgba(27,80,145,0.15)",
                                     transition: "background .15s",
                                 }}
-                                onMouseEnter={e => { e.currentTarget.style.background = "#003a6e" }}
-                                onMouseLeave={e => { e.currentTarget.style.background = "#004786" }}
+                                onMouseEnter={e => { e.currentTarget.style.background = "var(--t-accent-hover)" }}
+                                onMouseLeave={e => { e.currentTarget.style.background = "var(--t-accent)" }}
                             >
                                 <UserPlus size={14} />
                                 إضافة مستخدم

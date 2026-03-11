@@ -1,7 +1,7 @@
 import { useState } from "react"
 import {
     Palette, RotateCcw, Sun, Moon, Check, Copy,
-    Sparkles, ShieldAlert, AlertTriangle, Info, Droplets,
+    Sparkles, ShieldAlert, AlertTriangle, Info, Droplets, Flame,
 } from "lucide-react"
 import {
     useThemeStore, DEFAULT_COLORS, DEFAULT_COLORS_DARK,
@@ -16,13 +16,22 @@ const CSS = `
 /* ── Color groups ── */
 const COLOR_GROUPS = [
     {
-        title: "اللون الأساسي",
+        title: "اللون الأساسي (أزرق)",
         desc: "اللون الرئيسي للأزرار والعناصر النشطة والتبديلات",
         icon: Palette,
         keys: [
             { key: "accent" as ThemeColorKey, label: "الأساسي", showPicker: true },
             { key: "accent-hover" as ThemeColorKey, label: "عند التمرير", showPicker: true },
             { key: "text-on-accent" as ThemeColorKey, label: "نص فوق الأساسي", showPicker: true },
+        ],
+    },
+    {
+        title: "اللون الثانوي (برتقالي)",
+        desc: "اللون البرتقالي للعلامة التجارية والعناصر المميزة",
+        icon: Flame,
+        keys: [
+            { key: "brand-orange" as ThemeColorKey, label: "البرتقالي", showPicker: true },
+            { key: "brand-orange-hover" as ThemeColorKey, label: "عند التمرير", showPicker: true },
         ],
     },
     {
@@ -99,6 +108,11 @@ function ColorEditor({ colorKey, label, showPicker }: {
             setFn("accent-muted", hexToSoft(hex, 0.08))
             setFn("text-on-accent", contrastText(hex))
         }
+        if (colorKey === "brand-orange") {
+            setFn("brand-orange-hover", shadeHex(hex, isDark ? -15 : 30))
+            setFn("brand-orange-soft", hexToSoft(hex, isDark ? 0.15 : 0.10))
+            setFn("brand-orange-muted", hexToSoft(hex, isDark ? 0.08 : 0.06))
+        }
         if (colorKey === "success") setFn("success-soft", hexToSoft(hex, isDark ? 0.12 : 0.08))
         if (colorKey === "warning") setFn("warning-soft", hexToSoft(hex, isDark ? 0.12 : 0.08))
         if (colorKey === "danger") setFn("danger-soft", hexToSoft(hex, isDark ? 0.1 : 0.06))
@@ -127,6 +141,11 @@ function ColorEditor({ colorKey, label, showPicker }: {
             delete current["accent-muted"]
             delete current["text-on-accent"]
         }
+        if (colorKey === "brand-orange") {
+            delete current["brand-orange-hover"]
+            delete current["brand-orange-soft"]
+            delete current["brand-orange-muted"]
+        }
         if (colorKey === "success") delete current["success-soft"]
         if (colorKey === "warning") delete current["warning-soft"]
         if (colorKey === "danger") delete current["danger-soft"]
@@ -143,6 +162,7 @@ function ColorEditor({ colorKey, label, showPicker }: {
         if (colorKey === "accent") keysToReset.push("accent-hover", "accent-muted", "text-on-accent")
         if (colorKey === "success") keysToReset.push("success-soft")
         if (colorKey === "warning") keysToReset.push("warning-soft")
+        if (colorKey === "brand-orange") keysToReset.push("brand-orange-hover", "brand-orange-soft", "brand-orange-muted")
         if (colorKey === "danger") keysToReset.push("danger-soft")
         if (colorKey === "info") keysToReset.push("info-soft")
         for (const k of keysToReset) {
@@ -249,7 +269,7 @@ function ColorEditor({ colorKey, label, showPicker }: {
    PRESET PALETTE
    ══════════════════════════════════════ */
 const PRESETS = [
-    { name: "الافتراضي", accent: "#111827", accentDark: "#e2e8f0" },
+    { name: "الافتراضي", accent: "#0145b2", accentDark: "#65caf4" },
     { name: "أزرق كلاسيكي", accent: "#2563eb", accentDark: "#60a5fa" },
     { name: "بنفسجي أنيق", accent: "#7c3aed", accentDark: "#a78bfa" },
     { name: "وردي حيوي", accent: "#db2777", accentDark: "#f472b6" },
@@ -276,7 +296,7 @@ function LivePreview() {
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                     <button style={{
                         padding: "8px 18px", borderRadius: 8, border: "none",
-                        background: "var(--t-accent)", color: "var(--t-text-on-accent)",
+                        background: "var(--t-brand-orange)", color: "var(--t-text-on-accent)",
                         fontSize: 12, fontWeight: 600, cursor: "default",
                     }}>زر أساسي</button>
                     <button style={{

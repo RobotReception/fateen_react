@@ -80,7 +80,7 @@ export function OnboardingPage() {
         (step1Submitted || touched[field]) && step1Errors[field]
 
     const step1Class = (field: keyof typeof step1Errors, extra = "") =>
-        `w-full rounded-xl border ${showStep1Error(field) ? "border-red-400 bg-red-50/30" : "border-gray-200 bg-gray-50/50"} px-4 py-3 text-sm text-gray-900 outline-none transition-all duration-300 placeholder:text-gray-400 focus:border-[#0098d6]/50 focus:bg-white focus:ring-2 focus:ring-[#0098d6]/10 ${extra}`
+        `w-full rounded-xl border ${showStep1Error(field) ? "border-red-400 bg-red-50/30" : "border-gray-200 bg-gray-50/50"} px-4 py-3 text-sm text-gray-900 outline-none transition-all duration-300 placeholder:text-gray-400 focus:border-[var(--t-accent-light)]/50 focus:bg-white focus:ring-2 focus:ring-[var(--t-accent-light)]/10 ${extra}`
 
     const handleBlur = (field: string) => setTouched(p => ({ ...p, [field]: true }))
 
@@ -150,7 +150,7 @@ export function OnboardingPage() {
             <select
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
-                className="w-full appearance-none rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-3 text-sm text-gray-900 outline-none transition-all duration-300 focus:border-[#0098d6]/50 focus:bg-white focus:ring-2 focus:ring-[#0098d6]/10"
+                className="w-full appearance-none rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-3 text-sm text-gray-900 outline-none transition-all duration-300 focus:border-[var(--t-accent-light)]/50 focus:bg-white focus:ring-2 focus:ring-[var(--t-accent-light)]/10"
             >
                 <option value="">{placeholder}</option>
                 {opts.map((o) => (
@@ -166,7 +166,7 @@ export function OnboardingPage() {
         return (
             <AuthLayout>
                 <div className="flex flex-col items-center gap-3 py-12">
-                    <Loader2 className="h-8 w-8 animate-spin text-[#0098d6]" />
+                    <Loader2 className="h-8 w-8 animate-spin text-[var(--t-accent-light)]" />
                     <p className="text-sm text-gray-500">جاري التحميل...</p>
                 </div>
             </AuthLayout>
@@ -185,7 +185,7 @@ export function OnboardingPage() {
                     <p className="mb-8 text-sm text-gray-400">سجّل دخولك للوصول إلى لوحة التحكم</p>
                     <button
                         onClick={() => navigate("/login")}
-                        className="group relative w-full overflow-hidden rounded-xl bg-gradient-to-l from-[#0098d6] to-[#004786] px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-[#0098d6]/20 transition-all duration-300 hover:shadow-xl hover:shadow-[#0098d6]/30 hover:-translate-y-0.5"
+                        className="group relative w-full overflow-hidden rounded-xl bg-gradient-to-l from-[var(--t-accent-light)] to-[var(--t-accent)] px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-[var(--t-accent-light)]/20 transition-all duration-300 hover:shadow-xl hover:shadow-[var(--t-accent-light)]/30 hover:-translate-y-0.5"
                     >
                         <span className="relative z-10 flex items-center justify-center gap-2">تسجيل الدخول</span>
                         <div className="absolute inset-0 bg-gradient-to-l from-[#00b4ff] to-[#0066aa] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
@@ -198,8 +198,8 @@ export function OnboardingPage() {
     return (
         <AuthLayout>
             {/* Icon + Header */}
-            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#0098d6]/10 to-[#004786]/10">
-                <Building2 className="h-7 w-7 text-[#0098d6]" />
+            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--t-accent-light)]/10 to-[var(--t-accent)]/10">
+                <Building2 className="h-7 w-7 text-[var(--t-accent-light)]" />
             </div>
             <div className="mb-6 text-center">
                 <h1 className="mb-1 text-2xl font-bold text-gray-900">إعداد المؤسسة</h1>
@@ -208,8 +208,8 @@ export function OnboardingPage() {
 
             {/* Progress */}
             <div className="mb-8 flex items-center gap-2">
-                <div className={`h-1.5 flex-1 rounded-full transition-colors ${step >= 1 ? "bg-[#0098d6]" : "bg-gray-200"}`} />
-                <div className={`h-1.5 flex-1 rounded-full transition-colors ${step >= 2 ? "bg-[#0098d6]" : "bg-gray-200"}`} />
+                <div className={`h-1.5 flex-1 rounded-full transition-colors ${step >= 1 ? "bg-[var(--t-accent-light)]" : "bg-gray-200"}`} />
+                <div className={`h-1.5 flex-1 rounded-full transition-colors ${step >= 2 ? "bg-[var(--t-accent-light)]" : "bg-gray-200"}`} />
             </div>
 
             {error && (
@@ -264,7 +264,7 @@ export function OnboardingPage() {
                                 value={domain}
                                 onChange={(e) => setDomain(e.target.value)}
                                 placeholder="example.com"
-                                className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-3 text-sm text-gray-900 outline-none transition-all duration-300 placeholder:text-gray-400 focus:border-[#0098d6]/50 focus:bg-white focus:ring-2 focus:ring-[#0098d6]/10"
+                                className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-3 text-sm text-gray-900 outline-none transition-all duration-300 placeholder:text-gray-400 focus:border-[var(--t-accent-light)]/50 focus:bg-white focus:ring-2 focus:ring-[var(--t-accent-light)]/10"
                                 dir="ltr"
                             />
                         </div>
@@ -295,7 +295,7 @@ export function OnboardingPage() {
                             type="button"
                             onClick={handleNext}
                             disabled={!canProceedStep1}
-                            className="group relative mt-2 w-full overflow-hidden rounded-xl bg-gradient-to-l from-[#0098d6] to-[#004786] px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-[#0098d6]/20 transition-all duration-300 hover:shadow-xl hover:shadow-[#0098d6]/30 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+                            className="group relative mt-2 w-full overflow-hidden rounded-xl bg-gradient-to-l from-[var(--t-accent-light)] to-[var(--t-accent)] px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-[var(--t-accent-light)]/20 transition-all duration-300 hover:shadow-xl hover:shadow-[var(--t-accent-light)]/30 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
                         >
                             <span className="relative z-10 flex items-center justify-center gap-2">
                                 التالي
@@ -326,7 +326,7 @@ export function OnboardingPage() {
                             <button
                                 type="submit"
                                 disabled={loading || !canProceedStep2}
-                                className="group relative flex-1 overflow-hidden rounded-xl bg-gradient-to-l from-[#0098d6] to-[#004786] px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-[#0098d6]/20 transition-all duration-300 hover:shadow-xl hover:shadow-[#0098d6]/30 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+                                className="group relative flex-1 overflow-hidden rounded-xl bg-gradient-to-l from-[var(--t-accent-light)] to-[var(--t-accent)] px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-[var(--t-accent-light)]/20 transition-all duration-300 hover:shadow-xl hover:shadow-[var(--t-accent-light)]/30 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
                             >
                                 <span className="relative z-10 flex items-center justify-center gap-2">
                                     {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Building2 className="h-4 w-4" />}

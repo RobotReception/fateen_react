@@ -20,9 +20,9 @@ const PreviewTab = lazy(() => import("../components/PreviewTab").then(m => ({ de
 type TabKey = "templates" | "tree-editor" | "assignments" | "groups" | "preview"
 
 const TABS: { key: TabKey; title: string; icon: typeof ListTree; description: string; gradient: string }[] = [
-    { key: "templates", title: "القوالب", icon: FileText, description: "إدارة قوالب القوائم", gradient: "linear-gradient(135deg, #3b82f6, #2563eb)" },
-    { key: "tree-editor", title: "محرر الشجرة", icon: FolderTree, description: "بناء الشجرة التفاعلية", gradient: "linear-gradient(135deg, #10b981, #059669)" },
-    { key: "assignments", title: "التعيينات", icon: Link2, description: "ربط القوالب بالأهداف", gradient: "linear-gradient(135deg, #f59e0b, #d97706)" },
+    { key: "templates", title: "القوالب", icon: FileText, description: "إدارة قوالب القوائم", gradient: "linear-gradient(135deg, var(--t-info), #2563eb)" },
+    { key: "tree-editor", title: "محرر الشجرة", icon: FolderTree, description: "بناء الشجرة التفاعلية", gradient: "linear-gradient(135deg, var(--t-success), #059669)" },
+    { key: "assignments", title: "التعيينات", icon: Link2, description: "ربط القوالب بالأهداف", gradient: "linear-gradient(135deg, var(--t-warning), #d97706)" },
     { key: "groups", title: "المجموعات", icon: Users, description: "مجموعات الحسابات", gradient: "linear-gradient(135deg, #8b5cf6, #7c3aed)" },
     { key: "preview", title: "المعاينة", icon: Eye, description: "معاينة القائمة", gradient: "linear-gradient(135deg, #ec4899, #db2777)" },
 ]
@@ -106,7 +106,7 @@ export function MenuManagerPage() {
                 <div
                     onClick={() => { if (sidebarCollapsed) setSidebarCollapsed(false) }}
                     style={{
-                        background: "linear-gradient(160deg, #004786 0%, #0072b5 50%, #0098d6 100%)",
+                        background: "var(--t-gradient-accent-wide)",
                         padding: sidebarCollapsed ? "14px 8px" : "14px 16px",
                         position: "relative",
                         overflow: "hidden",
@@ -166,7 +166,7 @@ export function MenuManagerPage() {
                                     display: "flex", width: "100%", alignItems: "center", gap: 10,
                                     padding: sidebarCollapsed ? "10px 0" : "8px 10px",
                                     borderRadius: 10, border: "none",
-                                    background: isActive ? "rgba(0,71,134,0.07)" : "transparent",
+                                    background: isActive ? "rgba(27,80,145,0.07)" : "transparent",
                                     cursor: "pointer",
                                     justifyContent: sidebarCollapsed ? "center" : "flex-start",
                                     position: "relative", textAlign: "right",
@@ -181,13 +181,13 @@ export function MenuManagerPage() {
                                     <div style={{
                                         position: "absolute", right: 0, top: "50%", transform: "translateY(-50%)",
                                         width: 3, height: 20, borderRadius: 3,
-                                        background: "linear-gradient(180deg, #004786, #0098d6)",
+                                        background: "linear-gradient(180deg, var(--t-accent), var(--t-accent-light))",
                                     }} />
                                 )}
                                 <div style={{
                                     width: sidebarCollapsed ? 32 : 28, height: sidebarCollapsed ? 32 : 28,
                                     borderRadius: 8,
-                                    background: isActive ? "rgba(0,71,134,0.1)" : "var(--t-surface, #f3f4f6)",
+                                    background: isActive ? "rgba(27,80,145,0.1)" : "var(--t-surface, var(--t-surface))",
                                     display: "flex", alignItems: "center", justifyContent: "center",
                                     flexShrink: 0, transition: "all 0.2s",
                                 }}>
@@ -195,7 +195,7 @@ export function MenuManagerPage() {
                                         size={sidebarCollapsed ? 14 : 13}
                                         strokeWidth={isActive ? 2.2 : 1.6}
                                         style={{
-                                            color: isActive ? "#004786" : "var(--t-text-muted, #9ca3af)",
+                                            color: isActive ? "var(--t-accent)" : "var(--t-text-muted, var(--t-text-faint))",
                                             transition: "color 0.15s",
                                         }}
                                     />
@@ -204,12 +204,12 @@ export function MenuManagerPage() {
                                     <div style={{ overflow: "hidden", flex: 1 }}>
                                         <span style={{
                                             fontSize: 12.5, fontWeight: isActive ? 600 : 500,
-                                            color: isActive ? "var(--t-text, #1f2937)" : "var(--t-text-secondary, #6b7280)",
+                                            color: isActive ? "var(--t-text, #1f2937)" : "var(--t-text-secondary, var(--t-text-muted))",
                                             transition: "color 0.15s", display: "block",
                                             overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
                                         }}>{tab.title}</span>
                                         {isActive && (
-                                            <span style={{ fontSize: 10, color: "var(--t-text-muted, #9ca3af)", display: "block", marginTop: 1 }}>
+                                            <span style={{ fontSize: 10, color: "var(--t-text-muted, var(--t-text-faint))", display: "block", marginTop: 1 }}>
                                                 {tab.description}
                                             </span>
                                         )}
@@ -227,7 +227,7 @@ export function MenuManagerPage() {
                         display: "flex", alignItems: "center", gap: 6,
                     }}>
                         <Sparkles size={11} style={{ color: "#d97706" }} />
-                        <span style={{ fontSize: 10, color: "var(--t-text-muted, #9ca3af)" }}>Professional Menu System</span>
+                        <span style={{ fontSize: 10, color: "var(--t-text-muted, var(--t-text-faint))" }}>Professional Menu System</span>
                     </div>
                 )}
             </aside>
@@ -256,7 +256,7 @@ export function MenuManagerPage() {
                                     <h1 style={{ fontSize: 16, fontWeight: 700, color: "var(--t-text, #1f2937)", margin: 0 }}>
                                         {activeTabInfo.title}
                                     </h1>
-                                    <p style={{ fontSize: 11, color: "var(--t-text-muted, #9ca3af)", margin: 0 }}>
+                                    <p style={{ fontSize: 11, color: "var(--t-text-muted, var(--t-text-faint))", margin: 0 }}>
                                         {activeTabInfo.description}
                                     </p>
                                 </div>
@@ -296,7 +296,7 @@ export function MenuManagerPage() {
                 @keyframes tabFadeIn { from { opacity:0; transform:translateY(8px) } to { opacity:1; transform:translateY(0) } }
                 @media (max-width: 768px) {
                     .flex.h-full { flex-direction: column; }
-                    .flex.h-full > aside { width: 100% !important; border-left: none; border-bottom: 1px solid #e5e7eb; }
+                    .flex.h-full > aside { width: 100% !important; border-left: none; border-bottom: 1px solid var(--t-border); }
                     .flex.h-full > aside nav { display: flex; gap: 4px; overflow-x: auto; padding: 8px 12px; }
                     .flex.h-full > aside nav button { flex-shrink: 0; }
                 }

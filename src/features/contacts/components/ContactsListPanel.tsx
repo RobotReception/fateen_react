@@ -109,21 +109,21 @@ export function ContactsListPanel() {
                     </span>
                     <button className="cl-icon-btn" onClick={toggleFilterPanel} title="فلترة"
                         style={{
-                            background: filterPanelOpen ? "rgba(0,71,134,.06)" : undefined,
-                            color: filterPanelOpen ? "#004786" : undefined,
+                            background: filterPanelOpen ? "rgba(27,80,145,.06)" : undefined,
+                            color: filterPanelOpen ? "var(--t-accent)" : undefined,
                             position: "relative",
                         }}>
                         <SlidersHorizontal size={13} />
                         {activeFilterCount > 0 && (
                             <span style={{
                                 position: "absolute", top: -3, right: -3, width: 14, height: 14,
-                                borderRadius: "50%", background: "#004786", color: "#fff",
+                                borderRadius: "50%", background: "var(--t-brand-orange)", color: "#fff",
                                 fontSize: 8, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center",
                             }}>{activeFilterCount}</span>
                         )}
                     </button>
                     <button className="cl-icon-btn" onClick={() => refetch()} title="تحديث"
-                        style={{ background: isFetching ? "rgba(0,71,134,.06)" : undefined, color: isFetching ? "#004786" : undefined }}>
+                        style={{ background: isFetching ? "rgba(27,80,145,.06)" : undefined, color: isFetching ? "var(--t-accent)" : undefined }}>
                         <RefreshCw size={13} className={isFetching ? "cl-spin" : ""} />
                     </button>
                 </div>
@@ -207,8 +207,8 @@ export function ContactsListPanel() {
 
             {/* ── Loading bar ── */}
             {isFetching && (
-                <div style={{ height: 2, background: "#ebeef2", overflow: "hidden", position: "relative" }}>
-                    <div style={{ position: "absolute", inset: 0, background: "linear-gradient(90deg, transparent, #004786, transparent)", animation: "clSweep 1.3s ease-in-out infinite" }} />
+                <div style={{ height: 2, background: "var(--t-border)", overflow: "hidden", position: "relative" }}>
+                    <div style={{ position: "absolute", inset: 0, background: "linear-gradient(90deg, transparent, var(--t-accent), transparent)", animation: "clSweep 1.3s ease-in-out infinite" }} />
                 </div>
             )}
 
@@ -217,17 +217,17 @@ export function ContactsListPanel() {
                 {isLoading ? (
                     <div className="cl-loading">
                         <div className="cl-spinner" />
-                        <span style={{ fontSize: 12, color: "#9ca3af" }}>جاري تحميل جهات الاتصال…</span>
+                        <span style={{ fontSize: 12, color: "var(--t-text-faint)" }}>جاري تحميل جهات الاتصال…</span>
                     </div>
                 ) : contacts.length === 0 ? (
                     <div className="cl-empty">
-                        <div style={{ width: 52, height: 52, borderRadius: 14, background: "#f5f6f8", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 8 }}>
-                            <Users size={22} style={{ color: "#d1d5db" }} />
+                        <div style={{ width: 52, height: 52, borderRadius: 14, background: "var(--t-surface)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 8 }}>
+                            <Users size={22} style={{ color: "var(--t-border-medium)" }} />
                         </div>
-                        <div style={{ fontSize: 14, fontWeight: 700, color: "#111827", marginBottom: 3 }}>
+                        <div style={{ fontSize: 14, fontWeight: 700, color: "var(--t-text)", marginBottom: 3 }}>
                             {searchQuery ? "لا توجد نتائج" : "لا توجد جهات اتصال"}
                         </div>
-                        <div style={{ fontSize: 11, color: "#9ca3af" }}>
+                        <div style={{ fontSize: 11, color: "var(--t-text-faint)" }}>
                             {searchQuery ? "حاول تغيير كلمات البحث" : "جهات الاتصال الجديدة ستظهر هنا"}
                         </div>
                     </div>
@@ -288,43 +288,43 @@ export function ContactsListPanel() {
 
             <style>{`
                 .cl-root{flex:1;display:flex;flex-direction:column;background:#fafbfc;overflow:hidden;min-width:0}
-                .cl-topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#fff;border-bottom:1px solid #ebeef2;gap:10px;flex-shrink:0}
-                .cl-search-wrap{display:flex;align-items:center;gap:7px;background:#f5f6f8;border:1.5px solid #ebeef2;border-radius:8px;padding:6px 10px;flex:0 0 220px;transition:border-color .2s}
-                .cl-search-wrap:focus-within{border-color:#004786;background:#fff}
+                .cl-topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#fff;border-bottom:1px solid var(--t-border);gap:10px;flex-shrink:0}
+                .cl-search-wrap{display:flex;align-items:center;gap:7px;background:var(--t-surface);border:1.5px solid var(--t-border);border-radius:8px;padding:6px 10px;flex:0 0 220px;transition:border-color .2s}
+                .cl-search-wrap:focus-within{border-color:var(--t-accent);background:#fff}
                 .cl-search-icon{color:#b0b7c3;flex-shrink:0}
-                .cl-search-input{border:none;background:transparent;outline:none;font-size:12px;color:#111827;width:100%;font-family:inherit}
+                .cl-search-input{border:none;background:transparent;outline:none;font-size:12px;color:var(--t-text);width:100%;font-family:inherit}
                 .cl-search-input::placeholder{color:#b0b7c3}
                 .cl-topbar-right{display:flex;align-items:center;gap:6px}
-                .cl-count-label{display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:#9ca3af;padding:0 6px}
-                .cl-icon-btn{width:30px;height:30px;border-radius:7px;border:1px solid #ebeef2;background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#9ca3af;transition:all .12s}
-                .cl-icon-btn:hover{background:#f5f6f8;color:#6b7280;border-color:#d1d5db}
+                .cl-count-label{display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:var(--t-text-faint);padding:0 6px}
+                .cl-icon-btn{width:30px;height:30px;border-radius:7px;border:1px solid var(--t-border);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t-text-faint);transition:all .12s}
+                .cl-icon-btn:hover{background:var(--t-surface);color:var(--t-text-muted);border-color:var(--t-border-medium)}
                 .cl-table-wrap{flex:1;overflow:auto}
                 .cl-table-wrap::-webkit-scrollbar{width:3px;height:3px}
                 .cl-table-wrap::-webkit-scrollbar-thumb{background:rgba(0,0,0,.1);border-radius:3px}
                 .cl-table{width:100%;border-collapse:collapse;min-width:850px}
-                .cl-thead-row{position:sticky;top:0;z-index:2;background:#fff;border-bottom:1.5px solid #ebeef2}
-                .cl-th{padding:9px 12px;text-align:right;font-size:11px;font-weight:700;color:#9ca3af;white-space:nowrap;user-select:none}
+                .cl-thead-row{position:sticky;top:0;z-index:2;background:#fff;border-bottom:1.5px solid var(--t-border)}
+                .cl-th{padding:9px 12px;text-align:right;font-size:11px;font-weight:700;color:var(--t-text-faint);white-space:nowrap;user-select:none}
                 .cl-th-inner{display:flex;align-items:center;gap:3px}
-                .cl-sort-icon{font-size:9px;color:#d1d5db;cursor:pointer}
-                .cl-checkbox{width:14px;height:14px;border-radius:3px;cursor:pointer;accent-color:#004786}
+                .cl-sort-icon{font-size:9px;color:var(--t-border-medium);cursor:pointer}
+                .cl-checkbox{width:14px;height:14px;border-radius:3px;cursor:pointer;accent-color:var(--t-accent)}
                 .cl-loading{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:10px}
-                .cl-spinner{width:26px;height:26px;border-radius:50%;border:2.5px solid #ebeef2;border-top-color:#004786;animation:spin .7s linear infinite}
+                .cl-spinner{width:26px;height:26px;border-radius:50%;border:2.5px solid var(--t-border);border-top-color:var(--t-accent);animation:spin .7s linear infinite}
                 .cl-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:24px;text-align:center}
-                .cl-footer{display:flex;align-items:center;justify-content:flex-end;padding:8px 14px;gap:16px;border-top:1px solid #ebeef2;background:#fff;flex-shrink:0}
-                .cl-page-size{display:flex;align-items:center;gap:5px;font-size:11px;color:#9ca3af}
-                .cl-page-select{border:1px solid #ebeef2;border-radius:6px;padding:2px 6px;font-size:11px;background:#fff;color:#111827;outline:none;cursor:pointer;font-family:inherit}
-                .cl-page-info{display:flex;align-items:center;gap:6px;font-size:11px;color:#9ca3af}
-                .cl-page-btn{width:26px;height:26px;border-radius:6px;border:1px solid #ebeef2;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#9ca3af;transition:all .12s}
-                .cl-page-btn:hover:not(:disabled){background:#f5f6f8;color:#111827}
+                .cl-footer{display:flex;align-items:center;justify-content:flex-end;padding:8px 14px;gap:16px;border-top:1px solid var(--t-border);background:#fff;flex-shrink:0}
+                .cl-page-size{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--t-text-faint)}
+                .cl-page-select{border:1px solid var(--t-border);border-radius:6px;padding:2px 6px;font-size:11px;background:#fff;color:var(--t-text);outline:none;cursor:pointer;font-family:inherit}
+                .cl-page-info{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--t-text-faint)}
+                .cl-page-btn{width:26px;height:26px;border-radius:6px;border:1px solid var(--t-border);background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t-text-faint);transition:all .12s}
+                .cl-page-btn:hover:not(:disabled){background:var(--t-surface);color:var(--t-text)}
                 .cl-page-btn:disabled{opacity:.35;cursor:not-allowed}
-                .cl-filter-panel{padding:10px 14px;background:#fafbfc;border-bottom:1px solid #ebeef2;animation:clFilterFade .15s ease-out}
+                .cl-filter-panel{padding:10px 14px;background:#fafbfc;border-bottom:1px solid var(--t-border);animation:clFilterFade .15s ease-out}
                 .cl-filter-row{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end}
-                .cl-filter-clear{display:flex;align-items:center;gap:4px;background:none;border:none;font-size:10.5px;color:#ef4444;cursor:pointer;padding:4px 0 0;font-family:inherit;font-weight:600;transition:opacity .12s}
+                .cl-filter-clear{display:flex;align-items:center;gap:4px;background:none;border:none;font-size:10.5px;color:var(--t-danger);cursor:pointer;padding:4px 0 0;font-family:inherit;font-weight:600;transition:opacity .12s}
                 .cl-filter-clear:hover{opacity:.7}
                 .cl-filter-group{display:flex;flex-direction:column;gap:3px;min-width:120px;flex:1;max-width:180px}
-                .cl-filter-label{font-size:9.5px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.04em}
-                .cl-filter-select{padding:5px 8px;border:1px solid #e5e7eb;border-radius:7px;font-size:11.5px;background:#fff;color:#111827;outline:none;cursor:pointer;font-family:inherit;transition:border-color .15s;appearance:auto}
-                .cl-filter-select:focus{border-color:#004786}
+                .cl-filter-label{font-size:9.5px;font-weight:700;color:var(--t-text-faint);text-transform:uppercase;letter-spacing:.04em}
+                .cl-filter-select{padding:5px 8px;border:1px solid var(--t-border);border-radius:7px;font-size:11.5px;background:#fff;color:var(--t-text);outline:none;cursor:pointer;font-family:inherit;transition:border-color .15s;appearance:auto}
+                .cl-filter-select:focus{border-color:var(--t-accent)}
                 @keyframes spin{to{transform:rotate(360deg)}}
                 @keyframes clSweep{0%{transform:translateX(-100%)}100%{transform:translateX(200%)}}
                 @keyframes clFilterFade{from{opacity:0;max-height:0}to{opacity:1;max-height:200px}}

@@ -330,7 +330,7 @@ export function AgentSelector({
                     <button onClick={() => setShowCreate(!showCreate)} style={{
                         display: "inline-flex", alignItems: "center", gap: 5,
                         padding: "7px 14px", borderRadius: 9, border: "none",
-                        background: "var(--t-accent)", color: "var(--t-text-on-accent)",
+                        background: "var(--t-brand-orange)", color: "var(--t-text-on-accent)",
                         fontSize: 12, fontWeight: 600, cursor: "pointer", transition: "all .15s",
                     }}>
                         <Plus size={13} /> وكيل جديد
@@ -383,7 +383,7 @@ export function AgentSelector({
                     <div style={{ display: "flex", gap: 6 }}>
                         <button disabled={!newName.trim() || createMut.isPending} onClick={handleCreate} style={{
                             padding: "8px 18px", borderRadius: 9, border: "none",
-                            background: "var(--t-accent)", color: "var(--t-text-on-accent)",
+                            background: "var(--t-brand-orange)", color: "var(--t-text-on-accent)",
                             fontSize: 12, fontWeight: 600, cursor: "pointer",
                             display: "inline-flex", alignItems: "center", gap: 5,
                             opacity: createMut.isPending ? 0.7 : 1,

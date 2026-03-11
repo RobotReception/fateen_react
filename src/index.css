@@ -85,7 +85,7 @@
   --color-popover: hsl(0 0% 100%);
   --color-popover-foreground: hsl(222.2 84% 4.9%);
 
-  --color-primary: hsl(207 100% 27%);
+  --color-primary: hsl(204 98% 35%);
   --color-primary-foreground: hsl(0 0% 100%);
 
   --color-secondary: hsl(210 40% 96.1%);
@@ -94,7 +94,7 @@
   --color-muted: hsl(210 40% 96.1%);
   --color-muted-foreground: hsl(215.4 16.3% 46.9%);
 
-  --color-accent: hsl(199 100% 42%);
+  --color-accent: hsl(204 98% 35%);
   --color-accent-foreground: hsl(0 0% 100%);
 
   --color-destructive: hsl(0 84.2% 60.2%);
@@ -102,16 +102,16 @@
 
   --color-border: hsl(214.3 31.8% 91.4%);
   --color-input: hsl(214.3 31.8% 91.4%);
-  --color-ring: hsl(207 100% 27%);
+  --color-ring: hsl(204 98% 35%);
 
   --color-sidebar-background: hsl(0 0% 98%);
   --color-sidebar-foreground: hsl(240 5.3% 26.1%);
-  --color-sidebar-primary: hsl(207 100% 27%);
+  --color-sidebar-primary: hsl(204 98% 35%);
   --color-sidebar-primary-foreground: hsl(0 0% 98%);
   --color-sidebar-accent: hsl(240 4.8% 95.9%);
   --color-sidebar-accent-foreground: hsl(240 5.9% 10%);
   --color-sidebar-border: hsl(220 13% 91%);
-  --color-sidebar-ring: hsl(217.2 91.2% 59.8%);
+  --color-sidebar-ring: hsl(197 89% 67%);
 
   --color-chart-1: hsl(12 76% 61%);
   --color-chart-2: hsl(173 58% 39%);
@@ -151,7 +151,7 @@
   --color-popover: hsl(222.2 84% 4.9%);
   --color-popover-foreground: hsl(210 40% 98%);
 
-  --color-primary: hsl(199 100% 42%);
+  --color-primary: hsl(197 89% 67%);
   --color-primary-foreground: hsl(222.2 47.4% 11.2%);
 
   --color-secondary: hsl(217.2 32.6% 17.5%);
@@ -172,12 +172,12 @@
 
   --color-sidebar-background: hsl(240 5.9% 10%);
   --color-sidebar-foreground: hsl(240 4.8% 95.9%);
-  --color-sidebar-primary: hsl(199 100% 42%);
+  --color-sidebar-primary: hsl(197 89% 67%);
   --color-sidebar-primary-foreground: hsl(0 0% 98%);
   --color-sidebar-accent: hsl(240 3.7% 15.9%);
   --color-sidebar-accent-foreground: hsl(240 4.8% 95.9%);
   --color-sidebar-border: hsl(240 3.7% 15.9%);
-  --color-sidebar-ring: hsl(217.2 91.2% 59.8%);
+  --color-sidebar-ring: hsl(197 89% 67%);
 
   --color-chart-1: hsl(220 70% 50%);
   --color-chart-2: hsl(160 60% 45%);
@@ -196,16 +196,29 @@
   --t-input: #ffffff;
   --t-surface: #f3f4f6;
   --t-surface-deep: #e5e7eb;
-  --t-accent: #004786;
-  --t-accent-soft: #e8f4fc;
-  --t-accent-hover: #003a6e;
-  --t-accent-muted: rgba(0, 71, 134, 0.08);
+  --t-accent: #0145b2;
+  --t-accent-secondary: #0378d4;
+  --t-accent-light: #65caf4;
+  --t-accent-soft: #e6f2fc;
+  --t-accent-hover: #013a96;
+  --t-accent-muted: rgba(1, 69, 178, 0.08);
+  --t-gradient-accent: linear-gradient(135deg, var(--t-accent), var(--t-accent-secondary));
+  --t-gradient-accent-wide: linear-gradient(135deg, var(--t-accent), var(--t-accent-secondary), var(--t-accent-light));
+  --t-gradient-accent-h: linear-gradient(90deg, var(--t-accent), var(--t-accent-secondary), var(--t-accent));
+  /* Brand orange — secondary accent */
+  --t-brand-orange: #f39200;
+  --t-brand-orange-hover: #f3a630;
+  --t-brand-orange-soft: rgba(243, 146, 0, 0.10);
+  --t-brand-orange-muted: rgba(243, 146, 0, 0.06);
+  --t-brand-yellow: #f3c900;
+  --t-brand-yellow-soft: rgba(243, 201, 0, 0.10);
   --t-text: #111827;
   --t-text-secondary: #374151;
   --t-text-muted: #6b7280;
   --t-text-faint: #9ca3af;
   --t-text-on-accent: #ffffff;
   --t-border: #e5e7eb;
+  --t-border-medium: #d1d5db;
   --t-border-light: #f3f4f6;
   --t-shadow: rgba(0, 0, 0, 0.06);
   --t-overlay: rgba(0, 0, 0, 0.4);
@@ -228,16 +241,29 @@
   --t-input: #1e293b;
   --t-surface: #334155;
   --t-surface-deep: #475569;
-  --t-accent: #60b8e6;
-  --t-accent-soft: #1a3a5c;
-  --t-accent-hover: #8dcbee;
-  --t-accent-muted: rgba(96, 184, 230, 0.1);
+  --t-accent: #65caf4;
+  --t-accent-secondary: #4bb8e8;
+  --t-accent-light: #8dd8f7;
+  --t-accent-soft: #0d2a42;
+  --t-accent-hover: #8dd8f7;
+  --t-accent-muted: rgba(101, 202, 244, 0.12);
+  --t-gradient-accent: linear-gradient(135deg, var(--t-accent), var(--t-accent-secondary));
+  --t-gradient-accent-wide: linear-gradient(135deg, var(--t-accent), var(--t-accent-secondary), var(--t-accent-light));
+  --t-gradient-accent-h: linear-gradient(90deg, var(--t-accent), var(--t-accent-secondary), var(--t-accent));
+  /* Brand orange — secondary accent (dark) */
+  --t-brand-orange: #f39200;
+  --t-brand-orange-hover: #f3a630;
+  --t-brand-orange-soft: rgba(243, 146, 0, 0.15);
+  --t-brand-orange-muted: rgba(243, 146, 0, 0.08);
+  --t-brand-yellow: #f3c900;
+  --t-brand-yellow-soft: rgba(243, 201, 0, 0.12);
   --t-text: #f1f5f9;
   --t-text-secondary: #e2e8f0;
   --t-text-muted: #94a3b8;
   --t-text-faint: #64748b;
   --t-text-on-accent: #0f172a;
   --t-border: #334155;
+  --t-border-medium: #475569;
   --t-border-light: #1e293b;
   --t-shadow: rgba(0, 0, 0, 0.3);
   --t-overlay: rgba(0, 0, 0, 0.6);

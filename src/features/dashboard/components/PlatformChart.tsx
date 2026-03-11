@@ -13,11 +13,11 @@ const PLATFORM_META: Record<string, { label: string; color: string; gradient: [s
     instagram: { label: "إنستقرام", color: "#E4405F", gradient: ["#F472B6", "#E4405F"] },
     telegram: { label: "تيليقرام", color: "#0088CC", gradient: ["#38BDF8", "#0088CC"] },
     webchat: { label: "ويب شات", color: "#6366F1", gradient: ["#A5B4FC", "#6366F1"] },
-    web: { label: "ويب", color: "#6B7280", gradient: ["#9CA3AF", "#6B7280"] },
+    web: { label: "ويب", color: "var(--t-text-muted)", gradient: ["var(--t-text-faint)", "var(--t-text-muted)"] },
 }
 
 function getPlatformInfo(key: string) {
-    return PLATFORM_META[key.toLowerCase()] ?? { label: key, color: "#6B7280", gradient: ["#9CA3AF", "#6B7280"] as [string, string] }
+    return PLATFORM_META[key.toLowerCase()] ?? { label: key, color: "var(--t-text-muted)", gradient: ["var(--t-text-faint)", "var(--t-text-muted)"] as [string, string] }
 }
 
 

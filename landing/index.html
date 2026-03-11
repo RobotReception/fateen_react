@@ -1,0 +1,3254 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>داري — منصة إدارة محادثات العملاء بالذكاء الاصطناعي | Dar AI</title>
+    <meta name="description"
+        content="منصة عربية موحّدة تجمع واتساب، ماسنجر، إنستغرام والويب شات مع وكلاء AI يردون 24/7.">
+    <link rel="icon" href="/darai_logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Cairo:wght@400;600;700;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/landing/style.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 80px
+        }
+
+        :root {
+            /* Light palette */
+            --bg: #F5F7FA;
+            --bg2: #EEF2F8;
+            --surface: #FFFFFF;
+            --surface2: #F8FAFD;
+            --border: #E2E8F2;
+            --border2: #CDD8EC;
+
+            /* Text */
+            --ink: #0D1526;
+            --ink2: #2D3E5C;
+            --ink3: #5A708A;
+            --muted: #94A8C0;
+
+            /* Brand */
+            --blue: #0145b2;
+            --blue-mid: #0378d4;
+            --blue-light: #65caf4;
+            --blue-pale: #EBF4FF;
+            --orange: #f39200;
+            --orange-mid: #f3c900;
+            --orange-pale: #FFF3EC;
+            --green: #12B76A;
+
+            /* Platforms */
+            --wa: #25D366;
+            --ig1: #F58529;
+            --ig2: #DD2A7B;
+            --ig3: #8134AF;
+            --mg1: #00B2FF;
+            --mg2: #0866FF;
+            --tg: #29B6F6;
+        }
+
+        html {
+            font-size: 16px;
+            scroll-behavior: smooth
+        }
+
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background: var(--bg);
+            color: var(--ink);
+            direction: rtl;
+            line-height: 1.7;
+            min-height: 100vh;
+            cursor: none;
+            overflow-x: hidden;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit
+        }
+
+        /* ── custom cursor ── */
+        #cur {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 10px;
+            height: 10px;
+            background: var(--blue-mid);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 99999;
+            box-shadow: 0 0 12px rgba(46, 143, 232, .5);
+        }
+
+        #cur-ring {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 34px;
+            height: 34px;
+            border: 1.5px solid rgba(26, 107, 204, .3);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 99998;
+            transition: transform .3s cubic-bezier(.16, 1, .3, 1), border-color .25s, width .25s, height .25s;
+        }
+
+        body:hover #cur-ring {
+            opacity: 1
+        }
+
+        /* ── subtle dot grid ── */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: radial-gradient(circle, rgba(26, 107, 204, .06) 1px, transparent 1px);
+            background-size: 28px 28px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ══════════════ NAV ══════════════ */
+        .nav {
+            position: fixed;
+            top: 0;
+            inset-inline: 0;
+            z-index: 1000;
+            padding: 16px 48px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(245, 247, 250, .85);
+            backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid var(--border);
+            animation: navIn .7s cubic-bezier(.16, 1, .3, 1) both;
+        }
+
+        @keyframes navIn {
+            from {
+                opacity: 0;
+                transform: translateY(-16px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none
+        }
+
+        .logo-img {
+            height: 36px;
+            width: auto;
+            object-fit: contain
+        }
+
+        .logo-mark {
+            width: 38px;
+            height: 38px;
+            border-radius: 11px;
+            background: linear-gradient(135deg, var(--blue), var(--blue-mid));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Cairo', sans-serif;
+            font-size: 17px;
+            font-weight: 900;
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(26, 107, 204, .3);
+        }
+
+        .logo-name {
+            font-family: 'Cairo', sans-serif;
+            font-size: 21px;
+            font-weight: 900;
+            color: var(--ink);
+        }
+
+        .logo-name span {
+            color: var(--blue-mid)
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            list-style: none
+        }
+
+        .nav-links a {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--ink3);
+            transition: color .2s;
+            position: relative;
+            padding-bottom: 2px;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            left: 0;
+            height: 1.5px;
+            background: var(--blue-mid);
+            transform: scaleX(0);
+            transform-origin: center;
+            transition: transform .25s cubic-bezier(.16, 1, .3, 1);
+        }
+
+        .nav-links a:hover {
+            color: var(--blue)
+        }
+
+        .nav-links a:hover::after {
+            transform: scaleX(1)
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 10px 22px;
+            border-radius: 11px;
+            font-weight: 700;
+            font-size: 14px;
+            border: none;
+            cursor: pointer;
+            transition: all .28s cubic-bezier(.16, 1, .3, 1);
+            font-family: 'Tajawal', sans-serif;
+        }
+
+        .btn-nav-ghost {
+            background: transparent;
+            color: var(--ink2);
+            border: 1.5px solid var(--border2);
+        }
+
+        .btn-nav-ghost:hover {
+            background: var(--surface);
+            border-color: var(--blue-light);
+            color: var(--blue);
+            transform: translateY(-1px)
+        }
+
+        .btn-nav-solid {
+            background: linear-gradient(135deg, var(--orange), var(--orange-mid));
+            color: #fff;
+            box-shadow: 0 4px 16px rgba(255, 107, 26, .3), inset 0 1px 0 rgba(255, 255, 255, .2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-nav-solid::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -80%;
+            width: 40px;
+            height: 200%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .3), transparent);
+            transform: skewX(-15deg);
+            animation: sheen 4s 2s ease-in-out infinite;
+        }
+
+        @keyframes sheen {
+
+            0%,
+            100% {
+                left: -80%
+            }
+
+            50% {
+                left: 130%
+            }
+        }
+
+        .btn-nav-solid:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(255, 107, 26, .4)
+        }
+
+        /* ══════════════════════════════════
+   HERO
+══════════════════════════════════ */
+        .hero {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 0.8fr 1.2fr;
+            align-items: center;
+            gap: 64px;
+            padding: 200px 64px 20px 96px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        @media(max-width:980px) {
+            .hero {
+                grid-template-columns: 1fr;
+                padding: 100px 28px 60px
+            }
+
+            .hero-visual {
+                display: none
+            }
+        }
+
+        /* soft background shapes */
+        .hero-bg-blob {
+            position: absolute;
+            pointer-events: none;
+            border-radius: 50%;
+            z-index: 0;
+            filter: blur(60px);
+        }
+
+        .blob-1 {
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(26, 107, 204, .07), transparent 70%);
+            top: -150px;
+            right: -100px;
+            animation: blobDrift 20s ease-in-out infinite;
+        }
+
+        .blob-2 {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(255, 107, 26, .05), transparent 70%);
+            bottom: -60px;
+            left: 60px;
+            animation: blobDrift 15s 5s ease-in-out infinite reverse;
+        }
+
+        .blob-3 {
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(90, 179, 255, .06), transparent 70%);
+            top: 40%;
+            left: 45%;
+            animation: blobDrift 18s 8s ease-in-out infinite;
+        }
+
+        @keyframes blobDrift {
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1)
+            }
+
+            40% {
+                transform: translate(-30px, 20px) scale(1.08)
+            }
+
+            70% {
+                transform: translate(20px, -25px) scale(.94)
+            }
+        }
+
+        /* ── LEFT TEXT COLUMN ── */
+        .hero-left {
+            position: relative;
+            z-index: 5;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            align-self: start;
+            margin-top: -40px;
+        }
+
+        /* top eyebrow */
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 18px 8px 12px;
+            border-radius: 50px;
+            background: var(--blue-pale);
+            border: 1px solid rgba(26, 107, 204, .15);
+            color: var(--blue);
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 28px;
+            width: fit-content;
+            opacity: 0;
+            animation: fadeUp .6s .3s cubic-bezier(.16, 1, .3, 1) forwards;
+        }
+
+        .eyebrow-dot {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--blue), var(--blue-mid));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+            color: #fff;
+            box-shadow: 0 0 10px rgba(46, 143, 232, .4);
+            animation: eyebrowGlow 2.5s ease-in-out infinite;
+        }
+
+        @keyframes eyebrowGlow {
+
+            0%,
+            100% {
+                box-shadow: 0 0 6px rgba(46, 143, 232, .3)
+            }
+
+            50% {
+                box-shadow: 0 0 16px rgba(46, 143, 232, .6)
+            }
+        }
+
+        /* headline */
+        .hero-h1 {
+            font-family: 'Cairo', sans-serif;
+            font-size: clamp(30px, 3.2vw, 48px);
+            font-weight: 900;
+            line-height: 1.25;
+            letter-spacing: -0.3px;
+            color: var(--ink);
+            margin-bottom: 20px;
+        }
+
+        .h1-line {
+            display: block;
+            opacity: 0
+        }
+
+        .h1-line-1 {
+            animation: fadeUp .75s .45s cubic-bezier(.16, 1, .3, 1) forwards
+        }
+
+        .h1-line-2 {
+            animation: fadeUp .75s .65s cubic-bezier(.16, 1, .3, 1) forwards;
+            position: relative;
+            display: inline-block;
+        }
+
+        /* gradient accent word */
+        .h1-accent {
+            background: linear-gradient(135deg, var(--blue) 0%, var(--blue-mid) 50%, #38B2FF 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .h1-orange {
+            background: linear-gradient(135deg, var(--orange), var(--orange-mid));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* animated underline */
+        .h1-underline {
+            position: relative;
+            display: inline-block;
+        }
+
+        .h1-underline svg {
+            position: absolute;
+            bottom: -6px;
+            right: 0;
+            left: 0;
+            width: 100%;
+            height: 8px;
+            overflow: visible;
+        }
+
+        .ul-path {
+            stroke-dasharray: 350;
+            stroke-dashoffset: 350;
+            animation: drawLine 1s 1.3s cubic-bezier(.16, 1, .3, 1) forwards;
+        }
+
+        @keyframes drawLine {
+            to {
+                stroke-dashoffset: 0
+            }
+        }
+
+        /* description */
+        .hero-desc {
+            font-size: 15.5px;
+            color: var(--ink3);
+            line-height: 1.9;
+            max-width: 480px;
+            margin-bottom: 28px;
+            opacity: 0;
+            animation: fadeUp .75s .9s cubic-bezier(.16, 1, .3, 1) forwards;
+        }
+
+        .hero-desc strong {
+            color: var(--ink2);
+            font-weight: 700
+        }
+
+        /* feature chips */
+        .feature-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 32px;
+            opacity: 0;
+            animation: fadeUp .75s 1.0s cubic-bezier(.16, 1, .3, 1) forwards;
+        }
+
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 8px 16px;
+            border-radius: 50px;
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--ink2);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .05);
+            transition: all .25s;
+        }
+
+        .chip:hover {
+            border-color: var(--blue-light);
+            color: var(--blue);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 14px rgba(26, 107, 204, .1)
+        }
+
+        .chip-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--blue-mid);
+            box-shadow: 0 0 6px rgba(46, 143, 232, .5);
+        }
+
+        .chip-dot.orange {
+            background: var(--orange);
+            box-shadow: 0 0 6px rgba(255, 107, 26, .5)
+        }
+
+        .chip-dot.green {
+            background: var(--green);
+            box-shadow: 0 0 6px rgba(18, 183, 106, .5)
+        }
+
+        /* CTA buttons */
+        .cta-row {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+            margin-bottom: 40px;
+            opacity: 0;
+            animation: fadeUp .75s 1.1s cubic-bezier(.16, 1, .3, 1) forwards;
+        }
+
+        .btn-cta-primary {
+            font-size: 16px;
+            padding: 16px 38px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, var(--blue), var(--blue-mid));
+            color: #fff;
+            box-shadow: 0 6px 24px rgba(26, 107, 204, .3), inset 0 1px 0 rgba(255, 255, 255, .18);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-cta-primary::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -80%;
+            width: 40px;
+            height: 200%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .25), transparent);
+            transform: skewX(-15deg);
+            animation: sheen 3.5s 2s ease-in-out infinite;
+        }
+
+        .btn-cta-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 36px rgba(26, 107, 204, .4)
+        }
+
+        .btn-cta-ghost {
+            font-size: 16px;
+            padding: 16px 38px;
+            border-radius: 14px;
+            background: var(--surface);
+            color: var(--ink2);
+            border: 1.5px solid var(--border2);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, .06);
+        }
+
+        .btn-cta-ghost:hover {
+            border-color: var(--blue-light);
+            color: var(--blue);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(26, 107, 204, .1)
+        }
+
+        /* stats row */
+        .stats-row {
+            display: flex;
+            gap: 0;
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, .07);
+            width: 100%;
+            max-width: 520px;
+            opacity: 0;
+            animation: fadeUp .75s 1.25s cubic-bezier(.16, 1, .3, 1) forwards;
+        }
+
+        .stat-item {
+            padding: 18px 0;
+            text-align: center;
+            border-left: 1px solid var(--border);
+            transition: background .25s;
+            flex: 1;
+        }
+
+        .stat-item:last-child {
+            border-left: none
+        }
+
+        .stat-item:hover {
+            background: var(--blue-pale)
+        }
+
+        .stat-num {
+            font-family: 'Cairo', sans-serif;
+            font-size: 30px;
+            font-weight: 900;
+            color: var(--blue);
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .stat-num.orange {
+            color: var(--orange)
+        }
+
+        .stat-lbl {
+            font-size: 11.5px;
+            color: var(--muted);
+            font-weight: 600;
+            letter-spacing: .2px
+        }
+
+        /* social proof */
+        .trust-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 20px;
+            opacity: 0;
+            animation: fadeUp .75s 1.4s cubic-bezier(.16, 1, .3, 1) forwards;
+        }
+
+        .trust-avatars {
+            display: flex
+        }
+
+        .trust-av {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 2px solid var(--surface);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 800;
+            color: #fff;
+            margin-left: -8px;
+        }
+
+        .trust-av:first-child {
+            margin-left: 0
+        }
+
+        .trust-text {
+            font-size: 12px;
+            color: var(--ink3);
+            font-weight: 600
+        }
+
+        .trust-text strong {
+            color: var(--ink);
+            font-weight: 800
+        }
+
+        .trust-stars {
+            color: #F59E0B;
+            font-size: 11px;
+            letter-spacing: -1px
+        }
+
+        /* CTA sub (trust inline) */
+        .cta-sub {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 36px;
+            opacity: 0;
+            animation: fadeUp .75s 1.2s cubic-bezier(.16, 1, .3, 1) forwards;
+        }
+
+        .cta-sub-text {
+            font-size: 12.5px;
+            color: var(--ink3);
+            font-weight: 600;
+        }
+
+        .cta-sub-text strong {
+            color: var(--ink);
+            font-weight: 800;
+        }
+
+        /* ══ METRICS SECTION (below hero) ══ */
+        .metrics-section {
+            position: relative;
+            z-index: 10;
+            margin-top: -250px;
+            padding: 0 80px 40px;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+        }
+
+        .m-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255, 255, 255, .85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 14px 16px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, .04);
+            transition: all .3s;
+        }
+
+        .m-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, .07);
+        }
+
+        .m-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .m-icon.ic-blue {
+            background: linear-gradient(135deg, rgba(26, 107, 204, .1), rgba(46, 143, 232, .15));
+        }
+
+        .m-icon.ic-orange {
+            background: linear-gradient(135deg, rgba(255, 107, 26, .1), rgba(255, 138, 61, .15));
+        }
+
+        .m-icon.ic-green {
+            background: linear-gradient(135deg, rgba(5, 150, 105, .1), rgba(16, 185, 129, .15));
+        }
+
+        .m-icon svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .m-body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .m-num {
+            font-family: 'Cairo', sans-serif;
+            font-size: 22px;
+            font-weight: 900;
+            color: var(--blue);
+            line-height: 1;
+        }
+
+        .m-num.orange {
+            color: var(--orange);
+        }
+
+        .m-num.green {
+            color: #059669;
+        }
+
+        .m-lbl {
+            font-size: 11px;
+            color: var(--muted);
+            font-weight: 700;
+            margin-top: 2px;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(22px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        /* ══════════════════════════════════
+   RIGHT VISUAL
+══════════════════════════════════ */
+        .hero-visual {
+            position: relative;
+            z-index: 5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 900px;
+        }
+
+        /* soft glow halo */
+        .vis-halo {
+            position: absolute;
+            width: 720px;
+            height: 720px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(26, 107, 204, .06) 0%, transparent 70%);
+            filter: blur(40px);
+            animation: haloBreath 7s ease-in-out infinite;
+        }
+
+        @keyframes haloBreath {
+
+            0%,
+            100% {
+                transform: scale(1)
+            }
+
+            50% {
+                transform: scale(1.2)
+            }
+        }
+
+        /* 3D scene */
+        .scene {
+            position: relative;
+            width: 440px;
+            height: 600px;
+            opacity: 0;
+            animation: sceneReveal 1.2s .5s cubic-bezier(.16, 1, .3, 1) forwards;
+            transform: perspective(1200px) rotateY(-8deg) rotateX(4deg) scale(1.35);
+            transform-style: preserve-3d;
+        }
+
+        @keyframes sceneReveal {
+            from {
+                opacity: 0;
+                transform: perspective(1200px) rotateY(-18deg) rotateX(10deg) translateY(40px) scale(1.35)
+            }
+
+            to {
+                opacity: 1;
+                transform: perspective(1200px) rotateY(-8deg) rotateX(4deg) translateY(0) scale(1.35)
+            }
+        }
+
+        .scene-float {
+            animation: float 7s ease-in-out infinite
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0)
+            }
+
+            50% {
+                transform: translateY(-12px)
+            }
+        }
+
+        /* connector dashes */
+        .conn-svg {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2;
+            overflow: visible;
+        }
+
+        .conn-line {
+            stroke-dasharray: 5 5;
+            stroke-dashoffset: 0;
+            animation: flowDash 2s linear infinite;
+        }
+
+        @keyframes flowDash {
+            to {
+                stroke-dashoffset: -20
+            }
+        }
+
+        /* ── MAIN DASHBOARD CARD ── */
+        .dash-card {
+            position: absolute;
+            top: 0;
+            left: 16px;
+            right: 0;
+            border-radius: 20px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            box-shadow:
+                0 2px 4px rgba(0, 0, 0, .04),
+                0 8px 24px rgba(0, 0, 0, .08),
+                0 32px 64px rgba(0, 0, 0, .1),
+                inset 0 1px 0 rgba(255, 255, 255, .9);
+            overflow: hidden;
+        }
+
+        /* macOS bar */
+        .card-topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 11px 14px;
+            background: var(--surface2);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .mac-dots {
+            display: flex;
+            gap: 5px
+        }
+
+        .md {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%
+        }
+
+        .md-r {
+            background: #FF5F57
+        }
+
+        .md-y {
+            background: #FEBC2E
+        }
+
+        .md-g {
+            background: #28C840
+        }
+
+        .card-title {
+            font-size: 11.5px;
+            font-weight: 700;
+            color: var(--ink2);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .live-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 9px;
+            border-radius: 20px;
+            background: #ECFDF5;
+            border: 1px solid #A7F3D0;
+            font-size: 9px;
+            font-weight: 800;
+            color: var(--green);
+        }
+
+        .live-dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: var(--green);
+            animation: livePulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes livePulse {
+
+            0%,
+            100% {
+                opacity: 1
+            }
+
+            50% {
+                opacity: .3
+            }
+        }
+
+        /* tabs */
+        .card-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg);
+            overflow-x: auto;
+        }
+
+        .tab {
+            padding: 9px 14px;
+            font-size: 10.5px;
+            font-weight: 700;
+            color: var(--muted);
+            border-bottom: 2px solid transparent;
+            white-space: nowrap;
+            cursor: default;
+            transition: all .2s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .tab.active {
+            color: var(--blue);
+            border-bottom-color: var(--blue)
+        }
+
+        .tab-badge {
+            background: var(--orange);
+            color: #fff;
+            font-size: 8.5px;
+            font-weight: 900;
+            padding: 1px 6px;
+            border-radius: 10px;
+        }
+
+        /* inbox rows */
+        .inbox {
+            padding: 8px
+        }
+
+        .inbox-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 10px;
+            border-radius: 10px;
+            cursor: default;
+            margin-bottom: 2px;
+            opacity: 0;
+            transition: background .2s;
+        }
+
+        .inbox-row.r1 {
+            animation: rowSlide .4s 1.4s cubic-bezier(.16, 1, .3, 1) forwards
+        }
+
+        .inbox-row.r2 {
+            animation: rowSlide .4s 1.6s cubic-bezier(.16, 1, .3, 1) forwards
+        }
+
+        .inbox-row.r3 {
+            animation: rowSlide .4s 1.8s cubic-bezier(.16, 1, .3, 1) forwards
+        }
+
+        .inbox-row.r4 {
+            animation: rowSlide .4s 2.0s cubic-bezier(.16, 1, .3, 1) forwards
+        }
+
+        .inbox-row.r5 {
+            animation: rowSlide .4s 2.2s cubic-bezier(.16, 1, .3, 1) forwards
+        }
+
+        @keyframes rowSlide {
+            from {
+                opacity: 0;
+                transform: translateX(10px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0)
+            }
+        }
+
+        .inbox-row.active-row {
+            background: var(--blue-pale)
+        }
+
+        .inbox-row:hover {
+            background: var(--bg2)
+        }
+
+        .row-av {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        .av-1 {
+            background: linear-gradient(135deg, #0145b2, #0378d4)
+        }
+
+        .av-2 {
+            background: linear-gradient(135deg, #f39200, #f3c900)
+        }
+
+        .av-3 {
+            background: linear-gradient(135deg, #059669, #10B981)
+        }
+
+        .av-4 {
+            background: linear-gradient(135deg, #7C3AED, #A78BFA)
+        }
+
+        .av-5 {
+            background: linear-gradient(135deg, #DC2626, #F87171)
+        }
+
+        .row-info {
+            flex: 1;
+            min-width: 0
+        }
+
+        .row-name {
+            font-size: 11.5px;
+            font-weight: 700;
+            color: var(--ink);
+            margin-bottom: 1px
+        }
+
+        .row-msg {
+            font-size: 10.5px;
+            color: var(--muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis
+        }
+
+        .row-right {
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 3px
+        }
+
+        .row-time {
+            font-size: 9.5px;
+            color: var(--muted)
+        }
+
+        /* channel tag with svg */
+        .ch-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            font-size: 8.5px;
+            font-weight: 800;
+            padding: 2px 7px;
+            border-radius: 6px;
+        }
+
+        .ch-badge svg {
+            width: 8px;
+            height: 8px
+        }
+
+        .b-wa {
+            background: #ECFDF5;
+            color: #059669
+        }
+
+        .b-ig {
+            background: #FDF2F8;
+            color: #BE185D
+        }
+
+        .b-fb {
+            background: #EFF6FF;
+            color: #1D4ED8
+        }
+
+        .b-tg {
+            background: #F0F9FF;
+            color: #0284C7
+        }
+
+        .b-web {
+            background: #F5F3FF;
+            color: #6D28D9
+        }
+
+        .b-ai {
+            background: #FFF7ED;
+            color: #C2410C
+        }
+
+        .unread-badge {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--orange);
+            box-shadow: 0 0 6px rgba(255, 107, 26, .5);
+            animation: unreadPop 2s ease-in-out infinite;
+        }
+
+        @keyframes unreadPop {
+
+            0%,
+            100% {
+                opacity: 1
+            }
+
+            50% {
+                opacity: .4
+            }
+        }
+
+        /* ── AI POPUP (floating) ── */
+        .float-ai {
+            position: absolute;
+            bottom: -6px;
+            left: -90px;
+            width: 215px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, .12), 0 2px 8px rgba(0, 0, 0, .06);
+            padding: 13px;
+            z-index: 20;
+            opacity: 0;
+            animation: floatIn .6s 3.0s cubic-bezier(.16, 1, .3, 1) forwards;
+        }
+
+        @keyframes floatIn {
+            from {
+                opacity: 0;
+                transform: translateY(16px) scale(.93)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1)
+            }
+        }
+
+        .fai-head {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 9px
+        }
+
+        .fai-av {
+            width: 30px;
+            height: 30px;
+            border-radius: 9px;
+            background: linear-gradient(135deg, var(--orange), var(--orange-mid));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(255, 107, 26, .3);
+        }
+
+        .fai-name {
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--ink)
+        }
+
+        .fai-status {
+            font-size: 9px;
+            color: var(--green);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 4px
+        }
+
+        .fai-status::before {
+            content: '';
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: var(--green);
+            animation: livePulse 1.5s infinite
+        }
+
+        .fai-msg {
+            font-size: 10.5px;
+            color: var(--ink3);
+            line-height: 1.65;
+            margin-bottom: 8px
+        }
+
+        .typing {
+            display: flex;
+            gap: 4px;
+            align-items: center
+        }
+
+        .tdot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: var(--orange);
+            animation: typeBounce 1.4s ease-in-out infinite;
+        }
+
+        .tdot:nth-child(2) {
+            animation-delay: .2s
+        }
+
+        .tdot:nth-child(3) {
+            animation-delay: .4s
+        }
+
+        @keyframes typeBounce {
+
+            0%,
+            60%,
+            100% {
+                transform: translateY(0);
+                opacity: .5
+            }
+
+            30% {
+                transform: translateY(-5px);
+                opacity: 1
+            }
+        }
+
+        /* ── TOAST (floating) ── */
+        .float-toast {
+            position: absolute;
+            top: -14px;
+            left: -90px;
+            width: 198px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--wa);
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, .1), 0 2px 6px rgba(0, 0, 0, .05);
+            padding: 10px 12px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            z-index: 20;
+            opacity: 0;
+            animation: slideLeft .55s 3.5s cubic-bezier(.16, 1, .3, 1) forwards;
+        }
+
+        @keyframes slideLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-16px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0)
+            }
+        }
+
+        .toast-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            flex-shrink: 0;
+            background: #ECFDF5;
+            border: 1px solid #A7F3D0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .toast-t1 {
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--ink);
+            margin-bottom: 1px
+        }
+
+        .toast-t2 {
+            font-size: 9.5px;
+            color: var(--muted)
+        }
+
+        /* ── KPI CARD (floating) ── */
+        .float-kpi {
+            position: absolute;
+            bottom: -6px;
+            right: -70px;
+            width: 150px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, .1), 0 2px 6px rgba(0, 0, 0, .05);
+            padding: 12px;
+            z-index: 20;
+            opacity: 0;
+            animation: floatIn .6s 3.8s cubic-bezier(.16, 1, .3, 1) forwards;
+        }
+
+        .kpi-lbl {
+            font-size: 9.5px;
+            color: var(--muted);
+            font-weight: 700;
+            margin-bottom: 5px
+        }
+
+        .kpi-val {
+            font-family: 'Cairo', sans-serif;
+            font-size: 32px;
+            font-weight: 900;
+            color: var(--blue);
+            line-height: 1;
+            margin-bottom: 5px;
+        }
+
+        .kpi-bar-bg {
+            height: 4px;
+            border-radius: 2px;
+            background: var(--bg2);
+            overflow: hidden;
+            margin-bottom: 5px
+        }
+
+        .kpi-bar-fill {
+            height: 100%;
+            border-radius: 2px;
+            background: linear-gradient(90deg, var(--blue), var(--blue-mid));
+            width: 0;
+            animation: barGrow 1.5s 4.5s cubic-bezier(.16, 1, .3, 1) forwards;
+        }
+
+        @keyframes barGrow {
+            to {
+                width: 85%
+            }
+        }
+
+        .kpi-delta {
+            font-size: 9.5px;
+            font-weight: 800;
+            color: var(--green);
+            display: flex;
+            align-items: center;
+            gap: 3px
+        }
+
+        /* ── MINI CHART (floating) ── */
+        .float-chart {
+            position: absolute;
+            top: 76px;
+            left: -96px;
+            width: 130px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-top: 2px solid var(--orange);
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, .1), 0 2px 6px rgba(0, 0, 0, .05);
+            padding: 11px;
+            z-index: 20;
+            opacity: 0;
+            animation: slideRight .6s 4.2s cubic-bezier(.16, 1, .3, 1) forwards;
+        }
+
+        @keyframes slideRight {
+            from {
+                opacity: 0;
+                transform: translateX(-14px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0)
+            }
+        }
+
+        .chart-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px
+        }
+
+        .chart-lbl {
+            font-size: 9.5px;
+            color: var(--muted);
+            font-weight: 700
+        }
+
+        .chart-val {
+            font-size: 9.5px;
+            font-weight: 800;
+            color: var(--orange)
+        }
+
+        .bars-wrap {
+            display: flex;
+            gap: 4px;
+            align-items: flex-end;
+            height: 40px
+        }
+
+        .bar {
+            flex: 1;
+            border-radius: 2px 2px 0 0;
+            background: linear-gradient(180deg, rgba(255, 107, 26, .7), rgba(255, 107, 26, .15));
+            transform-origin: bottom;
+            transform: scaleY(0);
+        }
+
+        .bar:nth-child(1) {
+            animation: barUp .35s 4.3s cubic-bezier(.16, 1, .3, 1) forwards;
+            height: 30%
+        }
+
+        .bar:nth-child(2) {
+            animation: barUp .35s 4.42s cubic-bezier(.16, 1, .3, 1) forwards;
+            height: 50%
+        }
+
+        .bar:nth-child(3) {
+            animation: barUp .35s 4.54s cubic-bezier(.16, 1, .3, 1) forwards;
+            height: 40%
+        }
+
+        .bar:nth-child(4) {
+            animation: barUp .35s 4.66s cubic-bezier(.16, 1, .3, 1) forwards;
+            height: 65%
+        }
+
+        .bar:nth-child(5) {
+            animation: barUp .35s 4.78s cubic-bezier(.16, 1, .3, 1) forwards;
+            height: 55%
+        }
+
+        .bar:nth-child(6) {
+            animation: barUp .35s 4.90s cubic-bezier(.16, 1, .3, 1) forwards;
+            height: 80%
+        }
+
+        .bar:nth-child(7) {
+            animation: barUp .35s 5.02s cubic-bezier(.16, 1, .3, 1) forwards;
+            height: 100%;
+            background: linear-gradient(180deg, var(--orange), rgba(255, 107, 26, .2))
+        }
+
+        @keyframes barUp {
+            to {
+                transform: scaleY(1)
+            }
+        }
+
+        /* ══════════════════════════════════
+   PLATFORM PILLS — LIGHT THEME
+══════════════════════════════════ */
+        .plt-pill {
+            position: absolute;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 15px 9px 9px;
+            border-radius: 50px;
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            box-shadow:
+                0 2px 8px rgba(0, 0, 0, .06),
+                0 8px 28px rgba(0, 0, 0, .1),
+                inset 0 1px 0 rgba(255, 255, 255, .9);
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--ink);
+            z-index: 30;
+            white-space: nowrap;
+            cursor: default;
+            transition: transform .35s cubic-bezier(.16, 1, .3, 1), box-shadow .35s;
+            will-change: transform;
+        }
+
+        /* icon container */
+        .plt-ic {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            position: relative;
+            transition: transform .3s cubic-bezier(.16, 1, .3, 1);
+        }
+
+        .plt-ic svg {
+            width: 17px;
+            height: 17px;
+            position: relative;
+            z-index: 2
+        }
+
+        .plt-pill:hover .plt-ic {
+            transform: scale(1.18) rotate(-6deg)
+        }
+
+        /* glow behind icon */
+        .plt-ic::before {
+            content: '';
+            position: absolute;
+            inset: -3px;
+            border-radius: 50%;
+            opacity: .2;
+            filter: blur(5px);
+            animation: iconGlowL 3s ease-in-out infinite;
+        }
+
+        @keyframes iconGlowL {
+
+            0%,
+            100% {
+                opacity: .15;
+                transform: scale(.9)
+            }
+
+            50% {
+                opacity: .4;
+                transform: scale(1.1)
+            }
+        }
+
+        /* outer pulse ring */
+        .plt-ic::after {
+            content: '';
+            position: absolute;
+            inset: -6px;
+            border-radius: 50%;
+            border: 1.5px solid currentColor;
+            opacity: 0;
+            animation: outerRingL 3s ease-in-out infinite;
+        }
+
+        @keyframes outerRingL {
+            0% {
+                transform: scale(.75);
+                opacity: .5
+            }
+
+            65% {
+                transform: scale(1.45);
+                opacity: 0
+            }
+
+            100% {
+                transform: scale(1.45);
+                opacity: 0
+            }
+        }
+
+        /* message count */
+        .plt-count {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            font-size: 8px;
+            font-weight: 900;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1.5px solid var(--surface);
+            z-index: 10;
+            animation: countPop 3s ease-in-out infinite;
+        }
+
+        @keyframes countPop {
+
+            0%,
+            85%,
+            100% {
+                transform: scale(1)
+            }
+
+            90% {
+                transform: scale(1.25)
+            }
+        }
+
+        /* active dot */
+        .plt-live {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            animation: liveDot 2.5s ease-in-out infinite;
+        }
+
+        @keyframes liveDot {
+
+            0%,
+            100% {
+                opacity: .5;
+                transform: scale(1)
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.35)
+            }
+        }
+
+        .plt-labels {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+            flex: 1
+        }
+
+        .plt-name {
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--ink);
+            line-height: 1.2
+        }
+
+        .plt-sub {
+            font-size: 9.5px;
+            color: var(--muted);
+            font-weight: 600
+        }
+
+        /* per-platform styles */
+        .ic-wa {
+            background: rgba(37, 211, 102, .1);
+            border: 1.5px solid rgba(37, 211, 102, .25);
+            color: rgba(37, 211, 102, .4)
+        }
+
+        .ic-wa::before {
+            background: rgba(37, 211, 102, .5)
+        }
+
+        .ic-wa::after {
+            border-color: rgba(37, 211, 102, .5)
+        }
+
+        .plt-wa .plt-count {
+            background: linear-gradient(135deg, #25D366, #128C7E)
+        }
+
+        .plt-wa .plt-live {
+            background: #25D366;
+            box-shadow: 0 0 7px rgba(37, 211, 102, .6)
+        }
+
+        .plt-wa:hover {
+            box-shadow: 0 6px 28px rgba(37, 211, 102, .18), 0 2px 8px rgba(0, 0, 0, .06), inset 0 1px 0 rgba(255, 255, 255, .9) !important
+        }
+
+        .ic-ig {
+            background: rgba(221, 42, 123, .08);
+            border: 1.5px solid rgba(221, 42, 123, .22);
+            color: rgba(221, 42, 123, .4)
+        }
+
+        .ic-ig::before {
+            background: linear-gradient(135deg, rgba(245, 133, 41, .4), rgba(221, 42, 123, .4))
+        }
+
+        .ic-ig::after {
+            border-color: rgba(221, 42, 123, .4)
+        }
+
+        .plt-ig .plt-count {
+            background: linear-gradient(135deg, #F58529, #DD2A7B)
+        }
+
+        .plt-ig .plt-live {
+            background: #DD2A7B;
+            box-shadow: 0 0 7px rgba(221, 42, 123, .5)
+        }
+
+        .plt-ig:hover {
+            box-shadow: 0 6px 28px rgba(221, 42, 123, .15), 0 2px 8px rgba(0, 0, 0, .06), inset 0 1px 0 rgba(255, 255, 255, .9) !important
+        }
+
+        .ic-mg {
+            background: rgba(8, 102, 255, .08);
+            border: 1.5px solid rgba(8, 102, 255, .2);
+            color: rgba(8, 102, 255, .4)
+        }
+
+        .ic-mg::before {
+            background: linear-gradient(135deg, rgba(0, 178, 255, .4), rgba(8, 102, 255, .4))
+        }
+
+        .ic-mg::after {
+            border-color: rgba(8, 102, 255, .4)
+        }
+
+        .plt-fb .plt-count {
+            background: linear-gradient(135deg, #00B2FF, #0866FF)
+        }
+
+        .plt-fb .plt-live {
+            background: #0866FF;
+            box-shadow: 0 0 7px rgba(8, 102, 255, .5)
+        }
+
+        .plt-fb:hover {
+            box-shadow: 0 6px 28px rgba(8, 102, 255, .15), 0 2px 8px rgba(0, 0, 0, .06), inset 0 1px 0 rgba(255, 255, 255, .9) !important
+        }
+
+        .ic-tg {
+            background: rgba(41, 182, 246, .08);
+            border: 1.5px solid rgba(41, 182, 246, .22);
+            color: rgba(41, 182, 246, .4)
+        }
+
+        .ic-tg::before {
+            background: rgba(41, 182, 246, .4)
+        }
+
+        .ic-tg::after {
+            border-color: rgba(41, 182, 246, .4)
+        }
+
+        .plt-tg .plt-count {
+            background: linear-gradient(135deg, #29B6F6, #0288D1)
+        }
+
+        .plt-tg .plt-live {
+            background: #29B6F6;
+            box-shadow: 0 0 7px rgba(41, 182, 246, .5)
+        }
+
+        .plt-tg:hover {
+            box-shadow: 0 6px 28px rgba(41, 182, 246, .15), 0 2px 8px rgba(0, 0, 0, .06), inset 0 1px 0 rgba(255, 255, 255, .9) !important
+        }
+
+        .ic-web {
+            background: rgba(109, 40, 217, .07);
+            border: 1.5px solid rgba(109, 40, 217, .2);
+            color: rgba(109, 40, 217, .4)
+        }
+
+        .ic-web::before {
+            background: rgba(109, 40, 217, .35)
+        }
+
+        .ic-web::after {
+            border-color: rgba(109, 40, 217, .35)
+        }
+
+        .plt-web .plt-live {
+            background: #7C3AED;
+            box-shadow: 0 0 7px rgba(109, 40, 217, .5)
+        }
+
+        .plt-web:hover {
+            box-shadow: 0 6px 28px rgba(109, 40, 217, .12), 0 2px 8px rgba(0, 0, 0, .06), inset 0 1px 0 rgba(255, 255, 255, .9) !important
+        }
+
+        /* pill entrance + float */
+        .plt-wa {
+            top: 78px;
+            left: -18px;
+            opacity: 0;
+            animation: pillIn .5s 1.85s cubic-bezier(.16, 1, .3, 1) forwards, floatPill1 5s 2.4s ease-in-out infinite
+        }
+
+        .plt-ig {
+            top: 208px;
+            left: -30px;
+            opacity: 0;
+            animation: pillIn .5s 2.1s cubic-bezier(.16, 1, .3, 1) forwards, floatPill2 5.5s 2.7s ease-in-out infinite
+        }
+
+        .plt-fb {
+            top: 338px;
+            left: -18px;
+            opacity: 0;
+            animation: pillIn .5s 2.35s cubic-bezier(.16, 1, .3, 1) forwards, floatPill3 4.8s 3.0s ease-in-out infinite
+        }
+
+        .plt-tg {
+            top: 448px;
+            left: -26px;
+            opacity: 0;
+            animation: pillIn .5s 2.6s cubic-bezier(.16, 1, .3, 1) forwards, floatPill1 6s 3.3s ease-in-out infinite
+        }
+
+        .plt-web {
+            top: 545px;
+            left: -22px;
+            opacity: 0;
+            animation: pillIn .5s 2.85s cubic-bezier(.16, 1, .3, 1) forwards, floatPill2 5.3s 3.6s ease-in-out infinite
+        }
+
+        @keyframes pillIn {
+            from {
+                opacity: 0;
+                transform: translateX(-22px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0)
+            }
+        }
+
+        @keyframes floatPill1 {
+
+            0%,
+            100% {
+                transform: translateY(0)
+            }
+
+            50% {
+                transform: translateY(-7px)
+            }
+        }
+
+        @keyframes floatPill2 {
+
+            0%,
+            100% {
+                transform: translateY(0)
+            }
+
+            50% {
+                transform: translateY(-9px)
+            }
+        }
+
+        @keyframes floatPill3 {
+
+            0%,
+            100% {
+                transform: translateY(0)
+            }
+
+            50% {
+                transform: translateY(-6px)
+            }
+        }
+
+        /* stagger ring delays */
+        .plt-wa .plt-ic::after {
+            animation-delay: 0s
+        }
+
+        .plt-ig .plt-ic::after {
+            animation-delay: .6s
+        }
+
+        .plt-fb .plt-ic::after {
+            animation-delay: 1.2s
+        }
+
+        .plt-tg .plt-ic::after {
+            animation-delay: 1.8s
+        }
+
+        .plt-web .plt-ic::after {
+            animation-delay: 2.4s
+        }
+    </style>
+</head>
+
+<body>
+    <div id="cur"></div>
+    <div id="cur-ring"></div>
+
+    <!-- ══ NAV ══ -->
+    <nav class="nav">
+        <a href="/" class="logo">
+            <img src="/darai_logo_full.png" alt="داري" class="logo-img">
+        </a>
+        <ul class="nav-links">
+            <li><a href="#features">المميزات</a></li>
+            <li><a href="#channels">القنوات</a></li>
+            <li><a href="#pricing">التسعير</a></li>
+            <li><a href="#faq">الأسئلة</a></li>
+        </ul>
+        <div class="nav-actions">
+            <a href="/login" class="btn btn-nav-ghost">تسجيل الدخول</a>
+            <a href="/login" class="btn btn-nav-solid">ابدأ مجاناً ←</a>
+        </div>
+    </nav>
+
+    <!-- ══ HERO ══ -->
+    <section class="hero">
+        <canvas id="hero-particles"
+            style="position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none"></canvas>
+        <div class="hero-bg-blob blob-1"></div>
+        <div class="hero-bg-blob blob-2"></div>
+        <div class="hero-bg-blob blob-3"></div>
+
+        <!-- LEFT -->
+        <div class="hero-left">
+
+            <!-- eyebrow -->
+            <div class="eyebrow">
+                <span class="eyebrow-dot">✦</span>
+                داري — منصة المحادثات الذكية للشركات
+            </div>
+
+            <!-- headline -->
+            <h1 class="hero-h1">
+                <span class="h1-line h1-line-1">أدِر <span class="h1-accent">محادثات عملائك</span> بذكاء</span>
+                <span class="h1-line h1-line-2">
+                    من <span class="h1-underline">
+                        <span class="h1-orange">منصة واحدة</span>
+                        <svg viewBox="0 0 200 8" fill="none">
+                            <path class="ul-path" d="M2 6C40 2 100 2 130 4C155 6 180 2 198 4" stroke="url(#og)"
+                                stroke-width="2.5" stroke-linecap="round" />
+                            <defs>
+                                <linearGradient id="og" x1="0" y1="0" x2="200" y2="0">
+                                    <stop offset="0%" stop-color="#f39200" />
+                                    <stop offset="100%" stop-color="#FFB27A" />
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                    </span>
+                </span>
+            </h1>
+
+            <!-- description -->
+            <p class="hero-desc">
+                وحّد واتساب، إنستغرام، فيسبوك والويب شات في <strong>صندوق وارد واحد</strong>.
+                اترك وكلاء الذكاء الاصطناعي يردّون فوراً، يفهمون السياق، ويرفعون جودة خدمتك — بدون توقف.
+            </p>
+
+            <!-- CTA + trust inline -->
+            <div class="cta-row">
+                <a href="/login" class="btn btn-cta-primary">🚀 ابدأ تجربتك المجانية</a>
+                <a href="#features" class="btn btn-cta-ghost">▶ شاهد كيف يعمل</a>
+            </div>
+
+
+        </div><!-- /hero-left -->
+
+        <!-- RIGHT VISUAL -->
+        <div class="hero-visual">
+            <div class="vis-halo"></div>
+            <div class="scene">
+                <div class="scene-float">
+
+                    <!-- connector lines -->
+                    <svg class="conn-svg" viewBox="0 0 440 600">
+                        <line x1="16" y1="94" x2="102" y2="148" stroke="rgba(37,211,102,.35)" stroke-width="1"
+                            class="conn-line" style="animation-delay:.3s" />
+                        <line x1="16" y1="224" x2="102" y2="242" stroke="rgba(221,42,123,.3)" stroke-width="1"
+                            class="conn-line" style="animation-delay:.8s" />
+                        <line x1="16" y1="354" x2="102" y2="320" stroke="rgba(8,102,255,.3)" stroke-width="1"
+                            class="conn-line" style="animation-delay:.2s" />
+                        <line x1="16" y1="464" x2="102" y2="396" stroke="rgba(41,182,246,.3)" stroke-width="1"
+                            class="conn-line" style="animation-delay:.6s" />
+                        <line x1="16" y1="561" x2="102" y2="462" stroke="rgba(109,40,217,.3)" stroke-width="1"
+                            class="conn-line" style="animation-delay:1s" />
+                    </svg>
+
+                    <!-- DASHBOARD CARD -->
+                    <div class="dash-card">
+                        <div class="card-topbar">
+                            <div class="mac-dots">
+                                <div class="md md-r"></div>
+                                <div class="md md-y"></div>
+                                <div class="md md-g"></div>
+                            </div>
+                            <div class="card-title">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                                    <rect x="3" y="3" width="8" height="8" rx="2" fill="#0145b2" opacity=".8" />
+                                    <rect x="13" y="3" width="8" height="8" rx="2" fill="#0145b2" opacity=".4" />
+                                    <rect x="3" y="13" width="8" height="8" rx="2" fill="#0145b2" opacity=".4" />
+                                    <rect x="13" y="13" width="8" height="8" rx="2" fill="#f39200" opacity=".7" />
+                                </svg>
+                                صندوق الوارد الموحّد
+                            </div>
+                            <div class="live-pill">
+                                <div class="live-dot"></div>مباشر
+                            </div>
+                        </div>
+
+                        <div class="card-tabs">
+                            <div class="tab active">الكل <span class="tab-badge">12</span></div>
+                            <div class="tab">🤖 AI</div>
+                            <div class="tab">⏳ انتظار</div>
+                            <div class="tab">✅ مكتمل</div>
+                        </div>
+
+                        <div class="inbox">
+
+                            <div class="inbox-row r1 active-row">
+                                <div class="row-av av-1">أح</div>
+                                <div class="row-info">
+                                    <div class="row-name">محمد الشبلي</div>
+                                    <div class="row-msg">مرحبا، أريد الاستفسار عن الأسعار...</div>
+                                </div>
+                                <div class="row-right">
+                                    <div class="row-time">الآن</div>
+                                    <span class="ch-badge b-wa">
+                                        <svg viewBox="0 0 24 24" fill="#059669">
+                                            <path
+                                                d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+                                        </svg>
+                                        WA
+                                    </span>
+                                    <div class="unread-badge"></div>
+                                </div>
+                            </div>
+
+                            <div class="inbox-row r2">
+                                <div class="row-av av-2">سا</div>
+                                <div class="row-info">
+                                    <div class="row-name">لجين محمد</div>
+                                    <div class="row-msg">شكراً جزيلاً، سيتم التوصيل اليوم ✓</div>
+                                </div>
+                                <div class="row-right">
+                                    <div class="row-time">3د</div>
+                                    <span class="ch-badge b-ig">
+                                        <svg viewBox="0 0 24 24">
+                                            <defs>
+                                                <linearGradient id="igI" x1="0%" y1="100%" x2="100%" y2="0%">
+                                                    <stop offset="0%" stop-color="#F58529" />
+                                                    <stop offset="50%" stop-color="#DD2A7B" />
+                                                    <stop offset="100%" stop-color="#8134AF" />
+                                                </linearGradient>
+                                            </defs>
+                                            <path fill="url(#igI)"
+                                                d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
+                                        </svg>
+                                        IG
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="inbox-row r3">
+                                <div class="row-av av-3">خا</div>
+                                <div class="row-info">
+                                    <div class="row-name">خالد الدوسري</div>
+                                    <div class="row-msg">🤖 وكيل AI يرد الآن...</div>
+                                </div>
+                                <div class="row-right">
+                                    <div class="row-time">7د</div>
+                                    <span class="ch-badge b-ai">AI</span>
+                                </div>
+                            </div>
+
+                            <div class="inbox-row r4">
+                                <div class="row-av av-4">نو</div>
+                                <div class="row-info">
+                                    <div class="row-name">نورة الزهراني</div>
+                                    <div class="row-msg">هل يوجد خصم للطلبات الكبيرة؟</div>
+                                </div>
+                                <div class="row-right">
+                                    <div class="row-time">15د</div>
+                                    <span class="ch-badge b-fb">
+                                        <svg viewBox="0 0 24 24">
+                                            <defs>
+                                                <linearGradient id="mgI" x1="0%" y1="0%" x2="100%" y2="100%">
+                                                    <stop offset="0%" stop-color="#00B2FF" />
+                                                    <stop offset="100%" stop-color="#0866FF" />
+                                                </linearGradient>
+                                            </defs>
+                                            <path fill="url(#mgI)"
+                                                d="M12 0C5.373 0 0 4.974 0 11.111c0 3.498 1.744 6.614 4.469 8.652V24l4.088-2.242c1.092.3 2.246.464 3.443.464C18.627 22.222 24 17.248 24 11.111 24 4.974 18.627 0 12 0zm1.191 14.963l-3.055-3.26-5.963 3.26L10.732 8.4l3.131 3.26 5.888-3.26-6.56 6.563z" />
+                                        </svg>
+                                        MSG
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="inbox-row r5">
+                                <div class="row-av av-5">مح</div>
+                                <div class="row-info">
+                                    <div class="row-name">محمد الشهري</div>
+                                    <div class="row-msg">متى سيصل الطلب رقم #4421؟</div>
+                                </div>
+                                <div class="row-right">
+                                    <div class="row-time">22د</div>
+                                    <span class="ch-badge b-tg">
+                                        <svg viewBox="0 0 24 24" fill="#0284C7">
+                                            <path
+                                                d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" />
+                                        </svg>
+                                        TG
+                                    </span>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div><!-- /dash-card -->
+
+                    <!-- AI POPUP -->
+                    <div class="float-ai">
+                        <div class="fai-head">
+                            <div class="fai-av">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="white">
+                                    <path
+                                        d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <div class="fai-name">وكيل الدعم الذكي</div>
+                                <div class="fai-status">يكتب الآن</div>
+                            </div>
+                        </div>
+                        <div class="fai-msg">مرحباً خالد! الطلب #4421 في طريقه إليك وسيصل خلال 2-3 ساعات 📦</div>
+                        <div class="typing">
+                            <div class="tdot"></div>
+                            <div class="tdot"></div>
+                            <div class="tdot"></div>
+                        </div>
+                    </div>
+
+                    <!-- TOAST -->
+                    <div class="float-toast">
+                        <div class="toast-icon">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="#25D366">
+                                <path
+                                    d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="toast-t1">رسالة جديدة</div>
+                            <div class="toast-t2">محمد الشبلي — واتساب</div>
+                        </div>
+                    </div>
+
+                    <!-- KPI -->
+                    <div class="float-kpi">
+                        <div class="kpi-lbl">📊 الرد التلقائي</div>
+                        <div class="kpi-val" id="kpiNum">0%</div>
+                        <div class="kpi-bar-bg">
+                            <div class="kpi-bar-fill"></div>
+                        </div>
+                        <div class="kpi-delta">▲ +23% هذا الشهر</div>
+                    </div>
+
+                    <!-- CHART -->
+                    <div class="float-chart">
+                        <div class="chart-head">
+                            <span class="chart-lbl">المحادثات</span>
+                            <span class="chart-val">+47%</span>
+                        </div>
+                        <div class="bars-wrap">
+                            <div class="bar"></div>
+                            <div class="bar"></div>
+                            <div class="bar"></div>
+                            <div class="bar"></div>
+                            <div class="bar"></div>
+                            <div class="bar"></div>
+                            <div class="bar"></div>
+                        </div>
+                    </div>
+
+                </div><!-- /scene-float -->
+            </div><!-- /scene -->
+
+            <!-- ══ PLATFORM PILLS ══ -->
+
+            <!-- WhatsApp -->
+            <div class="plt-pill plt-wa" style="position:absolute;top:78px;left:-18px">
+                <div class="plt-ic ic-wa" style="position:relative">
+                    <svg viewBox="0 0 24 24" fill="#25D366">
+                        <path
+                            d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+                    </svg>
+                    <div class="plt-count">3</div>
+                </div>
+                <div class="plt-labels">
+                    <span class="plt-name">واتساب بزنس</span>
+                    <span class="plt-sub">WhatsApp Business API</span>
+                </div>
+                <div class="plt-live"></div>
+            </div>
+
+            <!-- Instagram -->
+            <div class="plt-pill plt-ig" style="position:absolute;top:208px;left:-30px">
+                <div class="plt-ic ic-ig" style="position:relative">
+                    <svg viewBox="0 0 24 24">
+                        <defs>
+                            <linearGradient id="igP2" x1="0%" y1="100%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#F58529" />
+                                <stop offset="50%" stop-color="#DD2A7B" />
+                                <stop offset="100%" stop-color="#8134AF" />
+                            </linearGradient>
+                        </defs>
+                        <path fill="url(#igP2)"
+                            d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
+                    </svg>
+                    <div class="plt-count" style="background:linear-gradient(135deg,#F58529,#8134AF)">5</div>
+                </div>
+                <div class="plt-labels">
+                    <span class="plt-name">إنستغرام</span>
+                    <span class="plt-sub">Instagram Direct</span>
+                </div>
+                <div class="plt-live" style="background:#DD2A7B;box-shadow:0 0 7px rgba(221,42,123,.5)"></div>
+            </div>
+
+            <!-- Messenger -->
+            <div class="plt-pill plt-fb" style="position:absolute;top:338px;left:-18px">
+                <div class="plt-ic ic-mg" style="position:relative">
+                    <svg viewBox="0 0 24 24">
+                        <defs>
+                            <linearGradient id="mgP2" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#00B2FF" />
+                                <stop offset="100%" stop-color="#0866FF" />
+                            </linearGradient>
+                        </defs>
+                        <path fill="url(#mgP2)"
+                            d="M12 0C5.373 0 0 4.974 0 11.111c0 3.498 1.744 6.614 4.469 8.652V24l4.088-2.242c1.092.3 2.246.464 3.443.464C18.627 22.222 24 17.248 24 11.111 24 4.974 18.627 0 12 0zm1.191 14.963l-3.055-3.26-5.963 3.26L10.732 8.4l3.131 3.26 5.888-3.26-6.56 6.563z" />
+                    </svg>
+                    <div class="plt-count" style="background:linear-gradient(135deg,#00B2FF,#0866FF)">2</div>
+                </div>
+                <div class="plt-labels">
+                    <span class="plt-name">ماسنجر</span>
+                    <span class="plt-sub">Facebook Messenger</span>
+                </div>
+                <div class="plt-live" style="background:#0866FF;box-shadow:0 0 7px rgba(8,102,255,.5)"></div>
+            </div>
+
+            <!-- Telegram -->
+            <div class="plt-pill plt-tg" style="position:absolute;top:448px;left:-26px">
+                <div class="plt-ic ic-tg" style="position:relative">
+                    <svg viewBox="0 0 24 24" fill="#29B6F6">
+                        <path
+                            d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" />
+                    </svg>
+                    <div class="plt-count" style="background:linear-gradient(135deg,#29B6F6,#0288D1)">1</div>
+                </div>
+                <div class="plt-labels">
+                    <span class="plt-name">تيليجرام</span>
+                    <span class="plt-sub">Telegram Bot API</span>
+                </div>
+                <div class="plt-live" style="background:#29B6F6;box-shadow:0 0 7px rgba(41,182,246,.5)"></div>
+            </div>
+
+            <!-- Web Chat -->
+            <div class="plt-pill plt-web" style="position:absolute;top:545px;left:-22px">
+                <div class="plt-ic ic-web">
+                    <svg viewBox="0 0 24 24" fill="#7C3AED">
+                        <path
+                            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" />
+                    </svg>
+                </div>
+                <div class="plt-labels">
+                    <span class="plt-name">ويب شات</span>
+                    <span class="plt-sub">Web Chat SDK</span>
+                </div>
+                <div class="plt-live" style="background:#7C3AED;box-shadow:0 0 7px rgba(109,40,217,.5)"></div>
+            </div>
+
+        </div><!-- /hero-visual -->
+    </section>
+
+    <!-- ══ METRICS STRIP ══ -->
+    <div class="metrics-section">
+        <div class="metrics-grid">
+            <div class="m-card">
+                <span class="m-icon ic-blue">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#0145b2" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M12 6v6l4 2" />
+                    </svg>
+                </span>
+                <div class="m-body">
+                    <div class="m-num" id="s1">0%</div>
+                    <div class="m-lbl">ردود AI تلقائية</div>
+                </div>
+            </div>
+            <div class="m-card">
+                <span class="m-icon ic-orange">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#f39200" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                    </svg>
+                </span>
+                <div class="m-body">
+                    <div class="m-num orange" id="s2">0%</div>
+                    <div class="m-lbl">توفير في الوقت</div>
+                </div>
+            </div>
+            <div class="m-card">
+                <span class="m-icon ic-blue">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#0145b2" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+                    </svg>
+                </span>
+                <div class="m-body">
+                    <div class="m-num" id="s3">0+</div>
+                    <div class="m-lbl">قنوات مدمجة</div>
+                </div>
+            </div>
+            <div class="m-card">
+                <span class="m-icon ic-green">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                        <polyline points="22 4 12 14.01 9 11.01" />
+                    </svg>
+                </span>
+                <div class="m-body">
+                    <div class="m-num green">24/7</div>
+                    <div class="m-lbl">استجابة مستمرة</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ PAINS ══ -->
+    <section class="section">
+        <div class="container">
+            <div class="section-header reveal"><span class="section-badge"><span class="section-badge-dot"
+                        style="background:#ef4444;box-shadow:0 0 6px rgba(239,68,68,.5)"></span>التحدّي</span>
+                <h2 class="section-title">لماذا تخسر شركتك <span class="accent-o">عملاء كل يوم؟</span></h2>
+                <p class="section-sub">80% من العملاء يتوقعون ردّاً خلال دقائق — هل فريقك جاهز؟</p>
+            </div>
+            <div class="pain-split reveal">
+                <div class="pain-visual">
+                    <img src="/landing/img/pains.png" alt="تحديات إدارة المحادثات" loading="lazy">
+                </div>
+                <div class="pain-list-pro">
+                    <div class="pain-point" style="--pp-color:#ef4444">
+                        <div class="pain-point-num">01</div>
+                        <div>
+                            <h4>قنوات مبعثرة بلا نظام</h4>
+                            <p>واتساب، ماسنجر، إنستغرام… كل تطبيق على حدة. رسائل تضيع والعملاء يشتكون.</p>
+                        </div>
+                    </div>
+                    <div class="pain-point" style="--pp-color:#f97316">
+                        <div class="pain-point-num">02</div>
+                        <div>
+                            <h4>عميلك لا ينتظر — المنافس أسرع</h4>
+                            <p>كل دقيقة تأخير = فرصة مبيعات تذهب لغيرك. السرعة هي الفارق اليوم.</p>
+                        </div>
+                    </div>
+                    <div class="pain-point" style="--pp-color:#a855f7">
+                        <div class="pain-point-num">03</div>
+                        <div>
+                            <h4>لا متابعة — لا تنظيم — لا سيطرة</h4>
+                            <p>من ردّ على العميل؟ هل أُغلقت الصفقة؟ بدون نظام، كل شيء يضيع بالفوضى.</p>
+                        </div>
+                    </div>
+                    <div class="pain-point" style="--pp-color:#ec4899">
+                        <div class="pain-point-num">04</div>
+                        <div>
+                            <h4>فريقك يعمل بلا رقابة ولا بيانات</h4>
+                            <p>لا تعرف أداء كل موظف، ولا تملك أرقاماً لاتخاذ القرارات الصحيحة.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ══ SOLUTION ══ -->
+    <section class="section" id="features">
+        <div class="container">
+            <div class="section-header reveal"><span class="section-badge"><span
+                        class="section-badge-dot"></span>الحل</span>
+                <h2 class="section-title">من الفوضى إلى <span class="accent">التحكّم الكامل</span></h2>
+                <p class="section-sub">رحلة عملائك تبدأ هنا — خمس خطوات لتحويل محادثاتك إلى نتائج</p>
+            </div>
+            <div class="sol-steps">
+                <div class="sol-step reveal">
+                    <div class="sol-text">
+                        <div class="sol-step-num"><span>01</span> اربط</div>
+                        <h3>اربط كل قنواتك <span class="accent">في مكان واحد</span></h3>
+                        <p>واتساب بزنس، ماسنجر، إنستغرام، تيليجرام والويب شات — ربط فوري بدون كود. كل رسائل عملائك تصل
+                            لصندوق وارد موحّد.</p>
+                    </div>
+                    <div class="sol-img">
+                        <img src="/landing/img/sol-inbox.png" alt="ربط القنوات" loading="lazy">
+                    </div>
+                </div>
+                <div class="sol-step reveal">
+                    <div class="sol-text">
+                        <div class="sol-step-num"><span>02</span> نظّم</div>
+                        <h3>صندوق وارد ذكي <span class="accent">يدير محادثاتك</span></h3>
+                        <p>فلترة حسب القناة والحالة، تعيين للفريق المناسب بضغطة، إرسال نصوص وصور وملفات — كل شيء بواجهة
+                            واحدة سلسة.</p>
+                    </div>
+                    <div class="sol-img">
+                        <img src="/landing/img/sol-inbox-feat.png" alt="صندوق وارد ذكي" loading="lazy">
+                    </div>
+                </div>
+                <div class="sol-step reveal">
+                    <div class="sol-text">
+                        <div class="sol-step-num"><span>03</span> أتمت</div>
+                        <h3>وكلاء AI يردون <span class="accent-o">نيابة عنك 24/7</span></h3>
+                        <p>أنشئ وكلاء ذكاء اصطناعي مخصصين لكل قسم، يتعلمون من مستنداتك ويردون على 85% من الأسئلة
+                            تلقائياً بدقة عالية.</p>
+                    </div>
+                    <div class="sol-img">
+                        <img src="/landing/img/sol-ai.png" alt="وكلاء ذكاء اصطناعي" loading="lazy">
+                    </div>
+                </div>
+                <div class="sol-step reveal">
+                    <div class="sol-text">
+                        <div class="sol-step-num"><span>04</span> درّب</div>
+                        <h3>قاعدة معرفة <span class="accent">تغذّي الذكاء</span></h3>
+                        <p>ارفع مستنداتك وملفاتك — يتعلم منها الوكيل تلقائياً. كلما أضفت محتوى، زادت دقة الردود وقلّ
+                            تدخّلك اليدوي.</p>
+                    </div>
+                    <div class="sol-img">
+                        <img src="/landing/img/sol-ai-agents.png" alt="قاعدة المعرفة" loading="lazy">
+                    </div>
+                </div>
+                <div class="sol-step reveal">
+                    <div class="sol-text">
+                        <div class="sol-step-num"><span>05</span> حلّل</div>
+                        <h3>تحليلات لحظية — <span class="accent-o">قرارات بالأرقام</span></h3>
+                        <p>لوحة تحكم تعرض أداء الفريق، رضا العملاء، توزيع المحادثات حسب القناة — كل البيانات في رسوم
+                            بيانية واضحة.</p>
+                    </div>
+                    <div class="sol-img">
+                        <img src="/landing/img/sol-analytics.png" alt="تحليلات لحظية" loading="lazy">
+                    </div>
+                </div>
+            </div>
+    </section>
+    <section class="section" id="channels">
+        <div class="container">
+            <div class="section-header reveal"><span class="section-badge"><span
+                        class="section-badge-dot"></span>القنوات</span>
+                <h2 class="section-title">كل قنواتك — <span class="accent">بوابة واحدة</span></h2>
+                <p class="section-sub">ستّ قنوات تواصل جاهزة للربط فوراً بدون كود</p>
+            </div>
+            <div class="ch-flow">
+                <div class="ch-node reveal" style="--ch-color:#25D366">
+                    <div class="ch-circle" style="background:#25D366;color:#25D366"><svg viewBox="0 0 24 24"
+                            fill="#fff">
+                            <path
+                                d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+                        </svg></div>
+                    <div class="ch-dot"></div>
+                    <div class="ch-label">
+                        <h4>واتساب بزنس</h4>
+                        <p>API رسمي — رسائل + وسائط</p>
+                    </div>
+                </div>
+                <div class="ch-node reveal" style="--ch-color:#0084FF">
+                    <div class="ch-circle" style="background:#0084FF;color:#0084FF"><svg viewBox="0 0 24 24"
+                            fill="#fff">
+                            <path
+                                d="M12 0C5.373 0 0 4.974 0 11.111c0 3.498 1.744 6.614 4.469 8.654V24l4.088-2.242c1.092.301 2.246.464 3.443.464 6.627 0 12-4.975 12-11.111C24 4.974 18.627 0 12 0zm1.191 14.963l-3.055-3.26-5.963 3.26L10.732 8.2l3.131 3.259L19.752 8.2l-6.561 6.763z" />
+                        </svg></div>
+                    <div class="ch-dot"></div>
+                    <div class="ch-label">
+                        <h4>ماسنجر</h4>
+                        <p>ردّ على رسائل صفحتك</p>
+                    </div>
+                </div>
+                <div class="ch-node reveal" style="--ch-color:#E4405F">
+                    <div class="ch-circle"
+                        style="background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);color:#E4405F">
+                        <svg viewBox="0 0 24 24" fill="#fff">
+                            <path
+                                d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
+                        </svg>
+                    </div>
+                    <div class="ch-dot"></div>
+                    <div class="ch-label">
+                        <h4>إنستغرام</h4>
+                        <p>دايركت + تعليقات مباشرة</p>
+                    </div>
+                </div>
+                <div class="ch-node reveal" style="--ch-color:#0088cc">
+                    <div class="ch-circle" style="background:#0088cc;color:#0088cc"><svg viewBox="0 0 24 24"
+                            fill="#fff">
+                            <path
+                                d="M11.944 0A12 12 0 000 12a12 12 0 0012 12 12 12 0 0012-12A12 12 0 0012 0h-.056zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 01.171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" />
+                        </svg></div>
+                    <div class="ch-dot"></div>
+                    <div class="ch-label">
+                        <h4>تيليجرام</h4>
+                        <p>بوت API لدعم فوري</p>
+                    </div>
+                </div>
+                <div class="ch-node reveal" style="--ch-color:#0145b2">
+                    <div class="ch-circle"
+                        style="background:linear-gradient(135deg,var(--blue),var(--blue-mid));color:var(--blue)"><svg
+                            viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
+                        </svg></div>
+                    <div class="ch-dot"></div>
+                    <div class="ch-label">
+                        <h4>ويب شات</h4>
+                        <p>نافذة محادثة بسطر كود</p>
+                    </div>
+                </div>
+                <div class="ch-node reveal" style="--ch-color:#f39200">
+                    <div class="ch-circle"
+                        style="background:linear-gradient(135deg,var(--orange),var(--orange-mid));color:var(--orange)">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
+                            <line x1="12" y1="18" x2="12" y2="18" />
+                        </svg>
+                    </div>
+                    <div class="ch-dot"></div>
+                    <div class="ch-label">
+                        <h4>تطبيقات</h4>
+                        <p>SDK لدمج في تطبيقك</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ══ SECURITY ══ -->
+    <section class="section">
+        <div class="container">
+            <div class="sec-premium reveal">
+                <div class="sec-premium-header">
+                    <div class="sec-shield">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="url(#shieldGrad)" stroke-width="1.5">
+                            <defs>
+                                <linearGradient id="shieldGrad" x1="0" y1="0" x2="1" y2="1">
+                                    <stop offset="0%" stop-color="#f39200" />
+                                    <stop offset="100%" stop-color="#FFA94D" />
+                                </linearGradient>
+                            </defs>
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                        </svg>
+                    </div>
+                    <span class="sec-badge-tag">أمان من الدرجة الأولى</span>
+                    <h2>بياناتك <span>محميّة بالكامل</span></h2>
+                    <p>تشفير متقدم، صلاحيات دقيقة، وسجل عمليات كامل — كل طبقة مصمّمة لحماية بيانات عملائك.</p>
+                </div>
+                <div class="sec-features">
+                    <div class="sec-feat">
+                        <div class="sec-feat-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                                <path d="M7 11V7a5 5 0 0110 0v4" />
+                            </svg>
+                        </div>
+                        <h4>تشفير JWT متقدم</h4>
+                        <p>مصادقة آمنة مع تجديد تلقائي للجلسات</p>
+                    </div>
+                    <div class="sec-feat">
+                        <div class="sec-feat-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                            </svg>
+                        </div>
+                        <h4>صلاحيات Bitwise</h4>
+                        <p>تحكم دقيق — من يرى ماذا ويفعل ماذا</p>
+                    </div>
+                    <div class="sec-feat">
+                        <div class="sec-feat-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                                <polyline points="22,6 12,13 2,6" />
+                            </svg>
+                        </div>
+                        <h4>تحقق البريد</h4>
+                        <p>تأكيد هوية كل مستخدم قبل الدخول</p>
+                    </div>
+                    <div class="sec-feat">
+                        <div class="sec-feat-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="23 4 23 10 17 10" />
+                                <polyline points="1 20 1 14 7 14" />
+                                <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
+                            </svg>
+                        </div>
+                        <h4>تجديد تلقائي</h4>
+                        <p>تجديد صامت كل 12 دقيقة بدون انقطاع</p>
+                    </div>
+                    <div class="sec-feat">
+                        <div class="sec-feat-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                                <polyline points="14 2 14 8 20 8" />
+                                <line x1="16" y1="13" x2="8" y2="13" />
+                                <line x1="16" y1="17" x2="8" y2="17" />
+                            </svg>
+                        </div>
+                        <h4>سجل عمليات كامل</h4>
+                        <p>من فعل ماذا ومتى — تتبع شامل</p>
+                    </div>
+                    <div class="sec-feat">
+                        <div class="sec-feat-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
+                                <polyline points="22 4 12 14.01 9 11.01" />
+                            </svg>
+                        </div>
+                        <h4>موافقة مسبقة</h4>
+                        <p>لا شيء يُنشر بدون مراجعة المدير</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ══ PRICING ══ -->
+    <section class="section" id="pricing">
+        <div class="container">
+            <div class="section-header reveal"><span class="section-badge"><span
+                        class="section-badge-dot"></span>التسعير</span>
+                <h2 class="section-title">خطط تنمو مع <span class="accent">عملك</span></h2>
+                <p class="section-sub">تجربة 14 يوم مجانية — بدون بطاقة ائتمان</p>
+            </div>
+            <div class="price-grid">
+                <div class="price-card reveal">
+                    <h4>Starter</h4>
+                    <p class="price-tier">للمشاريع الناشئة</p>
+                    <div class="price-amount blue">مجاني</div>
+                    <ul>
+                        <li>100 محادثة/شهر</li>
+                        <li>قناتين</li>
+                        <li>وكيل AI واحد</li>
+                        <li>عضوين</li>
+                        <li>50 مستند</li>
+                    </ul><a href="/login" class="btn btn-ghost"
+                        style="width:100%;justify-content:center;padding:12px">ابدأ
+                        مجاناً</a>
+                </div>
+                <div class="price-card pop reveal">
+                    <div class="price-badge">⭐ الأكثر شيوعاً</div>
+                    <h4>Growth</h4>
+                    <p class="price-tier">للشركات النامية</p>
+                    <div class="price-amount orange">199 <span>ر.س/شهر</span></div>
+                    <ul>
+                        <li>5,000 محادثة/شهر</li>
+                        <li>5 قنوات</li>
+                        <li>5 وكلاء AI</li>
+                        <li>15 عضو</li>
+                        <li>500 مستند</li>
+                    </ul><a href="/login" class="btn btn-orange"
+                        style="width:100%;justify-content:center;padding:12px">ابدأ
+                        التجربة</a>
+                </div>
+                <div class="price-card reveal">
+                    <h4>Enterprise</h4>
+                    <p class="price-tier">للمؤسسات الكبيرة</p>
+                    <div class="price-amount blue">مخصص</div>
+                    <ul>
+                        <li>محادثات غير محدودة</li>
+                        <li>قنوات غير محدودة</li>
+                        <li>وكلاء AI غير محدودة</li>
+                        <li>أعضاء غير محدود</li>
+                        <li>مدير حساب مخصص</li>
+                    </ul><a href="mailto:info@darai.com" class="btn btn-primary"
+                        style="width:100%;justify-content:center;padding:12px">تواصل معنا</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══ TESTIMONIALS ══ -->
+    <section class="section">
+        <div class="container">
+            <div class="section-header reveal"><span class="section-badge"><span class="section-badge-dot"
+                        style="background:var(--orange);box-shadow:0 0 6px rgba(255,107,26,.5)"></span>آراء
+                    العملاء</span>
+                <h2 class="section-title">ثقة عملائنا هي <span class="accent-o">أقوى دليل</span></h2>
+                <p class="section-sub">شركات عربية رائدة تعتمد على داري في تواصلها اليومي</p>
+            </div>
+            <div class="testi-grid">
+                <div class="testi-card reveal">
+                    <div class="testi-stars">★★★★★</div>
+                    <p class="testi-text">"داري غيّر طريقة تواصلنا بالكامل. كنا نضيع 4 ساعات يومياً — الآن كل شيء في
+                        مكان واحد بفضل الذكاء الاصطناعي."</p>
+                    <div class="testi-author">
+                        <div class="testi-av" style="background:linear-gradient(135deg,#0145b2,#0378d4)">أ</div>
+                        <div>
+                            <div class="testi-name">محمد الشبلي</div>
+                            <div class="testi-role">مدير خدمة العملاء — شركة تقنية</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="testi-card testi-pop reveal">
+                    <div class="testi-stars">★★★★★</div>
+                    <p class="testi-text">"وكيل AI تولى 80% من الاستفسارات المتكررة. فريقنا يركز على المبيعات الآن بدل
+                        الأسئلة المكررة. النتائج فاقت التوقعات!"</p>
+                    <div class="testi-author">
+                        <div class="testi-av" style="background:linear-gradient(135deg,#f39200,#f3c900)">س</div>
+                        <div>
+                            <div class="testi-name">لجين محمد</div>
+                            <div class="testi-role">المؤسسة والمديرة التنفيذية — متجر إلكتروني</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="testi-card reveal">
+                    <div class="testi-stars">★★★★★</div>
+                    <p class="testi-text">"التحليلات الذكية أعطتنا رؤية واضحة لأداء الفريق ورضا العملاء لأول مرة. قرارات
+                        مبنية على بيانات حقيقية."</p>
+                    <div class="testi-author">
+                        <div class="testi-av" style="background:linear-gradient(135deg,#059669,#10B981)">خ</div>
+                        <div>
+                            <div class="testi-name">خالد الدوسري</div>
+                            <div class="testi-role">مدير العمليات — شركة خدمات</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══ FAQ ══ -->
+    <section class="section" id="faq">
+        <div class="container">
+            <div class="section-header reveal"><span class="section-badge"><span class="section-badge-dot"></span>أسئلة
+                    شائعة</span>
+                <h2 class="section-title">أسئلة <span class="accent">شائعة</span></h2>
+                <p class="section-sub">إجابات على أكثر الأسئلة تكراراً</p>
+            </div>
+            <div class="faq-list">
+                <div class="faq-item reveal">
+                    <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">هل أحتاج خبرة تقنية
+                        لاستخدام داري؟<span class="faq-arrow">▼</span></div>
+                    <div class="faq-a">لا. واجهة سهلة بدون أي برمجة. الإعداد يستغرق 5 دقائق فقط.</div>
+                </div>
+                <div class="faq-item reveal">
+                    <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">كيف يتعلم وكيل AI من
+                        بياناتي؟<span class="faq-arrow">▼</span></div>
+                    <div class="faq-a">ارفع مستنداتك لقاعدة المعرفة والوكيل يتدرب عليها تلقائياً ويجيب بناءً على
+                        محتواها.</div>
+                </div>
+                <div class="faq-item reveal">
+                    <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">ما القنوات المدعومة؟<span
+                            class="faq-arrow">▼</span></div>
+                    <div class="faq-a">واتساب بزنس API، فيسبوك ماسنجر، إنستغرام، تيليجرام، الويب شات، وشات التطبيق.
+                    </div>
+                </div>
+                <div class="faq-item reveal">
+                    <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">هل بياناتي آمنة؟<span
+                            class="faq-arrow">▼</span></div>
+                    <div class="faq-a">نعم. تشفير JWT متقدم + صلاحيات Bitwise + سجل عمليات كامل.</div>
+                </div>
+                <div class="faq-item reveal">
+                    <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">هل يدعم العربية
+                        بالكامل؟<span class="faq-arrow">▼</span></div>
+                    <div class="faq-a">100%. واجهة RTL + خطوط عربية + وكلاء AI يتحدثون العربية بطلاقة.</div>
+                </div>
+                <div class="faq-item reveal">
+                    <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">هل يوجد تطبيق موبايل؟<span
+                            class="faq-arrow">▼</span></div>
+                    <div class="faq-a">نعم. تطبيق احترافي لمتابعة المحادثات أثناء التنقل.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ══ CTA FINAL ══ -->
+    <section class="cta-final">
+        <div class="container" style="position:relative;z-index:2">
+            <h2 class="reveal">جاهز تحوّل خدمة عملائك <br>بقوة <span class="accent-o">الذكاء الاصطناعي؟</span></h2>
+            <p class="reveal">انضم لأكثر من 500 شركة عربية تستخدم داري</p>
+            <div class="reveal" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+                <a href="/login" class="btn btn-orange" style="font-size:16px;padding:15px 36px">🚀 ابدأ تجربتك المجانية
+                    الآن</a>
+                <a href="mailto:info@darai.com" class="btn btn-ghost" style="font-size:16px;padding:15px 36px">📞 تواصل
+                    مع المبيعات</a>
+            </div>
+            <div class="reveal" style="display:flex;justify-content:center;gap:24px;margin-top:24px">
+                <span style="font-size:12.5px;color:var(--muted);font-weight:600">✅ 14 يوم مجاناً</span>
+                <span style="font-size:12.5px;color:var(--muted);font-weight:600">✅ بدون بطاقة ائتمان</span>
+                <span style="font-size:12.5px;color:var(--muted);font-weight:600">✅ إلغاء في أي وقت</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══ FOOTER ══ -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a href="/" class="logo" style="margin-bottom:14px">
+                        <img src="/darai_logo_full.png" alt="داري" class="logo-img">
+                    </a>
+                    <p>منصة عربية متكاملة لإدارة محادثات العملاء بالذكاء الاصطناعي. نجمع كل القنوات في مكان واحد.</p>
+                    <div class="footer-social">
+                        <a href="#" aria-label="Twitter"><svg viewBox="0 0 24 24" fill="currentColor">
+                                <path
+                                    d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                            </svg></a>
+                        <a href="#" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor">
+                                <path
+                                    d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+                            </svg></a>
+                        <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="currentColor">
+                                <path
+                                    d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
+                            </svg></a>
+                    </div>
+                </div>
+                <div>
+                    <h5>المنتج</h5>
+                    <ul class="footer-links">
+                        <li><a href="#features">المميزات</a></li>
+                        <li><a href="#pricing">التسعير</a></li>
+                        <li><a href="#">وكلاء AI</a></li>
+                        <li><a href="#channels">القنوات</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h5>الشركة</h5>
+                    <ul class="footer-links">
+                        <li><a href="#">عن داري</a></li>
+                        <li><a href="#">المدونة</a></li>
+                        <li><a href="#">الوظائف</a></li>
+                        <li><a href="#">الخصوصية</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h5>تواصل معنا</h5>
+                    <ul class="footer-links">
+                        <li><a href="#faq">الأسئلة الشائعة</a></li>
+                        <li><a href="#">مركز المساعدة</a></li>
+                        <li><a href="mailto:info@darai.com">info@darai.com</a></li>
+                        <li><a href="tel:+966500000000">+966 50 000 0000</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>© 2025 داري — Dar AI | جميع الحقوق محفوظة</span>
+                <span>صنع بـ ❤️ في السعودية</span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Reveal on scroll
+        const obs = new IntersectionObserver(e => e.forEach(x => { if (x.isIntersecting) { x.target.classList.add('visible'); obs.unobserve(x.target) } }), { threshold: .12 });
+        document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+        /* cursor */
+        const cur = document.getElementById('cur'), ring = document.getElementById('cur-ring');
+        let mx = window.innerWidth / 2, my = window.innerHeight / 2, rx = mx, ry = my;
+        document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; cur.style.transform = `translate(${mx - 5}px,${my - 5}px)` });
+        (function loop() { rx += (mx - rx) * .1; ry += (my - ry) * .1; ring.style.transform = `translate(${rx - 17}px,${ry - 17}px)`; requestAnimationFrame(loop) })();
+        document.querySelectorAll('.plt-pill,button,.inbox-row,.float-ai,.float-toast,.float-kpi,.float-chart').forEach(el => {
+            el.addEventListener('mouseenter', () => { ring.style.borderColor = 'rgba(255,107,26,.45)'; ring.style.width = '44px'; ring.style.height = '44px' });
+            el.addEventListener('mouseleave', () => { ring.style.borderColor = 'rgba(26,107,204,.3)'; ring.style.width = '34px'; ring.style.height = '34px' });
+        });
+
+        /* counters */
+        function countUp(id, target, suf, dur) {
+            const el = document.getElementById(id); if (!el) return;
+            let v = 0; const step = target / (dur / 16);
+            const t = setInterval(() => { v = Math.min(v + step, target); el.textContent = Math.round(v) + suf; if (v >= target) clearInterval(t) }, 16);
+        }
+        setTimeout(() => { countUp('s1', 85, '%', 1400); countUp('s2', 70, '%', 1200); countUp('s3', 5, '+', 900) }, 1400);
+        setTimeout(() => countUp('kpiNum', 85, '%', 1600), 3900);
+
+        /* active row cycling */
+        const rows = document.querySelectorAll('.inbox-row'); let ar = 0;
+        setInterval(() => {
+            rows.forEach(r => r.classList.remove('active-row'));
+            ar = (ar + 1) % rows.length; rows[ar].classList.add('active-row');
+        }, 2500);
+
+        /* flash new message */
+        setInterval(() => {
+            const r = rows[Math.floor(Math.random() * rows.length)];
+            r.style.background = 'rgba(255,107,26,.04)';
+            r.style.boxShadow = 'inset 3px 0 0 rgba(255,107,26,.4)';
+            setTimeout(() => { r.style.background = ''; r.style.boxShadow = '' }, 700);
+        }, 4000);
+
+        /* magnetic hover on pills */
+        document.querySelectorAll('.plt-pill').forEach(pill => {
+            pill.addEventListener('mousemove', e => {
+                const r = pill.getBoundingClientRect();
+                const dx = (e.clientX - r.left - r.width / 2) / r.width * 10;
+                const dy = (e.clientY - r.top - r.height / 2) / r.height * 8;
+                pill.style.transform = `scale(1.04) translate(${dx}px,${dy}px)`;
+            });
+            pill.addEventListener('mouseleave', () => { pill.style.transform = '' });
+        });
+
+        /* random pill highlight */
+        const pills = document.querySelectorAll('.plt-pill');
+        setInterval(() => {
+            const p = pills[Math.floor(Math.random() * pills.length)];
+            p.style.transition = 'box-shadow .3s';
+            p.style.boxShadow = '0 10px 40px rgba(26,107,204,.18),0 2px 8px rgba(0,0,0,.08),inset 0 1px 0 rgba(255,255,255,.9)';
+            setTimeout(() => { p.style.boxShadow = '' }, 1000);
+        }, 3500);
+        /* ══ 3D NEURAL NETWORK ANIMATION ══ */
+        (function () {
+            const canvas = document.getElementById('hero-particles');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            let W, H, cx, cy;
+            const BLUE = '26,107,204';
+            const BLUE_MID = '46,143,232';
+            const ORANGE = '255,107,26';
+            const LIGHT = '90,179,255';
+            const FL = 800; // focal length for 3D projection
+            let rotY = 0, rotX = 0.15; // rotation angles
+
+            function resize() {
+                const hero = canvas.parentElement;
+                W = canvas.width = hero.offsetWidth;
+                H = canvas.height = hero.offsetHeight;
+                cx = W / 2; cy = H / 2;
+                buildNetwork();
+            }
+
+            // 3D projection
+            function project(x, y, z) {
+                const scale = FL / (FL + z);
+                return {
+                    sx: cx + x * scale,
+                    sy: cy + y * scale,
+                    sc: scale
+                };
+            }
+
+            // Rotate point around Y then X axis
+            function rotate(x, y, z) {
+                // Y rotation
+                let x1 = x * Math.cos(rotY) - z * Math.sin(rotY);
+                let z1 = x * Math.sin(rotY) + z * Math.cos(rotY);
+                // X rotation
+                let y1 = y * Math.cos(rotX) - z1 * Math.sin(rotX);
+                let z2 = y * Math.sin(rotX) + z1 * Math.cos(rotX);
+                return { x: x1, y: y1, z: z2 };
+            }
+
+            let nodes3d = [], connections = [], signals = [];
+            const LAYERS = [5, 8, 12, 10, 8, 5];
+
+            function buildNetwork() {
+                nodes3d = []; connections = []; signals = [];
+                const spread = Math.min(W, H) * .7;
+                const colors = [BLUE, BLUE_MID, LIGHT, ORANGE, BLUE_MID, BLUE];
+                const layerSpan = spread * 2.5;
+
+                LAYERS.forEach((count, li) => {
+                    const lx = (li / (LAYERS.length - 1) - .5) * layerSpan;
+                    const nodeGap = (spread * 2) / (count + 1);
+                    for (let ni = 0; ni < count; ni++) {
+                        const ly = -spread + nodeGap * (ni + 1) + (Math.random() - .5) * 15;
+                        const lz = (Math.random() - .5) * spread * .8;
+                        nodes3d.push({
+                            ox: lx, oy: ly, oz: lz,
+                            r: 3 + Math.random() * 2.5,
+                            layer: li,
+                            color: colors[li % colors.length],
+                            phase: Math.random() * Math.PI * 2,
+                            baseAlpha: .25 + Math.random() * .15,
+                            driftX: (Math.random() - .5) * .15,
+                            driftY: (Math.random() - .5) * .12,
+                            driftZ: (Math.random() - .5) * .1,
+                        });
+                    }
+                });
+
+                for (let i = 0; i < nodes3d.length; i++) {
+                    for (let j = 0; j < nodes3d.length; j++) {
+                        if (nodes3d[j].layer === nodes3d[i].layer + 1) {
+                            if (Math.random() < .6) {
+                                connections.push({ from: i, to: j, alpha: .06 + Math.random() * .06 });
+                            }
+                        }
+                    }
+                }
+            }
+
+            function spawnSignal() {
+                if (!connections.length) return;
+                const ci = Math.floor(Math.random() * connections.length);
+                const c = connections[ci];
+                signals.push({
+                    conn: ci, t: 0,
+                    speed: .004 + Math.random() * .006,
+                    color: nodes3d[c.from].color,
+                    r: 2 + Math.random() * 1.5,
+                });
+            }
+
+            function draw() {
+                ctx.clearRect(0, 0, W, H);
+                const time = Date.now() * .001;
+
+                // compute projected positions
+                const projected = nodes3d.map(n => {
+                    const r = rotate(n.ox, n.oy, n.oz);
+                    const p = project(r.x, r.y, r.z);
+                    return { ...p, z: r.z, color: n.color, r: n.r, phase: n.phase, baseAlpha: n.baseAlpha };
+                });
+
+                // Draw connections
+                for (const c of connections) {
+                    const a = projected[c.from], b = projected[c.to];
+                    const avgScale = (a.sc + b.sc) / 2;
+                    ctx.beginPath();
+                    ctx.moveTo(a.sx, a.sy);
+                    ctx.lineTo(b.sx, b.sy);
+                    ctx.strokeStyle = `rgba(${BLUE_MID},${(c.alpha * avgScale).toFixed(3)})`;
+                    ctx.lineWidth = Math.max(.3, 1 * avgScale);
+                    ctx.stroke();
+                }
+
+                // Draw signals
+                for (const s of signals) {
+                    const c = connections[s.conn];
+                    const a = projected[c.from], b = projected[c.to];
+                    const x = a.sx + (b.sx - a.sx) * s.t;
+                    const y = a.sy + (b.sy - a.sy) * s.t;
+                    const sc = (a.sc + b.sc) / 2;
+
+                    const grad = ctx.createRadialGradient(x, y, 0, x, y, s.r * 7 * sc);
+                    grad.addColorStop(0, `rgba(${s.color},.45)`);
+                    grad.addColorStop(1, `rgba(${s.color},0)`);
+                    ctx.beginPath();
+                    ctx.arc(x, y, s.r * 7 * sc, 0, Math.PI * 2);
+                    ctx.fillStyle = grad;
+                    ctx.fill();
+
+                    ctx.beginPath();
+                    ctx.arc(x, y, s.r * sc, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(${s.color},.9)`;
+                    ctx.fill();
+                }
+
+                // Draw nodes (sorted by z for depth)
+                const sortedIdx = [...projected.keys()].sort((a, b) => projected[b].z - projected[a].z);
+                for (const idx of sortedIdx) {
+                    const n = projected[idx];
+                    const pulse = Math.sin(time * 1.5 + n.phase) * .06;
+                    const alpha = n.baseAlpha + pulse;
+                    const sr = n.r * n.sc;
+
+                    // outer glow
+                    const grad = ctx.createRadialGradient(n.sx, n.sy, 0, n.sx, n.sy, sr * 5);
+                    grad.addColorStop(0, `rgba(${n.color},${(alpha * .4).toFixed(3)})`);
+                    grad.addColorStop(1, `rgba(${n.color},0)`);
+                    ctx.beginPath();
+                    ctx.arc(n.sx, n.sy, sr * 5, 0, Math.PI * 2);
+                    ctx.fillStyle = grad;
+                    ctx.fill();
+
+                    // core
+                    ctx.beginPath();
+                    ctx.arc(n.sx, n.sy, sr, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(${n.color},${alpha.toFixed(3)})`;
+                    ctx.fill();
+
+                    // bright center
+                    ctx.beginPath();
+                    ctx.arc(n.sx, n.sy, sr * .35, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(255,255,255,${(alpha * .7).toFixed(3)})`;
+                    ctx.fill();
+                }
+            }
+
+            function update() {
+                // continuous rotation
+                rotY += .004;
+                rotX = .12 + Math.sin(Date.now() * .0005) * .12;
+
+                // drift nodes
+                for (const n of nodes3d) {
+                    n.ox += n.driftX;
+                    n.oy += n.driftY;
+                    n.oz += n.driftZ;
+                    // gentle bounce within bounds
+                    const bound = Math.min(W, H) * .7;
+                    if (Math.abs(n.ox) > bound) n.driftX *= -1;
+                    if (Math.abs(n.oy) > bound) n.driftY *= -1;
+                    if (Math.abs(n.oz) > bound * .5) n.driftZ *= -1;
+                }
+
+                for (let i = signals.length - 1; i >= 0; i--) {
+                    signals[i].t += signals[i].speed;
+                    if (signals[i].t >= 1) signals.splice(i, 1);
+                }
+                // always spawn signals to keep movement alive
+                if (Math.random() < .15) spawnSignal();
+            }
+
+            function loop() {
+                update();
+                draw();
+                requestAnimationFrame(loop);
+            }
+
+            window.addEventListener('resize', resize);
+            resize();
+            for (let i = 0; i < 15; i++) spawnSignal();
+            loop();
+        })();
+    </script>
+</body>
+
+</html>

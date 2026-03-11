@@ -44,9 +44,9 @@ export function ContactItem({ contact: c, isSelected, onClick, lifecycleMap, cus
             <td className="ci-td">
                 {lc ? (
                     <span className="ci-lc" style={{
-                        background: lc.color ? `${lc.color}14` : "rgba(0,71,134,.05)",
-                        color: lc.color || "#004786",
-                        borderColor: lc.color ? `${lc.color}25` : "rgba(0,71,134,.1)",
+                        background: lc.color ? `${lc.color}14` : "rgba(27,80,145,.05)",
+                        color: lc.color || "var(--t-accent)",
+                        borderColor: lc.color ? `${lc.color}25` : "rgba(27,80,145,.1)",
                     }}>
                         {lc.icon && <span style={{ marginLeft: 2 }}>{lc.icon}</span>}
                         {lc.name}
@@ -74,24 +74,24 @@ export function ContactItem({ contact: c, isSelected, onClick, lifecycleMap, cus
 
             <style>{`
                 .ci-row{cursor:pointer;transition:background .1s;border-bottom:1px solid #f0f1f3}
-                .ci-row:hover{background:#f9fafb}
-                .ci-sel{background:rgba(0,71,134,.03)!important}
-                .ci-sel:hover{background:rgba(0,71,134,.05)!important}
-                .ci-td{padding:9px 12px;font-size:12.5px;color:#374151;white-space:nowrap;vertical-align:middle;font-weight:500}
+                .ci-row:hover{background:var(--t-page)}
+                .ci-sel{background:rgba(27,80,145,.03)!important}
+                .ci-sel:hover{background:rgba(27,80,145,.05)!important}
+                .ci-td{padding:9px 12px;font-size:12.5px;color:var(--t-text-secondary);white-space:nowrap;vertical-align:middle;font-weight:500}
                 .ci-td-chk{width:36px;text-align:center}
-                .ci-chk{width:13px;height:13px;border-radius:3px;cursor:pointer;accent-color:#004786}
+                .ci-chk{width:13px;height:13px;border-radius:3px;cursor:pointer;accent-color:var(--t-accent)}
                 .ci-td-name{min-width:160px}
                 .ci-name-cell{display:flex;align-items:center;gap:8px}
-                .ci-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#004786,#0072b5);color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
+                .ci-avatar{width:30px;height:30px;border-radius:50%;background:var(--t-gradient-accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
                 .ci-avatar-img{width:30px;height:30px;border-radius:50%;object-fit:cover;flex-shrink:0}
-                .ci-name-text{font-weight:600;color:#111827;overflow:hidden;text-overflow:ellipsis;font-size:12.5px}
+                .ci-name-text{font-weight:600;color:var(--t-text);overflow:hidden;text-overflow:ellipsis;font-size:12.5px}
                 .ci-channel{width:18px;height:18px;object-fit:contain}
                 .ci-channel-text{font-size:11px;color:#b0b7c3;text-transform:capitalize}
                 .ci-lc{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:600;border:1px solid}
                 .ci-muted{color:#b0b7c3;font-size:11px}
                 .ci-status{font-size:10px;font-weight:700;padding:2px 8px;border-radius:6px}
                 .ci-status-open{background:rgba(22,163,74,.06);color:#16a34a}
-                .ci-status-closed{background:rgba(239,68,68,.06);color:#ef4444}
+                .ci-status-closed{background:rgba(239,68,68,.06);color:var(--t-danger)}
             `}</style>
         </tr>
     )

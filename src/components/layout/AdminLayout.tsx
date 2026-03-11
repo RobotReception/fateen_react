@@ -267,7 +267,7 @@ export function AdminLayout() {
                 {/* Gradient accent line at top */}
                 <div style={{
                     height: 3,
-                    background: "linear-gradient(to left, #004786, #0098d6)",
+                    background: "linear-gradient(to left, var(--t-brand-orange), var(--t-brand-orange-hover), var(--t-accent-light))",
                     flexShrink: 0,
                 }} />
 
@@ -275,11 +275,11 @@ export function AdminLayout() {
                 <div className="flex h-14 lg:h-16 items-center justify-between lg:justify-center border-b px-4 lg:px-2" style={{ borderColor: "var(--t-border-light, #f0f0f0)" }}>
                     {/* Mobile: full logo + close button */}
                     <Link to="/dashboard" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 lg:hidden transition-opacity duration-200 hover:opacity-80">
-                        <img src="/logo.png" alt="فطين" className="h-8 object-contain" />
+                        <img src="/darai_logo_full.png" alt="Dar AI" className="h-8 object-contain" />
                     </Link>
                     {/* Desktop: short logo */}
                     <Link to="/dashboard" className="hidden lg:flex items-center justify-center transition-transform duration-200 hover:scale-110">
-                        <img src="/Fateen_02_short_logo.png" alt="فطين" className="h-10 w-10 rounded-lg object-contain" />
+                        <img src="/darai_logo.png" alt="Dar AI" className="h-10 w-10 rounded-lg object-contain" />
                     </Link>
                     {/* Mobile close button */}
                     <button
@@ -304,8 +304,8 @@ export function AdminLayout() {
                                 className="group relative flex items-center gap-3 lg:justify-center lg:gap-0 px-3 lg:px-0 py-2.5 text-sm font-medium transition-all duration-200"
                                 style={{
                                     borderRadius: 10,
-                                    background: active ? "rgba(0,71,134,0.08)" : "transparent",
-                                    color: active ? "#004786" : "var(--t-text-secondary, #6b7280)",
+                                    background: active ? "var(--t-accent-muted)" : "transparent",
+                                    color: active ? "var(--t-accent)" : "var(--t-text-secondary, var(--t-text-muted))",
                                 }}
                             >
                                 <div
@@ -316,7 +316,8 @@ export function AdminLayout() {
                                         display: "flex",
                                         alignItems: "center",
                                         justifyContent: "center",
-                                        background: active ? "#004786" : "transparent",
+                                        background: active ? "var(--t-accent)" : "transparent",
+                                        boxShadow: active ? "0 2px 8px var(--t-brand-orange-soft)" : "none",
                                         transition: "all 0.2s ease",
                                         flexShrink: 0,
                                     }}
@@ -326,7 +327,7 @@ export function AdminLayout() {
                                         size={19}
                                         strokeWidth={active ? 2 : 1.7}
                                         style={{
-                                            color: active ? "#fff" : "var(--t-text-faint, #9ca3af)",
+                                            color: active ? "#fff" : "var(--t-text-faint, var(--t-text-faint))",
                                             transition: "color 0.2s ease",
                                         }}
                                         className={active ? "" : "group-hover:!text-gray-600"}
@@ -347,8 +348,8 @@ export function AdminLayout() {
                             className="group relative flex w-full items-center gap-3 lg:justify-center lg:gap-0 px-3 lg:px-0 py-2.5 text-sm font-medium transition-all duration-200"
                             style={{
                                 borderRadius: 10,
-                                background: isSettingsActive || settingsOpen ? "rgba(0,71,134,0.08)" : "transparent",
-                                color: isSettingsActive || settingsOpen ? "#004786" : "var(--t-text-secondary, #6b7280)",
+                                background: isSettingsActive || settingsOpen ? "var(--t-accent-muted)" : "transparent",
+                                color: isSettingsActive || settingsOpen ? "var(--t-accent)" : "var(--t-text-secondary, var(--t-text-muted))",
                                 border: "none",
                                 cursor: "pointer",
                             }}
@@ -361,7 +362,8 @@ export function AdminLayout() {
                                     display: "flex",
                                     alignItems: "center",
                                     justifyContent: "center",
-                                    background: isSettingsActive || settingsOpen ? "#004786" : "transparent",
+                                    background: isSettingsActive || settingsOpen ? "var(--t-accent)" : "transparent",
+                                    boxShadow: isSettingsActive || settingsOpen ? "0 2px 8px var(--t-brand-orange-soft)" : "none",
                                     transition: "all 0.2s ease",
                                     flexShrink: 0,
                                 }}
@@ -372,7 +374,7 @@ export function AdminLayout() {
                                     strokeWidth={isSettingsActive ? 2 : 1.7}
                                     className={`transition-all duration-300 ${settingsOpen ? "rotate-90" : ""}`}
                                     style={{
-                                        color: isSettingsActive || settingsOpen ? "#fff" : "var(--t-text-faint, #9ca3af)",
+                                        color: isSettingsActive || settingsOpen ? "#fff" : "var(--t-text-faint, var(--t-text-faint))",
                                         transition: "color 0.2s ease",
                                     }}
                                 />
@@ -389,7 +391,7 @@ export function AdminLayout() {
                                 width: 240,
                                 borderRadius: 14,
                                 background: "var(--t-card, #fff)",
-                                border: "1px solid var(--t-border-light, #e5e7eb)",
+                                border: "1px solid var(--t-border-light, var(--t-border))",
                                 boxShadow: "0 16px 48px -8px rgba(0,0,0,0.14), 0 4px 16px -4px rgba(0,0,0,0.06)",
                                 zIndex: 9999,
                                 overflow: "hidden",
@@ -398,10 +400,11 @@ export function AdminLayout() {
 
                                 {/* ── Gradient Header ── */}
                                 <div style={{
-                                    background: "linear-gradient(135deg, #004786, #0072b5, #0098d6)",
+                                    background: "linear-gradient(135deg, var(--t-accent), var(--t-accent-secondary), var(--t-accent-light))",
                                     padding: "12px 14px",
                                     position: "relative",
                                     overflow: "hidden",
+                                    borderBottom: "2px solid var(--t-brand-orange)",
                                 }}>
                                     <div style={{
                                         position: "absolute", top: -15, left: -15,
@@ -430,12 +433,12 @@ export function AdminLayout() {
                                                 cursor: "pointer", transition: "all 0.12s",
                                                 textAlign: "right", color: "inherit",
                                             }}
-                                            onMouseEnter={e => { e.currentTarget.style.background = "var(--t-card-hover, #f3f4f6)" }}
+                                            onMouseEnter={e => { e.currentTarget.style.background = "var(--t-card-hover, var(--t-surface))" }}
                                             onMouseLeave={e => { e.currentTarget.style.background = "transparent" }}
                                         >
-                                            <item.icon size={16} strokeWidth={1.6} style={{ color: "var(--t-text-secondary, #6b7280)", flexShrink: 0 }} />
-                                            <span style={{ fontSize: 13, color: "var(--t-text, #374151)", fontWeight: 500, flex: 1 }}>{item.label}</span>
-                                            <ChevronLeft size={13} style={{ color: "var(--t-text-faint, #d1d5db)", flexShrink: 0 }} />
+                                            <item.icon size={16} strokeWidth={1.6} style={{ color: "var(--t-text-secondary, var(--t-text-muted))", flexShrink: 0 }} />
+                                            <span style={{ fontSize: 13, color: "var(--t-text, var(--t-text-secondary))", fontWeight: 500, flex: 1 }}>{item.label}</span>
+                                            <ChevronLeft size={13} style={{ color: "var(--t-text-faint, var(--t-border-medium))", flexShrink: 0 }} />
                                         </button>
                                     ))}
                                 </div>
@@ -461,11 +464,11 @@ export function AdminLayout() {
                                                 cursor: "pointer", transition: "all 0.12s",
                                                 textAlign: "right", color: "inherit",
                                             }}
-                                            onMouseEnter={e => { e.currentTarget.style.background = "var(--t-card-hover, #f3f4f6)" }}
+                                            onMouseEnter={e => { e.currentTarget.style.background = "var(--t-card-hover, var(--t-surface))" }}
                                             onMouseLeave={e => { e.currentTarget.style.background = "transparent" }}
                                         >
-                                            <item.icon size={14} strokeWidth={1.5} style={{ color: "var(--t-text-muted, #9ca3af)", flexShrink: 0 }} />
-                                            <span style={{ fontSize: 12, color: "var(--t-text-secondary, #6b7280)", fontWeight: 500 }}>{item.label}</span>
+                                            <item.icon size={14} strokeWidth={1.5} style={{ color: "var(--t-text-muted, var(--t-text-faint))", flexShrink: 0 }} />
+                                            <span style={{ fontSize: 12, color: "var(--t-text-secondary, var(--t-text-muted))", fontWeight: 500 }}>{item.label}</span>
                                         </button>
                                     ))}
                                 </div>
@@ -475,17 +478,17 @@ export function AdminLayout() {
                                     margin: "2px 4px 4px",
                                     padding: "7px 10px",
                                     borderRadius: 8,
-                                    background: "linear-gradient(135deg, rgba(0,71,134,0.04), rgba(0,152,214,0.04))",
+                                    background: "linear-gradient(135deg, var(--t-accent-muted), var(--t-accent-muted))",
                                     display: "flex", alignItems: "center", justifyContent: "space-between",
                                 }}>
-                                    <span style={{ fontSize: 11, color: "var(--t-text-faint, #9ca3af)", fontWeight: 500 }}>الخطة</span>
+                                    <span style={{ fontSize: 11, color: "var(--t-text-faint, var(--t-text-faint))", fontWeight: 500 }}>الخطة</span>
                                     <div style={{
                                         display: "flex", alignItems: "center", gap: 4,
-                                        fontSize: 10, fontWeight: 700, color: "#004786",
-                                        background: "rgba(0,71,134,0.08)",
+                                        fontSize: 10, fontWeight: 700, color: "var(--t-accent)",
+                                        background: "var(--t-accent-muted)",
                                         padding: "3px 8px", borderRadius: 12,
                                     }}>
-                                        <Zap size={9} style={{ color: "#0098d6" }} />
+                                        <Zap size={9} style={{ color: "var(--t-accent-light)" }} />
                                         Growth
                                     </div>
                                 </div>
@@ -497,16 +500,16 @@ export function AdminLayout() {
                 {/* ── User section ── */}
                 <div className="border-t p-2.5 lg:p-2" style={{ borderColor: "var(--t-border-light, #f0f0f0)" }}>
                     {/* Mobile: full user info */}
-                    <div className="flex items-center gap-3 rounded-xl px-3 py-2.5 lg:hidden" style={{ background: "var(--t-surface, #f9fafb)" }}>
+                    <div className="flex items-center gap-3 rounded-xl px-3 py-2.5 lg:hidden" style={{ background: "var(--t-surface, var(--t-page))" }}>
                         <div
                             className="flex h-9 w-9 items-center justify-center rounded-xl text-xs font-bold text-white flex-shrink-0"
-                            style={{ background: "linear-gradient(135deg, #004786, #0098d6)" }}
+                            style={{ background: "var(--t-gradient-accent)" }}
                         >
                             {user?.first_name?.charAt(0) || "U"}
                         </div>
                         <div className="min-w-0 flex-1">
-                            <p className="truncate text-[13px] font-semibold" style={{ color: "var(--t-text, #374151)" }}>{user?.first_name} {user?.last_name}</p>
-                            <p className="flex items-center gap-1 text-[11px]" style={{ color: "var(--t-text-faint, #9ca3af)" }}>
+                            <p className="truncate text-[13px] font-semibold" style={{ color: "var(--t-text, var(--t-text-secondary))" }}>{user?.first_name} {user?.last_name}</p>
+                            <p className="flex items-center gap-1 text-[11px]" style={{ color: "var(--t-text-faint, var(--t-text-faint))" }}>
                                 <Shield size={9} />
                                 {user?.role || "admin"}
                             </p>
@@ -523,7 +526,7 @@ export function AdminLayout() {
                     <div className="hidden lg:flex flex-col items-center gap-2">
                         <div
                             className="flex h-9 w-9 items-center justify-center rounded-xl text-xs font-bold text-white"
-                            style={{ background: "linear-gradient(135deg, #004786, #0098d6)" }}
+                            style={{ background: "var(--t-gradient-accent)" }}
                             title={`${user?.first_name} ${user?.last_name}`}
                         >
                             {user?.first_name?.charAt(0) || "U"}
@@ -550,6 +553,7 @@ export function AdminLayout() {
                         backdropFilter: "blur(16px) saturate(180%)",
                         WebkitBackdropFilter: "blur(16px) saturate(180%)",
                         borderBottom: "1px solid var(--t-border-light, #f0f0f0)",
+                        boxShadow: "inset 0 -2px 0 0 var(--t-brand-orange-muted)",
                         position: "relative",
                         zIndex: 30,
                     }}
@@ -560,8 +564,8 @@ export function AdminLayout() {
                         <button
                             onClick={() => setMobileOpen(true)}
                             className="rounded-lg p-2 transition-colors duration-150 lg:hidden"
-                            style={{ color: "var(--t-text-muted, #6b7280)" }}
-                            onMouseEnter={e => { e.currentTarget.style.background = "var(--t-card-hover, #f3f4f6)" }}
+                            style={{ color: "var(--t-text-muted, var(--t-text-muted))" }}
+                            onMouseEnter={e => { e.currentTarget.style.background = "var(--t-card-hover, var(--t-surface))" }}
                             onMouseLeave={e => { e.currentTarget.style.background = "transparent" }}
                         >
                             <Menu size={20} />
@@ -572,9 +576,9 @@ export function AdminLayout() {
                             <Link
                                 to="/dashboard"
                                 className="flex items-center justify-center rounded-lg p-1.5 transition-colors duration-150"
-                                style={{ color: "var(--t-text-faint, #9ca3af)" }}
-                                onMouseEnter={e => { e.currentTarget.style.color = "var(--t-text-secondary, #374151)"; e.currentTarget.style.background = "var(--t-card-hover, #f3f4f6)" }}
-                                onMouseLeave={e => { e.currentTarget.style.color = "var(--t-text-faint, #9ca3af)"; e.currentTarget.style.background = "transparent" }}
+                                style={{ color: "var(--t-text-faint, var(--t-text-faint))" }}
+                                onMouseEnter={e => { e.currentTarget.style.color = "var(--t-text-secondary, var(--t-text-secondary))"; e.currentTarget.style.background = "var(--t-card-hover, var(--t-surface))" }}
+                                onMouseLeave={e => { e.currentTarget.style.color = "var(--t-text-faint, var(--t-text-faint))"; e.currentTarget.style.background = "transparent" }}
                                 title="لوحة التحكم"
                             >
                                 <Home size={15} />
@@ -605,12 +609,12 @@ export function AdminLayout() {
 
                                 return segments.map((seg, i) => (
                                     <div key={i} className="flex items-center gap-1.5">
-                                        <ChevronLeft size={12} style={{ color: "var(--t-text-faint, #d1d5db)", transform: "scaleX(-1)" }} />
+                                        <ChevronLeft size={12} style={{ color: "var(--t-text-faint, var(--t-border-medium))", transform: "scaleX(-1)" }} />
                                         <span
                                             style={{
                                                 fontSize: 13,
                                                 fontWeight: i === segments.length - 1 ? 600 : 400,
-                                                color: i === segments.length - 1 ? "var(--t-text, #111827)" : "var(--t-text-faint, #9ca3af)",
+                                                color: i === segments.length - 1 ? "var(--t-text, var(--t-text))" : "var(--t-text-faint, var(--t-text-faint))",
                                                 whiteSpace: "nowrap",
                                             }}
                                         >
@@ -627,24 +631,24 @@ export function AdminLayout() {
                         <button
                             className="flex items-center w-full gap-2.5 rounded-xl px-3.5 py-2 transition-all duration-200 cursor-pointer group"
                             style={{
-                                background: "var(--t-surface, #f3f4f6)",
-                                border: "1px solid var(--t-border-light, #e5e7eb)",
+                                background: "var(--t-surface, var(--t-surface))",
+                                border: "1px solid var(--t-border-light, var(--t-border))",
                                 maxWidth: 420,
                             }}
-                            onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--t-border, #d1d5db)"; e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.04)" }}
-                            onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--t-border-light, #e5e7eb)"; e.currentTarget.style.boxShadow = "none" }}
+                            onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--t-border, var(--t-border-medium))"; e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.04)" }}
+                            onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--t-border-light, var(--t-border))"; e.currentTarget.style.boxShadow = "none" }}
                             onClick={openSearch}
                         >
-                            <Search size={15} style={{ color: "var(--t-text-faint, #9ca3af)", flexShrink: 0 }} />
-                            <span style={{ fontSize: 13, color: "var(--t-text-faint, #9ca3af)", flex: 1, textAlign: "right" }}>بحث سريع...</span>
+                            <Search size={15} style={{ color: "var(--t-text-faint, var(--t-text-faint))", flexShrink: 0 }} />
+                            <span style={{ fontSize: 13, color: "var(--t-text-faint, var(--t-text-faint))", flex: 1, textAlign: "right" }}>بحث سريع...</span>
                             <div className="hidden lg:flex items-center gap-0.5" style={{
                                 padding: "2px 6px",
                                 borderRadius: 6,
                                 background: "var(--t-card, #fff)",
-                                border: "1px solid var(--t-border-light, #e5e7eb)",
+                                border: "1px solid var(--t-border-light, var(--t-border))",
                             }}>
-                                <Command size={10} style={{ color: "var(--t-text-faint, #9ca3af)" }} />
-                                <span style={{ fontSize: 10, fontWeight: 600, color: "var(--t-text-faint, #9ca3af)" }}>K</span>
+                                <Command size={10} style={{ color: "var(--t-text-faint, var(--t-text-faint))" }} />
+                                <span style={{ fontSize: 10, fontWeight: 600, color: "var(--t-text-faint, var(--t-text-faint))" }}>K</span>
                             </div>
                         </button>
                     </div>
@@ -658,7 +662,7 @@ export function AdminLayout() {
                                 gap: 8,
                                 padding: "5px 12px 5px 8px",
                                 borderRadius: 8,
-                                background: "linear-gradient(135deg, #004786, #0072b5)",
+                                background: "var(--t-brand-orange)",
                                 border: "none",
                                 cursor: "pointer",
                                 transition: "all 0.15s",
@@ -685,8 +689,8 @@ export function AdminLayout() {
                         {/* Mobile search icon */}
                         <button
                             className="md:hidden rounded-xl p-2 transition-all duration-200"
-                            style={{ color: "var(--t-text-muted, #6b7280)" }}
-                            onMouseEnter={e => { e.currentTarget.style.background = "var(--t-card-hover, #f3f4f6)" }}
+                            style={{ color: "var(--t-text-muted, var(--t-text-muted))" }}
+                            onMouseEnter={e => { e.currentTarget.style.background = "var(--t-card-hover, var(--t-surface))" }}
                             onMouseLeave={e => { e.currentTarget.style.background = "transparent" }}
                             title="بحث"
                             onClick={openSearch}
@@ -697,9 +701,9 @@ export function AdminLayout() {
                         {/* Notifications Bell */}
                         <button
                             className="relative rounded-xl p-2 transition-all duration-200"
-                            style={{ color: notificationsOpen ? "var(--t-text, #111827)" : "var(--t-text-muted, #6b7280)", background: notificationsOpen ? "var(--t-card-hover, #f3f4f6)" : "transparent" }}
-                            onMouseEnter={e => { e.currentTarget.style.background = "var(--t-card-hover, #f3f4f6)"; e.currentTarget.style.color = "var(--t-text-secondary, #374151)" }}
-                            onMouseLeave={e => { if (!notificationsOpen) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--t-text-muted, #6b7280)" } }}
+                            style={{ color: notificationsOpen ? "var(--t-text, var(--t-text))" : "var(--t-text-muted, var(--t-text-muted))", background: notificationsOpen ? "var(--t-card-hover, var(--t-surface))" : "transparent" }}
+                            onMouseEnter={e => { e.currentTarget.style.background = "var(--t-card-hover, var(--t-surface))"; e.currentTarget.style.color = "var(--t-text-secondary, var(--t-text-secondary))" }}
+                            onMouseLeave={e => { if (!notificationsOpen) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--t-text-muted, var(--t-text-muted))" } }}
                             title="الإشعارات"
                             onClick={() => setNotificationsOpen((p) => !p)}
                         >
@@ -708,7 +712,7 @@ export function AdminLayout() {
                                 <span style={{
                                     position: "absolute", top: 6, right: 6,
                                     minWidth: 16, height: 16, borderRadius: 8,
-                                    background: "#ef4444",
+                                    background: "var(--t-danger)",
                                     color: "#fff", fontSize: 9, fontWeight: 700,
                                     display: "flex", alignItems: "center", justifyContent: "center",
                                     padding: "0 4px",
@@ -739,7 +743,7 @@ export function AdminLayout() {
 
 
                         {/* Divider */}
-                        <div className="hidden sm:block h-7 w-px mx-0.5" style={{ background: "var(--t-border-light, #e5e7eb)" }} />
+                        <div className="hidden sm:block h-7 w-px mx-0.5" style={{ background: "var(--t-border-light, var(--t-border))" }} />
 
                         {/* User info — clickable with dropdown */}
                         <div ref={userMenuRef} style={{ position: "relative" }}>
@@ -747,26 +751,26 @@ export function AdminLayout() {
                                 onClick={() => setUserMenuOpen(!userMenuOpen)}
                                 className="flex items-center gap-2 rounded-xl px-2 py-1.5 transition-all duration-200 cursor-pointer"
                                 style={{
-                                    background: userMenuOpen ? "var(--t-card-hover, #f3f4f6)" : "transparent",
+                                    background: userMenuOpen ? "var(--t-card-hover, var(--t-surface))" : "transparent",
                                     border: "none",
                                     outline: "none",
                                 }}
-                                onMouseEnter={e => { if (!userMenuOpen) e.currentTarget.style.background = "var(--t-card-hover, #f3f4f6)" }}
+                                onMouseEnter={e => { if (!userMenuOpen) e.currentTarget.style.background = "var(--t-card-hover, var(--t-surface))" }}
                                 onMouseLeave={e => { if (!userMenuOpen) e.currentTarget.style.background = "transparent" }}
                             >
                                 <div className="hidden text-left sm:block">
                                     <p className="text-[13px] font-semibold leading-tight" style={{ color: "var(--t-text, #1f2937)" }}>
                                         {user?.first_name} {user?.last_name}
                                     </p>
-                                    <p className="text-[11px] leading-tight" style={{ color: "var(--t-text-faint, #9ca3af)" }}>{user?.email}</p>
+                                    <p className="text-[11px] leading-tight" style={{ color: "var(--t-text-faint, var(--t-text-faint))" }}>{user?.email}</p>
                                 </div>
                                 <div
                                     className="flex h-8 w-8 items-center justify-center rounded-xl text-sm font-bold text-white"
-                                    style={{ background: "linear-gradient(135deg, #004786, #0098d6)" }}
+                                    style={{ background: "var(--t-gradient-accent)" }}
                                 >
                                     {user?.first_name?.charAt(0) || "U"}
                                 </div>
-                                <ChevronLeft size={14} className={`hidden sm:block transition-transform duration-200 ${userMenuOpen ? "rotate-90" : "-rotate-90"}`} style={{ color: "var(--t-text-faint, #9ca3af)" }} />
+                                <ChevronLeft size={14} className={`hidden sm:block transition-transform duration-200 ${userMenuOpen ? "rotate-90" : "-rotate-90"}`} style={{ color: "var(--t-text-faint, var(--t-text-faint))" }} />
                             </button>
 
                             {/* ── User Profile Dropdown ── */}
@@ -778,16 +782,16 @@ export function AdminLayout() {
                                     width: "min(300px, calc(100vw - 24px))",
                                     borderRadius: 16,
                                     background: "var(--t-card, #fff)",
-                                    border: "1px solid var(--t-border-light, #e5e7eb)",
+                                    border: "1px solid var(--t-border-light, var(--t-border))",
                                     boxShadow: "0 20px 60px -12px rgba(0,0,0,0.15), 0 4px 20px -4px rgba(0,0,0,0.06)",
                                     zIndex: 200,
                                     overflow: "hidden",
                                     animation: "userMenuSlide .2s cubic-bezier(0.16, 1, 0.3, 1)",
                                 }}>
-                                    {/* Profile header with gradient */}
                                     <div style={{
-                                        background: "linear-gradient(135deg, #004786, #0072b5, #0098d6)",
+                                        background: "linear-gradient(135deg, var(--t-accent), var(--t-accent-secondary), var(--t-accent-light))",
                                         padding: "24px 20px 20px",
+                                        borderBottom: "2px solid var(--t-brand-orange)",
                                         position: "relative",
                                         overflow: "hidden",
                                     }}>
@@ -848,20 +852,20 @@ export function AdminLayout() {
                                                 cursor: "pointer", transition: "background 0.12s",
                                                 textAlign: "right", color: "inherit",
                                             }}
-                                            onMouseEnter={e => { e.currentTarget.style.background = "var(--t-card-hover, #f3f4f6)" }}
+                                            onMouseEnter={e => { e.currentTarget.style.background = "var(--t-card-hover, var(--t-surface))" }}
                                             onMouseLeave={e => { e.currentTarget.style.background = "transparent" }}
                                         >
                                             <div style={{
                                                 width: 34, height: 34, borderRadius: 10,
-                                                background: "var(--t-surface, #f3f4f6)",
+                                                background: "var(--t-surface, var(--t-surface))",
                                                 display: "flex", alignItems: "center", justifyContent: "center",
                                                 flexShrink: 0,
                                             }}>
-                                                <User size={15} style={{ color: "var(--t-text-secondary, #6b7280)" }} />
+                                                <User size={15} style={{ color: "var(--t-text-secondary, var(--t-text-muted))" }} />
                                             </div>
                                             <div>
                                                 <div style={{ fontSize: 13, fontWeight: 600, color: "var(--t-text, #1f2937)" }}>الملف الشخصي</div>
-                                                <div style={{ fontSize: 11, color: "var(--t-text-faint, #9ca3af)", marginTop: 1 }}>تعديل بياناتك الشخصية</div>
+                                                <div style={{ fontSize: 11, color: "var(--t-text-faint, var(--t-text-faint))", marginTop: 1 }}>تعديل بياناتك الشخصية</div>
                                             </div>
                                         </button>
 
@@ -874,26 +878,26 @@ export function AdminLayout() {
                                                 cursor: "pointer", transition: "background 0.12s",
                                                 textAlign: "right", color: "inherit",
                                             }}
-                                            onMouseEnter={e => { e.currentTarget.style.background = "var(--t-card-hover, #f3f4f6)" }}
+                                            onMouseEnter={e => { e.currentTarget.style.background = "var(--t-card-hover, var(--t-surface))" }}
                                             onMouseLeave={e => { e.currentTarget.style.background = "transparent" }}
                                         >
                                             <div style={{
                                                 width: 34, height: 34, borderRadius: 10,
-                                                background: "var(--t-surface, #f3f4f6)",
+                                                background: "var(--t-surface, var(--t-surface))",
                                                 display: "flex", alignItems: "center", justifyContent: "center",
                                                 flexShrink: 0,
                                             }}>
-                                                <Building2 size={15} style={{ color: "var(--t-text-secondary, #6b7280)" }} />
+                                                <Building2 size={15} style={{ color: "var(--t-text-secondary, var(--t-text-muted))" }} />
                                             </div>
                                             <div>
                                                 <div style={{ fontSize: 13, fontWeight: 600, color: "var(--t-text, #1f2937)" }}>إعدادات المؤسسة</div>
-                                                <div style={{ fontSize: 11, color: "var(--t-text-faint, #9ca3af)", marginTop: 1 }}>إدارة المؤسسة والفريق</div>
+                                                <div style={{ fontSize: 11, color: "var(--t-text-faint, var(--t-text-faint))", marginTop: 1 }}>إدارة المؤسسة والفريق</div>
                                             </div>
                                         </button>
                                     </div>
 
                                     {/* Divider + logout */}
-                                    <div style={{ margin: "0 14px", borderTop: "1px solid var(--t-border-light, #e5e7eb)" }} />
+                                    <div style={{ margin: "0 14px", borderTop: "1px solid var(--t-border-light, var(--t-border))" }} />
                                     <div style={{ padding: "6px" }}>
                                         <button
                                             onClick={() => { setUserMenuOpen(false); handleLogout() }}
@@ -904,16 +908,16 @@ export function AdminLayout() {
                                                 cursor: "pointer", transition: "all 0.12s",
                                                 textAlign: "right", color: "inherit",
                                             }}
-                                            onMouseEnter={e => { e.currentTarget.style.background = "#fef2f2"; (e.currentTarget.querySelector('.logout-icon') as HTMLElement)?.style && Object.assign((e.currentTarget.querySelector('.logout-icon') as HTMLElement).style, { background: '#fee2e2', color: '#ef4444' }) }}
-                                            onMouseLeave={e => { e.currentTarget.style.background = "transparent"; (e.currentTarget.querySelector('.logout-icon') as HTMLElement)?.style && Object.assign((e.currentTarget.querySelector('.logout-icon') as HTMLElement).style, { background: 'var(--t-surface, #f3f4f6)', color: 'var(--t-text-secondary, #6b7280)' }) }}
+                                            onMouseEnter={e => { e.currentTarget.style.background = "#fef2f2"; (e.currentTarget.querySelector('.logout-icon') as HTMLElement)?.style && Object.assign((e.currentTarget.querySelector('.logout-icon') as HTMLElement).style, { background: '#fee2e2', color: 'var(--t-danger)' }) }}
+                                            onMouseLeave={e => { e.currentTarget.style.background = "transparent"; (e.currentTarget.querySelector('.logout-icon') as HTMLElement)?.style && Object.assign((e.currentTarget.querySelector('.logout-icon') as HTMLElement).style, { background: 'var(--t-surface, var(--t-surface))', color: 'var(--t-text-secondary, var(--t-text-muted))' }) }}
                                         >
                                             <div className="logout-icon" style={{
                                                 width: 34, height: 34, borderRadius: 10,
-                                                background: "var(--t-surface, #f3f4f6)",
+                                                background: "var(--t-surface, var(--t-surface))",
                                                 display: "flex", alignItems: "center", justifyContent: "center",
                                                 flexShrink: 0,
                                                 transition: "all 0.12s",
-                                                color: "var(--t-text-secondary, #6b7280)",
+                                                color: "var(--t-text-secondary, var(--t-text-muted))",
                                             }}>
                                                 <LogOut size={15} />
                                             </div>
@@ -954,7 +958,7 @@ export function AdminLayout() {
                             maxHeight: "min(480px, 70vh)",
                             borderRadius: 18,
                             background: "var(--t-card, #fff)",
-                            border: "1px solid var(--t-border-light, #e5e7eb)",
+                            border: "1px solid var(--t-border-light, var(--t-border))",
                             boxShadow: "0 24px 80px -12px rgba(0,0,0,0.25), 0 8px 24px -8px rgba(0,0,0,0.12)",
                             overflow: "hidden",
                             display: "flex", flexDirection: "column",
@@ -967,7 +971,7 @@ export function AdminLayout() {
                             padding: "14px 18px",
                             borderBottom: "1px solid var(--t-border-light, #f0f0f0)",
                         }}>
-                            <Search size={18} style={{ color: "var(--t-text-faint, #9ca3af)", flexShrink: 0 }} />
+                            <Search size={18} style={{ color: "var(--t-text-faint, var(--t-text-faint))", flexShrink: 0 }} />
                             <input
                                 ref={searchInputRef}
                                 type="text"
@@ -996,7 +1000,7 @@ export function AdminLayout() {
                                     flex: 1, border: "none", outline: "none",
                                     background: "transparent",
                                     fontSize: 15, fontWeight: 500,
-                                    color: "var(--t-text, #111827)",
+                                    color: "var(--t-text, var(--t-text))",
                                     fontFamily: "inherit",
                                 }}
                             />
@@ -1004,10 +1008,10 @@ export function AdminLayout() {
                                 onClick={closeSearch}
                                 style={{
                                     padding: "3px 8px", borderRadius: 6,
-                                    background: "var(--t-surface, #f3f4f6)",
-                                    border: "1px solid var(--t-border-light, #e5e7eb)",
+                                    background: "var(--t-surface, var(--t-surface))",
+                                    border: "1px solid var(--t-border-light, var(--t-border))",
                                     fontSize: 11, fontWeight: 600,
-                                    color: "var(--t-text-faint, #9ca3af)",
+                                    color: "var(--t-text-faint, var(--t-text-faint))",
                                     cursor: "pointer",
                                     flexShrink: 0,
                                 }}
@@ -1026,8 +1030,8 @@ export function AdminLayout() {
                                     display: "flex", flexDirection: "column", alignItems: "center",
                                     justifyContent: "center", padding: "36px 20px", gap: 8,
                                 }}>
-                                    <Search size={32} style={{ color: "var(--t-text-faint, #d1d5db)" }} />
-                                    <span style={{ fontSize: 14, color: "var(--t-text-faint, #9ca3af)", fontWeight: 500 }}>
+                                    <Search size={32} style={{ color: "var(--t-text-faint, var(--t-border-medium))" }} />
+                                    <span style={{ fontSize: 14, color: "var(--t-text-faint, var(--t-text-faint))", fontWeight: 500 }}>
                                         لا توجد نتائج لـ "{searchQuery}"
                                     </span>
                                 </div>
@@ -1044,7 +1048,7 @@ export function AdminLayout() {
                                                 display: "flex", alignItems: "center", gap: 12,
                                                 width: "100%", padding: "10px 12px", borderRadius: 12,
                                                 border: "none",
-                                                background: isSelected ? "var(--t-card-hover, #f3f4f6)" : "transparent",
+                                                background: isSelected ? "var(--t-card-hover, var(--t-surface))" : "transparent",
                                                 cursor: "pointer", transition: "background 0.08s",
                                                 textAlign: "right", color: "inherit",
                                             }}
@@ -1052,8 +1056,8 @@ export function AdminLayout() {
                                             <div style={{
                                                 width: 36, height: 36, borderRadius: 10,
                                                 background: isSelected
-                                                    ? "linear-gradient(135deg, #004786, #0098d6)"
-                                                    : "var(--t-surface, #f3f4f6)",
+                                                    ? "var(--t-gradient-accent)"
+                                                    : "var(--t-surface, var(--t-surface))",
                                                 display: "flex", alignItems: "center", justifyContent: "center",
                                                 flexShrink: 0,
                                                 transition: "all 0.15s",
@@ -1062,25 +1066,25 @@ export function AdminLayout() {
                                                     size={16}
                                                     strokeWidth={1.8}
                                                     style={{
-                                                        color: isSelected ? "#fff" : "var(--t-text-muted, #6b7280)",
+                                                        color: isSelected ? "#fff" : "var(--t-text-muted, var(--t-text-muted))",
                                                         transition: "color 0.15s",
                                                     }}
                                                 />
                                             </div>
                                             <span style={{
                                                 fontSize: 14, fontWeight: 500, flex: 1,
-                                                color: isSelected ? "var(--t-text, #111827)" : "var(--t-text-secondary, #374151)",
+                                                color: isSelected ? "var(--t-text, var(--t-text))" : "var(--t-text-secondary, var(--t-text-secondary))",
                                             }}>
                                                 {item.title}
                                             </span>
                                             {isSelected && (
                                                 <span style={{
-                                                    fontSize: 11, color: "var(--t-text-faint, #9ca3af)",
+                                                    fontSize: 11, color: "var(--t-text-faint, var(--t-text-faint))",
                                                     display: "flex", alignItems: "center", gap: 3,
                                                 }}>
                                                     <span style={{
                                                         padding: "1px 5px", borderRadius: 4,
-                                                        background: "var(--t-surface, #e5e7eb)",
+                                                        background: "var(--t-surface, var(--t-border))",
                                                         fontSize: 10, fontWeight: 600,
                                                     }}>↵</span>
                                                     للانتقال
@@ -1097,18 +1101,18 @@ export function AdminLayout() {
                             display: "flex", alignItems: "center", gap: 12,
                             padding: "10px 18px",
                             borderTop: "1px solid var(--t-border-light, #f0f0f0)",
-                            fontSize: 11, color: "var(--t-text-faint, #9ca3af)",
+                            fontSize: 11, color: "var(--t-text-faint, var(--t-text-faint))",
                         }}>
                             <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                                <span style={{ padding: "1px 5px", borderRadius: 4, background: "var(--t-surface, #f3f4f6)", fontWeight: 600 }}>↑↓</span>
+                                <span style={{ padding: "1px 5px", borderRadius: 4, background: "var(--t-surface, var(--t-surface))", fontWeight: 600 }}>↑↓</span>
                                 للتنقل
                             </span>
                             <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                                <span style={{ padding: "1px 5px", borderRadius: 4, background: "var(--t-surface, #f3f4f6)", fontWeight: 600 }}>↵</span>
+                                <span style={{ padding: "1px 5px", borderRadius: 4, background: "var(--t-surface, var(--t-surface))", fontWeight: 600 }}>↵</span>
                                 لتأكيد
                             </span>
                             <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                                <span style={{ padding: "1px 5px", borderRadius: 4, background: "var(--t-surface, #f3f4f6)", fontWeight: 600 }}>Esc</span>
+                                <span style={{ padding: "1px 5px", borderRadius: 4, background: "var(--t-surface, var(--t-surface))", fontWeight: 600 }}>Esc</span>
                                 للإغلاق
                             </span>
                         </div>

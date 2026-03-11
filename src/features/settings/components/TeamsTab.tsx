@@ -18,59 +18,59 @@ import { PAGE_BITS, ACTION_BITS } from "@/lib/permissions"
 import { usePermissions } from "@/lib/usePermissions"
 
 /* ═══════════════════════════════════════
-   CSS — Fateen branded
+   CSS — DarAI branded
 ═══════════════════════════════════════ */
 const CSS = `
 .tt-table { width:100%; border-collapse:separate; border-spacing:0; }
 .tt-table thead th {
-    padding:10px 14px; font-size:10.5px; font-weight:700; color:#6b7280;
+    padding:10px 14px; font-size:10.5px; font-weight:700; color:var(--t-text-muted);
     text-align:right; border-bottom:1px solid #eaedf0; white-space:nowrap;
     background:#fafbfc; text-transform:uppercase; letter-spacing:.03em;
 }
 .tt-table thead th:first-child { border-radius:0 8px 0 0; }
 .tt-table thead th:last-child { border-radius:8px 0 0 0; }
 .tt-table tbody td {
-    padding:11px 14px; font-size:12px; color:var(--t-text,#111827); border-bottom:1px solid #f0f1f3;
+    padding:11px 14px; font-size:12px; color:var(--t-text,var(--t-text)); border-bottom:1px solid #f0f1f3;
     vertical-align:middle;
 }
 .tt-table tbody tr { transition:background .1s; }
-.tt-table tbody tr:hover { background:rgba(0,71,134,.02); }
+.tt-table tbody tr:hover { background:rgba(27,80,145,.02); }
 .tt-table tbody tr:last-child td { border-bottom:none; }
 .tt-th-sort { display:inline-flex; align-items:center; gap:3px; cursor:pointer; user-select:none; }
-.tt-th-sort:hover { color:#004786; }
+.tt-th-sort:hover { color:var(--t-accent); }
 
 .tt-field {
-    width:100%; padding:8px 11px; border-radius:8px; border:1.5px solid #e0e3e7;
-    background:#fafafa; font-size:12px; color:var(--t-text,#111827); outline:none;
+    width:100%; padding:8px 11px; border-radius:8px; border:1.5px solid var(--t-border);
+    background:var(--t-card-hover); font-size:12px; color:var(--t-text,var(--t-text)); outline:none;
     transition:border-color .15s,box-shadow .15s; box-sizing:border-box; font-family:inherit;
 }
-.tt-field:focus { border-color:#004786; box-shadow:0 0 0 3px rgba(0,71,134,.06); }
-.tt-field::placeholder { color:#9ca3af; opacity:.7; }
+.tt-field:focus { border-color:var(--t-accent); box-shadow:0 0 0 3px rgba(27,80,145,.06); }
+.tt-field::placeholder { color:var(--t-text-faint); opacity:.7; }
 
-.tt-label { font-size:11px; font-weight:700; color:#6b7280; display:block; margin-bottom:5px; }
+.tt-label { font-size:11px; font-weight:700; color:var(--t-text-muted); display:block; margin-bottom:5px; }
 
 .tt-btn-primary {
     display:inline-flex; align-items:center; gap:5px; padding:7px 14px; border-radius:8px;
-    border:none; background:#004786; color:#fff; font-size:12px;
+    border:none; background:var(--t-brand-orange); color:#fff; font-size:12px;
     font-weight:700; cursor:pointer; transition:all .12s; font-family:inherit;
-    box-shadow:0 1px 3px rgba(0,71,134,.15);
+    box-shadow:0 1px 3px rgba(27,80,145,.15);
 }
 .tt-btn-primary:hover:not(:disabled) { background:#003d73; }
 .tt-btn-primary:disabled { opacity:.5; cursor:not-allowed; }
 
 .tt-btn-ghost {
     display:inline-flex; align-items:center; gap:5px; padding:6px 12px; border-radius:8px;
-    border:1.5px solid #e0e3e7; background:transparent; color:var(--t-text,#374151);
+    border:1.5px solid var(--t-border); background:transparent; color:var(--t-text,var(--t-text-secondary));
     font-size:11px; font-weight:600; cursor:pointer; transition:all .12s; font-family:inherit;
 }
-.tt-btn-ghost:hover { border-color:#004786; color:#004786; }
+.tt-btn-ghost:hover { border-color:var(--t-accent); color:var(--t-accent); }
 
 .tt-actions-btn {
     width:28px; height:28px; border-radius:7px; border:none; background:transparent;
     cursor:pointer; display:flex; align-items:center; justify-content:center;
-    color:#9ca3af; transition:all .1s;
+    color:var(--t-text-faint); transition:all .1s;
 }
-.tt-actions-btn:hover { background:#f3f4f6; color:#004786; }
+.tt-actions-btn:hover { background:var(--t-surface); color:var(--t-accent); }
 
 .tt-actions-menu {
     position:absolute; left:0; top:100%; margin-top:2px; z-index:20;
@@ -81,24 +81,24 @@ const CSS = `
 .tt-actions-menu button {
     width:100%; padding:7px 10px; border:none; background:transparent; cursor:pointer;
     display:flex; align-items:center; gap:6px; border-radius:7px;
-    font-size:11px; font-weight:600; color:var(--t-text,#374151); transition:background .08s;
+    font-size:11px; font-weight:600; color:var(--t-text,var(--t-text-secondary)); transition:background .08s;
     font-family:inherit; text-align:right;
 }
-.tt-actions-menu button:hover { background:#f5f6f8; }
-.tt-actions-menu button.danger { color:#dc2626; }
+.tt-actions-menu button:hover { background:var(--t-surface); }
+.tt-actions-menu button.danger { color:var(--t-danger); }
 .tt-actions-menu button.danger:hover { background:rgba(239,68,68,.04); }
 
 .tt-member-chip {
     display:inline-flex; align-items:center; gap:4px; padding:3px 8px 3px 4px;
-    border-radius:6px; background:rgba(0,71,134,.04); border:1px solid rgba(0,71,134,.1);
-    font-size:11px; font-weight:600; color:#004786;
+    border-radius:6px; background:rgba(27,80,145,.04); border:1px solid rgba(27,80,145,.1);
+    font-size:11px; font-weight:600; color:var(--t-accent);
 }
 .tt-member-chip button {
     display:flex; align-items:center; justify-content:center; width:14px; height:14px;
     border-radius:4px; border:none; background:transparent; cursor:pointer;
-    color:rgba(0,71,134,.4); transition:all .1s; padding:0;
+    color:rgba(27,80,145,.4); transition:all .1s; padding:0;
 }
-.tt-member-chip button:hover { background:rgba(239,68,68,.1); color:#dc2626; }
+.tt-member-chip button:hover { background:rgba(239,68,68,.1); color:var(--t-danger); }
 
 .tt-members-dropdown {
     position:absolute; left:0; right:0; top:100%; margin-top:2px; z-index:10;
@@ -109,51 +109,51 @@ const CSS = `
 .tt-members-dropdown button {
     width:100%; padding:7px 10px; border:none; background:transparent; cursor:pointer;
     display:flex; align-items:center; gap:8px; font-size:11px; font-weight:500;
-    color:var(--t-text,#374151); transition:background .08s; font-family:inherit; text-align:right;
+    color:var(--t-text,var(--t-text-secondary)); transition:background .08s; font-family:inherit; text-align:right;
 }
 .tt-members-dropdown button:hover { background:#fafbfc; }
 
 .tt-tab-bar { display:flex; gap:2px; background:#f0f1f3; border-radius:10px; padding:3px; }
 .tt-tab {
     padding:6px 16px; border-radius:8px; border:none; background:transparent;
-    font-size:11px; font-weight:700; color:#6b7280; cursor:pointer;
+    font-size:11px; font-weight:700; color:var(--t-text-muted); cursor:pointer;
     transition:all .12s; font-family:inherit; display:inline-flex; align-items:center; gap:5px;
 }
-.tt-tab:hover { color:#004786; }
-.tt-tab.active { background:#fff; color:#004786; box-shadow:0 1px 3px rgba(0,0,0,.06); }
+.tt-tab:hover { color:var(--t-accent); }
+.tt-tab.active { background:#fff; color:var(--t-accent); box-shadow:0 1px 3px rgba(0,0,0,.06); }
 .tt-tab .tt-tab-count {
     font-size:9px; font-weight:800; padding:1px 6px; border-radius:10px;
-    background:rgba(0,71,134,.08); color:#004786;
+    background:rgba(27,80,145,.08); color:var(--t-accent);
 }
-.tt-tab.active .tt-tab-count { background:rgba(0,71,134,.12); }
+.tt-tab.active .tt-tab-count { background:rgba(27,80,145,.12); }
 
 .tt-status-badge {
     display:inline-flex; align-items:center; gap:3px;
     font-size:9.5px; font-weight:700; padding:2px 8px; border-radius:6px;
 }
 .tt-status-badge.active { background:rgba(22,163,74,.08); color:#16a34a; }
-.tt-status-badge.inactive { background:rgba(239,68,68,.06); color:#dc2626; }
+.tt-status-badge.inactive { background:rgba(239,68,68,.06); color:var(--t-danger); }
 
 .tt-restore-btn {
     display:inline-flex; align-items:center; gap:5px; padding:6px 14px; border-radius:8px;
-    border:1.5px solid rgba(0,71,134,.15); background:rgba(0,71,134,.03);
-    color:#004786; font-size:11px; font-weight:700; cursor:pointer;
+    border:1.5px solid rgba(27,80,145,.15); background:rgba(27,80,145,.03);
+    color:var(--t-accent); font-size:11px; font-weight:700; cursor:pointer;
     transition:all .12s; font-family:inherit;
 }
-.tt-restore-btn:hover { background:rgba(0,71,134,.08); border-color:#004786; }
+.tt-restore-btn:hover { background:rgba(27,80,145,.08); border-color:var(--t-accent); }
 .tt-restore-btn:disabled { opacity:.5; cursor:not-allowed; }
 
 .tt-pagination {
     display:flex; align-items:center; justify-content:center; gap:8px;
-    padding:12px 0; font-size:11px; color:#6b7280;
+    padding:12px 0; font-size:11px; color:var(--t-text-muted);
 }
 .tt-pagination button {
     display:inline-flex; align-items:center; gap:4px; padding:5px 12px;
-    border-radius:7px; border:1.5px solid #e0e3e7; background:#fff;
-    font-size:11px; font-weight:600; color:var(--t-text,#374151);
+    border-radius:7px; border:1.5px solid var(--t-border); background:#fff;
+    font-size:11px; font-weight:600; color:var(--t-text,var(--t-text-secondary));
     cursor:pointer; transition:all .12s; font-family:inherit;
 }
-.tt-pagination button:hover:not(:disabled) { border-color:#004786; color:#004786; }
+.tt-pagination button:hover:not(:disabled) { border-color:var(--t-accent); color:var(--t-accent); }
 .tt-pagination button:disabled { opacity:.4; cursor:not-allowed; }
 
 @keyframes ttIn { from{opacity:0;transform:scale(.97) translateY(6px)} to{opacity:1;transform:scale(1) translateY(0)} }
@@ -161,11 +161,11 @@ const CSS = `
 `
 
 const AVATAR_GRADIENTS = [
-    "linear-gradient(135deg, #004786, #0072b5)",
-    "linear-gradient(135deg, #0072b5, #0098d6)",
+    "var(--t-gradient-accent)",
+    "var(--t-gradient-accent)",
     "linear-gradient(135deg, #7c3aed, #a855f7)",
     "linear-gradient(135deg, #0891b2, #06b6d4)",
-    "linear-gradient(135deg, #004786, #0098d6)",
+    "var(--t-gradient-accent)",
 ]
 
 function hashCode(s: string): number {
@@ -195,7 +195,7 @@ function Modal({ title, subtitle, width = 440, onClose, children }: {
             }}>
                 {/* Gradient header */}
                 <div style={{
-                    background: "linear-gradient(135deg, #004786, #0072b5)",
+                    background: "var(--t-brand-orange)",
                     padding: "14px 16px",
                     display: "flex", alignItems: "flex-start", justifyContent: "space-between",
                 }}>
@@ -291,8 +291,8 @@ function TeamFormModal({ team, onClose, tenantId }: { team?: Team; onClose: () =
                                 style={{
                                     display: "flex", flexWrap: "wrap", gap: 5, alignItems: "center",
                                     padding: "6px 10px", minHeight: 36,
-                                    borderRadius: 8, border: "1.5px solid #e0e3e7",
-                                    background: "#fafafa", cursor: "pointer",
+                                    borderRadius: 8, border: "1.5px solid var(--t-border)",
+                                    background: "var(--t-card-hover)", cursor: "pointer",
                                     transition: "border-color .15s",
                                 }}
                             >
@@ -308,9 +308,9 @@ function TeamFormModal({ team, onClose, tenantId }: { team?: Team; onClose: () =
                                     </span>
                                 ))}
                                 {currentMembers.length === 0 && (
-                                    <span style={{ fontSize: 11, color: "#9ca3af" }}>اختر أعضاء...</span>
+                                    <span style={{ fontSize: 11, color: "var(--t-text-faint)" }}>اختر أعضاء...</span>
                                 )}
-                                <ChevronDown size={13} style={{ marginRight: "auto", color: "#9ca3af" }} />
+                                <ChevronDown size={13} style={{ marginRight: "auto", color: "var(--t-text-faint)" }} />
                             </div>
 
                             {showDropdown && (
@@ -323,7 +323,7 @@ function TeamFormModal({ team, onClose, tenantId }: { team?: Team; onClose: () =
                                                 onClick={e => e.stopPropagation()} />
                                         </div>
                                         {available.length === 0 ? (
-                                            <div style={{ textAlign: "center", padding: "12px 0", fontSize: 11, color: "#9ca3af" }}>
+                                            <div style={{ textAlign: "center", padding: "12px 0", fontSize: 11, color: "var(--t-text-faint)" }}>
                                                 لا يوجد أعضاء متاحين
                                             </div>
                                         ) : available.map(u => (
@@ -433,16 +433,16 @@ function MembersModal({ team, onClose, tenantId }: { team: Team; onClose: () => 
                         display: "flex", alignItems: "center", justifyContent: "center",
                         margin: "0 auto 10px",
                     }}>
-                        <Lock size={18} style={{ color: "#f59e0b" }} />
+                        <Lock size={18} style={{ color: "var(--t-warning)" }} />
                     </div>
-                    <p style={{ fontSize: 13, fontWeight: 600, color: "var(--t-text, #111827)", margin: "0 0 4px" }}>لا توجد صلاحية</p>
-                    <p style={{ fontSize: 11, color: "#9ca3af", margin: 0 }}>ليس لديك صلاحية عرض أعضاء الفريق</p>
+                    <p style={{ fontSize: 13, fontWeight: 600, color: "var(--t-text, var(--t-text))", margin: "0 0 4px" }}>لا توجد صلاحية</p>
+                    <p style={{ fontSize: 11, color: "var(--t-text-faint)", margin: 0 }}>ليس لديك صلاحية عرض أعضاء الفريق</p>
                 </div>
             ) : (
                 <>
                     {/* Add button */}
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
-                        <span style={{ fontSize: 11, fontWeight: 700, color: "#9ca3af" }}>
+                        <span style={{ fontSize: 11, fontWeight: 700, color: "var(--t-text-faint)" }}>
                             {members.length} عضو
                         </span>
                         <ActionGuard pageBit={PAGE_BITS.TEAMS} actionBit={ACTION_BITS.UPDATE_TEAM_MEMBERS}>
@@ -465,7 +465,7 @@ function MembersModal({ team, onClose, tenantId }: { team: Team; onClose: () => 
                                 placeholder="ابحث عن موظف..." style={{ fontSize: 11, padding: "7px 10px", marginBottom: 6 }} autoFocus />
                             <div style={{ maxHeight: 140, overflowY: "auto", display: "flex", flexDirection: "column", gap: 2 }}>
                                 {available.length === 0 ? (
-                                    <div style={{ textAlign: "center", padding: "10px 0", fontSize: 10, color: "#9ca3af" }}>لا يوجد</div>
+                                    <div style={{ textAlign: "center", padding: "10px 0", fontSize: 10, color: "var(--t-text-faint)" }}>لا يوجد</div>
                                 ) : available.map(u => (
                                     <button key={u.user_id}
                                         onClick={() => addMut.mutate({ teamId: team.team_id, userId: u.user_id })}
@@ -474,7 +474,7 @@ function MembersModal({ team, onClose, tenantId }: { team: Team; onClose: () => 
                                             display: "flex", alignItems: "center", gap: 7,
                                             padding: "6px 8px", borderRadius: 7, border: "none",
                                             background: "transparent", cursor: "pointer",
-                                            fontSize: 11, color: "var(--t-text, #374151)", fontFamily: "inherit",
+                                            fontSize: 11, color: "var(--t-text, var(--t-text-secondary))", fontFamily: "inherit",
                                             textAlign: "right", width: "100%", transition: "background .08s",
                                         }}
                                         onMouseEnter={e => { e.currentTarget.style.background = "#f0f1f3" }}
@@ -489,7 +489,7 @@ function MembersModal({ team, onClose, tenantId }: { team: Team; onClose: () => 
                                             {u.name.charAt(0).toUpperCase()}
                                         </div>
                                         <span style={{ flex: 1 }}>{u.name}</span>
-                                        <UserPlus size={10} style={{ color: "#004786" }} />
+                                        <UserPlus size={10} style={{ color: "var(--t-accent)" }} />
                                     </button>
                                 ))}
                             </div>
@@ -498,20 +498,20 @@ function MembersModal({ team, onClose, tenantId }: { team: Team; onClose: () => 
 
                     {/* Members list */}
                     {isLoading ? (
-                        <div style={{ textAlign: "center", padding: "28px 0", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, color: "#004786", fontSize: 11 }}>
+                        <div style={{ textAlign: "center", padding: "28px 0", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, color: "var(--t-accent)", fontSize: 11 }}>
                             <Loader2 size={14} className="animate-spin" /> جاري التحميل...
                         </div>
                     ) : members.length === 0 ? (
                         <div style={{ textAlign: "center", padding: "28px 0" }}>
                             <div style={{
                                 width: 44, height: 44, borderRadius: 12,
-                                background: "rgba(0,71,134,.06)",
+                                background: "rgba(27,80,145,.06)",
                                 display: "flex", alignItems: "center", justifyContent: "center",
                                 margin: "0 auto 8px",
                             }}>
-                                <Users size={20} style={{ color: "#004786" }} />
+                                <Users size={20} style={{ color: "var(--t-accent)" }} />
                             </div>
-                            <div style={{ fontSize: 12, color: "#9ca3af" }}>لا يوجد أعضاء</div>
+                            <div style={{ fontSize: 12, color: "var(--t-text-faint)" }}>لا يوجد أعضاء</div>
                         </div>
                     ) : (
                         <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
@@ -525,7 +525,7 @@ function MembersModal({ team, onClose, tenantId }: { team: Team; onClose: () => 
                                         border: "1px solid #eaedf0", background: "#fff",
                                         transition: "all .12s",
                                     }}
-                                        onMouseEnter={e => { e.currentTarget.style.borderColor = "#d1d5db"; e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,.03)" }}
+                                        onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--t-border-medium)"; e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,.03)" }}
                                         onMouseLeave={e => { e.currentTarget.style.borderColor = "#eaedf0"; e.currentTarget.style.boxShadow = "none" }}
                                     >
                                         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -544,14 +544,14 @@ function MembersModal({ team, onClose, tenantId }: { team: Team; onClose: () => 
                                             )}
                                             <div>
                                                 <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-                                                    <span style={{ fontSize: 12, fontWeight: 600, color: "var(--t-text, #111827)" }}>{member.full_name}</span>
+                                                    <span style={{ fontSize: 12, fontWeight: 600, color: "var(--t-text, var(--t-text))" }}>{member.full_name}</span>
                                                     {!member.is_active && (
-                                                        <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 4, background: "rgba(239,68,68,.06)", color: "#dc2626", fontWeight: 700 }}>غير نشط</span>
+                                                        <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 4, background: "rgba(239,68,68,.06)", color: "var(--t-danger)", fontWeight: 700 }}>غير نشط</span>
                                                     )}
                                                 </div>
                                                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 1 }}>
                                                     {member.email && (
-                                                        <span style={{ display: "flex", alignItems: "center", gap: 2, fontSize: 10, color: "#9ca3af" }}>
+                                                        <span style={{ display: "flex", alignItems: "center", gap: 2, fontSize: 10, color: "var(--t-text-faint)" }}>
                                                             <Mail size={9} /> {member.email}
                                                         </span>
                                                     )}
@@ -560,7 +560,7 @@ function MembersModal({ team, onClose, tenantId }: { team: Team; onClose: () => 
                                                             display: "flex", alignItems: "center", gap: 2,
                                                             fontSize: 9, fontWeight: 700,
                                                             padding: "1px 6px", borderRadius: 4,
-                                                            background: "rgba(0,71,134,.04)", color: "#004786",
+                                                            background: "rgba(27,80,145,.04)", color: "var(--t-accent)",
                                                         }}>
                                                             <Shield size={8} /> {member.role}
                                                         </span>
@@ -574,7 +574,7 @@ function MembersModal({ team, onClose, tenantId }: { team: Team; onClose: () => 
                                                 disabled={removeMut.isPending}
                                                 style={{
                                                     width: 26, height: 26, borderRadius: 7, border: "none",
-                                                    background: "rgba(239,68,68,.06)", color: "#dc2626",
+                                                    background: "rgba(239,68,68,.06)", color: "var(--t-danger)",
                                                     cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
                                                     transition: "all .12s",
                                                 }}
@@ -660,7 +660,7 @@ export function TeamsTab() {
                         <div style={{ position: "relative", width: 200 }}>
                             <Search size={13} style={{
                                 position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)",
-                                color: searchFocused ? "#004786" : "#9ca3af",
+                                color: searchFocused ? "var(--t-accent)" : "var(--t-text-faint)",
                                 pointerEvents: "none", transition: "color .15s",
                             }} />
                             <input className="tt-field" value={search}
@@ -684,20 +684,20 @@ export function TeamsTab() {
             {activeTab === "active" ? (
                 <div style={{ borderRadius: 12, border: "1px solid #eaedf0", background: "#fff", overflow: "visible" }}>
                     {isLoading ? (
-                        <div style={{ textAlign: "center", padding: "48px 0", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, color: "#004786", fontSize: 12 }}>
+                        <div style={{ textAlign: "center", padding: "48px 0", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, color: "var(--t-accent)", fontSize: 12 }}>
                             <Loader2 size={16} className="animate-spin" /> جاري التحميل...
                         </div>
                     ) : filtered.length === 0 ? (
                         <div style={{ textAlign: "center", padding: "48px 0" }}>
                             <div style={{
                                 width: 52, height: 52, borderRadius: 14,
-                                background: "rgba(0,71,134,.06)",
+                                background: "rgba(27,80,145,.06)",
                                 display: "flex", alignItems: "center", justifyContent: "center",
                                 margin: "0 auto 10px",
                             }}>
-                                <Users size={24} style={{ color: "#004786" }} />
+                                <Users size={24} style={{ color: "var(--t-accent)" }} />
                             </div>
-                            <div style={{ fontSize: 13, color: "var(--t-text, #111827)", fontWeight: 600 }}>
+                            <div style={{ fontSize: 13, color: "var(--t-text, var(--t-text))", fontWeight: 600 }}>
                                 {search ? "لا توجد نتائج" : "لا توجد فرق بعد"}
                             </div>
                             {!search && (
@@ -733,14 +733,14 @@ export function TeamsTab() {
                                                 <span style={{ fontWeight: 600, fontSize: 12 }}>{team.name}</span>
                                             </div>
                                         </td>
-                                        <td><span style={{ color: "#6b7280", fontSize: 11 }}>{team.description || "—"}</span></td>
+                                        <td><span style={{ color: "var(--t-text-muted)", fontSize: 11 }}>{team.description || "—"}</span></td>
                                         <td>
                                             <button className="tt-btn-ghost" style={{ padding: "3px 8px", gap: 3, fontSize: 10 }}
                                                 onClick={() => setMembersTeam(team)}>
                                                 <Users size={10} /> {team.members?.length ?? 0}
                                             </button>
                                         </td>
-                                        <td><span style={{ fontSize: 11, color: "#6b7280", whiteSpace: "nowrap" }}>{fmtDate(team.created_at)}</span></td>
+                                        <td><span style={{ fontSize: 11, color: "var(--t-text-muted)", whiteSpace: "nowrap" }}>{fmtDate(team.created_at)}</span></td>
                                         <td>
                                             <span className={`tt-status-badge ${team.is_active !== false ? "active" : "inactive"}`}>
                                                 {team.is_active !== false ? "نشط" : "معطّل"}
@@ -764,20 +764,20 @@ export function TeamsTab() {
                 /* ─── Deleted Teams View ─── */
                 <div style={{ borderRadius: 12, border: "1px solid #eaedf0", background: "#fff", overflow: "visible" }}>
                     {isLoadingDeleted ? (
-                        <div style={{ textAlign: "center", padding: "48px 0", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, color: "#004786", fontSize: 12 }}>
+                        <div style={{ textAlign: "center", padding: "48px 0", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, color: "var(--t-accent)", fontSize: 12 }}>
                             <Loader2 size={16} className="animate-spin" /> جاري التحميل...
                         </div>
                     ) : !deletedData?.items?.length ? (
                         <div style={{ textAlign: "center", padding: "48px 0" }}>
                             <div style={{
                                 width: 52, height: 52, borderRadius: 14,
-                                background: "rgba(0,71,134,.06)",
+                                background: "rgba(27,80,145,.06)",
                                 display: "flex", alignItems: "center", justifyContent: "center",
                                 margin: "0 auto 10px",
                             }}>
-                                <Trash2 size={24} style={{ color: "#9ca3af" }} />
+                                <Trash2 size={24} style={{ color: "var(--t-text-faint)" }} />
                             </div>
-                            <div style={{ fontSize: 13, color: "#9ca3af", fontWeight: 600 }}>
+                            <div style={{ fontSize: 13, color: "var(--t-text-faint)", fontWeight: 600 }}>
                                 لا توجد فرق معطلة
                             </div>
                         </div>
@@ -800,7 +800,7 @@ export function TeamsTab() {
                                                 <div style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
                                                     <div style={{
                                                         width: 28, height: 28, borderRadius: 8, flexShrink: 0,
-                                                        background: "#d1d5db",
+                                                        background: "var(--t-border-medium)",
                                                         display: "flex", alignItems: "center", justifyContent: "center",
                                                     }}>
                                                         <Users size={12} style={{ color: "#fff" }} />
@@ -808,9 +808,9 @@ export function TeamsTab() {
                                                     <span style={{ fontWeight: 600, fontSize: 12 }}>{team.name}</span>
                                                 </div>
                                             </td>
-                                            <td><span style={{ color: "#6b7280", fontSize: 11 }}>{team.description || "—"}</span></td>
-                                            <td><span style={{ fontSize: 11, color: "#6b7280" }}>{team.members?.length ?? 0}</span></td>
-                                            <td><span style={{ fontSize: 11, color: "#6b7280", whiteSpace: "nowrap" }}>{fmtDate(team.deactivated_at ?? team.updated_at)}</span></td>
+                                            <td><span style={{ color: "var(--t-text-muted)", fontSize: 11 }}>{team.description || "—"}</span></td>
+                                            <td><span style={{ fontSize: 11, color: "var(--t-text-muted)" }}>{team.members?.length ?? 0}</span></td>
+                                            <td><span style={{ fontSize: 11, color: "var(--t-text-muted)", whiteSpace: "nowrap" }}>{fmtDate(team.deactivated_at ?? team.updated_at)}</span></td>
                                             <td>
                                                 <ActionGuard pageBit={PAGE_BITS.TEAMS} actionBit={ACTION_BITS.UPDATE_TEAM}>
                                                     <button className="tt-restore-btn"
@@ -855,12 +855,12 @@ export function TeamsTab() {
                             background: "rgba(239,68,68,.08)", margin: "0 auto 12px",
                             display: "flex", alignItems: "center", justifyContent: "center",
                         }}>
-                            <AlertTriangle size={20} style={{ color: "#dc2626" }} />
+                            <AlertTriangle size={20} style={{ color: "var(--t-danger)" }} />
                         </div>
-                        <div style={{ fontSize: 13, fontWeight: 700, color: "var(--t-text, #111827)", marginBottom: 4 }}>
+                        <div style={{ fontSize: 13, fontWeight: 700, color: "var(--t-text, var(--t-text))", marginBottom: 4 }}>
                             تعطيل فريق «{deleteTarget.name}»؟
                         </div>
-                        <div style={{ fontSize: 11, color: "#9ca3af", marginBottom: 16 }}>
+                        <div style={{ fontSize: 11, color: "var(--t-text-faint)", marginBottom: 16 }}>
                             سيتم تعطيل الفريق ويمكنك استعادته لاحقاً
                         </div>
                         <div style={{ display: "flex", gap: 8, justifyContent: "center" }}>
@@ -871,7 +871,7 @@ export function TeamsTab() {
                                 style={{
                                     display: "inline-flex", alignItems: "center", gap: 5,
                                     padding: "7px 18px", borderRadius: 8, border: "none",
-                                    background: "#dc2626", color: "#fff",
+                                    background: "var(--t-danger)", color: "#fff",
                                     fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
                                     boxShadow: "0 1px 3px rgba(220,38,38,.15)",
                                 }}>

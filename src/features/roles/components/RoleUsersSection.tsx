@@ -1,4 +1,4 @@
-﻿import { useState, useCallback, useRef, useEffect } from "react"
+import { useState, useCallback, useRef, useEffect } from "react"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { UserPlus, X, Loader2, Users, Search, Mail, Phone, UserX, ChevronDown } from "lucide-react"
 import { useAssignUserRole, useRemoveUserRole } from "../hooks/use-roles"
@@ -10,11 +10,11 @@ import { PAGE_BITS, ACTION_BITS } from "@/lib/permissions"
 interface Props { role: string }
 
 const AVATAR_GRADIENTS = [
-    "linear-gradient(135deg, #004786, #0072b5)",
+    "var(--t-gradient-accent)",
     "linear-gradient(135deg, #0891b2, #06b6d4)",
     "linear-gradient(135deg, #7c3aed, #a855f7)",
-    "linear-gradient(135deg, #0072b5, #0098d6)",
-    "linear-gradient(135deg, #004786, #0098d6)",
+    "var(--t-gradient-accent)",
+    "var(--t-gradient-accent)",
 ]
 
 function hashCode(s: string): number {
@@ -116,14 +116,14 @@ export function RoleUsersSection({ role }: Props) {
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                     <div style={{
                         width: 34, height: 34, borderRadius: 9,
-                        background: "linear-gradient(135deg, #004786, #0072b5)",
+                        background: "var(--t-brand-orange)",
                         display: "flex", alignItems: "center", justifyContent: "center",
                     }}>
                         <Users size={15} style={{ color: "#fff" }} />
                     </div>
                     <div>
-                        <h3 style={{ fontSize: 13, fontWeight: 700, color: "var(--t-text, #111827)", margin: 0 }}>المستخدمون</h3>
-                        <p style={{ fontSize: 11, color: "var(--t-text-faint, #9ca3af)", margin: "1px 0 0" }}>
+                        <h3 style={{ fontSize: 13, fontWeight: 700, color: "var(--t-text, var(--t-text))", margin: 0 }}>المستخدمون</h3>
+                        <p style={{ fontSize: 11, color: "var(--t-text-faint, var(--t-text-faint))", margin: "1px 0 0" }}>
                             {users.length} مستخدم بهذا الدور
                         </p>
                     </div>
@@ -135,12 +135,12 @@ export function RoleUsersSection({ role }: Props) {
                         style={{
                             display: "flex", alignItems: "center", gap: 5,
                             padding: "7px 14px", borderRadius: 8, border: "none",
-                            background: showAdd ? "var(--t-surface, #f3f4f6)" : "#004786",
-                            color: showAdd ? "var(--t-text-faint, #6b7280)" : "#fff",
+                            background: showAdd ? "var(--t-surface, var(--t-surface))" : "var(--t-accent)",
+                            color: showAdd ? "var(--t-text-faint, var(--t-text-muted))" : "#fff",
                             fontSize: 12, fontWeight: 600,
                             cursor: "pointer", fontFamily: "inherit",
                             transition: "all 0.15s",
-                            boxShadow: showAdd ? "none" : "0 1px 3px rgba(0,71,134,0.15)",
+                            boxShadow: showAdd ? "none" : "0 1px 3px rgba(27,80,145,0.15)",
                         }}
                     >
                         {showAdd ? <X size={13} /> : <UserPlus size={13} />}
@@ -157,7 +157,7 @@ export function RoleUsersSection({ role }: Props) {
                     background: "var(--t-surface, #fafbfc)",
                     animation: "rusSlide .2s ease-out",
                 }}>
-                    <p style={{ fontSize: 12, fontWeight: 600, color: "var(--t-text-secondary, #6b7280)", margin: "0 0 8px" }}>
+                    <p style={{ fontSize: 12, fontWeight: 600, color: "var(--t-text-secondary, var(--t-text-muted))", margin: "0 0 8px" }}>
                         اختر مستخدم لتعيينه لهذا الدور
                     </p>
 
@@ -167,10 +167,10 @@ export function RoleUsersSection({ role }: Props) {
                             style={{
                                 display: "flex", alignItems: "center", gap: 8,
                                 padding: "9px 12px", borderRadius: 8,
-                                border: `1.5px solid ${pickerOpen ? "#004786" : "var(--t-border, #e0e3e7)"}`,
+                                border: `1.5px solid ${pickerOpen ? "var(--t-accent)" : "var(--t-border, var(--t-border))"}`,
                                 background: "var(--t-card, #fff)", cursor: "pointer",
                                 transition: "border-color 0.15s",
-                                boxShadow: pickerOpen ? "0 0 0 3px rgba(0,71,134,0.06)" : "none",
+                                boxShadow: pickerOpen ? "0 0 0 3px rgba(27,80,145,0.06)" : "none",
                             }}
                         >
                             {selectedUser ? (
@@ -182,12 +182,12 @@ export function RoleUsersSection({ role }: Props) {
                                     }}>
                                         <span style={{ fontSize: 10, fontWeight: 700, color: "#fff" }}>{getInitials(selectedUser.full_name)}</span>
                                     </div>
-                                    <span style={{ fontSize: 12, fontWeight: 600, color: "var(--t-text, #111827)", flex: 1 }}>{selectedUser.full_name}</span>
-                                    <span style={{ fontSize: 11, color: "var(--t-text-faint, #9ca3af)" }}>{selectedUser.email}</span>
+                                    <span style={{ fontSize: 12, fontWeight: 600, color: "var(--t-text, var(--t-text))", flex: 1 }}>{selectedUser.full_name}</span>
+                                    <span style={{ fontSize: 11, color: "var(--t-text-faint, var(--t-text-faint))" }}>{selectedUser.email}</span>
                                 </>
                             ) : (
                                 <>
-                                    <Search size={13} style={{ color: "var(--t-text-faint, #9ca3af)" }} />
+                                    <Search size={13} style={{ color: "var(--t-text-faint, var(--t-text-faint))" }} />
                                     <input
                                         value={pickerSearch}
                                         onChange={e => { setPickerSearch(e.target.value); setPickerOpen(true) }}
@@ -195,10 +195,10 @@ export function RoleUsersSection({ role }: Props) {
                                         placeholder="ابحث بالاسم أو البريد الإلكتروني..."
                                         style={{
                                             flex: 1, border: "none", background: "transparent",
-                                            fontSize: 12, color: "var(--t-text, #111827)", outline: "none",
+                                            fontSize: 12, color: "var(--t-text, var(--t-text))", outline: "none",
                                         }}
                                     />
-                                    <ChevronDown size={13} style={{ color: "var(--t-text-faint, #9ca3af)", flexShrink: 0 }} />
+                                    <ChevronDown size={13} style={{ color: "var(--t-text-faint, var(--t-text-faint))", flexShrink: 0 }} />
                                 </>
                             )}
                         </div>
@@ -215,12 +215,12 @@ export function RoleUsersSection({ role }: Props) {
                             }}>
                                 {allUsersLoading ? (
                                     <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "20px 0" }}>
-                                        <Loader2 size={15} className="animate-spin" style={{ color: "#004786" }} />
-                                        <span style={{ fontSize: 11, color: "var(--t-text-faint, #9ca3af)", marginRight: 6 }}>جارٍ البحث...</span>
+                                        <Loader2 size={15} className="animate-spin" style={{ color: "var(--t-accent)" }} />
+                                        <span style={{ fontSize: 11, color: "var(--t-text-faint, var(--t-text-faint))", marginRight: 6 }}>جارٍ البحث...</span>
                                     </div>
                                 ) : availableUsers.length === 0 ? (
                                     <div style={{ padding: "18px 0", textAlign: "center" }}>
-                                        <p style={{ fontSize: 12, color: "var(--t-text-faint, #9ca3af)", margin: 0 }}>
+                                        <p style={{ fontSize: 12, color: "var(--t-text-faint, var(--t-text-faint))", margin: 0 }}>
                                             {pickerSearch ? `لا توجد نتائج لـ "${pickerSearch}"` : "لا يوجد مستخدمون متاحون"}
                                         </p>
                                     </div>
@@ -255,19 +255,19 @@ export function RoleUsersSection({ role }: Props) {
                                             )}
                                             <div style={{ flex: 1, minWidth: 0 }}>
                                                 <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                                                    <span style={{ fontSize: 12, fontWeight: 600, color: "var(--t-text, #111827)" }}>{user.full_name || "—"}</span>
+                                                    <span style={{ fontSize: 12, fontWeight: 600, color: "var(--t-text, var(--t-text))" }}>{user.full_name || "—"}</span>
                                                     {!user.is_active && (
                                                         <span style={{
-                                                            fontSize: 9, fontWeight: 600, color: "#dc2626",
+                                                            fontSize: 9, fontWeight: 600, color: "var(--t-danger)",
                                                             background: "rgba(239,68,68,0.06)", padding: "1px 5px", borderRadius: 4,
                                                         }}>معطّل</span>
                                                     )}
                                                 </div>
-                                                <span style={{ fontSize: 10.5, color: "var(--t-text-faint, #9ca3af)" }} dir="ltr">{user.email}</span>
+                                                <span style={{ fontSize: 10.5, color: "var(--t-text-faint, var(--t-text-faint))" }} dir="ltr">{user.email}</span>
                                             </div>
                                             {user.role && (
                                                 <span style={{
-                                                    fontSize: 10, color: "#004786", background: "rgba(0,71,134,0.06)",
+                                                    fontSize: 10, color: "var(--t-accent)", background: "rgba(27,80,145,0.06)",
                                                     padding: "2px 7px", borderRadius: 4, flexShrink: 0, fontWeight: 500,
                                                 }}>{user.role}</span>
                                             )}
@@ -280,8 +280,8 @@ export function RoleUsersSection({ role }: Props) {
 
                     {assignMut.isPending && (
                         <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 8 }}>
-                            <Loader2 size={13} className="animate-spin" style={{ color: "#004786" }} />
-                            <span style={{ fontSize: 11, color: "var(--t-text-faint, #9ca3af)", fontWeight: 500 }}>جارٍ تعيين المستخدم...</span>
+                            <Loader2 size={13} className="animate-spin" style={{ color: "var(--t-accent)" }} />
+                            <span style={{ fontSize: 11, color: "var(--t-text-faint, var(--t-text-faint))", fontWeight: 500 }}>جارٍ تعيين المستخدم...</span>
                         </div>
                     )}
                 </div>
@@ -292,7 +292,7 @@ export function RoleUsersSection({ role }: Props) {
                 <div style={{ position: "relative", marginBottom: 12 }}>
                     <Search size={13} style={{
                         position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)",
-                        color: searchFocused ? "#004786" : "var(--t-text-faint, #9ca3af)",
+                        color: searchFocused ? "var(--t-accent)" : "var(--t-text-faint, var(--t-text-faint))",
                         pointerEvents: "none", transition: "color .15s",
                     }} />
                     <input
@@ -303,12 +303,12 @@ export function RoleUsersSection({ role }: Props) {
                         placeholder="بحث بالاسم أو البريد..."
                         style={{
                             width: "100%", borderRadius: 8,
-                            border: `1.5px solid ${searchFocused ? "#004786" : "var(--t-border, #e0e3e7)"}`,
-                            background: "var(--t-surface, #fafafa)",
+                            border: `1.5px solid ${searchFocused ? "var(--t-accent)" : "var(--t-border, var(--t-border))"}`,
+                            background: "var(--t-surface, var(--t-card-hover))",
                             paddingRight: 32, paddingLeft: 12, paddingTop: 8, paddingBottom: 8,
-                            fontSize: 12, color: "var(--t-text, #111827)", outline: "none",
+                            fontSize: 12, color: "var(--t-text, var(--t-text))", outline: "none",
                             transition: "border-color .15s, box-shadow .15s",
-                            boxShadow: searchFocused ? "0 0 0 3px rgba(0,71,134,0.06)" : "none",
+                            boxShadow: searchFocused ? "0 0 0 3px rgba(27,80,145,0.06)" : "none",
                         }}
                     />
                 </div>
@@ -318,8 +318,8 @@ export function RoleUsersSection({ role }: Props) {
             {isLoading && (
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "44px 0" }}>
                     <div style={{ textAlign: "center" }}>
-                        <Loader2 size={20} className="animate-spin" style={{ color: "#004786", margin: "0 auto 8px" }} />
-                        <p style={{ fontSize: 12, color: "var(--t-text-faint, #9ca3af)", margin: 0 }}>جارٍ تحميل المستخدمين...</p>
+                        <Loader2 size={20} className="animate-spin" style={{ color: "var(--t-accent)", margin: "0 auto 8px" }} />
+                        <p style={{ fontSize: 12, color: "var(--t-text-faint, var(--t-text-faint))", margin: 0 }}>جارٍ تحميل المستخدمين...</p>
                     </div>
                 </div>
             )}
@@ -328,21 +328,21 @@ export function RoleUsersSection({ role }: Props) {
             {!isLoading && users.length === 0 && (
                 <div style={{
                     padding: "44px 0", textAlign: "center",
-                    border: "1.5px dashed var(--t-border, #d1d5db)", borderRadius: 10,
+                    border: "1.5px dashed var(--t-border, var(--t-border-medium))", borderRadius: 10,
                     background: "var(--t-surface, #fafbfc)",
                 }}>
                     <div style={{
                         width: 48, height: 48, borderRadius: 12,
-                        background: "rgba(0,71,134,0.06)",
+                        background: "rgba(27,80,145,0.06)",
                         display: "flex", alignItems: "center", justifyContent: "center",
                         margin: "0 auto 10px",
                     }}>
-                        <Users size={22} style={{ color: "#004786" }} />
+                        <Users size={22} style={{ color: "var(--t-accent)" }} />
                     </div>
-                    <p style={{ fontSize: 13, fontWeight: 600, color: "var(--t-text, #111827)", margin: "0 0 4px" }}>
+                    <p style={{ fontSize: 13, fontWeight: 600, color: "var(--t-text, var(--t-text))", margin: "0 0 4px" }}>
                         لا يوجد مستخدمون بهذا الدور
                     </p>
-                    <p style={{ fontSize: 11, color: "var(--t-text-faint, #9ca3af)", margin: 0 }}>
+                    <p style={{ fontSize: 11, color: "var(--t-text-faint, var(--t-text-faint))", margin: 0 }}>
                         اضغط "تعيين مستخدم" لإضافة مستخدمين
                     </p>
                 </div>
@@ -368,7 +368,7 @@ export function RoleUsersSection({ role }: Props) {
                                     animation: `rusCard .2s ease-out ${idx * 0.03}s both`,
                                 }}
                                 onMouseEnter={e => {
-                                    e.currentTarget.style.borderColor = "var(--t-border, #d1d5db)"
+                                    e.currentTarget.style.borderColor = "var(--t-border, var(--t-border-medium))"
                                     e.currentTarget.style.boxShadow = "0 2px 6px rgba(0,0,0,0.03)"
                                 }}
                                 onMouseLeave={e => {
@@ -384,12 +384,12 @@ export function RoleUsersSection({ role }: Props) {
                                 ) : (
                                     <div style={{
                                         width: 38, height: 38, borderRadius: 10,
-                                        background: user.is_active ? gradient : "var(--t-surface, #e5e7eb)",
+                                        background: user.is_active ? gradient : "var(--t-surface, var(--t-border))",
                                         display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
                                     }}>
                                         <span style={{
                                             fontSize: 13, fontWeight: 700,
-                                            color: user.is_active ? "#fff" : "var(--t-text-faint, #9ca3af)",
+                                            color: user.is_active ? "#fff" : "var(--t-text-faint, var(--t-text-faint))",
                                             textTransform: "uppercase",
                                         }}>
                                             {initials}
@@ -400,7 +400,7 @@ export function RoleUsersSection({ role }: Props) {
                                 {/* Info */}
                                 <div style={{ flex: 1, minWidth: 0 }}>
                                     <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 2 }}>
-                                        <span style={{ fontSize: 13, fontWeight: 600, color: "var(--t-text, #111827)" }}>
+                                        <span style={{ fontSize: 13, fontWeight: 600, color: "var(--t-text, var(--t-text))" }}>
                                             {user.full_name || "—"}
                                         </span>
                                         <span style={{
@@ -408,23 +408,23 @@ export function RoleUsersSection({ role }: Props) {
                                             fontSize: 9.5, fontWeight: 600,
                                             padding: "2px 6px", borderRadius: 4,
                                             background: user.is_active ? "rgba(22,163,74,0.06)" : "rgba(239,68,68,0.06)",
-                                            color: user.is_active ? "#16a34a" : "#dc2626",
+                                            color: user.is_active ? "#16a34a" : "var(--t-danger)",
                                         }}>
                                             <span style={{
                                                 width: 4, height: 4, borderRadius: "50%",
-                                                background: user.is_active ? "#16a34a" : "#dc2626",
+                                                background: user.is_active ? "#16a34a" : "var(--t-danger)",
                                             }} />
                                             {user.is_active ? "نشط" : "معطّل"}
                                         </span>
                                     </div>
                                     <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
                                         {user.email && (
-                                            <span style={{ display: "flex", alignItems: "center", gap: 3, fontSize: 11, color: "var(--t-text-faint, #9ca3af)" }}>
+                                            <span style={{ display: "flex", alignItems: "center", gap: 3, fontSize: 11, color: "var(--t-text-faint, var(--t-text-faint))" }}>
                                                 <Mail size={10} /> <span dir="ltr">{user.email}</span>
                                             </span>
                                         )}
                                         {user.phone && (
-                                            <span style={{ display: "flex", alignItems: "center", gap: 3, fontSize: 11, color: "var(--t-text-faint, #9ca3af)" }}>
+                                            <span style={{ display: "flex", alignItems: "center", gap: 3, fontSize: 11, color: "var(--t-text-faint, var(--t-text-faint))" }}>
                                                 <Phone size={10} /> <span dir="ltr">{user.phone}</span>
                                             </span>
                                         )}
@@ -441,7 +441,7 @@ export function RoleUsersSection({ role }: Props) {
                                             padding: "5px 10px", borderRadius: 7,
                                             border: "1px solid var(--t-border-light, #eaedf0)",
                                             background: "var(--t-card, #fff)",
-                                            color: "var(--t-text-faint, #9ca3af)", fontSize: 11, fontWeight: 600,
+                                            color: "var(--t-text-faint, var(--t-text-faint))", fontSize: 11, fontWeight: 600,
                                             cursor: isRemoving ? "not-allowed" : "pointer",
                                             opacity: isRemoving ? 0.4 : 1,
                                             transition: "all 0.12s", flexShrink: 0,
@@ -450,13 +450,13 @@ export function RoleUsersSection({ role }: Props) {
                                         onMouseEnter={e => {
                                             if (!isRemoving) {
                                                 e.currentTarget.style.background = "rgba(239,68,68,0.04)"
-                                                e.currentTarget.style.color = "#dc2626"
+                                                e.currentTarget.style.color = "var(--t-danger)"
                                                 e.currentTarget.style.borderColor = "rgba(239,68,68,0.2)"
                                             }
                                         }}
                                         onMouseLeave={e => {
                                             e.currentTarget.style.background = "var(--t-card, #fff)"
-                                            e.currentTarget.style.color = "var(--t-text-faint, #9ca3af)"
+                                            e.currentTarget.style.color = "var(--t-text-faint, var(--t-text-faint))"
                                             e.currentTarget.style.borderColor = "var(--t-border-light, #eaedf0)"
                                         }}
                                     >
@@ -472,7 +472,7 @@ export function RoleUsersSection({ role }: Props) {
             {/* No search results */}
             {!isLoading && searchQuery.trim() && filteredUsers.length === 0 && users.length > 0 && (
                 <div style={{ padding: "28px 0", textAlign: "center" }}>
-                    <p style={{ fontSize: 12, color: "var(--t-text-faint, #9ca3af)", margin: 0 }}>لا توجد نتائج لـ "{searchQuery}"</p>
+                    <p style={{ fontSize: 12, color: "var(--t-text-faint, var(--t-text-faint))", margin: 0 }}>لا توجد نتائج لـ "{searchQuery}"</p>
                 </div>
             )}
 

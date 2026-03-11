@@ -114,7 +114,7 @@ export const useAuthStore = create<AuthState>()(
             },
         }),
         {
-            name: "fateen-auth-storage",
+            name: "darai-auth-storage",
             partialize: (state) => ({
                 user: state.user,
                 isAuthenticated: state.isAuthenticated,

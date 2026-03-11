@@ -108,10 +108,10 @@ interface HeroCardsProps {
 
 export function HeroCards({ totalCustomers, totalMessages, totalUsers, totalChannels }: HeroCardsProps) {
     const cards: HeroCard[] = [
-        { label: "إجمالي العملاء", sublabel: "contacts", value: totalCustomers, icon: Users, gradient: "linear-gradient(135deg, #3B82F6, #1E40AF)", glow: "0 14px 40px -8px rgba(59,130,246,0.5)" },
+        { label: "إجمالي العملاء", sublabel: "contacts", value: totalCustomers, icon: Users, gradient: "linear-gradient(135deg, var(--t-info), #1E40AF)", glow: "0 14px 40px -8px rgba(59,130,246,0.5)" },
         { label: "إجمالي الرسائل", sublabel: "messages", value: totalMessages, icon: MessageSquare, gradient: "linear-gradient(135deg, #8B5CF6, #5B21B6)", glow: "0 14px 40px -8px rgba(139,92,246,0.5)" },
-        { label: "المستخدمين", sublabel: "users", value: totalUsers, icon: UserCog, gradient: "linear-gradient(135deg, #10B981, #065F46)", glow: "0 14px 40px -8px rgba(16,185,129,0.5)" },
-        { label: "القنوات", sublabel: "channels", value: totalChannels, icon: Radio, gradient: "linear-gradient(135deg, #F59E0B, #B45309)", glow: "0 14px 40px -8px rgba(245,158,11,0.5)" },
+        { label: "المستخدمين", sublabel: "users", value: totalUsers, icon: UserCog, gradient: "linear-gradient(135deg, var(--t-success), #065F46)", glow: "0 14px 40px -8px rgba(16,185,129,0.5)" },
+        { label: "القنوات", sublabel: "channels", value: totalChannels, icon: Radio, gradient: "linear-gradient(135deg, var(--t-warning), #B45309)", glow: "0 14px 40px -8px rgba(245,158,11,0.5)" },
     ]
 
     return (

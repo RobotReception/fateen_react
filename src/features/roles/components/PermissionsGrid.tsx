@@ -1,4 +1,4 @@
-﻿import { useState, useCallback, useMemo } from "react"
+import { useState, useCallback, useMemo } from "react"
 import { ChevronDown, ChevronLeft, Loader2, Check, Minus, Lock, Shield, Search } from "lucide-react"
 import { useAllPermissions, useRoleActivePermissionIds, useAddRolePermissions, useRemoveRolePermissions } from "../hooks/use-roles"
 import type { PermissionSection } from "../types"
@@ -50,7 +50,7 @@ function ToggleSwitch({ checked, disabled, onChange }: {
                 width: 38, height: 20, borderRadius: 10, border: "none",
                 cursor: disabled ? "not-allowed" : "pointer",
                 opacity: disabled ? 0.4 : 1,
-                backgroundColor: checked ? "#004786" : "var(--t-surface-deep, #e2e4e7)",
+                backgroundColor: checked ? "var(--t-accent)" : "var(--t-surface-deep, #e2e4e7)",
                 transition: "background-color 0.2s ease", padding: 0, flexShrink: 0,
             }}
         >
@@ -76,8 +76,8 @@ function SectionCheckbox({ state, disabled, onClick }: {
             style={{
                 display: "flex", alignItems: "center", justifyContent: "center",
                 width: 18, height: 18, borderRadius: 5,
-                border: `2px solid ${state === "none" ? "var(--t-surface-deep, #d1d5db)" : "#004786"}`,
-                backgroundColor: state === "none" ? "#fff" : "#004786",
+                border: `2px solid ${state === "none" ? "var(--t-surface-deep, var(--t-border-medium))" : "var(--t-accent)"}`,
+                backgroundColor: state === "none" ? "#fff" : "var(--t-accent)",
                 cursor: disabled ? "not-allowed" : "pointer",
                 opacity: disabled ? 0.4 : 1,
                 transition: "all 0.15s ease", flexShrink: 0, padding: 0,
@@ -165,8 +165,8 @@ export function PermissionsGrid({ role }: Props) {
         return (
             <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "60px 0" }}>
                 <div style={{ textAlign: "center" }}>
-                    <Loader2 size={22} className="animate-spin" style={{ color: "#004786", margin: "0 auto 10px" }} />
-                    <p style={{ fontSize: 12, color: "var(--t-text-faint, #9ca3af)", fontWeight: 500, margin: 0 }}>جارٍ تحميل الصلاحيات...</p>
+                    <Loader2 size={22} className="animate-spin" style={{ color: "var(--t-accent)", margin: "0 auto 10px" }} />
+                    <p style={{ fontSize: 12, color: "var(--t-text-faint, var(--t-text-faint))", fontWeight: 500, margin: 0 }}>جارٍ تحميل الصلاحيات...</p>
                 </div>
             </div>
         )
@@ -178,12 +178,12 @@ export function PermissionsGrid({ role }: Props) {
             <div style={{ padding: "50px 0", textAlign: "center" }}>
                 <div style={{
                     width: 44, height: 44, borderRadius: 10,
-                    background: "rgba(0,71,134,0.06)",
+                    background: "rgba(27,80,145,0.06)",
                     display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 10px"
                 }}>
-                    <Lock size={18} style={{ color: "#004786" }} />
+                    <Lock size={18} style={{ color: "var(--t-accent)" }} />
                 </div>
-                <p style={{ fontSize: 13, fontWeight: 600, color: "var(--t-text, #111827)", margin: 0 }}>لا توجد صلاحيات في النظام</p>
+                <p style={{ fontSize: 13, fontWeight: 600, color: "var(--t-text, var(--t-text))", margin: 0 }}>لا توجد صلاحيات في النظام</p>
             </div>
         )
     }
@@ -198,7 +198,7 @@ export function PermissionsGrid({ role }: Props) {
                 <div style={{ position: "relative", flex: "1 1 200px", minWidth: 180 }}>
                     <Search size={13} style={{
                         position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)",
-                        color: searchFocused ? "#004786" : "var(--t-text-faint, #9ca3af)",
+                        color: searchFocused ? "var(--t-accent)" : "var(--t-text-faint, var(--t-text-faint))",
                         pointerEvents: "none", transition: "color .15s",
                     }} />
                     <input
@@ -209,12 +209,12 @@ export function PermissionsGrid({ role }: Props) {
                         placeholder="بحث في الصلاحيات..."
                         style={{
                             width: "100%", borderRadius: 8,
-                            border: `1.5px solid ${searchFocused ? "#004786" : "var(--t-border, #e0e3e7)"}`,
-                            background: "var(--t-surface, #fafafa)",
+                            border: `1.5px solid ${searchFocused ? "var(--t-accent)" : "var(--t-border, var(--t-border))"}`,
+                            background: "var(--t-surface, var(--t-card-hover))",
                             paddingRight: 32, paddingLeft: 12, paddingTop: 8, paddingBottom: 8,
-                            fontSize: 12, color: "var(--t-text, #111827)", outline: "none",
+                            fontSize: 12, color: "var(--t-text, var(--t-text))", outline: "none",
                             transition: "border-color .15s, box-shadow .15s",
-                            boxShadow: searchFocused ? "0 0 0 3px rgba(0,71,134,0.06)" : "none",
+                            boxShadow: searchFocused ? "0 0 0 3px rgba(27,80,145,0.06)" : "none",
                         }}
                     />
                 </div>
@@ -222,30 +222,30 @@ export function PermissionsGrid({ role }: Props) {
                 {/* Summary badge */}
                 <div style={{
                     display: "flex", alignItems: "center", gap: 8,
-                    background: "rgba(0,71,134,0.04)",
+                    background: "rgba(27,80,145,0.04)",
                     borderRadius: 8, padding: "6px 12px",
                 }}>
-                    <Shield size={12} style={{ color: "#004786" }} />
-                    <span style={{ fontSize: 12, fontWeight: 700, color: "#004786", fontFeatureSettings: "'tnum'" }}>
+                    <Shield size={12} style={{ color: "var(--t-accent)" }} />
+                    <span style={{ fontSize: 12, fontWeight: 700, color: "var(--t-accent)", fontFeatureSettings: "'tnum'" }}>
                         {totalActive}
                     </span>
-                    <span style={{ fontSize: 11, color: "var(--t-text-faint, #9ca3af)" }}>/</span>
-                    <span style={{ fontSize: 12, fontWeight: 600, color: "var(--t-text-secondary, #6b7280)", fontFeatureSettings: "'tnum'" }}>
+                    <span style={{ fontSize: 11, color: "var(--t-text-faint, var(--t-text-faint))" }}>/</span>
+                    <span style={{ fontSize: 12, fontWeight: 600, color: "var(--t-text-secondary, var(--t-text-muted))", fontFeatureSettings: "'tnum'" }}>
                         {totalPerms}
                     </span>
                     {/* Mini progress */}
                     <div style={{
                         width: 40, height: 4, borderRadius: 2,
-                        background: "rgba(0,71,134,0.1)", overflow: "hidden",
+                        background: "rgba(27,80,145,0.1)", overflow: "hidden",
                     }}>
                         <div style={{
                             width: `${progressPct}%`, height: "100%",
-                            borderRadius: 2, backgroundColor: "#004786",
+                            borderRadius: 2, backgroundColor: "var(--t-accent)",
                             transition: "width 0.3s ease",
                         }} />
                     </div>
                 </div>
-                <span style={{ fontSize: 11, color: "var(--t-text-faint, #9ca3af)", fontWeight: 500 }}>{filteredSections.length} قسم</span>
+                <span style={{ fontSize: 11, color: "var(--t-text-faint, var(--t-text-faint))", fontWeight: 500 }}>{filteredSections.length} قسم</span>
             </div>
 
             {/* ── تنبيه عدم وجود صلاحية التعديل ── */}
@@ -256,7 +256,7 @@ export function PermissionsGrid({ role }: Props) {
                     background: "rgba(245,158,11,0.06)",
                     border: "1px solid rgba(245,158,11,0.15)",
                 }}>
-                    <Lock size={13} style={{ color: "#f59e0b", flexShrink: 0 }} />
+                    <Lock size={13} style={{ color: "var(--t-warning)", flexShrink: 0 }} />
                     <span style={{ fontSize: 11.5, color: "#92400e", fontWeight: 500 }}>عرض فقط — ليس لديك صلاحية تعديل الصلاحيات</span>
                 </div>
             )}
@@ -289,15 +289,15 @@ export function PermissionsGrid({ role }: Props) {
                                 style={{
                                     display: "flex", alignItems: "center", justifyContent: "center",
                                     width: 24, height: 24, borderRadius: 6,
-                                    border: "none", background: "var(--t-surface, #f3f4f6)", cursor: "pointer",
+                                    border: "none", background: "var(--t-surface, var(--t-surface))", cursor: "pointer",
                                     flexShrink: 0, transition: "background 0.12s",
                                 }}
-                                onMouseEnter={e => (e.currentTarget.style.background = "var(--t-surface-deep, #e5e7eb)")}
-                                onMouseLeave={e => (e.currentTarget.style.background = "var(--t-surface, #f3f4f6)")}
+                                onMouseEnter={e => (e.currentTarget.style.background = "var(--t-surface-deep, var(--t-border))")}
+                                onMouseLeave={e => (e.currentTarget.style.background = "var(--t-surface, var(--t-surface))")}
                             >
                                 {isOpen
-                                    ? <ChevronDown size={13} style={{ color: "var(--t-text-secondary, #6b7280)" }} />
-                                    : <ChevronLeft size={13} style={{ color: "var(--t-text-secondary, #6b7280)" }} />}
+                                    ? <ChevronDown size={13} style={{ color: "var(--t-text-secondary, var(--t-text-muted))" }} />
+                                    : <ChevronLeft size={13} style={{ color: "var(--t-text-secondary, var(--t-text-muted))" }} />}
                             </button>
 
                             <SectionCheckbox
@@ -310,10 +310,10 @@ export function PermissionsGrid({ role }: Props) {
                                 onClick={() => toggleExpand(section.section)}
                                 style={{ flex: 1, minWidth: 0, textAlign: "right", border: "none", background: "none", cursor: "pointer", padding: 0 }}
                             >
-                                <span style={{ fontSize: 13, fontWeight: 600, color: "var(--t-text, #111827)", display: "block" }}>
+                                <span style={{ fontSize: 13, fontWeight: 600, color: "var(--t-text, var(--t-text))", display: "block" }}>
                                     {label}
                                 </span>
-                                <span style={{ fontSize: 10, color: "var(--t-text-faint, #9ca3af)", fontFamily: "monospace" }} dir="ltr">
+                                <span style={{ fontSize: 10, color: "var(--t-text-faint, var(--t-text-faint))", fontFamily: "monospace" }} dir="ltr">
                                     {section.section}
                                 </span>
                             </button>
@@ -322,7 +322,7 @@ export function PermissionsGrid({ role }: Props) {
                             <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
                                 <span style={{
                                     fontSize: 11, fontWeight: 600,
-                                    color: activeCount > 0 ? "#004786" : "var(--t-text-faint, #9ca3af)",
+                                    color: activeCount > 0 ? "var(--t-accent)" : "var(--t-text-faint, var(--t-text-faint))",
                                     fontFeatureSettings: "'tnum'",
                                 }}>
                                     {activeCount}/{total}
@@ -333,7 +333,7 @@ export function PermissionsGrid({ role }: Props) {
                                 }}>
                                     <div style={{
                                         width: `${progress}%`, height: "100%",
-                                        borderRadius: 2, backgroundColor: "#004786",
+                                        borderRadius: 2, backgroundColor: "var(--t-accent)",
                                         transition: "width 0.3s ease",
                                     }} />
                                 </div>
@@ -354,16 +354,16 @@ export function PermissionsGrid({ role }: Props) {
                                                 display: "flex", alignItems: "center", gap: 10,
                                                 padding: "9px 16px",
                                                 borderBottom: "1px solid var(--t-border-light, #f0f1f3)",
-                                                background: on ? "rgba(0,71,134,0.02)" : "transparent",
+                                                background: on ? "rgba(27,80,145,0.02)" : "transparent",
                                                 transition: "background 0.12s",
                                             }}
                                             onMouseEnter={e => { if (!on) e.currentTarget.style.background = "var(--t-surface, #fafbfc)" }}
-                                            onMouseLeave={e => { e.currentTarget.style.background = on ? "rgba(0,71,134,0.02)" : "transparent" }}
+                                            onMouseLeave={e => { e.currentTarget.style.background = on ? "rgba(27,80,145,0.02)" : "transparent" }}
                                         >
                                             <div style={{ flexShrink: 0 }}>
                                                 {isMutating ? (
                                                     <div style={{ width: 38, display: "flex", justifyContent: "center" }}>
-                                                        <Loader2 size={14} className="animate-spin" style={{ color: "#004786" }} />
+                                                        <Loader2 size={14} className="animate-spin" style={{ color: "var(--t-accent)" }} />
                                                     </div>
                                                 ) : (
                                                     <ToggleSwitch checked={on} disabled={isDisabled} onChange={() => togglePerm(perm.id)} />
@@ -373,7 +373,7 @@ export function PermissionsGrid({ role }: Props) {
                                             <div style={{ flex: 1, minWidth: 0 }}>
                                                 <p style={{
                                                     fontSize: 12.5, fontWeight: on ? 600 : 400,
-                                                    color: on ? "#004786" : "var(--t-text-secondary, #6b7280)",
+                                                    color: on ? "var(--t-accent)" : "var(--t-text-secondary, var(--t-text-muted))",
                                                     margin: 0, lineHeight: 1.5,
                                                 }}>
                                                     {perm.name}
@@ -382,8 +382,8 @@ export function PermissionsGrid({ role }: Props) {
 
                                             <span dir="ltr" style={{
                                                 fontSize: 9.5, fontFamily: "monospace",
-                                                color: "var(--t-text-faint, #9ca3af)", flexShrink: 0,
-                                                background: "var(--t-surface, #f3f4f6)",
+                                                color: "var(--t-text-faint, var(--t-text-faint))", flexShrink: 0,
+                                                background: "var(--t-surface, var(--t-surface))",
                                                 padding: "2px 6px", borderRadius: 4,
                                             }}>
                                                 {perm.id}
@@ -392,11 +392,11 @@ export function PermissionsGrid({ role }: Props) {
                                             {on && (
                                                 <span style={{
                                                     display: "inline-flex", alignItems: "center", gap: 3,
-                                                    fontSize: 10, fontWeight: 600, color: "#004786", flexShrink: 0,
-                                                    background: "rgba(0,71,134,0.06)",
+                                                    fontSize: 10, fontWeight: 600, color: "var(--t-accent)", flexShrink: 0,
+                                                    background: "rgba(27,80,145,0.06)",
                                                     padding: "2px 8px", borderRadius: 12,
                                                 }}>
-                                                    <span style={{ width: 4, height: 4, borderRadius: 2, backgroundColor: "#004786" }} />
+                                                    <span style={{ width: 4, height: 4, borderRadius: 2, backgroundColor: "var(--t-accent)" }} />
                                                     مفعّلة
                                                 </span>
                                             )}
@@ -412,7 +412,7 @@ export function PermissionsGrid({ role }: Props) {
             {/* No search results */}
             {filteredSections.length === 0 && searchQuery.trim() && (
                 <div style={{ padding: "36px 0", textAlign: "center" }}>
-                    <p style={{ fontSize: 12, color: "var(--t-text-faint, #9ca3af)", margin: 0 }}>لا توجد نتائج لـ "{searchQuery}"</p>
+                    <p style={{ fontSize: 12, color: "var(--t-text-faint, var(--t-text-faint))", margin: 0 }}>لا توجد نتائج لـ "{searchQuery}"</p>
                 </div>
             )}
 

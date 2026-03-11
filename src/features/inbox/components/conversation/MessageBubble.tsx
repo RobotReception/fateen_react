@@ -81,11 +81,11 @@ export function MessageBubble({ message: m, isPending }: Props) {
                 maxWidth: "68%", padding: "9px 13px",
                 borderRadius: isOwn ? "16px 16px 4px 16px" : "16px 16px 16px 4px",
                 background: isOwn
-                    ? "linear-gradient(135deg, #004786, #0072b5)"
+                    ? "var(--t-gradient-accent)"
                     : "var(--t-card)",
                 border: isOwn ? "none" : "1px solid var(--t-border-light)",
                 boxShadow: isOwn
-                    ? "0 2px 10px rgba(0,71,134,0.28)"
+                    ? "0 2px 10px rgba(27,80,145,0.28)"
                     : "0 1px 4px rgba(0,0,0,0.05)",
                 position: "relative",
             }}>
@@ -191,8 +191,8 @@ function StatusIcon({ status }: { status: string }) {
     const map: Record<string, { text: string; color: string }> = {
         sent: { text: "✓", color: "inherit" },
         delivered: { text: "✓✓", color: "inherit" },
-        read: { text: "✓✓", color: "#3b82f6" },
-        failed: { text: "✗", color: "#ef4444" },
+        read: { text: "✓✓", color: "var(--t-info)" },
+        failed: { text: "✗", color: "var(--t-danger)" },
         received: { text: "", color: "inherit" },
     }
     const s = map[status]
@@ -206,10 +206,10 @@ function InteractiveContent({ content: c, isOwn }: { content: any; isOwn: boolea
     const [hoveredRow, setHoveredRow] = useState<number | null>(null)
     const textColor = isOwn ? "rgba(255,255,255,0.95)" : "var(--t-text)"
     const mutedColor = isOwn ? "rgba(255,255,255,0.55)" : "var(--t-text-faint)"
-    // Fateen brand accent colours
-    const brandMain = isOwn ? "#fff" : "#004786"
-    const brandLight = isOwn ? "rgba(255,255,255,0.14)" : "rgba(0,71,134,0.07)"
-    const borderColor = isOwn ? "rgba(255,255,255,0.16)" : "rgba(0,71,134,0.14)"
+    // DarAI brand accent colours
+    const brandMain = isOwn ? "#fff" : "var(--t-accent)"
+    const brandLight = isOwn ? "rgba(255,255,255,0.14)" : "rgba(27,80,145,0.07)"
+    const borderColor = isOwn ? "rgba(255,255,255,0.16)" : "rgba(27,80,145,0.14)"
 
     // ── Inbound interactive: customer selected an option ──
     if (c.type === "interactive" && c.title) {
@@ -219,14 +219,14 @@ function InteractiveContent({ content: c, isOwn }: { content: any; isOwn: boolea
                 padding: "5px 12px 5px 6px", borderRadius: 20,
                 background: isOwn
                     ? "rgba(255,255,255,0.12)"
-                    : "linear-gradient(135deg, rgba(0,71,134,0.07), rgba(0,114,181,0.07))",
-                border: `1.5px solid ${isOwn ? "rgba(255,255,255,0.18)" : "rgba(0,71,134,0.18)"}`,
+                    : "linear-gradient(135deg, rgba(27,80,145,0.07), rgba(0,114,181,0.07))",
+                border: `1.5px solid ${isOwn ? "rgba(255,255,255,0.18)" : "rgba(27,80,145,0.18)"}`,
             }}>
                 <span style={{
                     width: 18, height: 18, borderRadius: "50%", flexShrink: 0,
                     background: isOwn
                         ? "rgba(255,255,255,0.25)"
-                        : "linear-gradient(135deg, #004786, #0072b5)",
+                        : "var(--t-gradient-accent)",
                     display: "flex", alignItems: "center", justifyContent: "center",
                     fontSize: 9, color: "#fff", fontWeight: 700,
                 }}>✓</span>
@@ -295,7 +295,7 @@ function InteractiveContent({ content: c, isOwn }: { content: any; isOwn: boolea
                                 style={{
                                     padding: "6px 12px", borderRadius: 8,
                                     background: brandLight,
-                                    border: `1.5px solid ${isOwn ? "rgba(255,255,255,0.22)" : "rgba(0,71,134,0.2)"}`,
+                                    border: `1.5px solid ${isOwn ? "rgba(255,255,255,0.22)" : "var(--t-accent-muted)"}`,
                                     textAlign: "center", fontSize: 12, fontWeight: 600,
                                     color: brandMain, cursor: url ? "pointer" : "default",
                                     display: "flex", alignItems: "center", justifyContent: "center", gap: 5,
@@ -303,14 +303,14 @@ function InteractiveContent({ content: c, isOwn }: { content: any; isOwn: boolea
                                     userSelect: "none",
                                 }}
                                 onMouseEnter={(e) => {
-                                    e.currentTarget.style.background = isOwn ? "rgba(255,255,255,0.22)" : "linear-gradient(135deg, #004786, #0072b5)"
+                                    e.currentTarget.style.background = isOwn ? "rgba(255,255,255,0.22)" : "var(--t-gradient-accent)"
                                     e.currentTarget.style.color = "#fff"
                                     e.currentTarget.style.borderColor = "transparent"
                                 }}
                                 onMouseLeave={(e) => {
                                     e.currentTarget.style.background = brandLight
                                     e.currentTarget.style.color = brandMain
-                                    e.currentTarget.style.borderColor = isOwn ? "rgba(255,255,255,0.22)" : "rgba(0,71,134,0.2)"
+                                    e.currentTarget.style.borderColor = isOwn ? "rgba(255,255,255,0.22)" : "var(--t-accent-muted)"
                                 }}
                             >
                                 {url && <span style={{ fontSize: 10 }}>🔗</span>}
@@ -329,9 +329,9 @@ function InteractiveContent({ content: c, isOwn }: { content: any; isOwn: boolea
                         style={{
                             width: "100%", padding: "7px 14px", borderRadius: 20,
                             background: listOpen
-                                ? (isOwn ? "rgba(255,255,255,0.22)" : "linear-gradient(135deg, #004786, #0072b5)")
+                                ? (isOwn ? "rgba(255,255,255,0.22)" : "var(--t-gradient-accent)")
                                 : brandLight,
-                            border: `1.5px solid ${isOwn ? "rgba(255,255,255,0.25)" : "rgba(0,71,134,0.25)"}`,
+                            border: `1.5px solid ${isOwn ? "rgba(255,255,255,0.25)" : "rgba(27,80,145,0.25)"}`,
                             cursor: "pointer", fontSize: 11, fontWeight: 700,
                             color: listOpen ? "#fff" : brandMain,
                             display: "flex", alignItems: "center",
@@ -339,12 +339,12 @@ function InteractiveContent({ content: c, isOwn }: { content: any; isOwn: boolea
                             transition: "all .2s ease",
                         }}
                         onMouseEnter={(e) => {
-                            e.currentTarget.style.background = isOwn ? "rgba(255,255,255,0.22)" : "linear-gradient(135deg, #004786, #0072b5)"
+                            e.currentTarget.style.background = isOwn ? "rgba(255,255,255,0.22)" : "var(--t-gradient-accent)"
                             e.currentTarget.style.color = "#fff"
                             e.currentTarget.style.transform = "scale(1.01)"
                         }}
                         onMouseLeave={(e) => {
-                            e.currentTarget.style.background = listOpen ? (isOwn ? "rgba(255,255,255,0.22)" : "linear-gradient(135deg, #004786, #0072b5)") : brandLight
+                            e.currentTarget.style.background = listOpen ? (isOwn ? "rgba(255,255,255,0.22)" : "var(--t-gradient-accent)") : brandLight
                             e.currentTarget.style.color = listOpen ? "#fff" : brandMain
                             e.currentTarget.style.transform = "scale(1)"
                         }}
@@ -378,24 +378,24 @@ function InteractiveContent({ content: c, isOwn }: { content: any; isOwn: boolea
                                         display: "flex", alignItems: "center", gap: 10,
                                         transition: "background .15s",
                                         background: hoveredRow === ri
-                                            ? (isOwn ? "rgba(255,255,255,0.07)" : "rgba(0,71,134,0.05)")
+                                            ? (isOwn ? "rgba(255,255,255,0.07)" : "rgba(27,80,145,0.05)")
                                             : "transparent",
                                         borderRight: `3px solid ${hoveredRow === ri
-                                            ? (isOwn ? "rgba(255,255,255,0.5)" : "#0072b5")
+                                            ? (isOwn ? "rgba(255,255,255,0.5)" : "var(--t-accent-secondary)")
                                             : "transparent"}`,
                                     }}
                                 >
                                     <span style={{
                                         width: 6, height: 6, borderRadius: "50%", flexShrink: 0,
                                         background: hoveredRow === ri
-                                            ? (isOwn ? "#fff" : "#0072b5")
-                                            : (isOwn ? "rgba(255,255,255,0.25)" : "rgba(0,71,134,0.2)"),
+                                            ? (isOwn ? "#fff" : "var(--t-accent-secondary)")
+                                            : (isOwn ? "rgba(255,255,255,0.25)" : "var(--t-accent-muted)"),
                                         transition: "background .15s",
                                     }} />
                                     <div style={{ flex: 1, minWidth: 0 }}>
                                         <p style={{
                                             fontSize: 12, fontWeight: 600, margin: 0,
-                                            color: hoveredRow === ri ? (isOwn ? "#fff" : "#004786") : textColor,
+                                            color: hoveredRow === ri ? (isOwn ? "#fff" : "var(--t-accent)") : textColor,
                                             overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
                                             transition: "color .15s",
                                         }}>{row.title}</p>
@@ -439,7 +439,7 @@ function InteractiveContent({ content: c, isOwn }: { content: any; isOwn: boolea
                                 <div key={si}>
                                     {section.title && (
                                         <p style={{
-                                            fontSize: 10, fontWeight: 800, color: isOwn ? "rgba(255,255,255,0.6)" : "#0072b5",
+                                            fontSize: 10, fontWeight: 800, color: isOwn ? "rgba(255,255,255,0.6)" : "var(--t-accent-secondary)",
                                             padding: "8px 12px 3px", margin: 0,
                                             textTransform: "uppercase", letterSpacing: "0.07em",
                                         }}>{section.title}</p>
@@ -650,30 +650,30 @@ function ContentRenderer({ message: m, isOwn }: { message: Message; isOwn: boole
                 <div style={{
                     minWidth: 200, maxWidth: 300,
                     borderRadius: 12, overflow: "hidden",
-                    border: `1px solid ${isOwn ? "rgba(255,255,255,0.2)" : "rgba(0,71,134,0.15)"}`,
-                    background: isOwn ? "rgba(255,255,255,0.08)" : "rgba(0,71,134,0.04)",
+                    border: `1px solid ${isOwn ? "rgba(255,255,255,0.2)" : "rgba(27,80,145,0.15)"}`,
+                    background: isOwn ? "rgba(255,255,255,0.08)" : "rgba(27,80,145,0.04)",
                 }}>
                     {/* Header bar */}
                     <div style={{
                         padding: "8px 12px",
                         background: isOwn
                             ? "rgba(255,255,255,0.12)"
-                            : "linear-gradient(135deg, rgba(0,71,134,0.08), rgba(0,114,181,0.08))",
-                        borderBottom: `1px solid ${isOwn ? "rgba(255,255,255,0.12)" : "rgba(0,71,134,0.1)"}`,
+                            : "linear-gradient(135deg, rgba(27,80,145,0.08), var(--t-accent-muted))",
+                        borderBottom: `1px solid ${isOwn ? "rgba(255,255,255,0.12)" : "rgba(27,80,145,0.1)"}`,
                         display: "flex", alignItems: "center", gap: 8,
                     }}>
                         <span style={{
                             width: 26, height: 26, borderRadius: 6, flexShrink: 0,
                             background: isOwn
                                 ? "rgba(255,255,255,0.2)"
-                                : "linear-gradient(135deg, #004786, #0072b5)",
+                                : "var(--t-gradient-accent)",
                             display: "flex", alignItems: "center", justifyContent: "center",
                             fontSize: 12, color: "#fff", fontWeight: 700,
                         }}>T</span>
                         <div>
                             <p style={{
                                 fontSize: 11, fontWeight: 700, margin: 0,
-                                color: isOwn ? "rgba(255,255,255,0.95)" : "#004786",
+                                color: isOwn ? "rgba(255,255,255,0.95)" : "var(--t-accent)",
                                 letterSpacing: "-0.01em",
                             }}>
                                 {c.template_name || c.name || "template"}
@@ -743,7 +743,7 @@ function ActivityBubble({ message: m }: { message: Message }) {
                     padding: expanded ? "8px 16px 10px" : "5px 14px",
                     borderRadius: expanded ? 12 : 20,
                     background: color || "var(--t-surface, #f1f5f9)",
-                    border: `1px solid ${expanded ? "var(--t-border-light)" : "var(--t-border-light, #e5e7eb)"}`,
+                    border: `1px solid ${expanded ? "var(--t-border-light)" : "var(--t-border-light, var(--t-border))"}`,
                     cursor: hasDetails ? "pointer" : "default",
                     transition: "all .2s ease",
                     maxWidth: "80%",
@@ -752,7 +752,7 @@ function ActivityBubble({ message: m }: { message: Message }) {
                 {/* Main row */}
                 <div style={{
                     display: "flex", alignItems: "center", gap: 6,
-                    fontSize: 11, color: "var(--t-text-muted, #6b7280)",
+                    fontSize: 11, color: "var(--t-text-muted, var(--t-text-muted))",
                     fontWeight: 500,
                 }}>
                     <span style={{ display: "flex", flexShrink: 0, opacity: .7 }}>{icon}</span>
@@ -776,7 +776,7 @@ function ActivityBubble({ message: m }: { message: Message }) {
                 {expanded && details && (
                     <div style={{
                         width: "100%",
-                        borderTop: "1px solid var(--t-border-light, #e5e7eb)",
+                        borderTop: "1px solid var(--t-border-light, var(--t-border))",
                         paddingTop: 6,
                         display: "flex", flexDirection: "column", gap: 3,
                     }}>
@@ -926,7 +926,7 @@ function CommentBubble({ message: m }: { message: Message }) {
                 {/* Accent bar */}
                 <div style={{
                     width: 3, flexShrink: 0,
-                    background: "linear-gradient(180deg, #f59e0b, #d97706)",
+                    background: "linear-gradient(180deg, var(--t-warning), #d97706)",
                     borderRadius: "3px 0 0 3px",
                 }} />
 
@@ -935,7 +935,7 @@ function CommentBubble({ message: m }: { message: Message }) {
                     <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 5 }}>
                         <div style={{
                             width: 22, height: 22, borderRadius: "50%", flexShrink: 0,
-                            background: "linear-gradient(135deg, #f59e0b, #d97706)",
+                            background: "linear-gradient(135deg, var(--t-warning), #d97706)",
                             display: "flex", alignItems: "center", justifyContent: "center",
                             fontSize: 10, fontWeight: 800, color: "#fff",
                             boxShadow: "0 1px 3px rgba(245,158,11,0.3)",
@@ -952,7 +952,7 @@ function CommentBubble({ message: m }: { message: Message }) {
                         <span style={{ flex: 1 }} />
                         {hasMentions && (
                             <span style={{
-                                fontSize: 9, color: "#004786", fontWeight: 600,
+                                fontSize: 9, color: "var(--t-accent)", fontWeight: 600,
                                 display: "flex", alignItems: "center", gap: 3,
                                 opacity: 0.6,
                             }}>
@@ -965,7 +965,7 @@ function CommentBubble({ message: m }: { message: Message }) {
 
                     {/* Body */}
                     <p style={{
-                        fontSize: 12.5, color: "#374151", lineHeight: 1.65,
+                        fontSize: 12.5, color: "var(--t-text-secondary)", lineHeight: 1.65,
                         margin: 0, whiteSpace: "pre-wrap", wordBreak: "break-word",
                     }}>
                         {displayText || rawText}
@@ -975,17 +975,17 @@ function CommentBubble({ message: m }: { message: Message }) {
                     {expanded && hasMentions && (
                         <div style={{
                             marginTop: 8, paddingTop: 7,
-                            borderTop: "1px solid #f3f4f6",
+                            borderTop: "1px solid var(--t-surface)",
                             display: "flex", flexWrap: "wrap", gap: 4,
                             animation: "noteIn .15s ease-out",
                         }}>
-                            <span style={{ fontSize: 9, color: "#9ca3af", fontWeight: 600, width: "100%", marginBottom: 2 }}>المذكورون:</span>
+                            <span style={{ fontSize: 9, color: "var(--t-text-faint)", fontWeight: 600, width: "100%", marginBottom: 2 }}>المذكورون:</span>
                             {mentionNames.map((name, i) => (
                                 <span key={i} style={{
                                     display: "inline-flex", alignItems: "center", gap: 3,
                                     padding: "3px 8px", borderRadius: 12,
-                                    background: "rgba(0,71,134,0.06)",
-                                    color: "#004786", fontSize: 10, fontWeight: 700,
+                                    background: "rgba(27,80,145,0.06)",
+                                    color: "var(--t-accent)", fontSize: 10, fontWeight: 700,
                                 }}>
                                     <AtSign size={9} />
                                     {name.replace("@", "")}
@@ -1000,7 +1000,7 @@ function CommentBubble({ message: m }: { message: Message }) {
                             <span style={{ fontSize: 9, color: "#d97706", opacity: 0.7 }}>اضغط لعرض المذكورين</span>
                         )}
                         <span style={{ flex: 1 }} />
-                        <span style={{ fontSize: 9, color: "#9ca3af" }}>{formatTime(m.timestamp)}</span>
+                        <span style={{ fontSize: 9, color: "var(--t-text-faint)" }}>{formatTime(m.timestamp)}</span>
                     </div>
                 </div>
             </div>

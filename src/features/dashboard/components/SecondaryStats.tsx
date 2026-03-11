@@ -13,9 +13,9 @@ interface StatItem {
 }
 
 const ITEMS: StatItem[] = [
-    { label: "الفرق", key: "total_teams", icon: UsersRound, color: "#3B82F6", gradient: "linear-gradient(135deg, #3B82F6, #1D4ED8)" },
-    { label: "التاغات", key: "total_tags", icon: Tag, color: "#F59E0B", gradient: "linear-gradient(135deg, #F59E0B, #D97706)" },
-    { label: "الأقسام", key: "total_departments", icon: Building, color: "#10B981", gradient: "linear-gradient(135deg, #10B981, #059669)" },
+    { label: "الفرق", key: "total_teams", icon: UsersRound, color: "var(--t-info)", gradient: "linear-gradient(135deg, var(--t-info), #1D4ED8)" },
+    { label: "التاغات", key: "total_tags", icon: Tag, color: "var(--t-warning)", gradient: "linear-gradient(135deg, var(--t-warning), #D97706)" },
+    { label: "الأقسام", key: "total_departments", icon: Building, color: "var(--t-success)", gradient: "linear-gradient(135deg, var(--t-success), #059669)" },
     { label: "الفئات", key: "total_categories", icon: FolderOpen, color: "#8B5CF6", gradient: "linear-gradient(135deg, #8B5CF6, #6D28D9)" },
     { label: "وكلاء AI", key: "total_agents", icon: Bot, color: "#EC4899", gradient: "linear-gradient(135deg, #EC4899, #BE185D)" },
     { label: "دورة الحياة", key: "total_lifecycles", icon: RefreshCw, color: "#06B6D4", gradient: "linear-gradient(135deg, #06B6D4, #0E7490)" },
@@ -31,7 +31,7 @@ export function SecondaryStats({ data }: SecondaryStatsProps) {
         <div style={{ background: "var(--t-card)", borderRadius: 16, border: "1px solid var(--t-border)", overflow: "hidden" }}>
             {/* Header */}
             <div style={{ padding: "13px 16px", borderBottom: "1px solid var(--t-border)", display: "flex", alignItems: "center", gap: 8 }}>
-                <div style={{ width: 7, height: 7, borderRadius: "50%", background: "linear-gradient(135deg, #3B82F6, #6366F1)" }} />
+                <div style={{ width: 7, height: 7, borderRadius: "50%", background: "linear-gradient(135deg, var(--t-info), #6366F1)" }} />
                 <h3 style={{ fontSize: 13, fontWeight: 700, color: "var(--t-text)" }}>إحصائيات النظام</h3>
                 <span style={{ fontSize: 11, color: "var(--t-text-faint)" }}>— تفاصيل مكونات المنصة</span>
             </div>
