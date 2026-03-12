@@ -54,6 +54,15 @@ function GuestGuard({ children }: { children: React.ReactNode }) {
     return <>{children}</>
 }
 
+/** الصفحة الرئيسية: إذا مسجّل → Dashboard، وإلا → Login */
+function RootRedirect() {
+    const { isAuthenticated, token } = useAuthStore()
+    if (isAuthenticated && token) {
+        return <Navigate to="/dashboard" replace />
+    }
+    return <Navigate to="/login" replace />
+}
+
 export function AppRouter() {
     // ── Session Bootstrap: تحقق من السيرفر عند تحميل التطبيق ──
     const ready = useSessionBootstrap()
@@ -67,8 +76,8 @@ export function AppRouter() {
 
     return (
         <Routes>
-            {/* Redirect root to login */}
-            <Route path="/" element={<Navigate to="/login" replace />} />
+            {/* Redirect root based on auth state */}
+            <Route path="/" element={<RootRedirect />} />
 
             {/* Auth Routes — محمية بـ GuestGuard (لا يدخلها المسجّل) */}
             <Route path="/login" element={<GuestGuard><LoginPage /></GuestGuard>} />

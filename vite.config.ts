@@ -60,12 +60,12 @@ export default defineConfig({
     },
   },
   server: {
-    host: '127.0.0.1',
+    host: '0.0.0.0',
     port: 7711,
     strictPort: true,
     proxy: {
       '/api': {
-        target: 'https://fateen-backend-dashboard.prideidea.com/',
+        target: 'http://localhost:4488',
         changeOrigin: true,
         secure: false,
         ws: true,
