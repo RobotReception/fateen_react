@@ -102,10 +102,10 @@ export function PreviewTab({ selectedTemplateId, embedded }: PreviewTabProps) {
             .catch(() => {/* silent */ })
     }, [])
 
-    // Walk tree recursively and collect all asset_ids, then resolve their URLs
+    // Walk tree recursively and collect all asset_ids from assets array, then resolve their URLs
     const resolveTreeAssets = (node: MenuTreeNode, ids: Set<string>) => {
-        const assetIds = (node.item?.content?.asset_ids as string[] | undefined) || []
-        assetIds.forEach(id => ids.add(id))
+        const assets = (node.item?.content?.assets as { asset_id: string }[] | undefined) || []
+        assets.forEach(a => ids.add(a.asset_id))
         node.children?.forEach(child => resolveTreeAssets(child, ids))
     }
 
@@ -167,22 +167,18 @@ export function PreviewTab({ selectedTemplateId, embedded }: PreviewTabProps) {
         const footer = pres?.footer || ""
         const button = pres?.button || "عرض الخيارات"
 
-        // Body text: for images type use caption or reply_after_media
-        const reply = c?.reply || c?.caption || (c?.reply_after_media as string | undefined) || ""
+        // Body text: for media types use first asset caption or reply
+        const assets = (c?.assets as { asset_id: string; caption?: string | null }[] | undefined) || []
+        const reply = (c?.reply as string) || (assets.length > 0 && assets[0].caption ? assets[0].caption : "") || ""
 
-        // Image: resolve first asset_id from cache
-        const assetIds = (c?.asset_ids as string[] | undefined) || []
-        const imgUrl: string | undefined = assetIds.length > 0 ? cache[assetIds[0]] : undefined
+        // Resolve first asset from cache
+        const firstAssetId = assets.length > 0 ? assets[0].asset_id : ""
+        const resolvedUrl: string | undefined = firstAssetId ? cache[firstAssetId] : undefined
 
-        // For videos: same asset_ids -> video URL
+        // For videos: same assets -> video URL
         const isVideo = node.item.type === "videos"
         const isFile = node.item.type === "files"
-        const isImage = node.item.type === "images"
-        const resolvedUrl = imgUrl // same field, just used differently below
-
-        // Buttons
-        const btns: { type: string; title: string; value: string }[] =
-            (c?.buttons as { type: string; title: string; value: string }[]) || []
+        const isImage = node.item.type === "images" || node.item.type === "multi"
 
         const hasChildren = (node.children || []).filter(child => child.item.is_active !== false).length > 0
 
@@ -195,7 +191,7 @@ export function PreviewTab({ selectedTemplateId, embedded }: PreviewTabProps) {
             videoUrl: isVideo ? resolvedUrl : undefined,
             fileUrl: isFile ? resolvedUrl : undefined,
             fileName: isFile ? node.item.title : undefined,
-            extraButtons: btns,
+            extraButtons: [],
             text: reply || (hasChildren ? "كيف يمكنني مساعدتك؟ اختر من القائمة أدناه 👇" : ""),
             showListBtn: hasChildren,
             listBtnLabel: button,

@@ -156,6 +156,27 @@ const CSS = `
 .tt-pagination button:hover:not(:disabled) { border-color:var(--t-accent); color:var(--t-accent); }
 .tt-pagination button:disabled { opacity:.4; cursor:not-allowed; }
 
+.tt-toggle { position:relative; width:36px; height:20px; flex-shrink:0; }
+.tt-toggle input { opacity:0; width:0; height:0; position:absolute; }
+.tt-toggle-track {
+    position:absolute; inset:0; border-radius:10px; cursor:pointer;
+    background:#d1d5db; transition:background .2s;
+}
+.tt-toggle-track::after {
+    content:''; position:absolute; top:2px; left:2px;
+    width:16px; height:16px; border-radius:50%; background:#fff;
+    box-shadow:0 1px 3px rgba(0,0,0,.15); transition:transform .2s;
+}
+.tt-toggle input:checked + .tt-toggle-track { background:var(--t-brand-orange); }
+.tt-toggle input:checked + .tt-toggle-track::after { transform:translateX(16px); }
+
+.tt-menu-badge {
+    display:inline-flex; align-items:center; gap:3px;
+    font-size:9.5px; font-weight:700; padding:2px 8px; border-radius:6px;
+}
+.tt-menu-badge.visible { background:rgba(22,163,74,.08); color:#16a34a; }
+.tt-menu-badge.hidden { background:rgba(107,114,128,.08); color:#6b7280; }
+
 @keyframes ttIn { from{opacity:0;transform:scale(.97) translateY(6px)} to{opacity:1;transform:scale(1) translateY(0)} }
 @keyframes ttMenuIn { from{opacity:0;transform:translateY(-3px)} to{opacity:1;transform:translateY(0)} }
 `
@@ -231,6 +252,7 @@ function TeamFormModal({ team, onClose, tenantId }: { team?: Team; onClose: () =
 
     const [name, setName] = useState(team?.name ?? "")
     const [desc, setDesc] = useState(team?.description ?? "")
+    const [isInMenu, setIsInMenu] = useState(team?.is_in_menu !== false)
     const [showDropdown, setShowDropdown] = useState(false)
     const [memberSearch, setMemberSearch] = useState("")
 
@@ -252,11 +274,10 @@ function TeamFormModal({ team, onClose, tenantId }: { team?: Team; onClose: () =
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault()
-        const base = { name, description: desc || undefined }
         if (isEdit) {
-            updateMut.mutate({ teamId: team.team_id, payload: base }, { onSuccess: r => { if (r.success) onClose() } })
+            updateMut.mutate({ teamId: team.team_id, payload: { name, description: desc || undefined, is_in_menu: isInMenu } }, { onSuccess: r => { if (r.success) onClose() } })
         } else {
-            createMut.mutate(base, { onSuccess: r => { if (r.success) onClose() } })
+            createMut.mutate({ name, description: desc || undefined, is_in_menu: isInMenu }, { onSuccess: r => { if (r.success) onClose() } })
         }
     }
 
@@ -280,6 +301,22 @@ function TeamFormModal({ team, onClose, tenantId }: { team?: Team; onClose: () =
                     <textarea className="tt-field" rows={3} value={desc} onChange={e => setDesc(e.target.value)}
                         placeholder="أضف وصفاً للفريق مثلاً: إدارة جهات اتصال التسويق."
                         style={{ resize: "vertical", lineHeight: 1.4 }} />
+                </div>
+
+                {/* Toggle: is_in_menu */}
+                <div style={{
+                    display: "flex", alignItems: "center", justifyContent: "space-between",
+                    padding: "10px 12px", borderRadius: 10,
+                    border: "1.5px solid var(--t-border)", background: "var(--t-card-hover)",
+                }}>
+                    <div>
+                        <div style={{ fontSize: 12, fontWeight: 700, color: "var(--t-text, var(--t-text))" }}>الظهور في القوائم</div>
+                        <div style={{ fontSize: 10, color: "var(--t-text-faint)", marginTop: 2 }}>عند التفعيل، سيظهر الفريق في قوائم الاختيار</div>
+                    </div>
+                    <label className="tt-toggle">
+                        <input type="checkbox" checked={isInMenu} onChange={e => setIsInMenu(e.target.checked)} />
+                        <span className="tt-toggle-track" />
+                    </label>
                 </div>
 
                 {isEdit && (
@@ -714,6 +751,7 @@ export function TeamsTab() {
                                     <th>الوصف</th>
                                     <th>الأعضاء</th>
                                     <th><span className="tt-th-sort" onClick={() => toggleSort("created_at")}>تاريخ الإنشاء <ArrowUpDown size={10} style={{ opacity: sortField === "created_at" ? 1 : .3 }} /></span></th>
+                                    <th>القوائم</th>
                                     <th>الحالة</th>
                                     <th>إجراءات</th>
                                 </tr>
@@ -741,6 +779,11 @@ export function TeamsTab() {
                                             </button>
                                         </td>
                                         <td><span style={{ fontSize: 11, color: "var(--t-text-muted)", whiteSpace: "nowrap" }}>{fmtDate(team.created_at)}</span></td>
+                                        <td>
+                                            <span className={`tt-menu-badge ${team.is_in_menu !== false ? "visible" : "hidden"}`}>
+                                                {team.is_in_menu !== false ? "ظاهر" : "مخفي"}
+                                            </span>
+                                        </td>
                                         <td>
                                             <span className={`tt-status-badge ${team.is_active !== false ? "active" : "inactive"}`}>
                                                 {team.is_active !== false ? "نشط" : "معطّل"}

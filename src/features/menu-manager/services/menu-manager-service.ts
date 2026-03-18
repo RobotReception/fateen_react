@@ -12,6 +12,7 @@ import type {
     UpdateMenuItemPayload,
     MoveItemPayload,
     ReorderItem,
+    DuplicateItemPayload,
     Assignment,
     AssignmentsListData,
     CreateAssignmentPayload,
@@ -104,10 +105,12 @@ export async function listItems(
 
 export async function getItem(
     templateId: string,
-    itemId: string
+    itemId: string,
+    includeDeleted = false
 ): Promise<ApiResponse<MenuItem>> {
     const { data } = await apiClient.get(
-        `${BASE}/templates/${templateId}/items/${itemId}`
+        `${BASE}/templates/${templateId}/items/${itemId}`,
+        { params: { include_deleted: includeDeleted } }
     )
     return data
 }
@@ -166,6 +169,29 @@ export async function reorderItems(
         `${BASE}/templates/${templateId}/items/reorder`,
         { items },
         { params: { parent_id: parentId } }
+    )
+    return data
+}
+
+export async function duplicateItem(
+    templateId: string,
+    itemId: string,
+    payload: DuplicateItemPayload
+): Promise<ApiResponse<MenuItem>> {
+    const { data } = await apiClient.post(
+        `${BASE}/templates/${templateId}/items/${itemId}/duplicate`,
+        payload
+    )
+    return data
+}
+
+export async function deleteItemAsset(
+    templateId: string,
+    itemId: string,
+    assetId: string
+): Promise<ApiResponse<{ message: string }>> {
+    const { data } = await apiClient.delete(
+        `${BASE}/templates/${templateId}/items/${itemId}/assets/${assetId}`
     )
     return data
 }
@@ -419,7 +445,7 @@ export async function uploadMedia(
     if (options?.tags) formData.append("tags", options.tags)
 
     const { data } = await apiClient.post("/media/upload", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+        timeout: 120000, // 2 minutes for large video uploads
     })
     return data
 }

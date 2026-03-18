@@ -1,0 +1,149 @@
+<!DOCTYPE html><html lang="ar" dir="rtl"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>التعيينات — توثيق إدارة القوائم | فطين</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap');
+:root{
+  --accent:#0145b2;--accent2:#0378d4;--accent-light:#65caf4;--accent-soft:#e6f2fc;--accent-hover:#013a96;
+  --accent-muted:rgba(1,69,178,.08);--orange:#f39200;--orange-soft:rgba(243,146,0,.1);
+  --bg:#f9fafb;--card:#fff;--text:#111827;--text2:#374151;--muted:#6b7280;--faint:#9ca3af;
+  --border:#e5e7eb;--border-light:#f3f4f6;--surface:#f3f4f6;
+  --success:#10b981;--warning:#f59e0b;--danger:#ef4444;--info:#3b82f6;
+  --purple:#7c3aed;--pink:#db2777;
+  --shadow:0 1px 3px rgba(0,0,0,.04),0 1px 2px rgba(0,0,0,.03);
+  --shadow-lg:0 10px 30px rgba(0,0,0,.08);
+  --radius:16px;--radius-sm:10px
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Tajawal','Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--text);direction:rtl;line-height:1.8;-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-decoration:none;transition:all .2s}a:hover{color:var(--accent2)}
+::selection{background:var(--accent-soft);color:var(--accent)}
+
+/* Layout */
+.wrap{max-width:920px;margin:0 auto;padding:0 20px 80px}
+
+/* Hero Header */
+.hero{position:relative;overflow:hidden;border-radius:0 0 24px 24px;padding:56px 40px 44px;margin-bottom:36px;color:#fff}
+.hero::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--accent) 0%,#013a96 50%,#0378d4 100%)}
+.hero::after{content:'';position:absolute;top:-80px;left:-80px;width:300px;height:300px;border-radius:50%;background:rgba(255,255,255,.04)}
+.hero *{position:relative;z-index:1}
+.hero h1{font-size:30px;font-weight:800;margin-bottom:6px;letter-spacing:-.3px}
+.hero p{font-size:15px;opacity:.82;max-width:560px}
+.hero .ver{display:inline-block;margin-top:14px;background:rgba(255,255,255,.12);padding:5px 16px;border-radius:20px;font-size:11px;font-weight:600;backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.12)}
+.hero-sm{padding:40px 32px 32px;margin-bottom:28px}
+.hero-sm h1{font-size:24px}
+
+/* Breadcrumb */
+.bc{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);margin:20px 0 24px;flex-wrap:wrap}
+.bc a{font-weight:600;color:var(--accent)}.bc .sep{color:var(--border)}
+
+/* Cards */
+.card{background:var(--card);border:1px solid var(--border-light);border-radius:var(--radius);padding:28px 30px;margin-bottom:18px;box-shadow:var(--shadow);transition:all .25s ease}
+.card:hover{box-shadow:var(--shadow-lg);border-color:var(--border)}
+.card h2{font-size:19px;font-weight:800;margin-bottom:12px;display:flex;align-items:center;gap:10px;color:var(--text)}
+.card h3{font-size:15px;font-weight:700;margin:18px 0 8px;color:var(--accent)}
+.card p,.card li{font-size:14px;color:var(--text2);line-height:1.8}
+.card ul,.card ol{padding-right:22px;margin:6px 0}
+.card li{margin-bottom:5px}
+
+/* Tables */
+.tbl{width:100%;border-collapse:separate;border-spacing:0;margin:14px 0;font-size:13px;border:1px solid var(--border-light);border-radius:14px;overflow:hidden}
+.tbl th{background:linear-gradient(135deg,var(--accent-soft),#f0f7ff);color:var(--accent);font-weight:700;padding:11px 16px;text-align:right;font-size:12px;letter-spacing:.2px}
+.tbl td{padding:11px 16px;border-top:1px solid var(--border-light);vertical-align:top}
+.tbl tr:hover td{background:#fafcff}
+.tbl code{background:var(--accent-soft);color:var(--accent);padding:2px 7px;border-radius:6px;font-size:11px}
+
+/* Tags */
+.t{display:inline-flex;align-items:center;gap:4px;padding:3px 11px;border-radius:20px;font-size:11px;font-weight:700}
+.tb{background:var(--accent-muted);color:var(--accent)}
+.tg{background:rgba(16,185,129,.08);color:var(--success)}
+.ty{background:rgba(245,158,11,.08);color:var(--warning)}
+.tr{background:rgba(239,68,68,.06);color:var(--danger)}
+.tp{background:rgba(124,58,237,.08);color:var(--purple)}
+
+/* Alerts */
+.al{padding:14px 18px;border-radius:12px;font-size:13px;margin:14px 0;display:flex;align-items:flex-start;gap:10px;line-height:1.7}
+.al-i{background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af}
+.al-t{background:#f0fdf4;border:1px solid #bbf7d0;color:#166534}
+.al-w{background:#fffbeb;border:1px solid #fde68a;color:#92400e}
+.al-d{background:#fef2f2;border:1px solid #fecaca;color:#991b1b}
+
+/* Steps */
+.st{display:flex;align-items:flex-start;gap:14px;margin:16px 0;padding:14px 16px;border-radius:14px;background:var(--surface);border:1px solid var(--border-light);transition:all .2s}
+.st:hover{border-color:var(--accent-soft);background:#fafcff}
+.st-n{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;flex-shrink:0;box-shadow:0 3px 10px rgba(1,69,178,.25)}
+.st-c{flex:1}.st-c strong{display:block;font-size:14px;margin-bottom:2px;color:var(--text)}.st-c span{font-size:13px;color:var(--muted)}
+
+/* Flow */
+.flow{display:flex;align-items:center;gap:0;margin:22px 0;flex-wrap:wrap;justify-content:center}
+.flow-i{padding:12px 18px;border-radius:14px;font-size:12px;font-weight:800;color:#fff;text-align:center;min-width:110px;box-shadow:0 3px 12px rgba(0,0,0,.15)}
+.flow-a{font-size:20px;color:var(--faint);padding:0 6px}
+
+/* Grid */
+.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin:14px 0}
+.g3{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:14px 0}
+
+/* Nav cards (index) */
+.nc{display:block;background:var(--card);border:1px solid var(--border-light);border-radius:var(--radius);padding:22px 24px;box-shadow:var(--shadow);transition:all .25s;text-decoration:none;color:inherit;position:relative;overflow:hidden}
+.nc:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(1,69,178,.12);border-color:var(--accent-soft)}
+.nc .ic{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:14px;color:#fff;box-shadow:0 4px 14px rgba(0,0,0,.15)}
+.nc h3{font-size:15px;font-weight:800;margin-bottom:4px;color:var(--text)}
+.nc p{font-size:12px;color:var(--muted);line-height:1.6}
+.nc .nm{position:absolute;top:16px;left:16px;width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;box-shadow:0 2px 8px rgba(1,69,178,.3)}
+
+/* Footer */
+.ft{text-align:center;padding:28px;font-size:12px;color:var(--faint);border-top:1px solid var(--border-light);margin-top:48px}
+.ft img{height:20px;margin-bottom:6px;opacity:.5}
+
+/* Navigation */
+.nav{display:flex;justify-content:space-between;margin-top:28px;padding-top:20px;border-top:1px solid var(--border-light)}
+.nav a{font-weight:700;font-size:13px;display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:10px;background:var(--accent-soft);color:var(--accent);transition:all .2s}
+.nav a:hover{background:var(--accent);color:#fff;box-shadow:0 4px 14px rgba(1,69,178,.3)}
+
+/* Feature grid */
+.fg{background:rgba(16,185,129,.04);padding:15px 18px;border-radius:14px;border:1px solid rgba(16,185,129,.12)}
+.fg strong{color:var(--success);font-size:13px}
+.fg p{font-size:12px;margin-top:3px;color:var(--muted)}
+
+/* Tip grid */
+.tip{background:#f0f9ff;padding:15px 18px;border-radius:14px;border:1px solid #bae6fd}
+.tip strong{color:var(--accent);font-size:13px}
+.tip p{font-size:12px;margin-top:3px;color:var(--text2)}
+
+/* Code tree */
+.tree{background:#f8fafc;border:1px solid var(--border-light);border-radius:14px;padding:18px 22px;font-family:'Courier New',monospace;font-size:13px;line-height:2.2;direction:ltr;text-align:left;color:var(--text2)}
+
+@media(max-width:640px){.wrap{padding:0 14px 40px}.hero{padding:32px 20px 28px;border-radius:0 0 18px 18px}.hero h1{font-size:22px}.card{padding:18px 20px}.flow{flex-direction:column;align-items:stretch}.flow-a{transform:rotate(90deg);text-align:center;padding:4px 0}.nav{flex-direction:column;gap:10px}}
+</style></head><body>
+<div class="wrap"><div class="bc"><a href="index.html">الرئيسية</a><span class="sep">‹</span><strong style="color:var(--text)">التعيينات</strong></div>
+<div class="hero hero-sm" style="background:linear-gradient(135deg,#f59e0b,#b45309)"><h1>🔗 الخطوة 5: التعيينات</h1><p>ربط القوالب بالأهداف — بدون تعيين لن تظهر القائمة لأي عميل</p></div>
+
+<div class="card"><h2>💡 ما هو التعيين؟</h2><p>التعيين هو <strong>الرابط</strong> بين قالب قائمة ووجهة محددة (حساب أو مجموعة أو مستأجر). بدون إنشاء تعيين، لن تظهر القائمة لأي عميل حتى لو كان القالب منشوراً.</p>
+<div class="al al-w">⚠️ <strong>مهم:</strong> نشر القالب وحده لا يكفي! يجب إنشاء تعيين لربط القالب بالحسابات المطلوبة.</div></div>
+
+<div class="card"><h2>🏷️ أنواع التعيين</h2>
+<table class="tbl"><tr><th>النوع</th><th>الأيقونة</th><th>الوصف</th><th>الأولوية</th></tr>
+<tr><td><span class="t tb">حساب</span></td><td>👤</td><td>ربط القالب بحساب واحد</td><td><strong>100</strong> (الأعلى)</td></tr>
+<tr><td><span class="t tp">مجموعة</span></td><td>👥</td><td>ربط القالب بمجموعة حسابات</td><td><strong>50</strong> (متوسط)</td></tr>
+<tr><td><span class="t tg">مستأجر</span></td><td>🏢</td><td>ربط القالب بالمنظمة بالكامل</td><td><strong>10</strong> (الأدنى)</td></tr></table>
+<div class="al al-i">ℹ️ <strong>نظام الأولويات:</strong> عندما يكون لحساب أكثر من تعيين، يُطبق التعيين ذو الأولوية <strong>الأعلى</strong>.<br>مثال: حساب مُعيّن مباشرة (100) + ضمن مجموعة (50) → يُستخدم تعيين الحساب.</div></div>
+
+<div class="card"><h2>📝 كيفية إنشاء تعيين</h2>
+<div class="st"><div class="st-n">1</div><div class="st-c"><strong>اضغط "إنشاء تعيين"</strong><span>الزر المتدرج في شريط الأدوات</span></div></div>
+<div class="st"><div class="st-n">2</div><div class="st-c"><strong>اختر النوع</strong><span>حساب أو مجموعة أو مستأجر</span></div></div>
+<div class="st"><div class="st-n">3</div><div class="st-c"><strong>اختر الهدف والقالب</strong><span>حدد الحساب/المجموعة والقالب المطلوب</span></div></div>
+<div class="st"><div class="st-n">4</div><div class="st-c"><strong>اضبط الإعدادات</strong><span>الأولوية، الفترة الزمنية، التخصيصات</span></div></div>
+<h3>📋 حقول التعيين</h3>
+<table class="tbl"><tr><th>الحقل</th><th>الوصف</th><th>مطلوب</th></tr>
+<tr><td><strong>نوع التعيين</strong></td><td>حساب / مجموعة / مستأجر</td><td>✅</td></tr>
+<tr><td><strong>الهدف</strong></td><td>اختيار من قائمة الحسابات أو المجموعات</td><td>✅</td></tr>
+<tr><td><strong>القالب</strong></td><td>القالب المراد تعيينه</td><td>✅</td></tr>
+<tr><td><strong>مفتاح القائمة</strong></td><td>عادة <code>root</code> للقائمة الرئيسية</td><td>✅</td></tr>
+<tr><td><strong>الأولوية</strong></td><td>الرقم الأعلى = أولوية أعلى</td><td>✅</td></tr>
+<tr><td><strong>فعال من / حتى</strong></td><td>فترة صلاحية التعيين الزمنية</td><td>اختياري</td></tr>
+<tr><td><strong>تخصيصات العرض</strong></td><td>عنوان/تذييل/زر مخصص لهذا التعيين فقط</td><td>اختياري</td></tr>
+<tr><td><strong>نشط</strong></td><td>تفعيل أو تعطيل التعيين</td><td>✅</td></tr></table>
+<div class="al al-t">💡 <strong>التخصيصات</strong> تتيح تغيير العنوان والتذييل لتعيين محدد بدون تعديل القالب — مثالي لترحيب مختلف لكل حساب.</div></div>
+<div class="nav"><a href="04-groups.html">→ المجموعات</a><a href="01-templates.html">رجوع: القوالب ←</a></div>
+<div class="ft">منصة فطين — نظام إدارة القوائم Professional Menu System<br>© 2026 جميع الحقوق محفوظة</div>
+</div></body></html>

@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react"
 import {
     Building2, Users, MessageSquare, CreditCard,
     Settings, ChevronLeft, Shield, Brain,
-    UsersRound, Tag, FileText, RefreshCw, FileSliders,
+    UsersRound, Tag, FileText, RefreshCw, FileSliders, FileSearch,
 } from "lucide-react"
 import { Link, useSearchParams } from "react-router-dom"
 import { OrganizationTab } from "../components/OrganizationTab"
@@ -17,12 +17,13 @@ import { TagsTab } from "../components/TagsTab"
 import { SnippetsTab } from "../components/SnippetsTab"
 import { LifecyclesTab } from "../components/LifecyclesTab"
 import { ContactFieldsTab } from "../components/ContactFieldsTab"
+import { AuditLogsTab } from "../components/AuditLogsTab"
 import { usePermissions } from "@/lib/usePermissions"
 import { PAGE_BITS } from "@/lib/permissions"
 import { usePermissionsRefresh } from "@/lib/usePermissionsSync"
 
 /* ── sidebar sections ── */
-type SidebarKey = "general" | "users" | "roles" | "channels" | "teams" | "tags" | "snippets" | "lifecycles" | "contact-fields" | "ai" | "billing"
+type SidebarKey = "general" | "users" | "roles" | "channels" | "teams" | "tags" | "snippets" | "lifecycles" | "contact-fields" | "ai" | "billing" | "audit-logs"
 
 /* ── map each tab to its PAGE_BIT (undefined = always visible) ── */
 const TAB_PAGE_BITS: Partial<Record<SidebarKey, number>> = {
@@ -76,6 +77,7 @@ const SIDEBAR_SECTIONS: SidebarSection[] = [
     {
         title: "النظام والفوترة",
         items: [
+            { key: "audit-logs", label: "سجلات التدقيق", icon: FileSearch, desc: "عرض جميع العمليات والطلبات على النظام" },
             { key: "billing", label: "الاشتراك والدفع", icon: CreditCard, desc: "إدارة الخطة والفواتير" },
         ],
     },
@@ -93,6 +95,7 @@ export function OrganizationSettingsPage() {
     /* ── فحص الصلاحية لتاب واحد ── */
     const canRenderTab = (key: SidebarKey): boolean => {
         if (!hasPermissionData) return true   // owner → كل شيء مسموح
+        if (key === "audit-logs") return false // سجلات التدقيق للسوبر أدمن فقط
         const bit = TAB_PAGE_BITS[key]
         return bit === undefined || canAccessPage(bit)
     }
@@ -332,6 +335,7 @@ export function OrganizationSettingsPage() {
                         {active === "lifecycles" && canRenderTab("lifecycles") && <LifecyclesTab />}
                         {active === "contact-fields" && canRenderTab("contact-fields") && <ContactFieldsTab />}
                         {active === "ai" && canRenderTab("ai") && <AISettingsTab />}
+                        {active === "audit-logs" && !hasPermissionData && <AuditLogsTab />}
                         {active === "billing" && <BillingTab />}
                     </div>
                 )}

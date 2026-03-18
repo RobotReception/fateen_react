@@ -51,6 +51,7 @@ export interface Team {
     name_en?: string
     description?: string
     members?: string[]
+    is_in_menu?: boolean          // whether team appears in menus
     is_active?: boolean          // soft-delete flag
     deactivated_at?: string      // timestamp when deactivated
     created_at?: string
@@ -104,6 +105,7 @@ export interface CreateTeamPayload {
     name_en?: string
     description?: string
     members?: string[]
+    is_in_menu?: boolean
     // NOTE: do NOT send team_id — generated server-side as "team_<8hex>"
 }
 
@@ -112,6 +114,7 @@ export interface UpdateTeamPayload {
     name_ar?: string
     name_en?: string
     description?: string
+    is_in_menu?: boolean
 }
 
 export interface UpdateTeamMembersPayload {
@@ -172,6 +175,7 @@ export interface CustomersByTeamData {
 export interface CacheViewTeam {
     team_id: string
     name: string
+    is_in_menu: boolean
 }
 
 export interface CacheViewData {

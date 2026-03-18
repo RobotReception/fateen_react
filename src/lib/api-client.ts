@@ -33,6 +33,12 @@ function isPublicEndpoint(url: string | undefined): boolean {
 // ── Request interceptor — inject JWT token + X-Tenant-ID (skip for public endpoints) ──
 apiClient.interceptors.request.use(
     (config) => {
+        // When sending FormData, delete the default Content-Type
+        // so the browser auto-sets "multipart/form-data; boundary=..."
+        if (config.data instanceof FormData) {
+            delete config.headers["Content-Type"]
+        }
+
         if (!isPublicEndpoint(config.url)) {
             // Read token from Zustand memory state (not localStorage)
             const token = useAuthStore.getState().token

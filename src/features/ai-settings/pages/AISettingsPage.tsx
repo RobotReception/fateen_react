@@ -1,13 +1,13 @@
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom"
 import { createPortal } from "react-dom"
 import {
     Bot, Plus, Search, Sparkles, Loader2, X,
     Building2, Tag, Check, Brain, MessageSquareText,
-    Volume2, Settings2,
+    Volume2, Settings2, MoreVertical, Edit3, Trash2, Save,
 } from "lucide-react"
 import { useQuery } from "@tanstack/react-query"
-import { useAgents, useCreateAgent } from "../hooks/use-ai-settings"
+import { useAgents, useCreateAgent, useUpdateAgent, useDeleteAgent } from "../hooks/use-ai-settings"
 import { useAuthStore } from "@/stores/auth-store"
 import { getDepartmentsLookup } from "../../knowledge/services/knowledge-service"
 import apiClient from "@/lib/api-client"
@@ -41,9 +41,21 @@ function Chip({ label, selected, onClick }: { label: string; selected: boolean; 
 }
 
 /* ════ AGENT CARD ════ */
-function AgentCard({ agent, onClick }: { agent: Agent; onClick: () => void }) {
+function AgentCard({ agent, onClick, onEdit, onDelete }: { agent: Agent; onClick: () => void; onEdit?: () => void; onDelete?: () => void }) {
     const [a, b] = BRAND
     const isActive = agent.status === "active"
+    const [menuOpen, setMenuOpen] = useState(false)
+    const btnRef = useRef<HTMLButtonElement>(null)
+    const [menuPos, setMenuPos] = useState({ top: 0, left: 0 })
+
+    const openMenu = (e: React.MouseEvent) => {
+        e.stopPropagation()
+        if (btnRef.current) {
+            const rect = btnRef.current.getBoundingClientRect()
+            setMenuPos({ top: rect.bottom + 4, left: rect.left })
+        }
+        setMenuOpen(v => !v)
+    }
 
     return (
         <div className="ag-card" onClick={onClick} style={{ animation: "agFade .3s ease-out both" }}>
@@ -51,7 +63,7 @@ function AgentCard({ agent, onClick }: { agent: Agent; onClick: () => void }) {
             <div style={{ height: 3, background: `linear-gradient(90deg, ${a}, ${b})` }} />
 
             <div style={{ padding: "12px 14px 10px", flex: 1 }}>
-                {/* Row: Avatar + Info + Status */}
+                {/* Row: Avatar + Info + Status + Menu */}
                 <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
                     <div className="ag-avatar" style={{
                         width: 36, height: 36, borderRadius: 10, flexShrink: 0,
@@ -81,6 +93,75 @@ function AgentCard({ agent, onClick }: { agent: Agent; onClick: () => void }) {
                             </p>
                         )}
                     </div>
+
+                    {/* ⋮ Three-dot menu */}
+                    {(onEdit || onDelete) && (
+                        <div style={{ flexShrink: 0 }}>
+                            <button
+                                ref={btnRef}
+                                onClick={openMenu}
+                                style={{
+                                    width: 28, height: 28, borderRadius: 7, border: "none",
+                                    background: menuOpen ? "var(--t-surface)" : "transparent",
+                                    cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+                                    color: "var(--t-text-faint)", transition: "all .12s",
+                                }}
+                                onMouseEnter={e => { e.currentTarget.style.background = "var(--t-surface)"; e.currentTarget.style.color = "var(--t-text-muted)" }}
+                                onMouseLeave={e => { if (!menuOpen) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--t-text-faint)" } }}
+                            >
+                                <MoreVertical size={14} />
+                            </button>
+                            {menuOpen && createPortal(
+                                <div style={{ position: "fixed", inset: 0, zIndex: 9990 }} onClick={e => { e.stopPropagation(); setMenuOpen(false) }}>
+                                    <div
+                                        onClick={e => e.stopPropagation()}
+                                        style={{
+                                            position: "fixed", top: menuPos.top, left: menuPos.left, zIndex: 9991,
+                                            background: "#fff", borderRadius: 10, border: "1px solid var(--t-border)",
+                                            boxShadow: "0 8px 24px rgba(0,0,0,.12)", minWidth: 150, overflow: "hidden",
+                                            animation: "agFade .15s ease-out",
+                                        }}
+                                    >
+                                        {onEdit && (
+                                            <ActionGuard pageBit={PAGE_BITS.AGENTS} actionBit={ACTION_BITS.UPDATE_AGENT}>
+                                                <button
+                                                    onClick={e => { e.stopPropagation(); setMenuOpen(false); onEdit() }}
+                                                    style={{
+                                                        width: "100%", padding: "10px 16px", border: "none", background: "transparent",
+                                                        cursor: "pointer", display: "flex", alignItems: "center", gap: 8,
+                                                        fontSize: 13, fontWeight: 600, color: "var(--t-text)", fontFamily: "inherit",
+                                                        transition: "background .1s",
+                                                    }}
+                                                    onMouseEnter={e => { e.currentTarget.style.background = "var(--t-surface)" }}
+                                                    onMouseLeave={e => { e.currentTarget.style.background = "transparent" }}
+                                                >
+                                                    <Edit3 size={14} style={{ color: "var(--t-accent)" }} /> تعديل
+                                                </button>
+                                            </ActionGuard>
+                                        )}
+                                        {onDelete && (
+                                            <ActionGuard pageBit={PAGE_BITS.AGENTS} actionBit={ACTION_BITS.DELETE_AGENT}>
+                                                <button
+                                                    onClick={e => { e.stopPropagation(); setMenuOpen(false); onDelete() }}
+                                                    style={{
+                                                        width: "100%", padding: "10px 16px", border: "none", background: "transparent",
+                                                        cursor: "pointer", display: "flex", alignItems: "center", gap: 8,
+                                                        fontSize: 13, fontWeight: 600, color: "#dc2626", fontFamily: "inherit",
+                                                        transition: "background .1s",
+                                                    }}
+                                                    onMouseEnter={e => { e.currentTarget.style.background = "#fef2f2" }}
+                                                    onMouseLeave={e => { e.currentTarget.style.background = "transparent" }}
+                                                >
+                                                    <Trash2 size={14} /> حذف
+                                                </button>
+                                            </ActionGuard>
+                                        )}
+                                    </div>
+                                </div>,
+                                document.body
+                            )}
+                        </div>
+                    )}
                 </div>
 
                 {/* Departments */}
@@ -110,6 +191,80 @@ function AgentCard({ agent, onClick }: { agent: Agent; onClick: () => void }) {
                 </div>
             </div>
         </div>
+    )
+}
+
+/* ════ EDIT MODAL ════ */
+function EditAgentModal({ agent, open, onClose, departments, categories, onSave, isSaving }: {
+    agent: Agent | null; open: boolean; onClose: () => void
+    departments: { department_id: string; name: string; name_ar: string }[]
+    categories: { category_id: string; name: string; name_ar?: string }[]
+    onSave: (v: any) => void; isSaving: boolean
+}) {
+    const [name, setName] = useState(""); const [desc, setDesc] = useState(""); const [status, setStatus] = useState<"active" | "inactive">("active"); const [depts, setDepts] = useState<string[]>([]); const [cats, setCats] = useState<string[]>([])
+
+    useEffect(() => { if (open && agent) { setName(agent.name); setDesc(agent.description || ""); setStatus(agent.status); setDepts(agent.departments || []); setCats(agent.categories || []) } }, [open, agent])
+
+    const toggle = (arr: string[], id: string, set: (v: string[]) => void) => set(arr.includes(id) ? arr.filter(x => x !== id) : [...arr, id])
+
+    if (!open || !agent) return null
+    return createPortal(
+        <div style={{ position: "fixed", inset: 0, zIndex: 9998, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,.35)", backdropFilter: "blur(4px)" }} onClick={onClose}>
+            <div dir="rtl" onClick={e => e.stopPropagation()} style={{ width: 440, maxHeight: "85vh", background: "#fff", borderRadius: 18, boxShadow: "0 24px 60px rgba(0,0,0,.18)", overflow: "hidden", animation: "agFade .2s ease-out" }}>
+                <div style={{ height: 4, background: "linear-gradient(90deg, var(--t-accent), var(--t-accent-secondary), var(--t-accent-light))" }} />
+                <div style={{ padding: "20px 24px 16px", borderBottom: "1px solid var(--t-border)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <div style={{ width: 32, height: 32, borderRadius: 10, background: "var(--t-brand-orange)", display: "flex", alignItems: "center", justifyContent: "center" }}><Edit3 size={14} style={{ color: "#fff" }} /></div>
+                        <div><div style={{ fontSize: 15, fontWeight: 800, color: "var(--t-text)" }}>تعديل الوكيل</div><div style={{ fontSize: 11, color: "var(--t-text-faint)" }}>{agent.name}</div></div>
+                    </div>
+                    <button onClick={onClose} style={{ width: 28, height: 28, borderRadius: 8, border: "none", background: "var(--t-surface)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--t-text-muted)" }}><X size={14} /></button>
+                </div>
+                <div style={{ padding: "18px 24px 20px", overflowY: "auto", maxHeight: "55vh" }}>
+                    <div style={{ marginBottom: 14 }}><label style={{ fontSize: 11, fontWeight: 700, color: "var(--t-text-muted)", display: "block", marginBottom: 5 }}>اسم الوكيل *</label><input autoFocus className="ag-input" value={name} onChange={e => setName(e.target.value)} /></div>
+                    <div style={{ marginBottom: 14 }}><label style={{ fontSize: 11, fontWeight: 700, color: "var(--t-text-muted)", display: "block", marginBottom: 5 }}>الوصف</label><input className="ag-input" value={desc} onChange={e => setDesc(e.target.value)} placeholder="وصف مختصر" /></div>
+                    <div style={{ marginBottom: 14 }}><label style={{ fontSize: 11, fontWeight: 700, color: "var(--t-text-muted)", display: "block", marginBottom: 5 }}>الحالة</label><div style={{ display: "flex", gap: 5 }}><Chip label="نشط" selected={status === "active"} onClick={() => setStatus("active")} /><Chip label="غير نشط" selected={status === "inactive"} onClick={() => setStatus("inactive")} /></div></div>
+                    {departments.length > 0 && <div style={{ marginBottom: 14 }}><label style={{ fontSize: 11, fontWeight: 700, color: "var(--t-text-muted)", display: "flex", alignItems: "center", gap: 4, marginBottom: 5 }}><Building2 size={11} /> الأقسام</label><div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>{departments.map(d => <Chip key={d.department_id} label={d.name_ar || d.name} selected={depts.includes(d.department_id)} onClick={() => toggle(depts, d.department_id, setDepts)} />)}</div></div>}
+                    {categories.length > 0 && <div style={{ marginBottom: 14 }}><label style={{ fontSize: 11, fontWeight: 700, color: "var(--t-text-muted)", display: "flex", alignItems: "center", gap: 4, marginBottom: 5 }}><Tag size={11} /> الفئات</label><div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>{categories.map(c => <Chip key={c.category_id} label={c.name_ar || c.name} selected={cats.includes(c.category_id)} onClick={() => toggle(cats, c.category_id, setCats)} />)}</div></div>}
+                </div>
+                <div style={{ padding: "14px 24px 18px", borderTop: "1px solid var(--t-border)", display: "flex", gap: 8 }}>
+                    <button disabled={!name.trim() || isSaving} onClick={() => onSave({ name, description: desc, status, departments: depts, categories: cats })} style={{ flex: 1, padding: "10px 0", borderRadius: 10, border: "none", background: "var(--t-brand-orange)", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, opacity: isSaving ? .7 : 1, fontFamily: "inherit" }}>
+                        {isSaving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} حفظ التعديلات
+                    </button>
+                    <button onClick={onClose} style={{ padding: "10px 18px", borderRadius: 10, border: "1.5px solid var(--t-border)", background: "#fff", color: "var(--t-text-muted)", fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}>إلغاء</button>
+                </div>
+            </div>
+        </div>,
+        document.body
+    )
+}
+
+/* ════ DELETE CONFIRM ════ */
+function DeleteConfirm({ agent, open, onClose, onConfirm, isDeleting }: {
+    agent: Agent | null; open: boolean; onClose: () => void; onConfirm: () => void; isDeleting: boolean
+}) {
+    if (!open || !agent) return null
+    return createPortal(
+        <div style={{ position: "fixed", inset: 0, zIndex: 9998, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,.35)", backdropFilter: "blur(4px)" }} onClick={onClose}>
+            <div dir="rtl" onClick={e => e.stopPropagation()} style={{ width: 380, background: "#fff", borderRadius: 18, boxShadow: "0 24px 60px rgba(0,0,0,.18)", overflow: "hidden", animation: "agFade .2s ease-out" }}>
+                <div style={{ height: 4, background: "linear-gradient(90deg, #dc2626, #ef4444)" }} />
+                <div style={{ padding: "24px 24px 16px", textAlign: "center" }}>
+                    <div style={{ width: 48, height: 48, borderRadius: 14, background: "#fef2f2", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 14px" }}>
+                        <Trash2 size={22} style={{ color: "#dc2626" }} />
+                    </div>
+                    <div style={{ fontSize: 16, fontWeight: 800, color: "var(--t-text)", marginBottom: 6 }}>حذف الوكيل</div>
+                    <div style={{ fontSize: 13, color: "var(--t-text-muted)", lineHeight: 1.6 }}>
+                        هل أنت متأكد من حذف الوكيل <strong>"{agent.name}"</strong>؟<br />هذا الإجراء لا يمكن التراجع عنه.
+                    </div>
+                </div>
+                <div style={{ padding: "14px 24px 18px", display: "flex", gap: 8 }}>
+                    <button disabled={isDeleting} onClick={onConfirm} style={{ flex: 1, padding: "10px 0", borderRadius: 10, border: "none", background: "#dc2626", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, opacity: isDeleting ? .7 : 1, fontFamily: "inherit" }}>
+                        {isDeleting ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />} نعم، احذف
+                    </button>
+                    <button onClick={onClose} style={{ padding: "10px 18px", borderRadius: 10, border: "1.5px solid var(--t-border)", background: "#fff", color: "var(--t-text-muted)", fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}>إلغاء</button>
+                </div>
+            </div>
+        </div>,
+        document.body
     )
 }
 
@@ -165,8 +320,12 @@ export function AISettingsPage() {
     const tid = useAuthStore(s => s.user?.tenant_id || "")
     const { data: agents = [], isLoading } = useAgents()
     const createMut = useCreateAgent()
+    const updateMut = useUpdateAgent()
+    const deleteMut = useDeleteAgent()
     const [showCreate, setShowCreate] = useState(false)
     const [search, setSearch] = useState("")
+    const [editAgent, setEditAgent] = useState<Agent | null>(null)
+    const [deleteAgent, setDeleteAgent] = useState<Agent | null>(null)
 
     const { data: departments = [] } = useQuery({
         queryKey: ["departments-lookup", tid],
@@ -195,6 +354,18 @@ export function AISettingsPage() {
                 if (res.data?.id) navigate(`/dashboard/settings/ai/${res.data.id}`)
             },
         })
+    }
+
+    const handleEditSave = (v: any) => {
+        if (!editAgent) return
+        updateMut.mutate({ id: editAgent.id, payload: { name: v.name, description: v.description || undefined, status: v.status, departments: v.departments, categories: v.categories } }, {
+            onSuccess: () => setEditAgent(null),
+        })
+    }
+
+    const handleDeleteConfirm = () => {
+        if (!deleteAgent) return
+        deleteMut.mutate(deleteAgent.id, { onSuccess: () => setDeleteAgent(null) })
     }
 
     return (
@@ -296,7 +467,7 @@ export function AISettingsPage() {
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 14 }}>
                         {filtered.map((agent, idx) => (
                             <div key={agent.id} style={{ animationDelay: `${idx * 0.04}s` }}>
-                                <AgentCard agent={agent} onClick={() => navigate(`/dashboard/settings/ai/${agent.id}`)} />
+                                <AgentCard agent={agent} onClick={() => navigate(`/dashboard/settings/ai/${agent.id}`)} onEdit={() => setEditAgent(agent)} onDelete={() => setDeleteAgent(agent)} />
                             </div>
                         ))}
 
@@ -323,6 +494,15 @@ export function AISettingsPage() {
             <CreateModal open={showCreate} onClose={() => setShowCreate(false)}
                 departments={departments} categories={categories}
                 onSave={handleCreateSave} isSaving={createMut.isPending} />
+
+            {/* ── Edit Modal ── */}
+            <EditAgentModal agent={editAgent} open={!!editAgent} onClose={() => setEditAgent(null)}
+                departments={departments} categories={categories}
+                onSave={handleEditSave} isSaving={updateMut.isPending} />
+
+            {/* ── Delete Confirm ── */}
+            <DeleteConfirm agent={deleteAgent} open={!!deleteAgent} onClose={() => setDeleteAgent(null)}
+                onConfirm={handleDeleteConfirm} isDeleting={deleteMut.isPending} />
         </div>
     )
 }

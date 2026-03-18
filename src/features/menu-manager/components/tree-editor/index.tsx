@@ -1,68 +1,230 @@
-import React, { useState, useCallback, useEffect } from "react"
+import React, { useState, useCallback, useEffect, useMemo } from "react"
 import { PreviewTab } from "../PreviewTab"
 import {
     ChevronDown, Plus, Trash2, Edit3,
-    Folder, FileText, Zap, Image, File, Video, MousePointerClick, List, Reply,
+    Folder, FileText, Zap, Image, File, Video, List,
     Loader2, AlertCircle, FolderTree, X, ChevronsDown, ChevronsUp,
-    Save, Link2, Paperclip, Phone,
+    Save, Paperclip, Phone, Globe,
 } from "lucide-react"
 import * as menuService from "../../services/menu-manager-service"
-import type { Template, MenuTreeNode, MenuItem, MenuItemType, CreateMenuItemPayload, UpdateMenuItemPayload, MenuItemContent } from "../../types"
+import { getTeamsCacheView } from "@/features/settings/services/teams-tags-service"
+import type { Template, MenuTreeNode, MenuItem, MenuItemType, CreateMenuItemPayload, UpdateMenuItemPayload, MenuItemContent, ApiCallInputField } from "../../types"
 import { MENU_ITEM_TYPES } from "../../types"
 import { usePermissions } from "@/lib/usePermissions"
 import { PAGE_BITS, ACTION_BITS } from "@/lib/permissions"
+import { validateContentForm, getCharCountInfo, hasErrors, LIMITS, validateTitle } from "./validation"
+import type { ValidationErrors } from "./validation"
+import ApiCallFields from "./ApiCallFields"
 
 const TYPE_ICONS: Record<MenuItemType, typeof Folder> = {
     submenu: Folder, text: FileText, action: Zap, images: Image,
-    files: File, videos: Video, buttons: MousePointerClick, list: List, quick_reply: Reply,
+    files: File, videos: Video, list: List, multi: Paperclip,
+    api_call: Globe,
 }
 
-// �"?�"? Reusable Styles �"?�"?
+// 💡 Reusable Styles 💡
 const labelSt: React.CSSProperties = { display: "block", fontSize: 12, fontWeight: 600, color: "var(--t-text-secondary, var(--t-text-muted))", marginBottom: 5 }
 const inputSt: React.CSSProperties = { width: "100%", padding: "9px 12px", borderRadius: 9, border: "1px solid var(--t-border-light, var(--t-border))", background: "var(--t-surface, var(--t-page))", fontSize: 13, outline: "none", color: "var(--t-text, #1f2937)" }
 const iconBtn: React.CSSProperties = { background: "transparent", border: "none", borderRadius: 5, padding: 4, cursor: "pointer", color: "var(--t-text-muted, var(--t-text-faint))", transition: "all 0.15s", display: "flex", alignItems: "center" }
 const sectionBox: React.CSSProperties = { display: "flex", flexDirection: "column", gap: 10, padding: 12, borderRadius: 10, background: "var(--t-surface, var(--t-page))", border: "1px solid var(--t-border-light, var(--t-border))" }
+const errorBorder: React.CSSProperties = { borderColor: "#ef4444" }
 
-// �"?�"? Content Form for a specific type (shared between Add & Edit) �"?�"?
+// ── Validation UI Helpers ──
+function CharCounter({ value, max }: { value: string; max: number }) {
+    const info = getCharCountInfo(value, max)
+    return (
+        <span style={{
+            fontSize: 10, fontWeight: 600, fontFamily: "'Fira Code', monospace",
+            color: info.color, marginRight: 4, direction: "ltr", display: "inline-block",
+            transition: "color 0.2s",
+        }}>
+            {info.count}/{info.max}
+        </span>
+    )
+}
+
+function FieldError({ error }: { error?: string }) {
+    if (!error) return null
+    return (
+        <div style={{
+            display: "flex", alignItems: "center", gap: 4, marginTop: 4,
+            fontSize: 11, color: "#ef4444", fontWeight: 500,
+            animation: "fieldErrorIn 0.2s ease",
+        }}>
+            <AlertCircle size={12} style={{ flexShrink: 0 }} />
+            <span>{error}</span>
+        </div>
+    )
+}
+
+// 🔔 Toast Notification
+interface ToastData { type: "error" | "success" | "info"; title: string; message: string }
+
+function Toast({ toast, onClose }: { toast: ToastData | null; onClose: () => void }) {
+    if (!toast) return null
+    const colors = {
+        error: { bg: "linear-gradient(135deg, #fef2f2, #fee2e2)", border: "#fca5a5", icon: "#dc2626", title: "#991b1b" },
+        success: { bg: "linear-gradient(135deg, #f0fdf4, #dcfce7)", border: "#86efac", icon: "#16a34a", title: "#166534" },
+        info: { bg: "linear-gradient(135deg, #eff6ff, #dbeafe)", border: "#93c5fd", icon: "#2563eb", title: "#1e40af" },
+    }
+    const c = colors[toast.type]
+    return (
+        <div style={{
+            position: "fixed", top: 20, left: "50%", transform: "translateX(-50%)", zIndex: 9999,
+            minWidth: 340, maxWidth: 520, padding: "14px 18px", borderRadius: 14,
+            background: c.bg, border: `1px solid ${c.border}`,
+            boxShadow: "0 10px 40px rgba(0,0,0,0.12), 0 4px 12px rgba(0,0,0,0.06)",
+            animation: "toastSlideIn 0.35s cubic-bezier(0.16,1,0.3,1)",
+            display: "flex", alignItems: "flex-start", gap: 12,
+            backdropFilter: "blur(12px)",
+        }}>
+            <div style={{ width: 32, height: 32, borderRadius: 10, background: `${c.icon}18`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 1 }}>
+                {toast.type === "error" ? <AlertCircle size={16} style={{ color: c.icon }} /> : toast.type === "success" ? <span style={{ fontSize: 16 }}>✓</span> : <span style={{ fontSize: 16 }}>ℹ</span>}
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: c.title, marginBottom: 3 }}>{toast.title}</div>
+                <div style={{ fontSize: 12, color: "#374151", lineHeight: 1.55, wordBreak: "break-word", whiteSpace: "pre-wrap" }}>{toast.message}</div>
+            </div>
+            <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", padding: 2, color: "#9ca3af", flexShrink: 0, marginTop: 2 }}><X size={14} /></button>
+        </div>
+    )
+}
+
+/** Extract a clean error message from an Axios/backend error response */
+function extractApiError(err: any): string {
+    const data = err?.response?.data
+    // Pydantic validation errors (FastAPI returns detail as array)
+    if (Array.isArray(data?.detail)) {
+        return data.detail.map((d: any) => {
+            const field = (d.loc || []).filter((l: string) => l !== "body").join(" → ")
+            return field ? `${field}: ${d.msg}` : d.msg
+        }).join("\n")
+    }
+    // Single message formats
+    return data?.detail || data?.message || data?.error || err?.message || "خطأ غير معروف"
+}
+
+// 💡 Content Form for a specific type (shared between Add & Edit) 💡
 interface UploadingFile { file: File; progress: number; mediaId?: string; error?: string }
 interface ContentFormState {
     reply: string; format: string
     presHeader: string; presFooter: string; presButton: string
     actionType: string; actionParams: string
-    assetIds: string[]; replyAfterMedia: string
-    caption: string
-    buttonItems: { type: string; title: string; value: string }[]
-    listSections: string
-    quickReplies: string
+    assets: { asset_id: string; caption: string; media_type?: string; fileName?: string }[]
+    listText: string
+    listItems: { id: string; title: string; description: string; target_key: string }[]
+    // api_call fields
+    apiUrl: string; apiMethod: string; apiTimeout: number; apiRetryCount: number
+    apiExecMode: string; apiCollectionStrategy: string; apiInitialMsg: string
+    apiHeaders: string; apiBodyTemplate: string; apiQueryParams: string
+    apiSuccessTemplate: string; apiErrorTemplate: string
+    apiAuthType: string; apiAuthConfig: string
+    apiRequiresConfirmation: boolean; apiConfirmationTemplate: string
+    apiResponseType: string; apiResponseMapping: string
+    apiConditionalResponses: { condition: string; template: string }[]
+    apiMediaUrlPath: string; apiMediaType: string; apiMediaCaptionTemplate: string
+    apiIntentDescription: string
+    apiInputs: {
+        key: string; label: string; type: string; required: boolean; order: number
+        prompt_message: string; error_message: string; placeholder: string; default_value: string
+        validation_regex: string; min_value: string; max_value: string; min_length: string; max_length: string; type_error: string
+        options: { value: string; label: string }[]; display_as: string
+        options_source: string; image_analysis: string; api_call_config: string
+        trigger_after: string; depends_on: string; show_condition: string
+        formula: string; accepted_types: string; max_size_mb: string
+        display_in_summary: boolean; filter_options: boolean
+        cross_validation: string; default_when: string
+    }[]
 }
 
 const defaultContentForm = (): ContentFormState => ({
     reply: "", format: "plain",
     presHeader: "", presFooter: "", presButton: "",
     actionType: "", actionParams: "",
-    assetIds: [], replyAfterMedia: "",
-    caption: "",
-    buttonItems: [],
-    listSections: "",
-    quickReplies: "",
+    assets: [],
+    listText: "",
+    listItems: [],
+    // api_call defaults
+    apiUrl: "", apiMethod: "POST", apiTimeout: 30, apiRetryCount: 0,
+    apiExecMode: "immediate", apiCollectionStrategy: "sequential", apiInitialMsg: "",
+    apiHeaders: "", apiBodyTemplate: "", apiQueryParams: "",
+    apiSuccessTemplate: "✅ تم تنفيذ العملية بنجاح", apiErrorTemplate: "❌ حدث خطأ أثناء تنفيذ العملية",
+    apiAuthType: "none", apiAuthConfig: "",
+    apiRequiresConfirmation: false, apiConfirmationTemplate: "",
+    apiResponseType: "text", apiResponseMapping: "",
+    apiConditionalResponses: [],
+    apiMediaUrlPath: "", apiMediaType: "", apiMediaCaptionTemplate: "",
+    apiIntentDescription: "",
+    apiInputs: [],
 })
 
 function loadContentForm(item: MenuItem): ContentFormState {
     const c = item.content || {}
     return {
-        reply: c.reply || "",
-        format: c.format || "plain",
+        reply: (c.reply as string) || "",
+        format: (c.format as string) || "plain",
         presHeader: c.presentation?.header || "",
         presFooter: c.presentation?.footer || "",
         presButton: c.presentation?.button || "",
         actionType: c.action?.type || "",
         actionParams: c.action?.params ? JSON.stringify(c.action.params, null, 2) : "",
-        assetIds: c.asset_ids || [],
-        replyAfterMedia: c.reply_after_media || "",
-        caption: c.caption || "",
-        buttonItems: c.buttons?.map(b => ({ type: b.type, title: b.title, value: b.value })) || [],
-        listSections: c.sections ? JSON.stringify(c.sections, null, 2) : "",
-        quickReplies: c.quick_replies ? JSON.stringify(c.quick_replies, null, 2) : "",
+        assets: (c.assets || []).map((a: { asset_id: string; caption?: string | null; media_type?: string }) => ({ asset_id: a.asset_id, caption: a.caption || "", media_type: a.media_type || "" })),
+        listText: (c.text as string) || "",
+        listItems: (c.items || []).map((i: { id: string; title: string; description?: string; target_key?: string }) => ({
+            id: i.id, title: i.title, description: i.description || "", target_key: i.target_key || ""
+        })),
+        // api_call
+        apiUrl: (c.url as string) || "",
+        apiMethod: (c.method as string) || "POST",
+        apiTimeout: (c.timeout_seconds as number) || 30,
+        apiRetryCount: (c.retry_count as number) || 0,
+        apiExecMode: (c.execution_mode as string) || "immediate",
+        apiCollectionStrategy: (c.collection_strategy as string) || "sequential",
+        apiInitialMsg: (c.initial_message as string) || "",
+        apiHeaders: c.headers ? JSON.stringify(c.headers, null, 2) : "",
+        apiBodyTemplate: c.body_template ? JSON.stringify(c.body_template, null, 2) : "",
+        apiQueryParams: c.query_params ? JSON.stringify(c.query_params, null, 2) : "",
+        apiSuccessTemplate: (c.success_template as string) || "✅ تم تنفيذ العملية بنجاح",
+        apiErrorTemplate: (c.error_template as string) || "❌ حدث خطأ أثناء تنفيذ العملية",
+        apiAuthType: (c.auth_type as string) || "none",
+        apiAuthConfig: c.auth_config ? JSON.stringify(c.auth_config, null, 2) : "",
+        apiRequiresConfirmation: !!c.require_confirmation,
+        apiConfirmationTemplate: (c.confirmation_template as string) || "",
+        apiResponseType: (c.response_type as string) || "text",
+        apiResponseMapping: c.response_mapping ? JSON.stringify(c.response_mapping, null, 2) : "",
+        apiConditionalResponses: ((c.conditional_responses as { condition: string; template: string }[]) || []),
+        apiMediaUrlPath: (c.media_url_path as string) || "",
+        apiMediaType: (c.media_type as string) || "",
+        apiMediaCaptionTemplate: (c.media_caption_template as string) || "",
+
+        apiIntentDescription: (c.intent_description as string) || "",
+        apiInputs: ((c.inputs as ApiCallInputField[]) || []).map((inp) => ({
+            key: inp.key || "", label: inp.label || "", type: inp.type || "text",
+            required: inp.required !== false, order: inp.order || 0,
+            prompt_message: inp.prompt_message || "", error_message: inp.error_message || "",
+            placeholder: inp.placeholder || "", default_value: inp.default_value || "",
+            validation_regex: inp.validation_regex || "",
+            min_value: inp.min_value != null ? String(inp.min_value) : "",
+            max_value: inp.max_value != null ? String(inp.max_value) : "",
+            min_length: inp.min_length != null ? String(inp.min_length) : "",
+            max_length: inp.max_length != null ? String(inp.max_length) : "",
+            type_error: inp.type_error || "",
+            options: (inp.options || []).map(o => ({ value: o.value, label: o.label })),
+            display_as: inp.display_as || "interactive_list",
+            options_source: inp.options_source ? JSON.stringify(inp.options_source, null, 2) : "",
+            image_analysis: inp.image_analysis ? JSON.stringify(inp.image_analysis, null, 2) : "",
+            api_call_config: inp.api_call_config ? JSON.stringify(inp.api_call_config, null, 2) : "",
+            trigger_after: (inp.trigger_after || []).join(", "),
+            depends_on: (inp.depends_on || []).join(", "),
+            show_condition: inp.show_condition || "",
+            formula: inp.formula || "",
+            accepted_types: (inp.accepted_types || []).join(", "),
+            max_size_mb: inp.max_size_mb != null ? String(inp.max_size_mb) : "",
+            display_in_summary: inp.display_in_summary ?? false,
+            filter_options: inp.filter_options ?? false,
+            cross_validation: inp.cross_validation ? JSON.stringify(inp.cross_validation) : "",
+            default_when: inp.default_when ? JSON.stringify(inp.default_when) : "",
+        })),
     }
 }
 
@@ -77,283 +239,769 @@ function buildContent(type: MenuItemType, f: ContentFormState): MenuItemContent 
         case "action": {
             let params: Record<string, unknown> = {}
             try { if (f.actionParams.trim()) params = JSON.parse(f.actionParams) } catch { /* ignore */ }
-            return { action: { type: f.actionType || "handoff", params }, reply: f.reply || undefined }
+            return { action: { type: "handoff", params }, reply: f.reply || undefined }
         }
-        case "images": {
-            return { asset_ids: f.assetIds.length ? f.assetIds : undefined, reply_after_media: f.replyAfterMedia || undefined, caption: f.caption || undefined }
-        }
-        case "files": {
-            return { asset_ids: f.assetIds.length ? f.assetIds : undefined, reply_after_media: f.replyAfterMedia || undefined }
-        }
-        case "videos": {
-            return { asset_ids: f.assetIds.length ? f.assetIds : undefined, reply_after_media: f.replyAfterMedia || undefined }
-        }
-        case "buttons":
-            return { buttons: f.buttonItems.length ? f.buttonItems.map(b => ({ type: b.type as "url" | "reply", title: b.title, value: b.value })) : undefined }
+        case "images":
+        case "files":
+        case "videos":
+            return { assets: f.assets.length ? f.assets.map(a => ({ asset_id: a.asset_id, caption: a.caption || undefined })) : undefined }
+        case "multi":
+            return {
+                reply: f.reply || undefined,
+                assets: f.assets.length ? f.assets.map(a => ({ asset_id: a.asset_id, media_type: a.media_type || undefined, caption: a.caption || undefined })) : undefined,
+            }
         case "list":
-            try { return f.listSections ? { sections: JSON.parse(f.listSections) } : undefined } catch { return undefined }
-        case "quick_reply":
-            try { return f.quickReplies ? { quick_replies: JSON.parse(f.quickReplies) } : undefined } catch { return undefined }
+            return {
+                text: f.listText || undefined,
+                items: f.listItems.length ? f.listItems.map(i => ({
+                    id: i.id, title: i.title,
+                    description: i.description || undefined,
+                    target_key: i.target_key || undefined,
+                })) : undefined,
+            }
+        case "api_call": {
+            let headers: Record<string, string> | undefined
+            let bodyTpl: Record<string, unknown> | undefined
+            let authCfg: Record<string, string> | undefined
+            let qParams: Record<string, string> | undefined
+            let respMap: Record<string, string> | undefined
+            try { if (f.apiHeaders.trim()) headers = JSON.parse(f.apiHeaders) } catch { /* ignore */ }
+            try { if (f.apiBodyTemplate.trim()) bodyTpl = JSON.parse(f.apiBodyTemplate) } catch { /* ignore */ }
+            try { if (f.apiAuthConfig.trim()) authCfg = JSON.parse(f.apiAuthConfig) } catch { /* ignore */ }
+            try { if (f.apiQueryParams.trim()) qParams = JSON.parse(f.apiQueryParams) } catch { /* ignore */ }
+            try { if (f.apiResponseMapping.trim()) respMap = JSON.parse(f.apiResponseMapping) } catch { /* ignore */ }
+            return {
+                url: f.apiUrl,
+                method: f.apiMethod || "POST",
+                headers,
+                timeout_seconds: f.apiTimeout || 30,
+                retry_count: f.apiRetryCount || undefined,
+                execution_mode: f.apiExecMode || "immediate",
+                collection_strategy: f.apiExecMode === "collect_data" ? (f.apiCollectionStrategy || "sequential") : undefined,
+                initial_message: f.apiInitialMsg || undefined,
+                inputs: f.apiInputs.length ? f.apiInputs.map((inp, i) => {
+                    const r: Record<string, unknown> = {
+                        key: inp.key, label: inp.label, type: inp.type || "text",
+                        required: inp.required, order: inp.order || i,
+                    }
+                    if (inp.prompt_message) r.prompt_message = inp.prompt_message
+                    if (inp.error_message) r.error_message = inp.error_message
+                    if (inp.placeholder) r.placeholder = inp.placeholder
+                    if (inp.default_value) r.default_value = inp.default_value
+                    if (inp.validation_regex) r.validation_regex = inp.validation_regex
+                    if (inp.min_value) r.min_value = parseFloat(inp.min_value)
+                    if (inp.max_value) r.max_value = parseFloat(inp.max_value)
+                    if (inp.min_length) r.min_length = parseInt(inp.min_length)
+                    if (inp.max_length) r.max_length = parseInt(inp.max_length)
+                    if (inp.type_error) r.type_error = inp.type_error
+                    if (inp.options.length) r.options = inp.options
+                    if (inp.display_as && inp.display_as !== "interactive_list") r.display_as = inp.display_as
+                    if (inp.depends_on) r.depends_on = inp.depends_on.split(",").map(s => s.trim()).filter(Boolean)
+                    if (inp.show_condition) r.show_condition = inp.show_condition
+                    if (inp.trigger_after) r.trigger_after = inp.trigger_after.split(",").map(s => s.trim()).filter(Boolean)
+                    if (inp.formula) r.formula = inp.formula
+                    if (inp.accepted_types) r.accepted_types = inp.accepted_types.split(",").map(s => s.trim()).filter(Boolean)
+                    if (inp.max_size_mb) r.max_size_mb = parseInt(inp.max_size_mb)
+                    try { if (inp.options_source) r.options_source = JSON.parse(inp.options_source) } catch { /* */ }
+                    try { if (inp.image_analysis) r.image_analysis = JSON.parse(inp.image_analysis) } catch { /* */ }
+                    try { if (inp.api_call_config) r.api_call_config = JSON.parse(inp.api_call_config) } catch { /* */ }
+                    return r as unknown as ApiCallInputField
+                }) : undefined,
+                body_template: bodyTpl,
+                query_params: qParams,
+                success_template: f.apiSuccessTemplate || undefined,
+                error_template: f.apiErrorTemplate || undefined,
+                auth_type: f.apiAuthType !== "none" ? f.apiAuthType : undefined,
+                auth_config: authCfg,
+                require_confirmation: f.apiRequiresConfirmation || undefined,
+                confirmation_template: f.apiConfirmationTemplate || undefined,
+                response_type: f.apiResponseType !== "text" ? f.apiResponseType : undefined,
+                response_mapping: respMap,
+                conditional_responses: f.apiConditionalResponses.length ? f.apiConditionalResponses : undefined,
+                media_url_path: f.apiMediaUrlPath || undefined,
+                media_type: f.apiMediaType || undefined,
+                media_caption_template: f.apiMediaCaptionTemplate || undefined,
+
+                intent_description: f.apiIntentDescription || undefined,
+            }
+        }
         default: return undefined
     }
 }
 
 // �"?�"? Media Upload Zone �"?�"?
-// ── Media Upload Zone ──
-function MediaUploadZone({ form, setForm, accept, label, icon }: {
+// ── Media Upload Zone (Redesigned) ──
+function MediaUploadZone({ form, setForm, accept, label, icon, templateId, itemId }: {
     form: ContentFormState; setForm: (f: ContentFormState) => void; accept: string; label: string; icon: string
+    templateId?: string | null; itemId?: string | null
 }) {
     const [uploading, setUploading] = useState<UploadingFile[]>([])
     const [dragOver, setDragOver] = useState(false)
+    const [previews, setPreviews] = useState<Record<string, string>>({})
+    const [deletingIdx, setDeletingIdx] = useState<number | null>(null)
+    const formRef = React.useRef(form)
+    formRef.current = form
+
+    const handleDeleteAsset = async (index: number) => {
+        const asset = form.assets[index]
+        if (!asset) return
+        // If we have templateId + itemId, call the API to delete from backend
+        if (templateId && itemId) {
+            setDeletingIdx(index)
+            try {
+                const res = await menuService.deleteItemAsset(templateId, itemId, asset.asset_id)
+                if (res.success) {
+                    setForm({ ...formRef.current, assets: formRef.current.assets.filter((_, j) => j !== index) })
+                }
+            } catch {
+                // Silent fail — keep asset in UI
+            } finally {
+                setDeletingIdx(null)
+            }
+        } else {
+            // No item saved yet (add mode) — just remove locally
+            setForm({ ...form, assets: form.assets.filter((_, j) => j !== index) })
+        }
+    }
+
+    const isImageAccept = accept.includes("image") || accept === "*/*"
+    const isVideoAccept = accept.includes("video") || accept === "*/*"
 
     const handleFiles = async (files: FileList | null) => {
-        if (!files) return
+        if (!files || files.length === 0) return
         const newFiles = Array.from(files)
+
+        // Create local previews for images
+        newFiles.forEach(file => {
+            if (file.type.startsWith("image/")) {
+                const url = URL.createObjectURL(file)
+                setPreviews(prev => ({ ...prev, [file.name]: url }))
+            }
+        })
+
         setUploading(prev => [...prev, ...newFiles.map(f => ({ file: f, progress: 0 }))])
+
         for (const file of newFiles) {
             try {
                 const res = await menuService.uploadMedia(file)
                 const mediaId = res.data.media_id
-                setForm({ ...form, assetIds: [...form.assetIds, mediaId] })
+                // Detect media_type from MIME type
+                const detectedType = file.type.startsWith("image/") ? "image" : file.type.startsWith("video/") ? "video" : "file"
+                // Use ref to avoid stale closure
+                const currentAssets = formRef.current.assets
+                setForm({ ...formRef.current, assets: [...currentAssets, { asset_id: mediaId, caption: "", media_type: detectedType, fileName: file.name }] })
+                // Transfer preview from file.name key to mediaId key (use functional updater to avoid stale closure)
+                setPreviews(prev => {
+                    if (prev[file.name]) {
+                        const updated = { ...prev, [mediaId]: prev[file.name] }
+                        delete updated[file.name]
+                        return updated
+                    }
+                    return prev
+                })
                 setUploading(prev => prev.map(u => u.file === file ? { ...u, progress: 100, mediaId } : u))
-                setTimeout(() => setUploading(prev => prev.filter(u => u.file !== file)), 1500)
+                setTimeout(() => setUploading(prev => prev.filter(u => u.file !== file)), 1200)
             } catch {
                 setUploading(prev => prev.map(u => u.file === file ? { ...u, error: "فشل الرفع" } : u))
             }
         }
     }
 
+    // Cleanup blob URLs on unmount
+    React.useEffect(() => {
+        return () => { Object.values(previews).forEach(url => { if (url.startsWith("blob:")) URL.revokeObjectURL(url) }) }
+    }, [])
+
+    const fileIcon = (_assetId: string) => {
+        if (isVideoAccept && !isImageAccept) return "🎬"
+        if (!isImageAccept) return "📄"
+        return icon
+    }
+
     return (
         <div>
-            <label style={labelSt}>{label} ({form.assetIds.length})</label>
-            {form.assetIds.length > 0 && (
-                <div style={{ display: "flex", flexDirection: "column", gap: 4, marginBottom: 8 }}>
-                    {form.assetIds.map((id, i) => (
-                        <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 10px", borderRadius: 8, background: "var(--t-card, #fff)", border: "1px solid var(--t-border-light, var(--t-border))" }}>
-                            <span style={{ fontSize: 13 }}>{icon}</span>
-                            <span style={{ fontSize: 11, fontFamily: "monospace", color: "var(--t-text-muted)", flex: 1, wordBreak: "break-all" }}>{id}</span>
-                            <span style={{ fontSize: 9, padding: "2px 6px", borderRadius: 6, background: "rgba(34,197,94,0.08)", color: "#22c55e", fontWeight: 600 }}>مرفوع</span>
-                            <button onClick={() => setForm({ ...form, assetIds: form.assetIds.filter((_, j) => j !== i) })} style={{ ...iconBtn, color: "var(--t-danger)" }}><X size={13} /></button>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
+                <label style={{ ...labelSt, margin: 0 }}>{icon} {label} ({form.assets.length})</label>
+                {form.assets.length > 0 && (
+                    <span style={{ fontSize: 10, color: "var(--t-text-faint)" }}>يمكنك رفع عدة ملفات دفعة واحدة</span>
+                )}
+            </div>
+
+            {/* ── Uploaded Assets Grid ── */}
+            {form.assets.length > 0 && (
+                <div style={{
+                    display: "grid",
+                    gridTemplateColumns: isImageAccept ? "repeat(auto-fill, minmax(180px, 1fr))" : "1fr",
+                    gap: 10, marginBottom: 10,
+                }}>
+                    {form.assets.map((asset, i) => (
+                        <div key={i} style={{
+                            borderRadius: 12, overflow: "hidden",
+                            background: "var(--t-card, #fff)",
+                            border: "1px solid var(--t-border-light, var(--t-border))",
+                            transition: "box-shadow 0.2s, transform 0.2s",
+                        }}
+                            onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 4px 16px rgba(0,0,0,0.08)"; e.currentTarget.style.transform = "translateY(-1px)" }}
+                            onMouseLeave={e => { e.currentTarget.style.boxShadow = "none"; e.currentTarget.style.transform = "none" }}
+                        >
+                            {/* Preview Area */}
+                            {isImageAccept && (
+                                <div style={{
+                                    width: "100%", height: 130, overflow: "hidden",
+                                    background: "linear-gradient(135deg, #f0f4f8 0%, #e2e8f0 100%)",
+                                    display: "flex", alignItems: "center", justifyContent: "center",
+                                    position: "relative",
+                                }}>
+                                    {previews[asset.asset_id] ? (
+                                        <img src={previews[asset.asset_id]} alt={asset.caption || "preview"}
+                                            style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                                    ) : (
+                                        <div style={{ textAlign: "center" }}>
+                                            <span style={{ fontSize: 32, opacity: 0.4 }}>{fileIcon(asset.asset_id)}</span>
+                                            <p style={{ fontSize: 9, color: "var(--t-text-faint)", margin: "4px 0 0" }}>تحميل المعاينة...</p>
+                                        </div>
+                                    )}
+                                    {/* Delete button overlay */}
+                                    <button onClick={(e) => { e.stopPropagation(); handleDeleteAsset(i) }}
+                                        disabled={deletingIdx === i}
+                                        style={{
+                                            position: "absolute", top: 6, left: 6,
+                                            width: 24, height: 24, borderRadius: "50%",
+                                            background: deletingIdx === i ? "rgba(150,150,150,0.85)" : "rgba(239,68,68,0.85)", backdropFilter: "blur(4px)",
+                                            border: "none", cursor: deletingIdx === i ? "wait" : "pointer",
+                                            display: "flex", alignItems: "center", justifyContent: "center",
+                                            transition: "transform 0.15s",
+                                        }}
+                                        onMouseEnter={e => e.currentTarget.style.transform = "scale(1.15)"}
+                                        onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"}
+                                    >
+                                        {deletingIdx === i ? <Loader2 size={12} className="animate-spin" style={{ color: "#fff" }} /> : <X size={12} style={{ color: "#fff" }} />}
+                                    </button>
+                                    {/* Status badge */}
+                                    <span style={{
+                                        position: "absolute", bottom: 6, right: 6,
+                                        fontSize: 9, padding: "2px 8px", borderRadius: 6,
+                                        background: "rgba(34,197,94,0.9)", color: "#fff", fontWeight: 700,
+                                        backdropFilter: "blur(4px)",
+                                    }}>✓ مرفوع</span>
+                                </div>
+                            )}
+
+                            {/* Non-image file row */}
+                            {!isImageAccept && (
+                                <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 14px" }}>
+                                    <div style={{
+                                        width: 40, height: 40, borderRadius: 10,
+                                        background: "linear-gradient(135deg, rgba(27,80,145,0.08), rgba(27,80,145,0.15))",
+                                        display: "flex", alignItems: "center", justifyContent: "center",
+                                        fontSize: 18, flexShrink: 0,
+                                    }}>
+                                        {fileIcon(asset.asset_id)}
+                                    </div>
+                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                        <span style={{ fontSize: 12, fontFamily: "'Fira Code', monospace", color: "var(--t-text-secondary)", display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} dir="ltr">
+                                            {asset.fileName || asset.asset_id}
+                                        </span>
+                                        <span style={{ fontSize: 9, color: "#22c55e", fontWeight: 600 }}>✓ مرفوع بنجاح</span>
+                                    </div>
+                                    <button onClick={() => handleDeleteAsset(i)}
+                                        disabled={deletingIdx === i}
+                                        style={{ ...iconBtn, color: deletingIdx === i ? "var(--t-text-faint)" : "var(--t-danger)", padding: 6 }}>
+                                        {deletingIdx === i ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
+                                    </button>
+                                </div>
+                            )}
+
+                            {/* Caption */}
+                            <div style={{ padding: isImageAccept ? "8px 10px 10px" : "0 14px 12px" }}>
+                                <label style={{ fontSize: 10, fontWeight: 600, color: "var(--t-text-faint)", display: "block", marginBottom: 4 }}>
+                                    الوصف التوضيحي <CharCounter value={asset.caption} max={LIMITS.MEDIA_CAPTION} />
+                                </label>
+                                <textarea
+                                    value={asset.caption}
+                                    onChange={e => {
+                                        const updated = [...form.assets]
+                                        updated[i] = { ...updated[i], caption: e.target.value }
+                                        setForm({ ...form, assets: updated })
+                                    }}
+                                    placeholder="أضف وصفاً توضيحياً لهذا الملف..."
+                                    rows={2}
+                                    style={{
+                                        ...inputSt, fontSize: 13, padding: "8px 12px",
+                                        resize: "vertical", lineHeight: 1.6,
+                                        minHeight: 44,
+                                    }}
+                                />
+                            </div>
                         </div>
                     ))}
                 </div>
             )}
-            {uploading.map((u, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 10px", borderRadius: 8, background: u.error ? "rgba(239,68,68,0.04)" : "rgba(27,80,145,0.04)", border: "1px solid var(--t-border-light)", marginBottom: 4 }}>
-                    {u.error ? <AlertCircle size={13} style={{ color: "var(--t-danger)" }} /> : <Loader2 size={13} className="animate-spin" style={{ color: "var(--t-accent)" }} />}
-                    <span style={{ fontSize: 11, color: "var(--t-text-muted)", flex: 1 }}>{u.file.name}</span>
-                    <span style={{ fontSize: 10, color: u.error ? "var(--t-danger)" : "var(--t-accent)", fontWeight: 600 }}>{u.error || (u.mediaId ? "تم الرفع" : "جاري الرفع...")}</span>
+
+            {/* ── Upload Progress ── */}
+            {uploading.length > 0 && (
+                <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 10 }}>
+                    {uploading.map((u, i) => (
+                        <div key={i} style={{
+                            display: "flex", alignItems: "center", gap: 10, padding: "10px 14px",
+                            borderRadius: 10, border: "1px solid var(--t-border-light)",
+                            background: u.error ? "rgba(239,68,68,0.04)" : "rgba(27,80,145,0.03)",
+                            transition: "all 0.3s",
+                        }}>
+                            {/* Thumbnail preview for uploading images */}
+                            {u.file.type.startsWith("image/") && previews[u.file.name] ? (
+                                <img src={previews[u.file.name]} alt=""
+                                    style={{ width: 36, height: 36, borderRadius: 8, objectFit: "cover", flexShrink: 0, opacity: u.error ? 0.4 : 0.8 }} />
+                            ) : (
+                                <div style={{
+                                    width: 36, height: 36, borderRadius: 8, flexShrink: 0,
+                                    background: u.error ? "rgba(239,68,68,0.08)" : "rgba(27,80,145,0.08)",
+                                    display: "flex", alignItems: "center", justifyContent: "center",
+                                }}>
+                                    {u.error ? <AlertCircle size={16} style={{ color: "var(--t-danger)" }} />
+                                        : <Loader2 size={16} className="animate-spin" style={{ color: "var(--t-accent)" }} />}
+                                </div>
+                            )}
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                                <span style={{ fontSize: 12, color: "var(--t-text-secondary)", display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                                    {u.file.name}
+                                </span>
+                                <span style={{ fontSize: 10, color: "var(--t-text-faint)" }}>
+                                    {(u.file.size / 1024).toFixed(0)} KB
+                                </span>
+                            </div>
+                            <span style={{
+                                fontSize: 10, fontWeight: 700, padding: "3px 10px", borderRadius: 8,
+                                background: u.error ? "rgba(239,68,68,0.08)" : u.mediaId ? "rgba(34,197,94,0.08)" : "rgba(27,80,145,0.08)",
+                                color: u.error ? "#ef4444" : u.mediaId ? "#22c55e" : "var(--t-accent)",
+                            }}>
+                                {u.error || (u.mediaId ? "✓ تم" : "⏳ جاري الرفع...")}
+                            </span>
+                            {u.error && (
+                                <button onClick={() => setUploading(prev => prev.filter((_, j) => j !== i))}
+                                    style={{ ...iconBtn, color: "var(--t-text-faint)" }}><X size={12} /></button>
+                            )}
+                        </div>
+                    ))}
                 </div>
-            ))}
+            )}
+
+            {/* ── Drop Zone ── */}
             <div
                 onDragOver={e => { e.preventDefault(); setDragOver(true) }}
                 onDragLeave={() => setDragOver(false)}
                 onDrop={e => { e.preventDefault(); setDragOver(false); handleFiles(e.dataTransfer.files) }}
-                onClick={() => { const inp = document.createElement("input"); inp.type = "file"; inp.accept = accept; inp.multiple = true; inp.onchange = () => handleFiles(inp.files); inp.click() }}
-                style={{
-                    display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 6,
-                    padding: "16px 12px", borderRadius: 10, cursor: "pointer", transition: "all 0.2s",
-                    border: `2px dashed ${dragOver ? "var(--t-accent)" : "var(--t-border-light, var(--t-border-medium))"}`,
-                    background: dragOver ? "rgba(27,80,145,0.04)" : "transparent",
+                onClick={() => {
+                    const inp = document.createElement("input")
+                    inp.type = "file"; inp.accept = accept; inp.multiple = true
+                    inp.onchange = () => handleFiles(inp.files); inp.click()
                 }}
+                style={{
+                    display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8,
+                    padding: form.assets.length > 0 ? "14px 12px" : "28px 16px",
+                    borderRadius: 12, cursor: "pointer", transition: "all 0.25s ease",
+                    border: `2px dashed ${dragOver ? "var(--t-accent)" : "var(--t-border-light, var(--t-border-medium))"}`,
+                    background: dragOver ? "rgba(27,80,145,0.06)" : "var(--t-surface, transparent)",
+                    transform: dragOver ? "scale(1.01)" : "scale(1)",
+                }}
+                onMouseEnter={e => { if (!dragOver) e.currentTarget.style.borderColor = "var(--t-accent)"; e.currentTarget.style.background = "rgba(27,80,145,0.03)" }}
+                onMouseLeave={e => { if (!dragOver) e.currentTarget.style.borderColor = "var(--t-border-light, var(--t-border-medium))"; e.currentTarget.style.background = "var(--t-surface, transparent)" }}
             >
-                <div style={{ width: 36, height: 36, borderRadius: "50%", background: "rgba(27,80,145,0.08)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <Plus size={16} style={{ color: "var(--t-accent)" }} />
+                <div style={{
+                    width: 44, height: 44, borderRadius: "50%",
+                    background: dragOver ? "rgba(27,80,145,0.15)" : "rgba(27,80,145,0.08)",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    transition: "all 0.2s",
+                }}>
+                    {dragOver ? <Paperclip size={18} style={{ color: "var(--t-accent)" }} /> : <Plus size={18} style={{ color: "var(--t-accent)" }} />}
                 </div>
-                <span style={{ fontSize: 12, fontWeight: 500, color: "var(--t-accent)" }}>اسحب الملفات هنا أو انقر للاختيار</span>
-                <span style={{ fontSize: 10, color: "var(--t-text-faint)" }}>{accept}</span>
+                <div style={{ textAlign: "center" }}>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: "var(--t-accent)", display: "block" }}>
+                        {form.assets.length > 0 ? "إضافة ملفات أخرى" : "اسحب الملفات هنا أو انقر للاختيار"}
+                    </span>
+                    <span style={{ fontSize: 11, color: "var(--t-text-faint)", marginTop: 2, display: "block" }}>
+                        يدعم رفع عدة ملفات دفعة واحدة • {accept === "*/*" ? "جميع الأنواع" : accept.replace(/\*/g, "").replace(/\./g, " ")}
+                    </span>
+                </div>
+            </div>
+        </div>
+    )
+}
+
+// ── Handoff Action Fields Component (replaces generic action form) ──
+function HandoffActionFields({ form, setForm, mode: _mode }: { form: ContentFormState; setForm: (f: ContentFormState) => void; mode: "add" | "edit" }) {
+    const [teams, setTeams] = useState<{ team_id: string; name: string }[]>([])
+    const [loadingTeams, setLoadingTeams] = useState(false)
+
+    // Parse current params from form
+    const currentParams = React.useMemo(() => {
+        try { return form.actionParams.trim() ? JSON.parse(form.actionParams) : {} } catch { return {} }
+    }, [form.actionParams])
+
+    const selectedTeamId = currentParams.team_id || ""
+    const aiEnabled = currentParams.ai_enabled ?? false
+    const autoReply = currentParams.auto_reply ?? ""
+    const priority = currentParams.priority || "normal"
+
+    // Update specific param key
+    const updateParam = (key: string, value: unknown) => {
+        const updated = { ...currentParams, [key]: value }
+        setForm({ ...form, actionParams: JSON.stringify(updated, null, 2) })
+    }
+
+    // Fetch teams on mount
+    useEffect(() => {
+        setLoadingTeams(true)
+        import("@/stores/auth-store").then(mod => {
+            const tenantId = mod.useAuthStore.getState().user?.tenant_id || ""
+            if (!tenantId) { setLoadingTeams(false); return }
+            getTeamsCacheView(tenantId)
+                .then(res => setTeams((res.data?.teams || []).filter((t: { is_in_menu?: boolean }) => t.is_in_menu !== false)))
+                .catch(() => {/* silent */ })
+                .finally(() => setLoadingTeams(false))
+        }).catch(() => setLoadingTeams(false))
+    }, [])
+
+    const handleTeamChange = (teamId: string) => {
+        const team = teams.find(t => t.team_id === teamId)
+        const updated = { ...currentParams, team_id: teamId, team_name: team?.name || "" }
+        setForm({ ...form, actionParams: JSON.stringify(updated, null, 2) })
+    }
+
+    return (
+        <div style={sectionBox}>
+            <p style={{ fontSize: 12, fontWeight: 700, color: "var(--t-accent)", margin: "0 0 8px", display: "flex", alignItems: "center", gap: 6 }}>🤝 تحويل لموظف (Handoff)</p>
+
+            {/* Team Selection */}
+            <div>
+                <label style={labelSt}>الفريق المستهدف *</label>
+                {loadingTeams ? (
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "10px 14px", borderRadius: 8, background: "var(--t-surface)", border: "1px solid var(--t-border-light)" }}>
+                        <Loader2 size={14} className="animate-spin" style={{ color: "var(--t-accent)" }} />
+                        <span style={{ fontSize: 12, color: "var(--t-text-muted)" }}>جاري تحميل الفرق...</span>
+                    </div>
+                ) : (
+                    <select
+                        value={selectedTeamId}
+                        onChange={e => handleTeamChange(e.target.value)}
+                        style={inputSt}
+                    >
+                        <option value="">— اختر الفريق —</option>
+                        {teams.map(t => (
+                            <option key={t.team_id} value={t.team_id}>{t.name}</option>
+                        ))}
+                    </select>
+                )}
+                {selectedTeamId && (
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 4, padding: "4px 10px", borderRadius: 6, background: "rgba(27,80,145,0.06)", width: "fit-content" }}>
+                        <span style={{ fontSize: 10, color: "var(--t-accent)", fontWeight: 600 }}>Team ID:</span>
+                        <span style={{ fontSize: 10, color: "var(--t-text-muted)", fontFamily: "'Fira Code', monospace", direction: "ltr" }}>{selectedTeamId}</span>
+                    </div>
+                )}
+            </div>
+
+            {/* Divider */}
+            <div style={{ height: 1, background: "var(--t-border-light)", margin: "6px 0" }} />
+
+            {/* 3 Automation Mechanisms */}
+            <p style={{ fontSize: 11, fontWeight: 700, color: "var(--t-text-secondary)", margin: "0 0 8px", display: "flex", alignItems: "center", gap: 4 }}>⚙️ آليات التحويل</p>
+
+            {/* 1. AI Enabled */}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 14px", borderRadius: 10, background: aiEnabled ? "rgba(16,185,129,0.06)" : "var(--t-surface)", border: `1px solid ${aiEnabled ? "rgba(16,185,129,0.2)" : "var(--t-border-light)"}`, transition: "all 0.2s" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <span style={{ fontSize: 16 }}>🤖</span>
+                    <div>
+                        <span style={{ fontSize: 12, fontWeight: 600, color: "var(--t-text)", display: "block" }}>تفعيل الذكاء الاصطناعي</span>
+                        <span style={{ fontSize: 10, color: "var(--t-text-faint)" }}>الرد التلقائي بالذكاء الاصطناعي قبل التحويل</span>
+                    </div>
+                </div>
+                <button
+                    onClick={() => updateParam("ai_enabled", !aiEnabled)}
+                    style={{
+                        width: 44, height: 24, borderRadius: 12, border: "none", cursor: "pointer",
+                        background: aiEnabled ? "var(--t-success, #10b981)" : "#d1d5db",
+                        position: "relative", transition: "background 0.2s", flexShrink: 0,
+                    }}
+                >
+                    <div style={{
+                        width: 18, height: 18, borderRadius: "50%", background: "#fff",
+                        position: "absolute", top: 3,
+                        left: aiEnabled ? 23 : 3,
+                        transition: "left 0.2s", boxShadow: "0 1px 3px rgba(0,0,0,0.15)",
+                    }} />
+                </button>
+            </div>
+
+            {/* 2. Priority */}
+            <div>
+                <label style={labelSt}>🔥 أولوية التحويل</label>
+                <div style={{ display: "flex", gap: 6 }}>
+                    {[
+                        { value: "low", label: "منخفضة", color: "#6b7280", bg: "rgba(107,114,128,0.08)" },
+                        { value: "normal", label: "عادية", color: "#3b82f6", bg: "rgba(59,130,246,0.08)" },
+                        { value: "high", label: "عالية", color: "#ef4444", bg: "rgba(239,68,68,0.08)" },
+                    ].map(p => (
+                        <button
+                            key={p.value}
+                            onClick={() => updateParam("priority", p.value)}
+                            style={{
+                                flex: 1, padding: "8px 10px", borderRadius: 8, border: `1.5px solid ${priority === p.value ? p.color : "var(--t-border-light)"}`,
+                                background: priority === p.value ? p.bg : "transparent",
+                                color: priority === p.value ? p.color : "var(--t-text-muted)",
+                                fontSize: 12, fontWeight: priority === p.value ? 700 : 500,
+                                cursor: "pointer", transition: "all 0.15s", fontFamily: "inherit",
+                            }}
+                        >
+                            {p.label}
+                        </button>
+                    ))}
+                </div>
+            </div>
+
+            {/* 3. Auto Reply */}
+            <div>
+                <label style={labelSt}>💬 رسالة تلقائية عند التحويل</label>
+                <textarea
+                    value={autoReply}
+                    onChange={e => updateParam("auto_reply", e.target.value)}
+                    rows={2}
+                    placeholder="جاري تحويلك لموظف الخدمة..."
+                    style={{ ...inputSt, resize: "vertical", lineHeight: 1.6 }}
+                />
+            </div>
+
+            {/* Divider */}
+            <div style={{ height: 1, background: "var(--t-border-light)", margin: "6px 0" }} />
+
+            {/* Reply message */}
+            <div>
+                <label style={labelSt}>↩️ رسالة الرد — تُرسل للمستخدم عند تنفيذ الإجراء</label>
+                <textarea
+                    value={form.reply}
+                    onChange={e => setForm({ ...form, reply: e.target.value })}
+                    rows={2}
+                    placeholder="جاري تحويلك لموظف الخدمة..."
+                    style={{ ...inputSt, resize: "vertical", lineHeight: 1.6 }}
+                    maxLength={LIMITS.ACTION_REPLY}
+                />
             </div>
         </div>
     )
 }
 
 // ── Content Fields Component ──
-function ContentFields({ type, form, setForm, mode }: { type: MenuItemType; form: ContentFormState; setForm: (f: ContentFormState) => void; mode: "add" | "edit" }) {
+function ContentFields({ type, form, setForm, mode, errors = {}, templateId, itemId }: { type: MenuItemType; form: ContentFormState; setForm: (f: ContentFormState) => void; mode: "add" | "edit"; errors?: ValidationErrors; templateId?: string | null; itemId?: string | null }) {
     const sectionTitle = (icon: string, title: string) => (
         <p style={{ fontSize: 12, fontWeight: 700, color: "var(--t-accent)", margin: "0 0 8px", display: "flex", alignItems: "center", gap: 6 }}>{icon} {title}</p>
     )
+    const fieldStyle = (key: string, base: React.CSSProperties = inputSt) => errors[key] ? { ...base, ...errorBorder } : base
     switch (type) {
         case "submenu":
             return (
                 <div style={sectionBox}>
                     {sectionTitle("🗂️", "إعدادات العرض (Presentation)")}
-                    <div><label style={labelSt}>العنوان (Header) — يظهر أعلى القائمة</label>
-                        <input value={form.presHeader} onChange={e => setForm({ ...form, presHeader: e.target.value })} placeholder="بنك القاسمي للتمويل..." style={inputSt} /></div>
-                    <div><label style={labelSt}>التذييل (Footer) — يظهر أسفل القائمة</label>
-                        <input value={form.presFooter} onChange={e => setForm({ ...form, presFooter: e.target.value })} placeholder="اختر الخدمة المطلوبة" style={inputSt} /></div>
-                    <div><label style={labelSt}>زر الرجوع (Button) — نص زر القائمة</label>
-                        <input value={form.presButton} onChange={e => setForm({ ...form, presButton: e.target.value })} placeholder="اختر من التالي" style={inputSt} /></div>
+                    <div>
+                        <label style={labelSt}>العنوان (Header) — يظهر أعلى القائمة <CharCounter value={form.presHeader} max={LIMITS.SUBMENU_HEADER} /></label>
+                        <input value={form.presHeader} onChange={e => setForm({ ...form, presHeader: e.target.value })} placeholder="بنك القاسمي للتمويل..." style={fieldStyle("presHeader")} maxLength={LIMITS.SUBMENU_HEADER + 10} />
+                        <FieldError error={errors.presHeader} />
+                    </div>
+                    <div>
+                        <label style={labelSt}>التذييل (Footer) — يظهر أسفل القائمة <CharCounter value={form.presFooter} max={LIMITS.SUBMENU_FOOTER} /></label>
+                        <input value={form.presFooter} onChange={e => setForm({ ...form, presFooter: e.target.value })} placeholder="اختر الخدمة المطلوبة" style={fieldStyle("presFooter")} maxLength={LIMITS.SUBMENU_FOOTER + 10} />
+                        <FieldError error={errors.presFooter} />
+                    </div>
+                    <div>
+                        <label style={labelSt}>زر الرجوع (Button) — نص زر القائمة <CharCounter value={form.presButton} max={LIMITS.SUBMENU_BUTTON} /></label>
+                        <input value={form.presButton} onChange={e => setForm({ ...form, presButton: e.target.value })} placeholder="اختر من التالي" style={fieldStyle("presButton")} maxLength={LIMITS.SUBMENU_BUTTON + 5} />
+                        <FieldError error={errors.presButton} />
+                    </div>
                 </div>
             )
         case "text":
             return (
                 <div style={sectionBox}>
                     {sectionTitle("💬", "الرد النصي")}
-                    <div><label style={labelSt}>نص الرد *</label>
-                        <textarea value={form.reply} onChange={e => setForm({ ...form, reply: e.target.value })} rows={mode === "edit" ? 6 : 3} placeholder="النص الذي سيُرسل كرد للمستخدم..." style={{ ...inputSt, resize: "vertical", lineHeight: 1.7 }} /></div>
-                    <div><label style={labelSt}>التنسيق</label>
-                        <select value={form.format} onChange={e => setForm({ ...form, format: e.target.value })} style={inputSt}>
+                    <div>
+                        <label style={labelSt}>نص الرد * <CharCounter value={form.reply} max={LIMITS.TEXT_REPLY} /></label>
+                        <textarea value={form.reply} onChange={e => setForm({ ...form, reply: e.target.value })} rows={mode === "edit" ? 6 : 3} placeholder="النص الذي سيُرسل كرد للمستخدم..." style={{ ...fieldStyle("reply", { ...inputSt, resize: "vertical" as const, lineHeight: 1.7 }) }} maxLength={LIMITS.TEXT_REPLY} />
+                        <FieldError error={errors.reply} />
+                    </div>
+                    <div>
+                        <label style={labelSt}>التنسيق</label>
+                        <select value={form.format} onChange={e => setForm({ ...form, format: e.target.value })} style={fieldStyle("format")}>
                             <option value="plain">نص عادي (Plain)</option>
                             <option value="markdown">Markdown</option>
-                        </select></div>
+                        </select>
+                        <FieldError error={errors.format} />
+                    </div>
                 </div>
             )
         case "action":
-            return (
-                <div style={sectionBox}>
-                    {sectionTitle("⚡", "إعدادات الإجراء (Action)")}
-                    <div><label style={labelSt}>نوع الإجراء *</label>
-                        <select value={form.actionType} onChange={e => setForm({ ...form, actionType: e.target.value })} style={inputSt}>
-                            <option value="">— اختر نوع الإجراء —</option>
-                            <option value="handoff">🤝 تحويل لموظف (Handoff)</option>
-                            <option value="callback_request">📞 طلب اتصال (Callback)</option>
-                            <option value="close_conversation">🔒 إغلاق المحادثة</option>
-                            <option value="custom">⚙️ إجراء مخصص</option>
-                        </select></div>
-                    <div><label style={labelSt}>المعاملات (Parameters) — JSON</label>
-                        <textarea value={form.actionParams} onChange={e => setForm({ ...form, actionParams: e.target.value })} rows={3}
-                            placeholder='{"team_id": "support", "priority": "high"}'
-                            style={{ ...inputSt, fontFamily: "'Fira Code', 'Consolas', monospace", fontSize: 12, resize: "vertical", direction: "ltr", textAlign: "left" }} /></div>
-                    <div><label style={labelSt}>رسالة الرد — تُرسل عند تنفيذ الإجراء</label>
-                        <textarea value={form.reply} onChange={e => setForm({ ...form, reply: e.target.value })} rows={2} placeholder="جاري تحويلك لموظف الخدمة..." style={{ ...inputSt, resize: "vertical", lineHeight: 1.6 }} /></div>
-                </div>
-            )
+            return <HandoffActionFields form={form} setForm={setForm} mode={mode} />
         case "images":
             return (
                 <div style={sectionBox}>
                     {sectionTitle("🖼️", "إعدادات الصور")}
-                    <MediaUploadZone form={form} setForm={setForm} accept="image/*" label="الصور" icon="🖼️" />
-                    <div><label style={labelSt}>النص التوضيحي (Caption)</label>
-                        <textarea value={form.caption} onChange={e => setForm({ ...form, caption: e.target.value })} rows={2} placeholder="وصف يُرسل مع الصورة" style={{ ...inputSt, resize: "vertical" }} /></div>
-                    <div><label style={labelSt}>رسالة بعد الوسائط</label>
-                        <textarea value={form.replyAfterMedia} onChange={e => setForm({ ...form, replyAfterMedia: e.target.value })} rows={2} placeholder="نص يُرسل بعد إرسال الصور" style={{ ...inputSt, resize: "vertical" }} /></div>
+                    <MediaUploadZone form={form} setForm={setForm} accept="image/*" label="الصور" icon="🖼️" templateId={templateId} itemId={itemId} />
+                    <FieldError error={errors.assets} />
+                </div>
+            )
+        case "multi":
+            return (
+                <div style={sectionBox}>
+                    {sectionTitle("📎", "وسائط متعددة (صور • ملفات • فيديو)")}
+                    <div style={{ marginBottom: 10 }}>
+                        <label style={{ display: "block", fontSize: 11.5, fontWeight: 600, color: "var(--t-text-secondary, #64748b)", marginBottom: 4 }}>نص يُرسل قبل الوسائط (اختياري)</label>
+                        <textarea value={form.reply} onChange={e => setForm({ ...form, reply: e.target.value })} rows={2} placeholder="إليك الملفات المطلوبة 📎" maxLength={4096}
+                            style={{ width: "100%", padding: "8px 12px", borderRadius: 8, border: "1px solid var(--t-border-light, #e2e8f0)", background: "var(--t-card, #fff)", fontSize: 12.5, resize: "vertical" as const, minHeight: 48 }} />
+                    </div>
+                    <MediaUploadZone form={form} setForm={setForm} accept="*/*" label="الملفات" icon="📎" templateId={templateId} itemId={itemId} />
+                    <FieldError error={errors.assets} />
                 </div>
             )
         case "files":
             return (
                 <div style={sectionBox}>
                     {sectionTitle("📎", "إعدادات الملفات")}
-                    <MediaUploadZone form={form} setForm={setForm} accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip" label="الملفات" icon="📎" />
-                    <div><label style={labelSt}>رسالة بعد الملف</label>
-                        <textarea value={form.replyAfterMedia} onChange={e => setForm({ ...form, replyAfterMedia: e.target.value })} rows={2} placeholder="نص يُرسل بعد إرسال الملف" style={{ ...inputSt, resize: "vertical" }} /></div>
+                    <MediaUploadZone form={form} setForm={setForm} accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip" label="الملفات" icon="📎" templateId={templateId} itemId={itemId} />
+                    <FieldError error={errors.assets} />
                 </div>
             )
         case "videos":
             return (
                 <div style={sectionBox}>
                     {sectionTitle("🎬", "إعدادات الفيديوهات")}
-                    <MediaUploadZone form={form} setForm={setForm} accept="video/*" label="الفيديوهات" icon="🎬" />
-                    <div><label style={labelSt}>رسالة بعد الفيديو</label>
-                        <textarea value={form.replyAfterMedia} onChange={e => setForm({ ...form, replyAfterMedia: e.target.value })} rows={2} placeholder="نص يُرسل بعد إرسال الفيديو" style={{ ...inputSt, resize: "vertical" }} /></div>
-                </div>
-            )
-        case "buttons":
-            return (
-                <div style={sectionBox}>
-                    {sectionTitle("🔘", "إعدادات الأزرار")}
-                    {form.buttonItems.map((b, i) => (
-                        <div key={i} style={{ display: "flex", gap: 6, alignItems: "center", padding: 8, borderRadius: 8, background: "var(--t-card, #fff)", border: "1px solid var(--t-border-light)" }}>
-                            <select value={b.type} onChange={e => { const n = [...form.buttonItems]; n[i] = { ...n[i], type: e.target.value }; setForm({ ...form, buttonItems: n }) }} style={{ ...inputSt, width: 90, fontSize: 11, padding: "6px 8px" }}>
-                                <option value="url">🔗 رابط</option>
-                                <option value="reply">↩️ رد</option>
-                            </select>
-                            <input value={b.title} onChange={e => { const n = [...form.buttonItems]; n[i] = { ...n[i], title: e.target.value }; setForm({ ...form, buttonItems: n }) }} placeholder="نص الزر" style={{ ...inputSt, flex: 1, fontSize: 12, padding: "6px 10px" }} />
-                            <input value={b.value} onChange={e => { const n = [...form.buttonItems]; n[i] = { ...n[i], value: e.target.value }; setForm({ ...form, buttonItems: n }) }} placeholder={b.type === "url" ? "https://..." : "القيمة"} style={{ ...inputSt, flex: 1, fontSize: 12, padding: "6px 10px" }} dir="ltr" />
-                            <button onClick={() => { const n = form.buttonItems.filter((_, j) => j !== i); setForm({ ...form, buttonItems: n }) }} style={{ ...iconBtn, color: "var(--t-danger)" }}><X size={14} /></button>
-                        </div>
-                    ))}
-                    <button onClick={() => setForm({ ...form, buttonItems: [...form.buttonItems, { type: "reply", title: "", value: "" }] })}
-                        style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 14px", borderRadius: 8, border: "1px dashed var(--t-border-light)", background: "transparent", color: "var(--t-accent)", fontSize: 12, fontWeight: 500, cursor: "pointer" }}>
-                        <Plus size={13} /> إضافة زر {form.buttonItems.length > 0 && `(${form.buttonItems.length})`}
-                    </button>
-                    {form.buttonItems.length >= 3 && <p style={{ fontSize: 10, color: "var(--t-warning)", margin: 0 }}>⚠️ الحد الأقصى لواتساب 3 أزرار</p>}
+                    <MediaUploadZone form={form} setForm={setForm} accept="video/*" label="الفيديوهات" icon="🎬" templateId={templateId} itemId={itemId} />
+                    <FieldError error={errors.assets} />
                 </div>
             )
         case "list":
             return (
                 <div style={sectionBox}>
-                    {sectionTitle("📋", "إعدادات القائمة (List)")}
-                    <div><label style={labelSt}>الأقسام (Sections) — JSON</label>
-                        <textarea value={form.listSections} onChange={e => setForm({ ...form, listSections: e.target.value })} rows={6}
-                            placeholder={'[\n  {\n    "title": "القسم الأول",\n    "rows": [\n      { "id": "1", "title": "عنصر", "description": "وصف" }\n    ]\n  }\n]'}
-                            style={{ ...inputSt, fontFamily: "'Fira Code', monospace", fontSize: 11, resize: "vertical", direction: "ltr", textAlign: "left" }} /></div>
-                    <div><label style={labelSt}>نص الزر</label>
-                        <input value={form.presButton} onChange={e => setForm({ ...form, presButton: e.target.value })} placeholder="عرض القائمة" style={inputSt} /></div>
+                    {sectionTitle("📋", "إعدادات القائمة التفاعلية (List)")}
+                    <div>
+                        <label style={labelSt}>النص المصاحب <CharCounter value={form.listText} max={LIMITS.LIST_TEXT} /></label>
+                        <textarea value={form.listText} onChange={e => setForm({ ...form, listText: e.target.value })} rows={2}
+                            placeholder="اختر من القائمة التالية..." style={{ ...fieldStyle("listText", { ...inputSt, resize: "vertical" as const }) }} maxLength={LIMITS.LIST_TEXT} />
+                        <FieldError error={errors.listText} />
+                    </div>
+                    <div>
+                        <label style={labelSt}>العناصر ({form.listItems.length}/{LIMITS.LIST_ITEMS_MAX})</label>
+                        <FieldError error={errors.listItems} />
+                    </div>
+                    {form.listItems.map((li, i) => {
+                        const idErr = errors[`listItem_${i}_id`]
+                        const titleErr = errors[`listItem_${i}_title`]
+                        const descErr = errors[`listItem_${i}_desc`]
+                        const targetErr = errors[`listItem_${i}_target`]
+                        const hasItemErr = idErr || titleErr || descErr || targetErr
+                        return (
+                            <div key={i} style={{ padding: 8, borderRadius: 8, background: "var(--t-card, #fff)", border: `1px solid ${hasItemErr ? "#ef4444" : "var(--t-border-light)"}`, transition: "border-color 0.2s" }}>
+                                <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                                    <input value={li.id} onChange={e => { const n = [...form.listItems]; n[i] = { ...n[i], id: e.target.value }; setForm({ ...form, listItems: n }) }}
+                                        placeholder="ID" style={{ ...inputSt, width: 60, fontSize: 11, padding: "6px 8px", ...(idErr ? errorBorder : {}) }} dir="ltr" />
+                                    <div style={{ flex: 1, display: "flex", alignItems: "center", gap: 4 }}>
+                                        <input value={li.title} onChange={e => { const n = [...form.listItems]; n[i] = { ...n[i], title: e.target.value }; setForm({ ...form, listItems: n }) }}
+                                            placeholder="العنوان" style={{ ...inputSt, flex: 1, fontSize: 12, padding: "6px 10px", ...(titleErr ? errorBorder : {}) }} maxLength={LIMITS.LIST_ITEM_TITLE + 5} />
+                                        <CharCounter value={li.title} max={LIMITS.LIST_ITEM_TITLE} />
+                                    </div>
+                                    <div style={{ flex: 1, display: "flex", alignItems: "center", gap: 4 }}>
+                                        <input value={li.description} onChange={e => { const n = [...form.listItems]; n[i] = { ...n[i], description: e.target.value }; setForm({ ...form, listItems: n }) }}
+                                            placeholder="الوصف" style={{ ...inputSt, flex: 1, fontSize: 12, padding: "6px 10px", ...(descErr ? errorBorder : {}) }} maxLength={LIMITS.LIST_ITEM_DESC + 10} />
+                                        <CharCounter value={li.description} max={LIMITS.LIST_ITEM_DESC} />
+                                    </div>
+                                    <input value={li.target_key} onChange={e => { const n = [...form.listItems]; n[i] = { ...n[i], target_key: e.target.value }; setForm({ ...form, listItems: n }) }}
+                                        placeholder="target_key" style={{ ...inputSt, width: 100, fontSize: 11, padding: "6px 8px", ...(targetErr ? errorBorder : {}) }} dir="ltr" />
+                                    <button onClick={() => { const n = form.listItems.filter((_, j) => j !== i); setForm({ ...form, listItems: n }) }} style={{ ...iconBtn, color: "var(--t-danger)" }}><X size={14} /></button>
+                                </div>
+                                {hasItemErr && (
+                                    <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 4 }}>
+                                        {idErr && <FieldError error={idErr} />}
+                                        {titleErr && <FieldError error={titleErr} />}
+                                        {descErr && <FieldError error={descErr} />}
+                                        {targetErr && <FieldError error={targetErr} />}
+                                    </div>
+                                )}
+                            </div>
+                        )
+                    })}
+                    {form.listItems.length < LIMITS.LIST_ITEMS_MAX && (
+                        <button onClick={() => setForm({ ...form, listItems: [...form.listItems, { id: `item_${form.listItems.length + 1}`, title: "", description: "", target_key: "" }] })}
+                            style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 14px", borderRadius: 8, border: "1px dashed var(--t-border-light)", background: "transparent", color: "var(--t-accent)", fontSize: 12, fontWeight: 500, cursor: "pointer" }}>
+                            <Plus size={13} /> إضافة عنصر
+                        </button>
+                    )}
                 </div>
             )
-        case "quick_reply":
-            return (
-                <div style={sectionBox}>
-                    {sectionTitle("⚡↩️", "الردود السريعة (Quick Replies)")}
-                    <div><label style={labelSt}>نص الرسالة</label>
-                        <textarea value={form.reply} onChange={e => setForm({ ...form, reply: e.target.value })} rows={2} placeholder="سؤال أو نص يُعرض مع الأزرار..." style={{ ...inputSt, resize: "vertical" }} /></div>
-                    <div><label style={labelSt}>الردود السريعة — JSON</label>
-                        <textarea value={form.quickReplies} onChange={e => setForm({ ...form, quickReplies: e.target.value })} rows={4}
-                            placeholder={'[\n  { "id": "yes", "title": "نعم" },\n  { "id": "no", "title": "لا" }\n]'}
-                            style={{ ...inputSt, fontFamily: "'Fira Code', monospace", fontSize: 11, resize: "vertical", direction: "ltr", textAlign: "left" }} /></div>
-                </div>
-            )
+        case "api_call":
+            return <ApiCallFields form={form} setForm={setForm} />
         default:
             return <p style={{ fontSize: 12, color: "var(--t-text-faint)", margin: 0 }}>لا توجد حقول إضافية لهذا النوع</p>
     }
 }
 
 // ── Media Preview Component ──
-function MediaPreview({ assetIds, type }: { assetIds: string[]; type: "images" | "files" | "videos" }) {
-    const [urls, setUrls] = useState<Record<string, { url: string; filename: string; loading: boolean; error?: string }>>({})
+function MediaPreview({ assets, type }: { assets: { asset_id: string; caption?: string | null }[]; type: "images" | "files" | "videos" }) {
+    const [urls, setUrls] = useState<Record<string, { url: string; loading: boolean; error?: string }>>({})
     const [lightboxUrl, setLightboxUrl] = useState<string | null>(null)
 
     useEffect(() => {
-        if (!assetIds.length) return
+        if (!assets.length) return
         const init: typeof urls = {}
-        assetIds.forEach(id => { init[id] = { url: "", filename: "", loading: true } })
+        assets.forEach(a => { init[a.asset_id] = { url: "", loading: true } })
         setUrls(init)
-        assetIds.forEach(async (id) => {
+        assets.forEach(async (a) => {
             try {
-                const res = await menuService.getMediaPublicUrl(id)
-                setUrls(prev => ({ ...prev, [id]: { url: res.data.url, filename: id, loading: false } }))
+                const res = await menuService.getMediaPublicUrl(a.asset_id)
+                setUrls(prev => ({ ...prev, [a.asset_id]: { url: res.data.url, loading: false } }))
             } catch {
-                setUrls(prev => ({ ...prev, [id]: { url: "", filename: "", loading: false, error: "فشل التحميل" } }))
+                setUrls(prev => ({ ...prev, [a.asset_id]: { url: "", loading: false, error: "فشل التحميل" } }))
             }
         })
-    }, [assetIds])
+    }, [assets])
 
     return (
         <>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 6 }}>
-                {assetIds.map(id => {
-                    const entry = urls[id]
+                {assets.map(a => {
+                    const entry = urls[a.asset_id]
                     if (!entry || entry.loading) return (
-                        <div key={id} style={{ width: type === "images" ? 100 : "100%", height: type === "images" ? 100 : 48, borderRadius: 10, background: "var(--t-surface, var(--t-surface))", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid var(--t-border-light, var(--t-border))" }}>
+                        <div key={a.asset_id} style={{ width: type === "images" ? 100 : "100%", height: type === "images" ? 100 : 48, borderRadius: 10, background: "var(--t-surface)", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid var(--t-border-light, var(--t-border))" }}>
                             <Loader2 size={16} className="animate-spin" style={{ color: "var(--t-text-faint)" }} />
                         </div>
                     )
                     if (entry.error) return (
-                        <div key={id} style={{ width: type === "images" ? 100 : "100%", height: type === "images" ? 100 : 48, borderRadius: 10, background: "rgba(239,68,68,0.04)", border: "1px solid rgba(239,68,68,0.15)", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, fontSize: 11, color: "var(--t-danger)" }}>
+                        <div key={a.asset_id} style={{ width: type === "images" ? 100 : "100%", height: type === "images" ? 100 : 48, borderRadius: 10, background: "rgba(239,68,68,0.04)", border: "1px solid rgba(239,68,68,0.15)", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, fontSize: 11, color: "var(--t-danger)" }}>
                             <AlertCircle size={14} /> {entry.error}
                         </div>
                     )
                     if (type === "images") return (
-                        <div key={id} onClick={() => setLightboxUrl(entry.url)} style={{ width: 100, height: 100, borderRadius: 10, overflow: "hidden", border: "1px solid var(--t-border-light, var(--t-border))", cursor: "pointer", transition: "all 0.2s" }}
-                            onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 4px 16px rgba(0,0,0,0.12)"; e.currentTarget.style.transform = "scale(1.05)" }}
-                            onMouseLeave={e => { e.currentTarget.style.boxShadow = "none"; e.currentTarget.style.transform = "scale(1)" }}>
-                            <img src={entry.url} alt={entry.filename} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                        <div key={a.asset_id} style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                            <div onClick={() => setLightboxUrl(entry.url)} style={{ width: 100, height: 100, borderRadius: 10, overflow: "hidden", border: "1px solid var(--t-border-light, var(--t-border))", cursor: "pointer", transition: "all 0.2s" }}
+                                onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 4px 16px rgba(0,0,0,0.12)"; e.currentTarget.style.transform = "scale(1.05)" }}
+                                onMouseLeave={e => { e.currentTarget.style.boxShadow = "none"; e.currentTarget.style.transform = "scale(1)" }}>
+                                <img src={entry.url} alt={a.caption || a.asset_id} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                            </div>
+                            {a.caption && <span style={{ fontSize: 10, color: "var(--t-text-muted)", textAlign: "center", maxWidth: 100, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{a.caption}</span>}
                         </div>
                     )
                     if (type === "videos") return (
-                        <div key={id} style={{ width: "100%", borderRadius: 10, overflow: "hidden", border: "1px solid var(--t-border-light)" }}>
-                            <video src={entry.url} controls style={{ width: "100%", maxHeight: 200, display: "block", background: "#000" }} />
+                        <div key={a.asset_id} style={{ width: "100%" }}>
+                            <div style={{ borderRadius: 10, overflow: "hidden", border: "1px solid var(--t-border-light)" }}>
+                                <video src={entry.url} controls style={{ width: "100%", maxHeight: 200, display: "block", background: "#000" }} />
+                            </div>
+                            {a.caption && <span style={{ fontSize: 11, color: "var(--t-text-muted)", marginTop: 3, display: "block" }}>📌 {a.caption}</span>}
                         </div>
                     )
                     return (
-                        <a key={id} href={entry.url} target="_blank" rel="noreferrer" style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "10px 14px", borderRadius: 10, textDecoration: "none", background: "var(--t-card, #fff)", border: "1px solid var(--t-border-light)", transition: "all 0.15s" }}
+                        <a key={a.asset_id} href={entry.url} target="_blank" rel="noreferrer" style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "10px 14px", borderRadius: 10, textDecoration: "none", background: "var(--t-card, #fff)", border: "1px solid var(--t-border-light)", transition: "all 0.15s" }}
                             onMouseEnter={e => e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.06)"}
                             onMouseLeave={e => e.currentTarget.style.boxShadow = "none"}>
                             <div style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(156,39,176,0.08)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                                 <Paperclip size={14} style={{ color: "#9c27b0" }} />
                             </div>
                             <div style={{ flex: 1, minWidth: 0 }}>
-                                <span style={{ fontSize: 12, fontWeight: 600, color: "var(--t-text, #1f2937)", display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{entry.filename || id}</span>
+                                <span style={{ fontSize: 12, fontWeight: 600, color: "var(--t-text, #1f2937)", display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{a.caption || a.asset_id}</span>
                                 <span style={{ fontSize: 10, color: "var(--t-text-faint)" }}>انقر للتحميل</span>
                             </div>
                         </a>
@@ -390,8 +1038,8 @@ function DetailContentView({ item }: { item: MenuItem }) {
         return (
             <div style={{ marginTop: 10 }}>
                 <span style={{ fontSize: 11, fontWeight: 600, color: "var(--t-text-muted)" }}>الرد:</span>
-                <div style={{ padding: 10, borderRadius: 8, background: "var(--t-surface, var(--t-page))", fontSize: 12, whiteSpace: "pre-wrap", lineHeight: 1.7, marginTop: 4 }}>{c.reply}</div>
-                {c.format && c.format !== "plain" && <span style={{ fontSize: 10, color: "var(--t-text-faint)", marginTop: 2, display: "block" }}>التنسيق: {c.format}</span>}
+                <div style={{ padding: 10, borderRadius: 8, background: "var(--t-surface, var(--t-page))", fontSize: 12, whiteSpace: "pre-wrap", lineHeight: 1.7, marginTop: 4 }}>{c.reply as string}</div>
+                {c.format && c.format !== "plain" && <span style={{ fontSize: 10, color: "var(--t-text-faint)", marginTop: 2, display: "block" }}>التنسيق: {c.format as string}</span>}
             </div>
         )
     }
@@ -403,35 +1051,54 @@ function DetailContentView({ item }: { item: MenuItem }) {
                 {c.action.params && Object.keys(c.action.params).length > 0 && (
                     <pre style={{ padding: 8, borderRadius: 8, background: "#1f2937", color: "#a5f3fc", fontSize: 11, margin: 0, overflow: "auto", maxHeight: 100 }}>{JSON.stringify(c.action.params, null, 2)}</pre>
                 )}
-                {c.reply && <div style={{ fontSize: 12, color: "var(--t-text-secondary)" }}>↩️ {c.reply}</div>}
+                {c.reply && <div style={{ fontSize: 12, color: "var(--t-text-secondary)" }}>↩️ {c.reply as string}</div>}
             </div>
         )
     }
-    if ((item.type === "images" || item.type === "files" || item.type === "videos") && (c.asset_ids?.length || c.reply_after_media)) {
+    if ((item.type === "images" || item.type === "files" || item.type === "videos" || item.type === "multi") && c.assets && (c.assets as { asset_id: string; caption?: string | null }[]).length > 0) {
+        const assets = c.assets as { asset_id: string; caption?: string | null }[]
         const icons: Record<string, string> = { images: "🖼️", files: "📎", videos: "🎬" }
         const labels: Record<string, string> = { images: "صور", files: "ملفات", videos: "فيديوهات" }
         return (
             <div style={{ ...sectionBox, marginTop: 10, gap: 8 }}>
-                <span style={{ fontWeight: 700, fontSize: 11, display: "flex", alignItems: "center", gap: 4 }}>{icons[item.type]} {labels[item.type]} {c.asset_ids?.length ? `(${c.asset_ids.length})` : ""}</span>
-                {c.asset_ids && c.asset_ids.length > 0 && <MediaPreview assetIds={c.asset_ids} type={item.type as "images" | "files" | "videos"} />}
-                {c.caption && <div style={{ fontSize: 12, color: "var(--t-text-secondary)" }}>📌 {c.caption}</div>}
-                {c.reply_after_media && <div style={{ fontSize: 12, color: "var(--t-text-secondary)" }}>↩️ {c.reply_after_media}</div>}
+                <span style={{ fontWeight: 700, fontSize: 11, display: "flex", alignItems: "center", gap: 4 }}>{icons[item.type]} {labels[item.type]} ({assets.length})</span>
+                <MediaPreview assets={assets} type={item.type as "images" | "files" | "videos"} />
             </div>
         )
     }
-    if (item.type === "buttons" && c.buttons?.length) {
+    if (item.type === "list" && c.items && (c.items as { id: string; title: string; description?: string; target_key?: string }[]).length > 0) {
+        const listItems = c.items as { id: string; title: string; description?: string; target_key?: string }[]
         return (
             <div style={{ ...sectionBox, marginTop: 10, gap: 6 }}>
-                <span style={{ fontWeight: 700, color: "#7b1fa2", fontSize: 11, display: "flex", alignItems: "center", gap: 4 }}>🔘 أزرار ({c.buttons.length})</span>
-                {c.buttons.map((b, i) => (
+                <span style={{ fontWeight: 700, color: "#00796b", fontSize: 11, display: "flex", alignItems: "center", gap: 4 }}><List size={12} /> قائمة تفاعلية ({listItems.length})</span>
+                {c.text && <div style={{ fontSize: 12, color: "var(--t-text-secondary)" }}>{c.text as string}</div>}
+                {listItems.map((li, i) => (
                     <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: 8, borderRadius: 8, background: "var(--t-card, #fff)" }}>
-                        {b.type === "url" ? <Link2 size={13} style={{ color: "var(--t-accent)", flexShrink: 0 }} /> : <MousePointerClick size={13} style={{ color: "var(--t-success)", flexShrink: 0 }} />}
-                        <span style={{ fontSize: 12, fontWeight: 500, flex: 1 }}>{b.title}</span>
-                        <span style={{ fontSize: 9, padding: "2px 6px", borderRadius: 6, background: b.type === "url" ? "rgba(27,80,145,0.08)" : "rgba(16,185,129,0.08)", color: b.type === "url" ? "var(--t-accent)" : "var(--t-success)", fontWeight: 600 }}>
-                            {b.type === "url" ? "رابط" : "رد"}
-                        </span>
+                        <span style={{ fontSize: 12, fontWeight: 500, flex: 1 }}>{li.title}</span>
+                        {li.description && <span style={{ fontSize: 10, color: "var(--t-text-faint)" }}>{li.description}</span>}
+                        {li.target_key && <span style={{ fontSize: 9, padding: "2px 6px", borderRadius: 6, background: "rgba(0,121,107,0.08)", color: "#00796b", fontWeight: 600 }}>{li.target_key}</span>}
                     </div>
                 ))}
+            </div>
+        )
+    }
+    if (item.type === "api_call" && c.url) {
+        const inputs = (c.inputs as ApiCallInputField[]) || []
+        const modeLabel = c.execution_mode === "collect_data" ? "جمع بيانات" : "فوري"
+        return (
+            <div style={{ ...sectionBox, marginTop: 10, gap: 6 }}>
+                <span style={{ fontWeight: 700, color: "#0288d1", fontSize: 11, display: "flex", alignItems: "center", gap: 4 }}><Globe size={12} /> استدعاء API</span>
+                <div style={{ fontSize: 12 }}>
+                    <span style={{ padding: "2px 8px", borderRadius: 6, background: "rgba(2,136,209,0.1)", color: "#0288d1", fontWeight: 600, fontSize: 11, marginLeft: 6 }}>{(c.method as string) || "POST"}</span>
+                    <code style={{ fontSize: 11, color: "var(--t-text-secondary)", marginRight: 4 }} dir="ltr">{c.url as string}</code>
+                </div>
+                <div style={{ fontSize: 11, color: "var(--t-text-muted)" }}>الوضع: {modeLabel} • المهلة: {(c.timeout_seconds as number) || 30}ث</div>
+                {inputs.length > 0 && (
+                    <div style={{ fontSize: 11, color: "var(--t-text-muted)" }}>المدخلات: {inputs.map(inp => inp.label || inp.key).join("، ")}</div>
+                )}
+                {c.auth_type && c.auth_type !== "none" && (
+                    <span style={{ fontSize: 10, padding: "2px 6px", borderRadius: 6, background: "rgba(237,108,2,0.08)", color: "#ed6c02", fontWeight: 600 }}>🔐 {c.auth_type as string}</span>
+                )}
             </div>
         )
     }
@@ -469,20 +1136,49 @@ export function TreeEditorTab({ selectedTemplateId }: TreeEditorTabProps) {
     const [saving, setSaving] = useState(false)
     const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null)
     const [previewVisible, setPreviewVisible] = useState(true)
+    const [toast, setToast] = useState<ToastData | null>(null)
+    const toastTimer = React.useRef<ReturnType<typeof setTimeout>>(undefined)
+    const showToast = useCallback((t: ToastData) => {
+        clearTimeout(toastTimer.current)
+        setToast(t)
+        toastTimer.current = setTimeout(() => setToast(null), 6000)
+    }, [])
+    const closeToast = useCallback(() => { clearTimeout(toastTimer.current); setToast(null) }, [])
     const [eTitle, setETitle] = useState("")
     const [eKey, setEKey] = useState("")
     const [eDesc, setEDesc] = useState("")
     const [eActive, setEActive] = useState(true)
     const [eContent, setEContent] = useState<ContentFormState>(defaultContentForm())
+    const [eOrder, setEOrder] = useState<number | "">("")
 
     const [aTitle, setATitle] = useState("")
     const [aType, setAType] = useState<MenuItemType>("text")
     const [aDesc, setADesc] = useState("")
+    const [aOrder, setAOrder] = useState<number | "">("")
     const [aContent, setAContent] = useState<ContentFormState>(defaultContentForm())
     const { canPerformAction } = usePermissions()
     const canCreateItem = canPerformAction(PAGE_BITS.MENU_MANAGER, ACTION_BITS.CREATE_MENU_ITEM)
     const canUpdateItem = canPerformAction(PAGE_BITS.MENU_MANAGER, ACTION_BITS.UPDATE_MENU_ITEM)
     const canDeleteItem = canPerformAction(PAGE_BITS.MENU_MANAGER, ACTION_BITS.DELETE_MENU_ITEM)
+
+    // ── Real-time Validation ──
+    const addErrors = useMemo(() => {
+        const titleErr = validateTitle(aTitle)
+        const contentErrors = validateContentForm(aType, aContent)
+        if (titleErr) contentErrors._title = titleErr
+        return contentErrors
+    }, [aTitle, aType, aContent])
+
+    const editErrors = useMemo(() => {
+        if (!detail || !editMode) return {} as ValidationErrors
+        const titleErr = validateTitle(eTitle)
+        const contentErrors = validateContentForm(detail.type, eContent)
+        if (titleErr) contentErrors._title = titleErr
+        return contentErrors
+    }, [eTitle, eContent, detail, editMode])
+
+    const addHasErrors = hasErrors(addErrors)
+    const editHasErrors = hasErrors(editErrors)
 
     useEffect(() => {
         menuService.listTemplates({ page: 1, limit: 100 })
@@ -526,21 +1222,25 @@ export function TreeEditorTab({ selectedTemplateId }: TreeEditorTabProps) {
     const openEdit = (item: MenuItem) => {
         setEditMode(true); setETitle(item.title); setEKey(item.key)
         setEDesc(item.description || ""); setEActive(item.is_active)
+        setEOrder(item.order ?? "")
         setEContent(loadContentForm(item))
     }
 
     const handleSave = async () => {
-        if (!tid || !detail) return; setSaving(true)
+        if (!tid || !detail || editHasErrors) return; setSaving(true)
         try {
             const p: UpdateMenuItemPayload = {}
             if (eTitle !== detail.title) p.title = eTitle
-            if (eKey !== detail.key) p.key = eKey
             if (eDesc !== (detail.description || "")) p.description = eDesc
             if (eActive !== detail.is_active) p.is_active = eActive
+            if (eOrder !== "" && eOrder !== (detail.order ?? "")) p.order = eOrder as number
             p.content = buildContent(detail.type, eContent)
             await menuService.updateItem(tid, detail.id, p)
             setEditMode(false); fetchTree(); selectNode(detail.id)
-        } catch { } finally { setSaving(false) }
+        } catch (err: any) {
+            console.error("Save error:", err)
+            showToast({ type: "error", title: "فشل الحفظ", message: extractApiError(err) })
+        } finally { setSaving(false) }
     }
 
     const handleDelete = async (id: string) => {
@@ -549,24 +1249,37 @@ export function TreeEditorTab({ selectedTemplateId }: TreeEditorTabProps) {
             await menuService.deleteItem(tid, id)
             if (selectedId === id) { setDetail(null); setSelectedId(null) }
             setDeleteConfirmId(null); fetchTree()
-        } catch { }
+        } catch (err: any) {
+            console.error("Delete error:", err)
+            showToast({ type: "error", title: "فشل الحذف", message: extractApiError(err) })
+        }
     }
 
     const resetAdd = () => {
         setAddParentId(null); setATitle("")
-        setAType("text"); setADesc(""); setAContent(defaultContentForm())
+        setAType("text"); setADesc(""); setAOrder(""); setAContent(defaultContentForm())
     }
 
     const handleAdd = async () => {
-        if (!addParentId || !tid || !aTitle.trim()) return
+        if (!addParentId || !tid || !aTitle.trim() || addHasErrors) return
         setSubmitting(true)
         try {
-            const p: CreateMenuItemPayload = { parent_id: addParentId, type: aType, title: aTitle.trim() }
-            if (aDesc.trim()) p.description = aDesc.trim()
             const content = buildContent(aType, aContent)
-            if (content) p.content = content
+            const apiType = aType
+            const p: CreateMenuItemPayload = {
+                parent_id: addParentId,
+                key: `item_${Date.now().toString(36)}`,
+                type: apiType,
+                title: aTitle.trim(),
+                content: content || {},
+            }
+            if (aDesc.trim()) p.description = aDesc.trim()
+            if (aOrder !== "") p.order = aOrder as number
             await menuService.createItem(tid, p); resetAdd(); fetchTree()
-        } catch { } finally { setSubmitting(false) }
+        } catch (err: any) {
+            console.error("Add error:", err?.response?.data || err)
+            showToast({ type: "error", title: "فشل الإضافة", message: extractApiError(err) })
+        } finally { setSubmitting(false) }
     }
 
     const renderNode = (node: MenuTreeNode, depth = 0, isLast = true): React.ReactNode => {
@@ -742,10 +1455,11 @@ export function TreeEditorTab({ selectedTemplateId }: TreeEditorTabProps) {
                                 <div style={{ flex: 1, overflowY: "auto", padding: 16, display: "flex", flexDirection: "column", gap: 12 }}>
                                     {editMode ? (
                                         <>
-                                            <div><label style={labelSt}>العنوان *</label><input value={eTitle} onChange={e => setETitle(e.target.value)} style={inputSt} /></div>
+                                            <div><label style={labelSt}>العنوان * <CharCounter value={eTitle} max={LIMITS.TITLE} /></label><input value={eTitle} onChange={e => setETitle(e.target.value)} style={editErrors._title ? { ...inputSt, ...errorBorder } : inputSt} maxLength={LIMITS.TITLE + 10} /><FieldError error={editErrors._title} /></div>
                                             <div><label style={labelSt}>المفتاح (key)</label><input value={eKey} onChange={e => setEKey(e.target.value)} style={inputSt} dir="ltr" /></div>
-                                            <div><label style={labelSt}>الوصف</label><textarea value={eDesc} onChange={e => setEDesc(e.target.value)} rows={2} style={{ ...inputSt, resize: "vertical" }} /></div>
-                                            <ContentFields type={detail.type} form={eContent} setForm={setEContent} mode="edit" />
+                                            <div><label style={labelSt}>الوصف <CharCounter value={eDesc} max={LIMITS.DESCRIPTION} /></label><textarea value={eDesc} onChange={e => setEDesc(e.target.value)} rows={2} style={{ ...inputSt, resize: "vertical" }} maxLength={LIMITS.DESCRIPTION + 20} /></div>
+                                            <div><label style={labelSt}>الترتيب (order)</label><input type="number" min={0} value={eOrder} onChange={e => setEOrder(e.target.value === "" ? "" : Number(e.target.value))} placeholder="تلقائي" style={{ ...inputSt, direction: "ltr" }} /></div>
+                                            <ContentFields type={detail.type} form={eContent} setForm={setEContent} mode="edit" errors={editErrors} templateId={tid} itemId={detail.id} />
                                             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 0" }}>
                                                 <label style={{ ...labelSt, margin: 0 }}>مفعّل</label>
                                                 <button onClick={() => setEActive(!eActive)} style={{ width: 40, height: 22, borderRadius: 11, border: "none", cursor: "pointer", background: eActive ? "var(--t-accent)" : "var(--t-border-medium)", position: "relative", transition: "all 0.2s" }}>
@@ -770,7 +1484,7 @@ export function TreeEditorTab({ selectedTemplateId }: TreeEditorTabProps) {
                                     {editMode ? (
                                         <>
                                             <button onClick={() => setEditMode(false)} style={{ flex: 1, padding: "8px 14px", borderRadius: 9, border: "1px solid var(--t-border-light)", background: "transparent", color: "var(--t-text-secondary)", fontSize: 13, cursor: "pointer" }}>إلغاء</button>
-                                            <button onClick={handleSave} disabled={saving} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "8px 14px", borderRadius: 9, border: "none", cursor: "pointer", background: "var(--t-gradient-accent)", color: "#fff", fontSize: 13, fontWeight: 600, opacity: saving ? 0.7 : 1 }}>
+                                            <button onClick={handleSave} disabled={saving || editHasErrors} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "8px 14px", borderRadius: 9, border: "none", cursor: (saving || editHasErrors) ? "default" : "pointer", background: editHasErrors ? "var(--t-border)" : "var(--t-gradient-accent)", color: editHasErrors ? "var(--t-text-faint)" : "#fff", fontSize: 13, fontWeight: 600, opacity: saving ? 0.7 : 1 }}>
                                                 {saving ? <Loader2 size={13} className="animate-spin" /> : <Save size={13} />} حفظ
                                             </button>
                                         </>
@@ -798,7 +1512,7 @@ export function TreeEditorTab({ selectedTemplateId }: TreeEditorTabProps) {
                             <div>
                                 <label style={labelSt}>نوع العنصر</label>
                                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(88px, 1fr))", gap: 6 }}>
-                                    {MENU_ITEM_TYPES.filter(t => !["action", "buttons", "list", "quick_reply"].includes(t.value)).map(t => {
+                                    {MENU_ITEM_TYPES.map(t => {
                                         const I = TYPE_ICONS[t.value]
                                         const sel = aType === t.value
                                         return (
@@ -820,18 +1534,21 @@ export function TreeEditorTab({ selectedTemplateId }: TreeEditorTabProps) {
                                 </div>
                             </div>
                             <div>
-                                <label style={labelSt}>العنوان *</label><input value={aTitle} onChange={e => setATitle(e.target.value)} placeholder="عنوان العنصر" style={inputSt} />
+                                <label style={labelSt}>العنوان * <CharCounter value={aTitle} max={LIMITS.TITLE} /></label>
+                                <input value={aTitle} onChange={e => setATitle(e.target.value)} placeholder="عنوان العنصر" style={addErrors._title ? { ...inputSt, ...errorBorder } : inputSt} maxLength={LIMITS.TITLE + 10} />
+                                <FieldError error={addErrors._title} />
                             </div>
-                            <div><label style={labelSt}>الوصف (اختياري)</label><input value={aDesc} onChange={e => setADesc(e.target.value)} placeholder="وصف قصير..." style={inputSt} /></div>
-                            <ContentFields type={aType} form={aContent} setForm={setAContent} mode="add" />
+                            <div><label style={labelSt}>الوصف (اختياري) <CharCounter value={aDesc} max={LIMITS.DESCRIPTION} /></label><input value={aDesc} onChange={e => setADesc(e.target.value)} placeholder="وصف قصير..." style={inputSt} maxLength={LIMITS.DESCRIPTION + 20} /></div>
+                            <div><label style={labelSt}>الترتيب (order)</label><input type="number" min={0} value={aOrder} onChange={e => setAOrder(e.target.value === "" ? "" : Number(e.target.value))} placeholder="تلقائي" style={{ ...inputSt, direction: "ltr" }} /></div>
+                            <ContentFields type={aType} form={aContent} setForm={setAContent} mode="add" errors={addErrors} />
                         </div>
                         <div style={{ padding: "12px 20px", borderTop: "1px solid var(--t-border-light)", display: "flex", justifyContent: "flex-end", gap: 8, flexShrink: 0 }}>
                             <button onClick={resetAdd} style={{ padding: "8px 18px", borderRadius: 8, border: "1px solid var(--t-border-light)", background: "transparent", color: "var(--t-text-secondary)", fontSize: 13, cursor: "pointer" }}>إلغاء</button>
-                            <button onClick={handleAdd} disabled={submitting || !aTitle.trim()} style={{
+                            <button onClick={handleAdd} disabled={submitting || !aTitle.trim() || addHasErrors} style={{
                                 padding: "8px 20px", borderRadius: 8, border: "none",
-                                background: aTitle.trim() ? "var(--t-gradient-accent)" : "var(--t-border)",
-                                color: aTitle.trim() ? "#fff" : "var(--t-text-faint)",
-                                fontSize: 13, fontWeight: 600, cursor: aTitle.trim() ? "pointer" : "default",
+                                background: (!aTitle.trim() || addHasErrors) ? "var(--t-border)" : "var(--t-gradient-accent)",
+                                color: (!aTitle.trim() || addHasErrors) ? "var(--t-text-faint)" : "#fff",
+                                fontSize: 13, fontWeight: 600, cursor: (!aTitle.trim() || addHasErrors) ? "default" : "pointer",
                                 display: "flex", alignItems: "center", gap: 6,
                                 opacity: submitting ? 0.7 : 1,
                             }}>
@@ -861,10 +1578,15 @@ export function TreeEditorTab({ selectedTemplateId }: TreeEditorTabProps) {
                 </div>
             )}
 
+            {/* 🔔 Toast */}
+            <Toast toast={toast} onClose={closeToast} />
+
             <style>{`
                 @keyframes fadeIn { from { opacity:0 } to { opacity:1 } }
                 @keyframes modalSlideIn { from { opacity:0; transform:translateY(24px) scale(.96) } to { opacity:1; transform:translateY(0) scale(1) } }
                 @keyframes treeSlide { from { opacity:0; max-height:0 } to { opacity:1; max-height:3000px } }
+                @keyframes fieldErrorIn { from { opacity:0; transform:translateY(-4px) } to { opacity:1; transform:translateY(0) } }
+                @keyframes toastSlideIn { from { opacity:0; transform:translateX(-50%) translateY(-20px) } to { opacity:1; transform:translateX(-50%) translateY(0) } }
             `}</style>
         </div>
     )

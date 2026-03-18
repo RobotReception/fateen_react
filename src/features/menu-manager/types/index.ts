@@ -69,9 +69,149 @@ export type MenuItemType =
     | "images"
     | "files"
     | "videos"
-    | "buttons"
     | "list"
-    | "quick_reply"
+    | "multi" // UI-only: accepts any file type, sends as 'images' to backend
+    | "api_call"
+
+/** Single asset with per-asset caption */
+export interface MediaAssetEntry {
+    asset_id: string
+    caption?: string | null
+}
+
+/** Action definition used in action items and list items */
+export interface ActionDefinition {
+    type: string
+    params?: Record<string, unknown>
+}
+
+/** Single list item entry */
+export interface ListItemEntry {
+    id: string
+    title: string
+    description?: string
+    target_key?: string
+    action?: ActionDefinition
+}
+
+/** Single input field for api_call — matches backend ApiCallInput */
+export interface ApiCallInputField {
+    key: string
+    label: string
+    type: string  // text | number | email | phone | select | select_api | date | image | file | api_enrichment | computed
+
+    required?: boolean
+    order?: number
+
+    // Prompts & messages
+    prompt_message?: string
+    error_message?: string
+    placeholder?: string
+    default_value?: string | null
+
+    // Validation
+    validation_regex?: string
+    min_value?: number | null
+    max_value?: number | null
+    min_length?: number | null
+    max_length?: number | null
+    type_error?: string
+
+    // Select options (static)
+    options?: { value: string; label: string; constraints?: Record<string, unknown> }[]
+    display_as?: string  // interactive_list | numbered_list
+
+    // Select API (dynamic options from API)
+    options_source?: {
+        url: string
+        method?: string
+        query_params?: Record<string, string>
+        headers?: Record<string, string>
+        response_path?: string
+        label_field?: string
+        value_field?: string
+        empty_message?: string
+    }
+
+    // Image analysis
+    image_analysis?: {
+        enabled: boolean
+        analysis_prompt?: string
+        must_be_description?: string
+        extract_fields?: string[]
+        low_quality_message?: string
+        invalid_image_message?: string
+        success_message?: string
+        partial_message?: string
+    }
+
+    // API enrichment (mid-flow API call)
+    trigger_after?: string[]
+    api_call_config?: {
+        url: string
+        method?: string
+        body?: Record<string, unknown>
+        auto_fill_fields?: Record<string, string>
+        success_message?: string
+        not_found_message?: string
+        loading_message?: string
+    }
+
+    // Computed
+    formula?: string
+    display_in_summary?: boolean
+
+    // Dependencies
+    depends_on?: string[]
+    show_condition?: string
+    cross_validation?: { rule: string; error_message: string }[]
+    filter_options?: boolean
+    default_when?: Record<string, string>
+
+    // File-specific
+    accepted_types?: string[]
+    max_size_mb?: number
+}
+
+/** API call content configuration — matches backend ApiCallContent */
+export interface ApiCallContentConfig {
+    // Endpoint
+    url: string
+    method: string  // GET | POST | PUT | PATCH | DELETE
+    headers?: Record<string, string>
+    timeout_seconds?: number
+    retry_count?: number
+
+    // Authentication
+    auth_type?: string  // none | bearer | api_key | basic
+    auth_config?: Record<string, string>
+
+    // Execution mode
+    execution_mode: string  // immediate | collect_data
+    collection_strategy?: string  // sequential | ai_managed
+
+    // Inputs
+    inputs?: ApiCallInputField[]
+    initial_message?: string
+
+    // Request template
+    body_template?: Record<string, unknown>
+    query_params?: Record<string, string>
+
+    // Confirmation
+    require_confirmation?: boolean
+    confirmation_template?: string
+
+    // Response handling
+    response_type?: string  // text | text_with_media | conditional
+    success_template?: string
+    error_template?: string
+    media_url_path?: string
+    media_type?: string  // image | video | document
+    media_caption_template?: string
+    response_mapping?: Record<string, string>
+    conditional_responses?: { condition: string; template: string }[]
+}
 
 export interface MenuItemContent {
     // submenu presentation
@@ -80,17 +220,36 @@ export interface MenuItemContent {
     reply?: string
     format?: string
     // action
-    action?: { type: string; params?: Record<string, unknown> }
-    // media
-    reply_after_media?: string | null
-    asset_ids?: string[]
-    // images (new format)
-    caption?: string
-    images?: { url: string; alt?: string }[]
-    // files (new format)
-    files?: { url: string; filename: string; mime_type?: string }[]
-    // buttons (new format)
-    buttons?: { type: "url" | "reply"; title: string; value: string }[]
+    action?: ActionDefinition
+    // media (images / files / videos) — new assets array structure
+    assets?: MediaAssetEntry[]
+    // list
+    text?: string
+    items?: ListItemEntry[]
+    // api_call — all fields from ApiCallContentConfig
+    url?: string
+    method?: string
+    headers?: Record<string, string>
+    timeout_seconds?: number
+    retry_count?: number
+    auth_type?: string
+    auth_config?: Record<string, string>
+    execution_mode?: string
+    collection_strategy?: string
+    inputs?: ApiCallInputField[]
+    initial_message?: string
+    body_template?: Record<string, unknown>
+    query_params?: Record<string, string>
+    require_confirmation?: boolean
+    confirmation_template?: string
+    response_type?: string
+    success_template?: string
+    error_template?: string
+    media_url_path?: string
+    media_type?: string
+    media_caption_template?: string
+    response_mapping?: Record<string, string>
+    conditional_responses?: { condition: string; template: string }[]
     // generic fallback
     [key: string]: unknown
 }
@@ -126,42 +285,36 @@ export interface ItemsListData {
 }
 
 export interface CreateMenuItemPayload {
-    parent_id: string
-    key?: string
+    parent_id: string | null
+    key: string
     type: MenuItemType
     title: string
     description?: string
-    content?: MenuItemContent
-    is_active?: boolean
+    content: MenuItemContent
     order?: number
-    // submenu-specific (API also accepts top-level)
-    header?: string
-    footer?: string
-    button?: string
 }
 
 export interface UpdateMenuItemPayload {
-    key?: string
     title?: string
     description?: string
-    type?: MenuItemType
     content?: MenuItemContent
     is_active?: boolean
     order?: number
-    parent_id?: string
-    header?: string
-    footer?: string
-    button?: string
 }
 
 export interface MoveItemPayload {
     new_parent_id?: string | null
-    new_order?: number
+    new_order: number
 }
 
 export interface ReorderItem {
     id: string
     order: number
+}
+
+export interface DuplicateItemPayload {
+    new_key: string
+    new_title?: string
 }
 
 // ── Assignments ──
@@ -318,7 +471,6 @@ export const MENU_ITEM_TYPES: MenuItemTypeConfig[] = [
     { value: "images", label: "صور", color: "#e91e63", icon: "image" },
     { value: "files", label: "ملفات", color: "#9c27b0", icon: "file" },
     { value: "videos", label: "فيديوهات", color: "#f44336", icon: "video" },
-    { value: "buttons", label: "أزرار", color: "#7b1fa2", icon: "mouse-pointer" },
-    { value: "list", label: "قائمة", color: "#00796b", icon: "list" },
-    { value: "quick_reply", label: "رد سريع", color: "#009688", icon: "reply" },
+    { value: "api_call", label: "استدعاء API", color: "#0288d1", icon: "globe" },
+    { value: "multi", label: "وسائط متعددة", color: "#795548", icon: "paperclip" },
 ]

@@ -1,14 +1,16 @@
 import { useState, useCallback, useEffect } from "react"
+import axios from "axios"
 import {
     Plus, Trash2, Edit3, Search, X, Link2, Loader2, AlertCircle,
-    User, Users, Building, Save, Calendar, Shield,
+    User, Users, Building, Save, Shield,
 } from "lucide-react"
 import * as menuService from "../services/menu-manager-service"
 import { getAccounts } from "../../inbox/services/inbox-service"
 import type { AccountInfo } from "../../inbox/services/inbox-service"
-import type { Assignment, AssignmentType, Template, CreateAssignmentPayload, UpdateAssignmentPayload } from "../types"
+import type { Assignment, AssignmentType, Template, CreateAssignmentPayload, UpdateAssignmentPayload, AccountGroup } from "../types"
 import { usePermissions } from "@/lib/usePermissions"
 import { PAGE_BITS, ACTION_BITS } from "@/lib/permissions"
+import { useAuthStore } from "@/stores/auth-store"
 
 const TYPE_CONFIG: Record<AssignmentType, { label: string; color: string; bg: string; icon: typeof User; priority: number }> = {
     account: { label: "حساب", color: "var(--t-accent)", bg: "rgba(27,80,145,0.08)", icon: User, priority: 100 },
@@ -31,6 +33,7 @@ export function AssignmentsTab(_props: AssignmentsTabProps) {
     const [showCreate, setShowCreate] = useState(false)
     const [editingAssignment, setEditingAssignment] = useState<Assignment | null>(null)
     const [submitting, setSubmitting] = useState(false)
+    const [formError, setFormError] = useState<string | null>(null)
     const [formType, setFormType] = useState<AssignmentType>("account")
     const [formTargetId, setFormTargetId] = useState("")
     const [formTemplateId, setFormTemplateId] = useState("")
@@ -45,10 +48,24 @@ export function AssignmentsTab(_props: AssignmentsTabProps) {
     // Accounts for target selector
     const [accounts, setAccounts] = useState<AccountInfo[]>([])
     const [accountsLoading, setAccountsLoading] = useState(false)
+    // Groups for target selector
+    const [groups, setGroups] = useState<AccountGroup[]>([])
+    const [groupsLoading, setGroupsLoading] = useState(false)
+    // Confirm-delete state
+    const [confirmDelete, setConfirmDelete] = useState<Assignment | null>(null)
+    const [deleting, setDeleting] = useState(false)
     const { canPerformAction } = usePermissions()
     const canCreate = canPerformAction(PAGE_BITS.MENU_MANAGER, ACTION_BITS.CREATE_ASSIGNMENT)
     const canUpdate = canPerformAction(PAGE_BITS.MENU_MANAGER, ACTION_BITS.UPDATE_ASSIGNMENT)
     const canDelete = canPerformAction(PAGE_BITS.MENU_MANAGER, ACTION_BITS.DELETE_ASSIGNMENT)
+    const tenantId = useAuthStore(s => s.user?.tenant_id || "")
+
+    // Auto-fill tenant_id when type is "tenant"
+    useEffect(() => {
+        if (formType === "tenant" && tenantId && !editingAssignment) {
+            setFormTargetId(tenantId)
+        }
+    }, [formType, tenantId, editingAssignment])
 
     const fetchAssignments = useCallback(async () => {
         setLoading(true); setError(null)
@@ -65,19 +82,38 @@ export function AssignmentsTab(_props: AssignmentsTabProps) {
 
     useEffect(() => { fetchAssignments() }, [fetchAssignments])
 
-    // Fetch accounts when modal opens
+    // Fetch accounts & groups on mount so names are available in table & modal
     useEffect(() => {
-        if (!showCreate) return
         setAccountsLoading(true)
         getAccounts().then(r => setAccounts(r.accounts || [])).catch(() => { }).finally(() => setAccountsLoading(false))
-    }, [showCreate])
+        setGroupsLoading(true)
+        menuService.listGroups({ page: 1, limit: 100 }).then(r => setGroups(r.data.groups || [])).catch(() => { }).finally(() => setGroupsLoading(false))
+    }, [])
 
-    const filtered = assignments.filter(a =>
-        a.target_id.toLowerCase().includes(search.toLowerCase()) ||
-        a.assignment_id.toLowerCase().includes(search.toLowerCase())
-    )
+    // Helper: resolve target_id → display name based on assignment type
+    const getTargetDisplayName = (targetId: string, type: AssignmentType) => {
+        if (type === "account") {
+            const acc = accounts.find(a => a.account_id === targetId)
+            if (!acc) return targetId
+            const emoji = acc.platform === "whatsapp" ? "📱" : acc.platform === "facebook" ? "📘" : acc.platform === "instagram" ? "📸" : acc.platform === "webchat" ? "🌐" : "💬"
+            return `${emoji} ${acc.name || acc.account_id}`
+        }
+        if (type === "group") {
+            const grp = groups.find(g => g.group_id === targetId)
+            return grp ? `👥 ${grp.name}` : targetId
+        }
+        return targetId
+    }
 
-    const resetForm = () => { setShowCreate(false); setEditingAssignment(null); setFormType("account"); setFormTargetId(""); setFormTemplateId(""); setFormMenuKey("root"); setFormPriority(100); setFormActive(true); setFormEffFrom(""); setFormEffUntil(""); setFormCustHeader(""); setFormCustFooter(""); setFormCustButton("") }
+    const filtered = assignments.filter(a => {
+        const q = search.toLowerCase()
+        const accountName = getTargetDisplayName(a.target_id, a.assignment_type).toLowerCase()
+        return a.target_id.toLowerCase().includes(q) ||
+            a.assignment_id.toLowerCase().includes(q) ||
+            accountName.includes(q)
+    })
+
+    const resetForm = () => { setShowCreate(false); setEditingAssignment(null); setFormType("account"); setFormTargetId(""); setFormTemplateId(""); setFormMenuKey("root"); setFormPriority(100); setFormActive(true); setFormEffFrom(""); setFormEffUntil(""); setFormCustHeader(""); setFormCustFooter(""); setFormCustButton(""); setFormError(null) }
 
     const openEdit = (a: Assignment) => {
         setEditingAssignment(a); setFormType(a.assignment_type); setFormTargetId(a.target_id); setFormTemplateId(a.template_id)
@@ -87,8 +123,19 @@ export function AssignmentsTab(_props: AssignmentsTabProps) {
         setShowCreate(true)
     }
 
+    const extractErrorMessage = (err: unknown): string => {
+        if (axios.isAxiosError(err)) {
+            const respData = err.response?.data
+            if (respData?.error) return typeof respData.error === "string" ? respData.error : respData.error.error || JSON.stringify(respData.error)
+            if (respData?.detail) return typeof respData.detail === "string" ? respData.detail : JSON.stringify(respData.detail)
+            if (respData?.message) return respData.message
+            return err.message
+        }
+        return err instanceof Error ? err.message : "حدث خطأ غير متوقع"
+    }
+
     const handleSubmit = async () => {
-        if (!formTargetId.trim() || !formTemplateId) return; setSubmitting(true)
+        if (!formTargetId.trim() || !formTemplateId) return; setSubmitting(true); setFormError(null)
         try {
             if (editingAssignment) {
                 const payload: UpdateAssignmentPayload = {
@@ -112,10 +159,15 @@ export function AssignmentsTab(_props: AssignmentsTabProps) {
                 await menuService.createAssignment(payload)
             }
             resetForm(); fetchAssignments()
-        } catch { } finally { setSubmitting(false) }
+        } catch (err: unknown) { setFormError(extractErrorMessage(err)) } finally { setSubmitting(false) }
     }
 
-    const handleDelete = async (id: string) => { try { await menuService.deleteAssignment(id); fetchAssignments() } catch { } }
+    const handleDelete = async () => {
+        if (!confirmDelete) return; setDeleting(true)
+        try { await menuService.deleteAssignment(confirmDelete.assignment_id); setConfirmDelete(null); fetchAssignments() }
+        catch (err: unknown) { setConfirmDelete(null); setError(extractErrorMessage(err)) }
+        finally { setDeleting(false) }
+    }
     const getTemplateName = (id: string) => templates.find(t => t.template_id === id)?.name || id.substring(0, 12) + "..."
 
     return (
@@ -195,7 +247,7 @@ export function AssignmentsTab(_props: AssignmentsTabProps) {
                                             </span>
                                         </td>
                                         <td style={{ padding: "12px 16px" }}>
-                                            <span style={{ fontWeight: 600, color: "var(--t-text, #1f2937)", fontSize: 13 }}>{a.target_id}</span>
+                                            <span style={{ fontWeight: 600, color: "var(--t-text, #1f2937)", fontSize: 13 }}>{getTargetDisplayName(a.target_id, a.assignment_type)}</span>
                                         </td>
                                         <td style={{ padding: "12px 16px", color: "var(--t-text-secondary, var(--t-text-muted))" }}>
                                             {getTemplateName(a.template_id)}
@@ -236,7 +288,7 @@ export function AssignmentsTab(_props: AssignmentsTabProps) {
                                                     title="تعديل">
                                                     <Edit3 size={14} />
                                                 </button>}
-                                                {canDelete && <button onClick={() => handleDelete(a.assignment_id)} style={{
+                                                {canDelete && <button onClick={() => setConfirmDelete(a)} style={{
                                                     background: "transparent", border: "none", borderRadius: 8,
                                                     padding: 6, cursor: "pointer", color: "var(--t-text-muted, var(--t-text-faint))",
                                                     transition: "all 0.15s", display: "flex", alignItems: "center",
@@ -295,6 +347,7 @@ export function AssignmentsTab(_props: AssignmentsTabProps) {
 
                         {/* Body */}
                         <div style={{ padding: 22, display: "flex", flexDirection: "column", gap: 14, overflowY: "auto", flex: 1 }}>
+                            {formError && <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 14px", borderRadius: 10, background: "rgba(239,68,68,0.07)", color: "var(--t-danger, #dc2626)", fontSize: 12, fontWeight: 500, border: "1px solid rgba(239,68,68,0.15)" }}><AlertCircle size={15} style={{ flexShrink: 0 }} /> {formError}</div>}
                             {!editingAssignment && (
                                 <>
                                     <div>
@@ -330,14 +383,33 @@ export function AssignmentsTab(_props: AssignmentsTabProps) {
                                                 disabled={accountsLoading}
                                             >
                                                 <option value="">{accountsLoading ? "جاري تحميل الحسابات..." : "— اختر حساب —"}</option>
-                                                {accounts.map(a => (
-                                                    <option key={a.account_id} value={a.account_id}>
-                                                        {a.account_id} ({a.platform} · {a.customer_count} عميل)
+                                                {accounts.map(a => {
+                                                    const emoji = a.platform === "whatsapp" ? "📱" : a.platform === "facebook" ? "📘" : a.platform === "instagram" ? "📸" : a.platform === "webchat" ? "🌐" : "💬"
+                                                    const displayName = a.name || a.account_id
+                                                    return (
+                                                        <option key={a.account_id} value={a.account_id}>
+                                                            {emoji} {displayName} ({a.customer_count} عميل)
+                                                        </option>
+                                                    )
+                                                })}
+                                            </select>
+                                        ) : formType === "group" ? (
+                                            <select
+                                                value={formTargetId}
+                                                onChange={e => setFormTargetId(e.target.value)}
+                                                style={inputSt}
+                                                disabled={groupsLoading}
+                                            >
+                                                <option value="">{groupsLoading ? "جاري تحميل المجموعات..." : "— اختر مجموعة —"}</option>
+                                                {groups.map(g => (
+                                                    <option key={g.group_id} value={g.group_id}>
+                                                        👥 {g.name} ({g.accounts_count ?? g.account_ids?.length ?? 0} حساب)
                                                     </option>
                                                 ))}
                                             </select>
                                         ) : (
-                                            <input value={formTargetId} onChange={e => setFormTargetId(e.target.value)} placeholder={formType === "tenant" ? "مثال: prideidea" : "معرف المجموعة"} style={inputSt} />
+                                            <input value={formTargetId} readOnly disabled
+                                                style={{ ...inputSt, background: "var(--t-surface-accent, rgba(27,80,145,0.04))", color: "var(--t-text-secondary)", cursor: "not-allowed", fontWeight: 600, fontFamily: "'Fira Code', monospace", letterSpacing: 0.5 }} />
                                         )}
                                     </div>
                                 </>
@@ -347,14 +419,7 @@ export function AssignmentsTab(_props: AssignmentsTabProps) {
                                     <option value="">— اختر قالب —</option>
                                     {templates.map(t => <option key={t.template_id} value={t.template_id}>{t.name}</option>)}
                                 </select></div>
-                            <div style={{ display: "flex", gap: 10 }}>
-                                <div style={{ flex: 1 }}><label style={labelSt}>مفتاح القائمة</label><input value={formMenuKey} onChange={e => setFormMenuKey(e.target.value)} placeholder="root" style={inputSt} /></div>
-                                <div style={{ flex: 1 }}><label style={labelSt}>الأولوية</label><input type="number" value={formPriority} onChange={e => setFormPriority(Number(e.target.value))} min={0} max={1000} style={inputSt} /></div>
-                            </div>
-                            <div style={{ display: "flex", gap: 10 }}>
-                                <div style={{ flex: 1 }}><label style={{ ...labelSt, display: "flex", alignItems: "center", gap: 4 }}><Calendar size={11} /> فعال من</label><input type="datetime-local" value={formEffFrom} onChange={e => setFormEffFrom(e.target.value)} style={inputSt} /></div>
-                                <div style={{ flex: 1 }}><label style={{ ...labelSt, display: "flex", alignItems: "center", gap: 4 }}><Calendar size={11} /> فعال حتى</label><input type="datetime-local" value={formEffUntil} onChange={e => setFormEffUntil(e.target.value)} style={inputSt} /></div>
-                            </div>
+                            {/* مفتاح القائمة والأولوية وتواريخ الفعالية مخفية — يتم إرسال القيم الافتراضية تلقائياً */}
                             <div style={{ padding: 14, borderRadius: 12, background: "var(--t-surface, var(--t-page))", border: "1px solid var(--t-border-light, #f0f0f0)", display: "flex", flexDirection: "column", gap: 10 }}>
                                 <p style={{ fontSize: 12, fontWeight: 700, color: "var(--t-accent)", margin: 0, display: "flex", alignItems: "center", gap: 6 }}>📋 تخصيصات العرض (اختياري)</p>
                                 <div><label style={{ ...labelSt, fontSize: 11 }}>عنوان مخصص (Header)</label><input value={formCustHeader} onChange={e => setFormCustHeader(e.target.value)} placeholder="ترحيب مخصص" style={inputSt} /></div>
@@ -389,6 +454,55 @@ export function AssignmentsTab(_props: AssignmentsTabProps) {
                             }}>
                                 {submitting && <Loader2 size={13} className="animate-spin" />}
                                 {editingAssignment ? <><Save size={13} /> حفظ</> : <><Plus size={13} /> إنشاء</>}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* ── Delete Confirmation Modal ── */}
+            {confirmDelete && (
+                <div style={{ position: "fixed", inset: 0, zIndex: 110, background: "rgba(0,0,0,0.5)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }} onClick={() => !deleting && setConfirmDelete(null)}>
+                    <div onClick={e => e.stopPropagation()} style={{
+                        width: "100%", maxWidth: 400, borderRadius: 20,
+                        background: "var(--t-card, #fff)", boxShadow: "0 25px 65px rgba(0,0,0,0.2)",
+                        overflow: "hidden", animation: "modalSlideIn .2s cubic-bezier(0.16,1,0.3,1)",
+                    }}>
+                        {/* Red header */}
+                        <div style={{ background: "linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)", padding: "18px 22px", position: "relative", overflow: "hidden" }}>
+                            <div style={{ position: "absolute", top: -20, left: -20, width: 80, height: 80, borderRadius: "50%", background: "rgba(255,255,255,0.06)" }} />
+                            <div style={{ position: "relative", zIndex: 1, display: "flex", alignItems: "center", gap: 10 }}>
+                                <div style={{ width: 32, height: 32, borderRadius: 9, background: "rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                    <Trash2 size={15} style={{ color: "#fff" }} />
+                                </div>
+                                <span style={{ fontSize: 15, fontWeight: 700, color: "#fff" }}>تأكيد الحذف</span>
+                            </div>
+                        </div>
+                        {/* Body */}
+                        <div style={{ padding: "22px 22px 14px", textAlign: "center" }}>
+                            <AlertCircle size={36} style={{ color: "#f59e0b", margin: "0 auto 12px" }} />
+                            <p style={{ fontSize: 14, fontWeight: 600, color: "var(--t-text, #1f2937)", margin: "0 0 6px" }}>هل أنت متأكد من حذف هذا التعيين؟</p>
+                            <p style={{ fontSize: 12, color: "var(--t-text-muted)", margin: 0, lineHeight: 1.6 }}>
+                                الهدف: <strong>{getTargetDisplayName(confirmDelete.target_id, confirmDelete.assignment_type)}</strong>
+                                <br />القالب: <strong>{getTemplateName(confirmDelete.template_id)}</strong>
+                            </p>
+                            <p style={{ fontSize: 11, color: "var(--t-danger, #dc2626)", margin: "12px 0 0", fontWeight: 500 }}>لا يمكن التراجع عن هذا الإجراء</p>
+                        </div>
+                        {/* Actions */}
+                        <div style={{ padding: "14px 22px 18px", display: "flex", justifyContent: "center", gap: 10 }}>
+                            <button onClick={() => setConfirmDelete(null)} disabled={deleting} style={{
+                                padding: "9px 24px", borderRadius: 10, border: "1px solid var(--t-border-light)",
+                                background: "transparent", color: "var(--t-text-secondary)", fontSize: 13, fontWeight: 500, cursor: "pointer",
+                            }}>إلغاء</button>
+                            <button onClick={handleDelete} disabled={deleting} style={{
+                                padding: "9px 24px", borderRadius: 10, border: "none",
+                                background: "linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)",
+                                color: "#fff", fontSize: 13, fontWeight: 600, cursor: "pointer",
+                                display: "flex", alignItems: "center", gap: 6,
+                                opacity: deleting ? 0.6 : 1, boxShadow: "0 3px 12px rgba(220,38,38,0.3)",
+                            }}>
+                                {deleting && <Loader2 size={13} className="animate-spin" />}
+                                <Trash2 size={13} /> نعم، احذف
                             </button>
                         </div>
                     </div>

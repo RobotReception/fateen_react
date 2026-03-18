@@ -21,6 +21,7 @@ export async function getSidebarSummary(userId?: string): Promise<SidebarSummary
 // GET /customers/accounts
 export interface AccountInfo {
     account_id: string
+    name?: string
     platform: string
     customer_count: number
     last_activity: string
@@ -115,7 +116,7 @@ export async function uploadMedia(file: File, options?: {
     form.append("source", options?.source ?? "user_upload")
     if (options?.tags) form.append("tags", options.tags)
     const { data } = await apiClient.post("/media/upload", form, {
-        headers: { "Content-Type": "multipart/form-data" },
+        timeout: 120000, // 2 minutes for large video uploads
     })
     return data.data
 }

@@ -50,6 +50,7 @@ export const uploadMedia = (
     if (options?.context) form.append("context", options.context)
     if (options?.tags) form.append("tags", options.tags)
     return apiClient.post<ApiResponse<MediaUploadResponse>>("/media/upload", form, {
-        headers: { ...h(tid), "Content-Type": "multipart/form-data" },
+        headers: h(tid),
+        timeout: 120000, // 2 minutes for large video uploads
     }).then(r => r.data)
 }

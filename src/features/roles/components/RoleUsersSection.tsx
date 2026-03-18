@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { UserPlus, X, Loader2, Users, Search, Mail, Phone, UserX, ChevronDown } from "lucide-react"
 import { useAssignUserRole, useRemoveUserRole } from "../hooks/use-roles"
 import { getAllUsers, type AdminUser } from "../services/admin-service"
+import { getUsersWithRole } from "../services/roles-service"
 import { useAuthStore } from "@/stores/auth-store"
 import { ActionGuard } from "@/components/guards/ActionGuard"
 import { PAGE_BITS, ACTION_BITS } from "@/lib/permissions"
@@ -39,12 +40,24 @@ export function RoleUsersSection({ role }: Props) {
     const dropdownRef = useRef<HTMLDivElement>(null)
 
     const { data, isLoading } = useQuery({
-        queryKey: ["adminUsers", "byRole", role],
-        queryFn: () => getAllUsers({ role, page_size: 200 }, tenantId),
+        queryKey: ["roleUsers", role],
+        queryFn: () => getUsersWithRole(role, tenantId),
         enabled: !!role && !!tenantId && isAuth,
         select: (res) => {
-            const items = res?.data?.items ?? []
-            return Array.isArray(items) ? items : []
+            const users = res?.data?.users ?? []
+            if (!Array.isArray(users)) return []
+            return users.map((u: any): AdminUser => ({
+                user_id: u.user_id ?? "",
+                email: u.email ?? "",
+                tenant_id: u.tenant_id ?? tenantId,
+                role: role,
+                full_name: u.full_name ?? "",
+                phone: u.phone ?? "",
+                profile_picture: u.profile_picture ?? "",
+                created_at: u.created_at ?? "",
+                updated_at: u.updated_at ?? "",
+                is_active: u.is_active ?? true,
+            }))
         },
         staleTime: 60 * 1000,
     })
@@ -89,7 +102,7 @@ export function RoleUsersSection({ role }: Props) {
         assignMut.mutate({ user_id: user.user_id, role }, {
             onSuccess: () => {
                 setSelectedUser(null); setShowAdd(false); setPickerSearch("")
-                qc.invalidateQueries({ queryKey: ["adminUsers", "byRole", role] })
+                qc.invalidateQueries({ queryKey: ["roleUsers", role] })
             },
             onSettled: () => { setSelectedUser(null) },
         })

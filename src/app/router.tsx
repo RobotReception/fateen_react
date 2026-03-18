@@ -26,6 +26,7 @@ import { InboxPage } from "@/features/inbox/pages/InboxPage"
 import { ConversationPage } from "@/features/inbox/pages/ConversationPage"
 import { ContactsPage } from "@/features/contacts/pages/ContactsPage"
 import { MenuManagerPage } from "@/features/menu-manager/pages/MenuManagerPage"
+import { LandingPage } from "@/features/landing/pages/LandingPage"
 
 /** يتحقق من تسجيل الدخول — يحوّل لصفحة Login إذا لم يكن مسجلاً */
 function AuthGuard({ children }: { children: React.ReactNode }) {
@@ -54,13 +55,13 @@ function GuestGuard({ children }: { children: React.ReactNode }) {
     return <>{children}</>
 }
 
-/** الصفحة الرئيسية: إذا مسجّل → Dashboard، وإلا → Login */
+/** الصفحة الرئيسية: إذا مسجّل → Dashboard، وإلا → Landing Page */
 function RootRedirect() {
     const { isAuthenticated, token } = useAuthStore()
     if (isAuthenticated && token) {
         return <Navigate to="/dashboard" replace />
     }
-    return <Navigate to="/login" replace />
+    return <LandingPage />
 }
 
 export function AppRouter() {

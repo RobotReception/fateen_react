@@ -54,6 +54,7 @@ export function AccountGroupsTab(_props: AccountGroupsTabProps) {
     }) => {
         const filtered = accounts.filter(a =>
             a.account_id.toLowerCase().includes(searchVal.toLowerCase()) ||
+            (a.name && a.name.toLowerCase().includes(searchVal.toLowerCase())) ||
             a.platform.toLowerCase().includes(searchVal.toLowerCase())
         )
         const allSelected = filtered.length > 0 && filtered.every(a => selected.includes(a.account_id))
@@ -119,7 +120,7 @@ export function AccountGroupsTab(_props: AccountGroupsTabProps) {
                                 {/* Info */}
                                 <div style={{ flex: 1, minWidth: 0 }}>
                                     <span style={{ fontSize: 12, fontWeight: 600, color: sel ? "var(--t-accent)" : "var(--t-text, #1f2937)", display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                                        {a.account_id}
+                                        {a.name || a.account_id}
                                     </span>
                                     <span style={{ fontSize: 10, color: "var(--t-text-faint)" }}>{a.customer_count} عميل</span>
                                 </div>
@@ -144,12 +145,13 @@ export function AccountGroupsTab(_props: AccountGroupsTabProps) {
 
     useEffect(() => { fetchGroups() }, [fetchGroups])
 
-    // Load accounts from API when inline add panel or modal opens
+    // Load accounts from API when inline add panel, modal, or expanded group opens
     useEffect(() => {
-        if (!showAddAccounts && !showCreate) return
+        if (!showAddAccounts && !showCreate && !expandedGroup) return
+        if (accounts.length > 0) return // already loaded
         setAccountsLoading(true)
         getAccounts().then(r => setAccounts(r.accounts || [])).catch(() => { }).finally(() => setAccountsLoading(false))
-    }, [showAddAccounts, showCreate])
+    }, [showAddAccounts, showCreate, expandedGroup])
 
     const filtered = groups.filter(g => g.name.toLowerCase().includes(search.toLowerCase()) || (g.description || "").toLowerCase().includes(search.toLowerCase()))
 
@@ -367,20 +369,23 @@ export function AccountGroupsTab(_props: AccountGroupsTabProps) {
                                                     {/* Account chips */}
                                                     {g.account_ids && g.account_ids.length > 0 && (
                                                         <div style={{ display: "flex", flexWrap: "wrap", gap: 5, paddingTop: 12, marginBottom: 10 }}>
-                                                            {g.account_ids.map(accId => (
+                                                            {g.account_ids.map(accId => {
+                                                                const accInfo = accounts.find(a => a.account_id === accId)
+                                                                return (
                                                                 <span key={accId} style={{
                                                                     display: "inline-flex", alignItems: "center", gap: 4,
                                                                     padding: "4px 8px 4px 10px", borderRadius: 20,
                                                                     background: "#fff", fontSize: 11, color: "var(--t-text-secondary)",
                                                                     border: "1px solid var(--t-border-light, var(--t-border))",
                                                                 }}>
-                                                                    {accId}
+                                                                    {accInfo?.name || accId}
                                                                     {canManageAccounts && <button onClick={e => { e.stopPropagation(); handleRemoveAccount(g.group_id, accId) }} style={{
                                                                         background: "transparent", border: "none", cursor: "pointer",
                                                                         padding: 1, display: "flex", color: "var(--t-danger)", borderRadius: "50%",
                                                                     }}><X size={10} /></button>}
                                                                 </span>
-                                                            ))}
+                                                                )
+                                                            })}
                                                         </div>
                                                     )}
 
